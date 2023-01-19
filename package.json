@@ -1,8 +1,14 @@
 {
   "dependencies": {
     "array": "^0.4.3",
+<<<<<<< HEAD
     "buffer": "^6.0.3",
+=======
+    "big-integer": "^1.6.51",
+>>>>>>> 12c18d8ac364f012eff5aad0f212187422988cf3
     "hashset": "^0.0.6",
+    "iterator": "^0.0.0",
+    "object-path": "^0.11.8",
     "ts-hashset": "^1.0.0"
   }
 }
