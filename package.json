@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "array": "^0.4.3",
+    "buffer": "^6.0.3",
     "hashset": "^0.0.6",
     "ts-hashset": "^1.0.0"
   }

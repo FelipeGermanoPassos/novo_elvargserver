@@ -11,45 +11,106 @@ import * as CombatType from '../../../content/combat/CombatType';
 import * as FightType from '../../../content/combat/FightStyle';
 import * as WeaponInterfaces from '../../../content/combat/WeaponInterfaces';
 import * as bountyhunter from '../../../content/combat/bountyhunter';
+import * as PendingHit from '../../../content/combat/hit/PendingHit';
+import * as Autocasting from '../../../content/combat/magic/Autocasting';
+import * as Barrows from '../../../content/minigames/impl/Barrows';
+import * as Presetable from '../../../content/presets/Presetable';
+import * as Presetables from '../../../content/presets/Presetables';
+import * as SkillManager from '../../../content/skill/SkillManager';
+import * as Skillable from '../../../content/skill/skillable/Skillable';
+import * as Runecrafting from '../../../content/skill/skillable/impl/Runecrafting';
+import * as ActiveSlayerTask from '../../../content/skill/slayer/ActiveSlayerTask';
+import * as ItemDefinition from '../../../definition/ItemDefinition';
+import * as PlayerBotDefinition from '../../../definition/PlayerBotDefinition';
+import * as Mobile from '../../../entity/impl/Mobile';
+import * as NPC from '../../../entity/impl/npc/NPC';
+import * as NpcAggression from '../../../entity/impl/npc/NpcAggression';
+import * as PlayerBot from '../../../entity/impl/playerbot/PlayerBot';
+import * as Animation from '../../../model/Animation';
+import * as Appearance from '../../../model/Appearance';
+import * as ChatMessage from '../../../model/ChatMessage';
+import * as EffectTimer from '../../../model/EffectTimer';
+import * as EnteredAmountAction from '../../../model/EnteredAmountAction';
+import * as EnteredSyntaxAction from '../../../model/EnteredSyntaxAction';
+import * as Flag from '../../../model/Flag';
+import * as ForceMovement from '../../../model/ForceMovement';
+import * as God from '../../../model/God';
+import * as Item from '../../../model/Item';
+import * as Location from '../../../model/Location';
+import * as MagicSpellbook from '../../../model/MagicSpell';
+import * as PlayerInteractingOption from '../../../model/PlayerInteracting';
+import * as PlayerRelations from '../../../model/PlayerRelations';
+import * as PlayerStatus from '../../../model/PlayerStatus';
+import * as SecondsTimer from '../../../model/SecondsTimer';
+import * as Skill from '../../../model/Skill';
+import * as SkullType from '../../../model/SkillType';
+import * as AreaManager from '../../../model/areas/AreaManager';
+import * as Bank from '../../../model/container/impl/Bank';
+import * as Equipment from '../../../model/container/impl/Equipment';
+import * as Inventory from '../../../model/container/impl/Inventory';
+import * as PriceChecker from '../../../model/container/impl/PriceCheck';
+import * as Shop from '../../../model/container/shop/Shop';
+import * as DialogueManager from '../../../model/dialogues/DialogueManager';
+import * as BonusManager from '../../../model/equipment/BonusManager';
+import * as CreationMenu from '../../../model/menu/CreationMenu';
+import * as MovementQueue from '../../../model/movement/MovementQueue';
+import * as DonatorRights from '../../../model/rights/DonatorRights';
+import * as PlayerRights from '../../../model/ rights/PlayerRights';
+import * as TeleportButton from '../../../model/teleportation/TeleportButton';
+import * as TaskManager from '../../../task/TaskManager';
+import * as CombatPoisonEffect from '../../../task/impl/CombatPoisonEffect';
+import * as PlayerDeathTask from '../../../task/impl/PlayerDeathTask';
+import * as RestoreSpecialAttackTask from '../../../task/impl/RestoreSpecialAttackTask';
+import * as PlayerSession from '../../../../net/PlayerSession';
+import * as ChannelEventHandler from '../../../../net/channel/ChannelEventHandler';
+import * as PacketSender from '../../../../net/packet/PacketSender';
+import * as FrameUpdater from '../../../../util/FrameUpdater';
+import * as Misc from '../../../../util/Misc';
+import * as NpcIdentifiers from '../../../../util/NpcIdentifiers';
+import * as Stopwatch from '../../../../util/Stopwatch';
+import * as TimerKey from '../../../../util/timers/TimerKey';
+import * as QuickPrayers from '../../../content/QuickPrayers';
+
+
 
 
 export class Player extends Mobile {
-    public SecondsTimer increaseStats = new SecondsTimer();
-    public SecondsTimer decreaseStats = new SecondsTimer();
+    public increaseStats: SecondsTimer = new SecondsTimer();
+    public decreaseStats:  = new SecondsTimer();
     private List<Player> localPlayers = new LinkedList<Player>();
     private List<NPC> localNpcs = new LinkedList<NPC>();
-    private PacketSender packetSender = new PacketSender(this);
-    private Appearance appearance = new Appearance(this);
-    private SkillManager skillManager = new SkillManager(this);
-    private PlayerRelations relations = new PlayerRelations(this);
-    private FrameUpdater frameUpdater = new FrameUpdater();
-    private BonusManager bonusManager = new BonusManager();
-    private QuickPrayers quickPrayers = new QuickPrayers(this);
-    private Inventory inventory = new Inventory(this);
-    private Equipment equipment = new Equipment(this);
-    private PriceChecker priceChecker = new PriceChecker(this);
-    private Stopwatch clickDelay = new Stopwatch();
-    private Stopwatch lastItemPickup = new Stopwatch();
-    private SecondsTimer yellDelay = new SecondsTimer();
-    private SecondsTimer aggressionTolerance = new SecondsTimer();
+    private packetSender: PacketSender = new PacketSender(this);
+    private appearance: Appearance = new Appearance(this);
+    private skillManager: SkillManager = new SkillManager(this);
+    private relations: PlayerRelations = new PlayerRelations(this);
+    private frameUpdater: FrameUpdater = new FrameUpdater();
+    private bonusManager: BonusManager = new BonusManager();
+    private quickPrayers: QuickPrayers = new QuickPrayers(this);
+    private inventory: Inventory = new Inventory(this);
+    private equipment: Equipment = new Equipment(this);
+    private priceChecker: PriceChecker = new PriceChecker(this);
+    private clickDelay: Stopwatch = new Stopwatch();
+    private lastItemPickup: Stopwatch = new Stopwatch();
+    private yellDelay: SecondsTimer = new SecondsTimer();
+    private aggressionTolerance: SecondsTimer = new SecondsTimer();
     // Delay for restoring special attack
-    private SecondsTimer specialAttackRestore = new SecondsTimer();
+    private specialAttackRestore: SecondsTimer = new SecondsTimer();
     /*
      * Fields
      */
-    private SecondsTimer targetSearchTimer = new SecondsTimer();
-    private List<String> recentKills = new ArrayList<String>(); // Contains ip addresses of recent kills
+    private targetSearchTimer: SecondsTimer = new SecondsTimer();
+    private recentKills: List<string> = new ArrayList<String>(); // Contains ip addresses of recent kills
     private Queue<ChatMessage> chatMessageQueue = new ConcurrentLinkedQueue<>();
-    private ChatMessage currentChatMessage;
+    private currentChatMessage: ChatMessage;
     // Logout
-    private SecondsTimer forcedLogoutTimer = new SecondsTimer();
+    private forcedLogoutTimer: SecondsTimer = new SecondsTimer();
     // Trading
-    private Trading trading = new Trading(this);
-    private Dueling dueling = new Dueling(this);
-    private DialogueManager dialogueManager = new DialogueManager(this);
+    private trading: Trading = new Trading(this);
+    private dueling: Dueling = new Dueling(this);
+    private dialogueManager: DialogueManager = new DialogueManager(this);
     // Presets
-    private Presetable currentPreset;
-    private Presetable[] presets = new Presetable[Presetables.MAX_PRESETS];
+    private currentPreset: Presetable;
+    private presets: Presetable[] = new Presetable[Presetables.MAX_PRESETS];
     private openPresetsOnDeath: boolean = true;
 
     private username: string;
@@ -58,25 +119,25 @@ export class Player extends Mobile {
     private isDiscordLogin: boolean;
     private cachedDiscordAccessToken: string;
     private longUsername: number;
-    private PlayerSession session;
-    private PlayerInteractingOption playerInteractingOption = PlayerInteractingOption.NONE;
-    private PlayerStatus status = PlayerStatus.NONE;
-    private ClanChat currentClanChat;
+    private session: PlayerSession;
+    private playerInteractingOption: PlayerInteractingOption = PlayerInteractingOption.NONE;
+    private status: PlayerStatus = PlayerStatus.NONE;
+    private currentClanChat: ClanChat;
     private clanChatName: string;
-    private Shop shop;
+    private shop: Shop;
     private interfaceId: number = -1, walkableInterfaceId = -1, multiIcon;
     private isRunning: boolean = true;
     private runEnergy: number = 100;
-    private Stopwatch lastRunRecovery = new Stopwatch();
+    private lastRunRecovery: Stopwatch = new Stopwatch();
     private isDying: boolean;
     private allowRegionChangePacket: boolean;
     private experienceLocked: boolean;
-    private ForceMovement forceMovement;
-    private NPC currentPet;
+    private forceMovement: ForceMovement;
+    private currentPet: NPC;
     private skillAnimation: number;
     private drainingPrayer: boolean;
     private prayerPointDrain: number;
-    private MagicSpellbook spellbook = MagicSpellbook.NORMAL;
+    private spellbook: MagicSpellbook = MagicSpellbook.NORMAL;
     private Map<TeleportButton, Location> previousTeleports = new HashMap<>();
     private teleportInterfaceOpen: boolean;
     private destroyItem: number = -1;
@@ -89,27 +150,27 @@ export class Player extends Mobile {
     private Map<Integer, Integer> questProgress = new HashMap<Integer, Integer>();
     // Skilling
     private Optional<Skillable> skill = Optional.empty();
-    private CreationMenu creationMenu;
+    private creationMenu: CreationMenu;
     // Entering data
-    private EnteredAmountAction enteredAmountAction;
-    private EnteredSyntaxAction enteredSyntaxAction;
+    private enteredAmountAction: EnteredAmountAction;
+    private enteredSyntaxAction: EnteredSyntaxAction;
 
     // Time the account was created
-    private Timestamp creationDate;
+    private creationDate: Timestamp;
     // RC
     private PouchContainer[] pouches = new PouchContainer[][new PouchContainer(Pouch.SMALL_POUCH),
         new PouchContainer(Pouch.MEDIUM_POUCH), new PouchContainer(Pouch.LARGE_POUCH),
         new PouchContainer(Pouch.GIANT_POUCH), ];
     // Slayer
-    private ActiveSlayerTask slayerTask;
+    private slayerTask: ActiveSlayerTask;
     private slayerPoints: number;
     private consecutiveTasks: number;
 
     // Combat
-    private SkullType skullType = SkullType.WHITE_SKULL;
-    private CombatSpecial combatSpecial;
+    private skullType: SkullType = SkullType.WHITE_SKULL;
+    private combatSpecial: CombatSpecial;
     private recoilDamage: number;
-    private SecondsTimer vengeanceTimer = new SecondsTimer();
+    private vengeanceTimer: SecondsTimer = new SecondsTimer();
     private wildernessLevel: number;
     private skullTimer: number;
     private points: number;
@@ -128,42 +189,42 @@ export class Player extends Mobile {
     private barrowsCrypt: number;
     private barrowsChestsLooted: number;
     private killedBrothers: boolean[] = new boolean[Brother.values().length];
-    private NPC currentBrother;
+    private currentBrother: NPC;
     private preserveUnlocked: boolean;
     private rigourUnlocked: boolean;
     private auguryUnlocked: boolean;
     private targetTeleportUnlocked: boolean;
     // Banking
     private currentBankTab: number;
-    private Bank[] banks = new Bank[Bank.TOTAL_BANK_TABS]; // last index is for bank searches
+    private banks: Bank[] = new Bank[Bank.TOTAL_BANK_TABS]; // last index is for bank searches
     private noteWithdrawal: boolean, insertMode: boolean, searchingBank: boolean;
     private searchSyntax: string = "";
     private placeholders: boolean = true;
     private infiniteHealth: boolean;
-    private FightType fightType = FightType.UNARMED_KICK;
-    private WeaponInterface weapon;
+    private fightType: FightType = FightType.UNARMED_KICK;
+    private weapon: WeaponInterfaces.WeaponInterface;
     private autoRetaliate: boolean = true;
 
     // GWD
-    private godwarsKillcount: number[] = new int[God.values().length];
+    private godwarsKillcount: number[] = new [God.values().length]: number;
 
     // Rights
-    private PlayerRights rights = PlayerRights.NONE;
-    private DonatorRights donatorRights = DonatorRights.NONE;
+    private  rights: PlayerRights = PlayerRights.NONE;
+    private  donatorRights: DonatorRights = DonatorRights.NONE;
     /**
      * The cached player update block for updating.
      */
-    private ByteBuf cachedUpdateBlock;
+    private  cachedUpdateBlock: ByteBuf;
     private loyaltyTitle: string = "empty";
     private spawnedBarrows: boolean;
-    private Location oldPosition;
+    private  oldPosition: Location;
 
     /**
      * Creates this player.
      *
      * @param playerIO
      */
-    public Player(playerIO: PlayerIO) {
+    public Player(playerIO: PlayerSession) {
         super(GameConstants.DEFAULT_LOCATION.clone());
         this.session = playerIO;
     }
