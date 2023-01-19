@@ -1,98 +1,26 @@
-import Array from 'array';
-import hashset from 'hashset'
-import * as DynamoDBPlayerPersistence from './entity/impl/player/persistence/dynamodb/DynamoDBPlayerPersistence';
-import * as PlayerPersistence from './entity/impl/player/persistence/PlayerPersistence';
-import * as PlayerBotDefinition from './definition/PlayerBotDefinition';
-import * as JSONFilePlayerPersistence from './entity/impl/player/persistence/jsonfile/JSONFilePlayerPersistence';
-import * from './entity/impl/playerbot/fightstyle/impl'
-import * as Location from './model/Location';
-import * as PlayerRights from './model/rights/PlayerRights'
+import { PlayerBotDefinition, PlayerPersistence, PlayerRights, Location } from './game.definition';
+import { DynamoDBPlayerPersistence, JSONFilePlayerPersistence } from './entity/player/persistence';
+import { FightStyleImpl } from './entity/playerbot/fightstyle/fightstyle.impl';
+import { Set } from 'typescript';
 
-export abstract class GameConstants {
-    /**
-    * The name of the game.
-    */
-    public static Name: string = "RspsApp";
-
-    /**
-    * The secure game UID /Unique Identifier/
-    */
-    public static client_Uid: number = 8784521;
-
-    /**
-     * The directory of the definition files.
-     */
-    public static DEFINITIONS_DIRECTORY: string = "./data/definitions/";
-
-    /**
-    * The directory of the clipping files.
-    */
-    public static CLIP_DIRECTORY: string = "./data/clipping/";
-
-    /**
-     * The method used to save/load players.
-     *
-     * Currently supports DynamoDBPlayerPersistence or JSONFilePlayerPersistence
-     */
-    public static  PLAYER_PERSISTENCE: PlayerPersistence = new JSONFilePlayerPersistence(); // new DynamoDBPlayerPersistence();
-
-    /**
-     * The flag that determines if processing should be parallelized, improving the
-     * performance of the server times {@code n} (where
-     * {@code n = Runtime.getRuntime().availableProcessors()}) at the cost of
-     * substantially more CPU usage.
-     */
-    public static CONCURRENCY: boolean = (Runtime.getRuntime().availableProcessors() > 1);
-
-    /**
-     * The game engine cycle rate in milliseconds.
-     */
-    public static GAME_ENGINE_PROCESSING_CYCLE_RATE: number = 600;
-
-    /**
-     * The maximum amount of iterations for a queue/list that should occur each
-     * cycle.
-     */
-    public static QUEUED_LOOP_THRESHOLD: number = 45;
-
-    /**
-     * The default position, where players will spawn upon logging in for the first
-     * time.
-     */
-    public static DEFAULT_LOCATION: Location = new Location(3089, 3524);
-
-    /**
-     * Should the inventory be refreshed immediately on switching items or should it
-     * be delayed until next game cycle?
-     */
-    public static QUEUE_SWITCHING_REFRESH: boolean = true;
-
-    /**
-     * The maximum amount of drops that can be rolled from the dynamic drop table.
-     */
-    public static DROP_THRESHOLD: number = 2;
-
-    /**
-     * Multiplies the experience gained.
-     */
-    public static COMBAT_SKILLS_EXP_MULTIPLIER: number = 6;
-    public static REGULAR_SKILLS_EXP_MULTIPLIER: number = 18;
-
-    /**
-     * Enabled debugging of attack distance for {@link PlayerRights} DEVELOPER
-     */
-    public static DEBUG_ATTACK_DISTANCE: boolean = false;
-
-    /**
-     * The gameframe's tab interface ids.
-     */
-    public static TAB_INTERFACES: number[] = [2423, 3917, 31000, 3213, 1644, 5608, -1, 37128, 5065, 5715, 2449,
+class GameConstants {
+    public static NAME = "RspsApp";
+    public static CLIENT_UID = 8784521;
+    public static DEFINITIONS_DIRECTORY = "./data/definitions/";
+    public static CLIPPING_DIRECTORY = "./data/clipping/";
+    public static PLAYER_PERSISTENCE: PlayerPersistence = new JSONFilePlayerPersistence();
+    public static CONCURRENCY = (Runtime.getRuntime().availableProcessors() > 1);
+    public static GAME_ENGINE_PROCESSING_CYCLE_RATE = 600;
+    public static QUEUED_LOOP_THRESHOLD = 45;
+    public static DEFAULT_LOCATION = new Location(3089, 3524);
+    public static QUEUE_SWITCHING_REFRESH = true;
+    public static DROP_THRESHOLD = 2;
+    public static COMBAT_SKILLS_EXP_MULTIPLIER = 6;
+    public static REGULAR_SKILLS_EXP_MULTIPLIER = 18;
+    public static DEBUG_ATTACK_DISTANCE = false;
+    public static TAB_INTERFACES = [2423, 3917, 31000, 3213, 1644, 5608, -1, 37128, 5065, 5715, 2449,
         42500, 147, 32000];
-
-    /**
-     * Spawnable Items
-     */
-    public static Set<Integer> ALLOWED_SPAWNS = new hashset(Array(
+    public static ALLOWED_SPAWNS = new Set<number>(Arrays.asList(
         13441, 3144, 391, 397, 385, 7946, 2436, 145, 147, 149, 2440, 157, 159, 161,
         2442, 163, 165, 167, 9739, 2444, 169, 171, 173, // potions and food
         3040, 3042, 3044, 3046, 2452, 2454, 2456, 2458, 2448, 181, 183, 185, 6685, 6687, 6689, 6691, 2450, 189, 191, 193, 3024, 3026, 3028, 3030, 2434, // potions and food
@@ -129,22 +57,23 @@ export abstract class GameConstants {
         544, 542, 1035, 1033, 579, 577, 1011, 554, 555, 556, 557, 558, 559, 561, 563, 562, 560, 565, 566, 9075,
         1704, 1731, 1725, 1727, 1729));
 
-    public static PLAYER_BOTS: PlayerBotDefinition = new PlayerBotDefinition[][
-    new PlayerBotDefinition("Bot Hello123", new Location(3085, 3528), new ObbyMaulerFighterPreset()),
-        new PlayerBotDefinition("Bot Hello123", new Location(3085, 3528), new ObbyMaulerFighterPreset()),
-        new PlayerBotDefinition("Elvemage", new Location(3093, 3529), new NHPureFighterPreset()),
-        new PlayerBotDefinition("Bot 1337Pk", new Location(3087, 3530), new DDSPureRFighterPreset()),
-        new PlayerBotDefinition("Bot Kids Ranqe", new Location(3089, 3530), new GRangerFighterPreset()),
-        new PlayerBotDefinition("Bot Josh", new Location(3091, 3533), new DDSPureMFighterPreset()),
-        new PlayerBotDefinition("Bot Odablock", new Location(3091, 3536), new TribridMaxFighterPreset()),
-        new PlayerBotDefinition("Bot SKillSpecs", new Location(3095, 3535), new MidTribridMaxFighterPreset()),
-        new PlayerBotDefinition("Bot F2P Pure", new Location(3096, 3530), new F2PMeleeFighterPreset()),
+    public static PLAYER_BOTS: { name: string; location: { x: number; y: number }; preset: any }[] = [
+        { name: "Bot Hello123", location: { x: 3085, y: 3528 }, preset: new ObbyMaulerFighterPreset() },
+        { name: "Elvemage", location: { x: 3093, y: 3529 }, preset: new NHPureFighterPreset() },
+        { name: "Bot 1337Pk", location: { x: 3087, y: 3530 }, preset: new DDSPureRFighterPreset() },
+        { name: "Bot Kids Ranqe", location: { x: 3089, y: 3530 }, preset: new GRangerFighterPreset() },
+        { name: "Bot Josh", location: { x: 3091, y: 3533 }, preset: new DDSPureMFighterPreset() },
+        { name: "Bot Odablock", location: { x: 3091, y: 3536 }, preset: new TribridMaxFighterPreset() },
+        { name: "Bot SKillSpecs", location: { x: 3095, y: 3535 }, preset: new MidTribridMaxFighterPreset() },
+        { name: "Bot F2P Pure", location: { x: 3096, y: 3530 }, preset: new F2PMeleeFighterPreset() },
     ];
 
-    // The password for every player bot account
-    public static PLAYER_BOT_PASSWORD: string = "wirfunerpro4n!1";
+    public static PLAYER_BOT_PASSWORD = "wirfunerpro4n!1";
 
-    // The list of roles who can "steal" a bot from any player
-	public static List<PlayerRights> PLAYER_BOT_OVERRIDE = Array(PlayerRights.MODERATOR, PlayerRights.ADMINISTRATOR, PlayerRights.DEVELOPER, PlayerRights.OWNER);
-
+    public static PLAYER_BOT_OVERRIDE = [
+        PlayerRights.MODERATOR,
+        PlayerRights.ADMINISTRATOR,
+        PlayerRights.DEVELOPER,
+        PlayerRights.OWNER,
+    ];
 }

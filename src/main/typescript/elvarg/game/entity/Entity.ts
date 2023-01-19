@@ -5,51 +5,46 @@ import * as Location from '../../game/model/Location';
 import * as Area from '../../game/model/areas/Area';
 import * as PrivateArea from '../../game/model/areas/impl/PrivateArea';
 
-
-abstract class Entity {
+abstract class Entities {
     /**
- * Represents the {@link Location} of this {@link Entity}.
- */
-    private Location: location = GameConstants.DEFAULT_LOCATION.clone();
-
-    /**
- * Represents the {@link Area} this {@link Entity} is currently in.
- */
+     * Represents the {@link Location} of this {@link Entities}.
+     */
+    private location: Location = GameConstants.DEFAULT_LOCATION.clone();
     private area: Area;
 
     /**
- * The Entity constructor.
- *
- * @param position The position the entity is currently in.
- */
-    public Entity(position: Location) {
-        this.Location = position;
+     * The Entities constructor.
+     *
+     * @param position The position the entity is currently in.
+     */
+    constructor(position: Location) {
+        this.location = position;
     }
 
     /**
- * Performs an {@link Animation}.
- * @param animation
- */
-    public abstract performAnimation(animation: Animation): void;
+     * Performs an {@link Animation}.
+     * @param animation
+     */
+    abstract performAnimation(animation: Animation): void;
 
     /**
- * Performs a {@link Graphic}.
- * @param animation
- */
-    public abstract performGraphic(graphic: Graphic): void;
+     * Performs a {@link Graphic}.
+     * @param animation
+     */
+    abstract performGraphic(graphic: Graphic): void;
 
     /**
- * Returns the size of this {@link Entity}.
- */
-    public abstract getSize();
+     * Returns the size of this {@link Entities}.
+     */
+    abstract getSize(): void;
 
     /**
- * Gets the entity position.
- *
- * @return the entity's world position
- */
-    public Location getPosition(): Location {
-        return location
+     * Gets the entity position.
+     *
+     * @return the entity's world position
+     */
+    getPosition(): Location {
+        return this.location;
     }
 
     /**
@@ -57,11 +52,10 @@ abstract class Entity {
      *
      * @param location the world position
      */
-    public Entity setLocation(location: Location) {
-        this.Location = location;
+    setLocation(location: Location): Entities {
+        this.location = location;
         return this;
     }
-
     public setArea(area: Area): void {
         this.area = area;
     }
@@ -70,8 +64,7 @@ abstract class Entity {
         return this.area;
     }
 
-    public getPrivateArea(): PrivateArea {
-        return (this.area instanceof PrivateArea ? ((PrivateArea) this.area) : null);
+    public getPrivateArea(): PrivateArea | null {
+        return (this.area instanceof PrivateArea ? (this.area as PrivateArea) : null);
     }
-
 }
