@@ -1,7 +1,7 @@
 class ExamineNpcPacketListener implements PacketExecutor {
     execute(player: Player, packet: Packet) {
         let npcId = packet.readShort();
-        
+
         if (npcId <= 0) {
             return;
         }

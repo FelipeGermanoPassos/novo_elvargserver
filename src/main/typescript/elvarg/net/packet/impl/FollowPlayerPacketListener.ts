@@ -25,22 +25,22 @@ class FollowPlayerPacketListener implements PacketExecutor {
             player.getMovementQueue().reset();
             return;
         }
-    
+
         player.getMovementQueue().reset();
         player.getMovementQueue().walkToReset();
-    
+
         player.setFollowing(leader);
         player.setMobileInteraction(leader);
-    
+
         TaskManager.submit(new Task(1, player.getIndex(), true) {
-    
+
             protected execute() {
                 if (player.getFollowing() == null) {
                     player.setPositionToFace(null);
                     this.stop();
                     return;
                 }
-    
+
                 if (leader.isTeleporting() || !leader.getLocation().isWithinDistance(player.getLocation(), 15)) {
                     player.setPositionToFace(null);
                     this.stop();
@@ -60,4 +60,4 @@ class FollowPlayerPacketListener implements PacketExecutor {
     }
 }
 
-        
+

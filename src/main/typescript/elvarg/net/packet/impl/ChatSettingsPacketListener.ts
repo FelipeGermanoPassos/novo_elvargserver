@@ -4,7 +4,7 @@ class ChatSettingsPacketListener {
         let privateMode = packet.readByte();
         let tradeMode = packet.readByte();
 
-        if (privateMode > Object.keys(PrivateChatStatus).length/2) {
+        if (privateMode > Object.keys(PrivateChatStatus).length / 2) {
             return;
         }
 

@@ -1,21 +1,21 @@
 import { ByteBuf, Unpooled } from 'io.netty.buffer';
 
 enum ValueType {
-  A,
-  C,
-  S,
-  STANDARD
+    A,
+    C,
+    S,
+    STANDARD
 }
 
-enum AccessType {   
+enum AccessType {
     BIT,
     BYTE,
 }
 
 class PacketBuilder {
     public static BIT_MASK = [0, 0x1, 0x3, 0x7, 0xf, 0x1f, 0x3f, 0x7f, 0xff, 0x1ff, 0x3ff, 0x7ff, 0xfff, 0x1fff, 0x3fff,
-            0x7fff, 0xffff, 0x1ffff, 0x3ffff, 0x7ffff, 0xfffff, 0x1fffff, 0x3fffff, 0x7fffff, 0xffffff, 0x1ffffff, 0x3ffffff, 0x7ffffff,
-            0xfffffff, 0x1fffffff, 0x3fffffff, 0x7fffffff, -1];
+        0x7fff, 0xffff, 0x1ffff, 0x3ffff, 0x7ffff, 0xfffff, 0x1fffff, 0x3fffff, 0x7fffff, 0xffffff, 0x1ffffff, 0x3ffffff, 0x7ffffff,
+        0xfffffff, 0x1fffffff, 0x3fffffff, 0x7fffffff, -1];
     private opcode: number;
     private type: PacketType;
     private bitPosition: number;
@@ -38,35 +38,35 @@ class PacketBuilder {
     //     }
     //     return this;
     // }
-    
-    public writeBuffer(buffer: ByteBuf) : PacketBuilder {
+
+    public writeBuffer(buffer: ByteBuf): PacketBuilder {
         this.buffer.writeBytes(buffer);
         return this;
     }
-    
+
     // public putBytes(from: Uint8Array) : PacketBuilder {
     //     buffer.writeBytes(from);
     //     return this;
     // }
-    
-    public putBytes(from: Uint8Array, size: number) : PacketBuilder {
+
+    public putBytes(from: Uint8Array, size: number): PacketBuilder {
         buffer.writeBytes(from, 0, size);
         return this;
     }
-    
-    public putBytesReverse(data: Uint8Array) : PacketBuilder {
+
+    public putBytesReverse(data: Uint8Array): PacketBuilder {
         for (let i = data.length - 1; i >= 0; i--) {
             this.put(data[i]);
         }
         return this;
     }
-    
+
     // public writeByteArray(bytes: Uint8Array, offset: number, length: number) : PacketBuilder {
     //     buffer.writeBytes(bytes, offset, length);
     //     return this;
     // }
-    
-    public writeByteArray(bytes: Uint8Array) : PacketBuilder {
+
+    public writeByteArray(bytes: Uint8Array): PacketBuilder {
         buffer.writeBytes(bytes);
         return this;
     }
@@ -74,17 +74,17 @@ class PacketBuilder {
 
     public putBits(numBits: number, value: number): PacketBuilder {
         if (!this.buffer.hasArray()) {
-        throw new Error("The ByteBuf implementation must support array() for bit usage.");
+            throw new Error("The ByteBuf implementation must support array() for bit usage.");
         }
         let bytes = Math.ceil(numBits / 8) + 1;
         this.buffer.ensureWritable((this.bitPosition + 7) / 8 + bytes);
-    
+
         let buffer = this.buffer.array();
-    
+
         let bytePos = this.bitPosition >> 3;
         let bitOffset = 8 - (this.bitPosition & 7);
         this.bitPosition += numBits;
-    
+
         for (; numBits > bitOffset; bitOffset = 8) {
             buffer[bytePos] &= ~PacketBuilder.BIT_MASK[bitOffset];
             buffer[bytePos++] |= (value >> (numBits - bitOffset)) & PacketBuilder.BIT_MASK[bitOffset];
@@ -139,7 +139,7 @@ class PacketBuilder {
         this.put(value, ValueType.STANDARD);
         return this;
     }
-    
+
     public putShort(value: number, type: ValueType, order: ByteOrder): PacketBuilder {
         switch (order) {
             case ByteOrder.BIG:
@@ -159,17 +159,17 @@ class PacketBuilder {
         }
         return this;
     }
-    
+
     // public putShort(value: number): PacketBuilder {
     //     this.putShort(value, ValueType.STANDARD, ByteOrder.BIG);
     //     return this;
     // }
-    
+
     // public putShort(value: number, type: ValueType): PacketBuilder {
     //     this.putShort(value, type, ByteOrder.BIG);
     //     return this;
     // }
-    
+
     public putInt(value: number, type: ValueType = ValueType.STANDARD, order: ByteOrder = ByteOrder.BIG): PacketBuilder {
         switch (order) {
             case ByteOrder.BIG:
@@ -253,22 +253,22 @@ class PacketBuilder {
         if (!this.buffer.hasArray()) {
             throw new Error("The ByteBuf implementation must support array() for bit usage.");
         }
-    
+
         let bytes: number = Math.ceil((numBits / 8)) + 1;
         this.buffer.ensureWritable((this.bitPosition + 7) / 8 + bytes);
-    
+
         let buffer: number[] = this.buffer.array();
-    
+
         let bytePos: number = this.bitPosition >> 3;
         let bitOffset: number = 8 - (this.bitPosition & 7);
         this.bitPosition += numBits;
-    
+
         for (; numBits > bitOffset; bitOffset = 8) {
             buffer[bytePos] &= ~BIT_MASK[bitOffset];
             buffer[bytePos++] |= (value >> (numBits - bitOffset)) & BIT_MASK[bitOffset];
             numBits -= bitOffset;
         }
-    
+
         if (numBits === bitOffset) {
             buffer[bytePos] &= ~BIT_MASK[bitOffset];
             buffer[bytePos] |= value & BIT_MASK[bitOffset];
@@ -291,12 +291,12 @@ class PacketBuilder {
         }
         return this;
     }
-    
+
     public putBit(flag: boolean) {
         this.putBits(1, flag ? 1 : 0);
         return this;
     }
-    
+
     public put(value: number, type: ValueType) {
         switch (type) {
             case ValueType.A:
@@ -314,7 +314,7 @@ class PacketBuilder {
         this.buffer.writeByte(value as any);
         return this;
     }
-    
+
     putShort(value: number, type: ValueType = ValueType.STANDARD, order: ByteOrder = ByteOrder.BIG): this {
         switch (order) {
             case ByteOrder.BIG:
@@ -334,7 +334,7 @@ class PacketBuilder {
         }
         return this;
     }
-    
+
     putShort(value: number): this {
         return this.putShort(value, ValueType.STANDARD, ByteOrder.BIG);
     }
@@ -421,90 +421,90 @@ class PacketBuilder {
                 this.put((value >> 48) as number);
                 this.put((value >> 56) as number);
                 break;
-            }
-            return this;
         }
+        return this;
+    }
 
-        public putLong(value: number, type: ValueType = ValueType.STANDARD, order: ByteOrder = ByteOrder.BIG): PacketBuilder {
-            switch (order) {
-                case ByteOrder.BIG:
-                    put((value >> 56) as number);
-                    put((value >> 48) as number);
-                    put((value >> 40) as number);
-                    put((value >> 32) as number);
-                    put((value >> 24) as number);
-                    put((value >> 16) as number);
-                    put((value >> 8) as number);
-                    put((value) as number, type);
-                    break;
-                case ByteOrder.MIDDLE:
-                    throw new Error("Middle-endian long " + "is not implemented!");
-                case ByteOrder.INVERSE_MIDDLE:
-                    throw new Error("Inverse-middle-endian long is not implemented!");
-                case ByteOrder.TRIPLE_INT:
-                    throw new Error("triple-int long is not implemented!");
-                case ByteOrder.LITTLE:
-                    put((value) as number, type);
-                    put((value >> 8) as number);
-                    put((value >> 16) as number);
-                    put((value >> 24) as number);
-                    put((value >> 32) as number);
-                    put((value >> 40) as number);
-                    put((value >> 48) as number);
-                    put((value >> 56) as number);
-                    break;
-            }
-            return this;
+    public putLong(value: number, type: ValueType = ValueType.STANDARD, order: ByteOrder = ByteOrder.BIG): PacketBuilder {
+        switch (order) {
+            case ByteOrder.BIG:
+                put((value >> 56) as number);
+                put((value >> 48) as number);
+                put((value >> 40) as number);
+                put((value >> 32) as number);
+                put((value >> 24) as number);
+                put((value >> 16) as number);
+                put((value >> 8) as number);
+                put((value) as number, type);
+                break;
+            case ByteOrder.MIDDLE:
+                throw new Error("Middle-endian long " + "is not implemented!");
+            case ByteOrder.INVERSE_MIDDLE:
+                throw new Error("Inverse-middle-endian long is not implemented!");
+            case ByteOrder.TRIPLE_INT:
+                throw new Error("triple-int long is not implemented!");
+            case ByteOrder.LITTLE:
+                put((value) as number, type);
+                put((value >> 8) as number);
+                put((value >> 16) as number);
+                put((value >> 24) as number);
+                put((value >> 32) as number);
+                put((value >> 40) as number);
+                put((value >> 48) as number);
+                put((value >> 56) as number);
+                break;
         }
-    
-        public putString(string: string) {
-            if (string == null) {
-                string = "unkown";
-            }
-            for (let value of string.getBytes()) {
-                put(value);
-            }
-            put(10);
-            return this;
+        return this;
+    }
+
+    public putString(string: string) {
+        if (string == null) {
+            string = "unkown";
         }
-    
-        /**
-         * Gets the packet's opcode.
-         *
-         * @return the packets opcode.
-         */
-        public getOpcode(): number {
-            return this.opcode;
+        for (let value of string.getBytes()) {
+            put(value);
         }
-    
-        /**
-         * Gets the packet's size.
-         *
-         * @return the packets size.
-         */
-        public getSize(): number {
-            return this.buffer.readableBytes();
-        }
-    
-        /**
-         * Gets the backing byte buffer used to read and write data.
-         *
-         * @return the backing byte buffer.
-         */
-        public buffer(): ByteBuf {
-            return this.buffer;
-        }
-    
-        /**
-         * Creates the actual packet from this builder
-         *
-         * @return
-         */
-        public toPacket(): Packet {
-            return new Packet(this.opcode, this.type, this.buffer);
-        }
-    
-        public getType(): PacketType {
-            return this.type;
-        }
+        put(10);
+        return this;
+    }
+
+    /**
+     * Gets the packet's opcode.
+     *
+     * @return the packets opcode.
+     */
+    public getOpcode(): number {
+        return this.opcode;
+    }
+
+    /**
+     * Gets the packet's size.
+     *
+     * @return the packets size.
+     */
+    public getSize(): number {
+        return this.buffer.readableBytes();
+    }
+
+    /**
+     * Gets the backing byte buffer used to read and write data.
+     *
+     * @return the backing byte buffer.
+     */
+    public buffer(): ByteBuf {
+        return this.buffer;
+    }
+
+    /**
+     * Creates the actual packet from this builder
+     *
+     * @return
+     */
+    public toPacket(): Packet {
+        return new Packet(this.opcode, this.type, this.buffer);
+    }
+
+    public getType(): PacketType {
+        return this.type;
+    }
 }

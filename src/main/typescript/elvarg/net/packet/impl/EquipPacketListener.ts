@@ -1,26 +1,26 @@
 class EquipPacketListener implements PacketExecutor {
 
-    public static resetWeapon(player: Player, deactivateSpecialAttack: boolean) {
-        if (deactivateSpecialAttack) {
-            player.setSpecialActivated(false);
-        }
-        player.getPacketSender().sendSpecialAttackState(false);
-        WeaponInterfaces.assign(player);
-    }
+	public static resetWeapon(player: Player, deactivateSpecialAttack: boolean) {
+		if (deactivateSpecialAttack) {
+			player.setSpecialActivated(false);
+		}
+		player.getPacketSender().sendSpecialAttackState(false);
+		WeaponInterfaces.assign(player);
+	}
 
-    execute(player: Player, packet: Packet) {
-        let id = packet.readShort();
-        let slot = packet.readShortA();
-        let interfaceId = packet.readShortA();
-    
-        EquipPacketListener.equip(player, id, slot, interfaceId);
-    }
+	execute(player: Player, packet: Packet) {
+		let id = packet.readShort();
+		let slot = packet.readShortA();
+		let interfaceId = packet.readShortA();
 
-    public static equipFromInventory(player: Player, itemInSlot: ItemInSlot) {
-        EquipPacketListener.equip(player, itemInSlot.getId(), itemInSlot.getSlot(), Inventory.INTERFACE_ID);
-    }
+		EquipPacketListener.equip(player, id, slot, interfaceId);
+	}
 
-    public static void equip(Player player, int id, int slot, int interfaceId) {
+	public static equipFromInventory(player: Player, itemInSlot: ItemInSlot) {
+		EquipPacketListener.equip(player, itemInSlot.getId(), itemInSlot.getSlot(), Inventory.INTERFACE_ID);
+	}
+
+	public static void equip(Player player, int id, int slot, int interfaceId) {
 
 		// Validate player..
 		if (player == null || player.getHitpoints() <= 0) {
@@ -53,19 +53,19 @@ class EquipPacketListener implements PacketExecutor {
 				if (item.getDefinition().getRequirements() != null) {
 					for (Skill skill : Skill.values()) {
 						if (item.getDefinition().getRequirements()[skill.ordinal()] > player.getSkillManager()
-								.getMaxLevel(skill)) {
+							.getMaxLevel(skill)) {
 							StringBuilder vowel = new StringBuilder();
 							if (skill.getName().startsWith("a") || skill.getName().startsWith("e")
-									|| skill.getName().startsWith("i") || skill.getName().startsWith("o")
-									|| skill.getName().startsWith("u")) {
+								|| skill.getName().startsWith("i") || skill.getName().startsWith("o")
+								|| skill.getName().startsWith("u")) {
 								vowel.append("an ");
 							} else {
 								vowel.append("a ");
 							}
 							player.getPacketSender()
-									.sendMessage("You need " + vowel.toString() + Misc.formatText(skill.getName())
-											+ " level of at least "
-											+ item.getDefinition().getRequirements()[skill.ordinal()] + " to wear this.");
+								.sendMessage("You need " + vowel.toString() + Misc.formatText(skill.getName())
+									+ " level of at least "
+									+ item.getDefinition().getRequirements()[skill.ordinal()] + " to wear this.");
 							return;
 						}
 					}
@@ -75,7 +75,7 @@ class EquipPacketListener implements PacketExecutor {
 				int equipmentSlot = item.getDefinition().getEquipmentType().getSlot();
 				if (equipmentSlot == -1) {
 					Server.getLogger()
-							.info("Attempting to equip item " + item.getId() + " which has no defined equipment slot.");
+						.info("Attempting to equip item " + item.getId() + " which has no defined equipment slot.");
 					return;
 				}
 
@@ -90,7 +90,7 @@ class EquipPacketListener implements PacketExecutor {
 						if (player.getDueling().getRules()[i]) {
 							DuelRule duelRule = DuelRule.forId(i);
 							if (equipmentSlot == duelRule.getEquipmentSlot()
-									|| duelRule == DuelRule.NO_SHIELD && item.getDefinition().isDoubleHanded()) {
+								|| duelRule == DuelRule.NO_SHIELD && item.getDefinition().isDoubleHanded()) {
 								///DialogueManager.sendStatement(player, "The rules that were set do not allow this item to be equipped.");
 								return;
 							}
@@ -107,8 +107,8 @@ class EquipPacketListener implements PacketExecutor {
 				Item equipItem = player.getEquipment().forSlot(equipmentSlot).clone();
 				if (equipItem.getDefinition().isStackable() && equipItem.getId() == item.getId()) {
 					int amount = equipItem.getAmount() + item.getAmount() <= Integer.MAX_VALUE
-							? equipItem.getAmount() + item.getAmount()
-							: Integer.MAX_VALUE;
+						? equipItem.getAmount() + item.getAmount()
+						: Integer.MAX_VALUE;
 					player.getInventory().delete(item, false);
 					player.getEquipment().getItems()[equipmentSlot].setAmount(amount);
 					equipItem.setAmount(amount);
@@ -116,7 +116,7 @@ class EquipPacketListener implements PacketExecutor {
 					if (item.getDefinition().isDoubleHanded() && equipmentSlot == Equipment.WEAPON_SLOT) {
 
 						int slotsRequired = player.getEquipment().isSlotOccupied(Equipment.SHIELD_SLOT)
-								&& player.getEquipment().isSlotOccupied(Equipment.WEAPON_SLOT) ? 1 : 0;
+							&& player.getEquipment().isSlotOccupied(Equipment.WEAPON_SLOT) ? 1 : 0;
 						if (player.getInventory().getFreeSlots() < slotsRequired) {
 							player.getInventory().full();
 							return;
@@ -138,14 +138,14 @@ class EquipPacketListener implements PacketExecutor {
 						}
 
 					} else if (equipmentSlot == Equipment.SHIELD_SLOT
-							&& player.getEquipment().getItems()[Equipment.WEAPON_SLOT].getDefinition().isDoubleHanded()) {
+						&& player.getEquipment().getItems()[Equipment.WEAPON_SLOT].getDefinition().isDoubleHanded()) {
 						player.getInventory().setItem(slot, player.getEquipment().getItems()[Equipment.WEAPON_SLOT]);
 						player.getEquipment().setItem(Equipment.WEAPON_SLOT, new Item(-1));
 						player.getEquipment().setItem(Equipment.SHIELD_SLOT, item);
 						resetWeapon(player, true);
 					} else {
 						if (equipmentSlot == equipItem.getDefinition().getEquipmentType().getSlot()
-								&& equipItem.getId() != -1) {
+							&& equipItem.getId() != -1) {
 							if (player.getInventory().contains(equipItem.getId())) {
 								player.getInventory().delete(item, false);
 								player.getInventory().add(equipItem, false);

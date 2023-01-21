@@ -37,7 +37,7 @@ class PacketDecoder extends ByteToMessageDecoder {
         if (session == null || session.getPlayer() == null) {
             return;
         }
-        
+
         let opcode = this.opcode;
         let size = this.size;
 

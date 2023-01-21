@@ -68,9 +68,9 @@ class LoginResponses {
             } else {
                 return LoginResponses.LOGIN_INVALID_CREDENTIALS;
             }
-    
+
             player.setUsername(discordInfo.username);
-    
+
             let playerSave = PLAYER_PERSISTENCE.load(player.getUsername());
             if (!playerSave) {
                 player.setDiscordLogin(true);
@@ -78,13 +78,13 @@ class LoginResponses {
                 player.setPasswordHashWithSalt(discordInfo.password);
                 return LoginResponses.NEW_ACCOUNT;
             }
-    
+
             playerSave.applyToPlayer(player);
             return LoginResponses.LOGIN_SUCCESSFUL;
-    
+
         } catch (ex) {
         }
-    
+
         return LoginResponses.LOGIN_INVALID_CREDENTIALS;
     }
 
@@ -93,24 +93,24 @@ class LoginResponses {
         if (msg.getIsDiscord()) {
             return LoginResponses.getDiscordResult(player, msg);
         }
-    
+
         let playerSave = PLAYER_PERSISTENCE.load(player.getUsername());
         if (!playerSave) {
             player.setPasswordHashWithSalt(PLAYER_PERSISTENCE.encryptPassword(plainPassword));
             return LoginResponses.NEW_ACCOUNT;
         }
-    
+
         if (msg.getIsDiscord() !== playerSave.isDiscordLogin()) {
             // User attempting Discord login on a non-Discord account
             return LoginResponses.LOGIN_BAD_SESSION_ID;
         }
-    
+
         if (!PLAYER_PERSISTENCE.checkPassword(plainPassword, playerSave)) {
             return LoginResponses.LOGIN_INVALID_CREDENTIALS;
         }
-    
+
         playerSave.applyToPlayer(player);
-    
+
         return LoginResponses.LOGIN_SUCCESSFUL;
     }
 }

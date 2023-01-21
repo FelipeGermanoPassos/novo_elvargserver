@@ -1,4 +1,4 @@
-import {ByteBuf} from 'netty';
+import { ByteBuf } from 'netty';
 
 class Packet {
     constructor(opcode: number, type: PacketType, buffer: ByteBuf) {
@@ -6,12 +6,12 @@ class Packet {
         this.type = type;
         this.buffer = buffer;
     }
-    
+
     private opcode: number;
     private type: PacketType;
     private buffer: ByteBuf;
 
-    
+
 
     public getOpcode(): number {
         return this.opcode;
@@ -99,98 +99,98 @@ class Packet {
     }
 
     class Packet {
-        // ... previous code
-        public readLEShort(): number {
-            let value = (this.readByte() & 0xFF) | (this.readByte() & 0xFF) << 8;
-            return value > 32767 ? value - 0x10000 : value;
-        }
-    
-        public readLEShortA(): number {
-            let value = (this.readByte() - 128 & 0xFF) | (this.readByte() & 0xFF) << 8;
-            return value > 32767 ? value - 0x10000 : value;
-        }
-    
-        public readUnsignedShort(): number {
-            return this.buffer.readUnsignedShort();
-        }
-    
-        public readUnsignedShortA(): number {
-            let value = 0;
-            value |= this.readUnsignedByte() << 8;
-            value |= (this.readByte() - 128) & 0xff;
-            return value;
-        }
-    
-        public readInt(): number {
-            return this.buffer.readInt();
-        }
-
-        public readSingleInt(): number {
-            let firstByte = this.readByte(), secondByte = this.readByte(), thirdByte = this.readByte(), fourthByte = this.readByte();
-            return ((thirdByte << 24) & 0xFF) | ((fourthByte << 16) & 0xFF) | ((firstByte << 8) & 0xFF) | (secondByte & 0xFF);
-        }
-    
-        public readDoubleInt(): number {
-            let firstByte = this.readByte() & 0xFF, secondByte = this.readByte() & 0xFF, thirdByte = this.readByte() & 0xFF, fourthByte = this.readByte() & 0xFF;
-            return ((secondByte << 24) & 0xFF) | ((firstByte << 16) & 0xFF) | ((fourthByte << 8) & 0xFF) | (thirdByte & 0xFF);
-        }
-    
-        public readTripleInt(): number {
-            return ((this.readByte() << 16) & 0xFF) | ((this.readByte() << 8) & 0xFF) | (this.readByte() & 0xFF);
-        }
-    
-        public readLong(): number {
-            return this.buffer.readLong();
-        }
-
-        public getBytesReverse(amount: number, type: ValueType): number[] {
-            let data = new Array(amount);
-            let dataPosition = 0;
-            for (let i = this.buffer.writerIndex() + amount - 1; i >= this.buffer.writerIndex(); i--) {
-                let value = this.buffer.getByte(i);
-                switch (type) {
-                    case ValueType.A:
-                        value -= 128;
-                        break;
-                    case ValueType.C:
-                        value = -value;
-                        break;
-                    case ValueType.S:
-                        value = 128 - value;
-                        break;
-                    case ValueType.STANDARD:
-                        break;
-                }
-                data[dataPosition++] = value;
-            }
-            return data;
-        }
-    
-        public readString(): string {
-            let builder = new StringBuilder();
-            let value;
-            while (this.buffer.isReadable() && (value = this.buffer.readByte()) != 10) {
-                builder.append(String.fromCharCode(value));
-            }
-            return builder.toString();
-        }
-    
-        public readSmart(): number {
-            return this.buffer.getByte(this.buffer.readerIndex()) < 128 ? this.readByte() & 0xFF : (this.readShort() & 0xFFFF) - 32768;
-        }
-
-        public readSignedSmart(): number {
-            return this.buffer.getByte(this.buffer.readerIndex()) < 128 ? (this.readByte() & 0xFF) - 64 : (this.readShort() & 0xFFFF) - 49152;
-        }
-    
-        public toString(): string {
-            return `Packet - [opcode, size] : [${this.getOpcode()}, ${this.getSize()}]`;
-        }
-    
-        public getType(): PacketType {
-            return this.type;
-        }
+    // ... previous code
+    public readLEShort(): number {
+        let value = (this.readByte() & 0xFF) | (this.readByte() & 0xFF) << 8;
+        return value > 32767 ? value - 0x10000 : value;
     }
+
+    public readLEShortA(): number {
+        let value = (this.readByte() - 128 & 0xFF) | (this.readByte() & 0xFF) << 8;
+        return value > 32767 ? value - 0x10000 : value;
+    }
+
+    public readUnsignedShort(): number {
+        return this.buffer.readUnsignedShort();
+    }
+
+    public readUnsignedShortA(): number {
+        let value = 0;
+        value |= this.readUnsignedByte() << 8;
+        value |= (this.readByte() - 128) & 0xff;
+        return value;
+    }
+
+    public readInt(): number {
+        return this.buffer.readInt();
+    }
+
+    public readSingleInt(): number {
+        let firstByte = this.readByte(), secondByte = this.readByte(), thirdByte = this.readByte(), fourthByte = this.readByte();
+        return ((thirdByte << 24) & 0xFF) | ((fourthByte << 16) & 0xFF) | ((firstByte << 8) & 0xFF) | (secondByte & 0xFF);
+    }
+
+    public readDoubleInt(): number {
+        let firstByte = this.readByte() & 0xFF, secondByte = this.readByte() & 0xFF, thirdByte = this.readByte() & 0xFF, fourthByte = this.readByte() & 0xFF;
+        return ((secondByte << 24) & 0xFF) | ((firstByte << 16) & 0xFF) | ((fourthByte << 8) & 0xFF) | (thirdByte & 0xFF);
+    }
+
+    public readTripleInt(): number {
+        return ((this.readByte() << 16) & 0xFF) | ((this.readByte() << 8) & 0xFF) | (this.readByte() & 0xFF);
+    }
+
+    public readLong(): number {
+        return this.buffer.readLong();
+    }
+
+    public getBytesReverse(amount: number, type: ValueType): number[] {
+        let data = new Array(amount);
+        let dataPosition = 0;
+        for (let i = this.buffer.writerIndex() + amount - 1; i >= this.buffer.writerIndex(); i--) {
+            let value = this.buffer.getByte(i);
+            switch (type) {
+                case ValueType.A:
+                    value -= 128;
+                    break;
+                case ValueType.C:
+                    value = -value;
+                    break;
+                case ValueType.S:
+                    value = 128 - value;
+                    break;
+                case ValueType.STANDARD:
+                    break;
+            }
+            data[dataPosition++] = value;
+        }
+        return data;
+    }
+
+    public readString(): string {
+        let builder = new StringBuilder();
+        let value;
+        while (this.buffer.isReadable() && (value = this.buffer.readByte()) != 10) {
+            builder.append(String.fromCharCode(value));
+        }
+        return builder.toString();
+    }
+
+    public readSmart(): number {
+        return this.buffer.getByte(this.buffer.readerIndex()) < 128 ? this.readByte() & 0xFF : (this.readShort() & 0xFFFF) - 32768;
+    }
+
+    public readSignedSmart(): number {
+        return this.buffer.getByte(this.buffer.readerIndex()) < 128 ? (this.readByte() & 0xFF) - 64 : (this.readShort() & 0xFFFF) - 49152;
+    }
+
+    public toString(): string {
+        return `Packet - [opcode, size] : [${this.getOpcode()}, ${this.getSize()}]`;
+    }
+
+    public getType(): PacketType {
+        return this.type;
+    }
+}
 
     }
 

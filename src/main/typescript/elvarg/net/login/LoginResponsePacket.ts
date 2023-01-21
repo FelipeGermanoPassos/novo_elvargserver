@@ -4,7 +4,7 @@ class LoginResponsePacket {
 
     constructor(response: number, rights: PlayerRights) {
         this.response = response;
-        if(!rights) {
+        if (!rights) {
             this.rights = PlayerRights.NONE;
         } else {
             this.rights = rights;
