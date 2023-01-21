@@ -8,22 +8,20 @@ import { ClanChatManager } from 'com.elvarg.game.content.clan';
  * @author Professor Oak
  */
 class GameEngine implements Runnable {
-    /**
-     * The {@link ScheduledExecutorService} which will be used for
-     * this engine.
-     */
-    private executorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("GameThread").build());
-
-    /**
-     * Initializes this {@link GameEngine}.
-     */
-    public init() {
-        this.executorService.scheduleAtFixedRate(this, 0, GameConstants.GAME_ENGINE_PROCESSING_CYCLE_RATE, TimeUnit.MILLISECONDS);
+    private executorService = new ScheduledExecutorService();
+    
+    Copy code
+    constructor() {
+        this.executorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("GameThread").build());
     }
-
-    public run() {
+    
+    public init() {
+        this.executorService.scheduleAtFixedRate(this.run.bind(this), 0, GameConstants.GAME_ENGINE_PROCESSING_CYCLE_RATE, TimeUnit.MILLISECONDS);
+    }
+    
+    public async run() {
         try {
-            World.process();
+            await World.process();
         } catch (e) {
             console.log(e);
             World.savePlayers();

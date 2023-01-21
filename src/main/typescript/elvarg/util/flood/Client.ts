@@ -10,7 +10,6 @@ public class Client {
     private serverSeed: number;
     private encryption: IsaacRandom;
     
-    Copy code
     constructor(username: string, password: string) {
         this.username = username;
         this.password = password;
