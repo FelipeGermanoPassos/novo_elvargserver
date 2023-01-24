@@ -3,7 +3,7 @@ import { DynamoDBPlayerPersistence, JSONFilePlayerPersistence } from './entity/p
 import { FightStyleImpl } from './entity/playerbot/fightstyle/fightstyle.impl';
 import { Set } from 'typescript';
 
-class GameConstants {
+export class GameConstants {
     public static NAME = "RspsApp";
     public static CLIENT_UID = 8784521;
     public static DEFINITIONS_DIRECTORY = "./data/definitions/";

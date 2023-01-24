@@ -1,4 +1,13 @@
-import { Region } from './Region';
+import GameConstants from '../GameConstants'
+import ObjectDefinition from '../definition/ObjectDefinition'
+import Mobile from '../entity/impl/Mobile'
+import GameObject from '../entity/impl/object/GameObject'
+import MapObjects from '../entity/impl/object/MapObjects'
+import Direction from '../model/Direction'
+import Location from '../model/Location'
+import PrivateArea from '../model/areas/impl/PrivateArea'
+
+
 
 export static class RegionManager {
     public static PROJECTILE_NORTH_WEST_BLOCKED = 0x200;

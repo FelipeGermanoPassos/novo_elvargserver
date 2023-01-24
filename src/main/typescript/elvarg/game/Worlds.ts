@@ -1,4 +1,4 @@
-class World {
+export class World {
     private static readonly MAX_PLAYERS = 500;
     private static players: MobileList<Player> = new MobileList<Player>(MAX_PLAYERS);
     private static playerBots: Map<string, PlayerBot> = new Map<string, PlayerBot>();
