@@ -1,21 +1,14 @@
 class Systems {
-    static init() {
-        try {
-            let npcOverrideClasses = ClassPath.from(ClassLoader.getSystemClassLoader())
-                .getAllClasses()
-                .filter(clazz => clazz.getPackageName().startsWith("com.elvarg.game.entity.impl.npc.impl"))
-                .map(clazz => clazz.load());
-
-            let npcClasses = npcOverrideClasses
-                .filter(clazz => clazz.getAnnotation(Ids) != null);
-
-            let implementationClasses = npcClasses.filter(clazz => clazz instanceof NPC);
-            NPC.initImplementations(implementationClasses);
-
-            let interactionClasses = npcClasses.filter(clazz => clazz instanceof NPCInteraction);
-            NPCInteractionSystem.init(interactionClasses);
-        } catch (IOException e) {
-            console.log(e);
-        }
+    public static init() {
+        // Firstly, gather all the classes inside the npc.impl package
+        const npcOverrideClasses = (Object.values(require('reflect-metadata')).filter(clazz => 
+        clazz.name.startsWith("com.elvarg.game.entity.impl.npc.impl")));
+    
+        // Filter all classes which have @Ids annotation defined on them
+        const npcClasses = npcOverrideClasses.filter(clazz => Reflect.getMetadata("Ids", clazz) != null);
+    
+        // Filter all classes which extend NPC
+        const implementationClasses = npcClasses.filter(clazz => clazz.prototype instanceof NPC);
+        NPC.initImplementations(implementationClasses);
     }
 }

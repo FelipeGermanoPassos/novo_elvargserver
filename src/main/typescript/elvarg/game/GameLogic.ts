@@ -3,16 +3,17 @@ import { ThreadFactoryBuilder } from 'com.google.common.util.concurrent';
 
 class GameLogic {
     private static logicService = GameLogic.createLogicService();
-
-    public static submit(t: Runnable) {
+    
+    Copy code
+    public static submit(t: () => void) {
         try {
             this.logicService.execute(t);
         } catch (e) {
             console.error(e);
         }
     }
-
-    public static createLogicService(): ScheduledExecutorService {
+    
+    private static createLogicService(): ScheduledExecutorService {
         const executor = new ScheduledThreadPoolExecutor(1);
         executor.setRejectedExecutionHandler(new CallerRunsPolicy());
         executor.setThreadFactory(new ThreadFactoryBuilder().setNameFormat("LogicServiceThread").build());
