@@ -1,3 +1,5 @@
+import Location from '../model/Location';
+
 export class Region {
     private regionId: number;
     private terrainFile: number;

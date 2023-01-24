@@ -1,4 +1,4 @@
-enum Flag {
+export enum Flag {
     CHAT,
     FORCED_CHAT,
     FORCED_MOVEMENT,
