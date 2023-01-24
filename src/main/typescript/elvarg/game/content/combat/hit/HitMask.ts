@@ -1,5 +1,4 @@
-enum HitMask
-{
+export enum HitMask {
     BLUE,
     RED,
     GREEN,

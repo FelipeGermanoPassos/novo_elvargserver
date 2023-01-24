@@ -1,4 +1,7 @@
-class Presetable {
+import {Item} from '../../model/Item';
+import {MagicSpellbook} from '../../model/MagicSpellbook';
+
+export class Presetable {
     /**
  * This set's name.
  */
@@ -90,7 +93,7 @@ class Presetable {
         this.spellbook = spellbook;
     }
 
-    isGlobal(): boolean {
+    getIsGlobal(): boolean {
         return this.isGlobal;
     }
 

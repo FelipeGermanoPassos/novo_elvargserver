@@ -1,3 +1,6 @@
+import { World } from '../../game/Worlds';
+
+
 class Obelisks {
     public static OBELISK_IDS = [14829, 14830, 14827, 14828, 14826, 14831];
     public static obelisks: GameObject[] = new Array(4);
