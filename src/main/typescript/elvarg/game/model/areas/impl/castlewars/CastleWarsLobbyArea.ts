@@ -1,5 +1,6 @@
 import CastleWars from '../../../../content/minigames/impl/CastleWars';
 import Lanthus from '../../../../entity/impl/npc/impl/Lanthus';
+import * as from '../../../../'
 import {Player} from '../../../../entity/impl/player/Player'
 import {PlayerBot} from '../../../../entity/impl/playerbot/PlayerBot'
 import {Arrays} from 'collections'

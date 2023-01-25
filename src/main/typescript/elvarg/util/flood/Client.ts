@@ -1,4 +1,4 @@
-public class Client {
+export public class Client {
     private readonly username: string;
     private readonly password: string;
     public loggedIn: boolean;
@@ -32,7 +32,7 @@ public class Client {
         this.password = password;
     }
     
-    public attemptLogin() {
+    public attemptLogin2() {
         this.login = Buffer.create();
         this.incoming = Buffer.create();
         this.outgoing = ByteBuffer.create(5000, false, null);

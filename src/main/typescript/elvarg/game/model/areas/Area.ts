@@ -1,10 +1,18 @@
+import {Boundary} from '../../../game/model/Boundary';
+import {Player} from '../../entity/impl/player/Player'
+import {PlayerBot} from '../../entity/impl/playerbot/PlayerBot'
+
+import {Mobile} from '../../entity/impl/Mobile'
+import {Item} from '../../../game/model/Item'
+import {CombatFactory} from '../../content/combat/CombatFactory'
+
+
 export abstract class Area {
     private boundaries: Boundary[];
     private npcs: { [key: number]: NPC } = {};
     private players: { [key: number]: Player } = {};
     private playerBots: { [key: number]: PlayerBot } = {};
     
-    Copy code
     constructor(boundaries: Boundary[]) {
       this.boundaries = boundaries;
     }
@@ -48,12 +56,12 @@ export abstract class Area {
         return true;
     }
 
-    public canAttack(attacker: Mobile, target: Mobile): CanAttackResponse {
+    public canAttack(attacker: Mobile, target: Mobile): CombatFactory.CanAttackResponse {
         if (attacker.isPlayer() && target.isPlayer()) {
-            return CanAttackResponse.CANT_ATTACK_IN_AREA;
+            return CombatFactory.CanAttackResponse.CANT_ATTACK_IN_AREA;
         }
 
-        return CanAttackResponse.CAN_ATTACK;
+        return CombatFactory.CanAttackResponse.CAN_ATTACK;
     }
 
     public canPlayerBotIdle(playerBot: PlayerBot): boolean {

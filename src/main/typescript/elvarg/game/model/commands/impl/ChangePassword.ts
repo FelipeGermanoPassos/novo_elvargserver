@@ -1,3 +1,7 @@
+import {Player} from '../../../entity/impl/player/Player';
+import {Command} from '../../../model/commands/Command';
+import {PasswordUtil} from '../../../../util/PasswordUtil';
+
 class ChangePassword implements Command {
     execute(player: Player, command: string, parts: string[]): void {
         // Known exploit

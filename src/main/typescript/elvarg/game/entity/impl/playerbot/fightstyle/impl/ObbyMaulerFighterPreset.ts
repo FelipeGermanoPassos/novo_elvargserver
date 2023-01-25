@@ -1,4 +1,4 @@
-class ObbyMaulerFighterPreset implements FighterPreset {
+export class ObbyMaulerFighterPreset implements FighterPreset {
     private static readonly BOT_OBBY_MAULER_57 = new Presetable(
         "Obby Mauler",
         [

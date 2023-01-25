@@ -1,7 +1,3 @@
-import com.elvarg.net.security.IsaacRandom;
-
-import * as bigInt from "big-integer";
-
 import { ungzip } from "gzip-js";
 import * as Bzip2 from 'bzip2';
 

@@ -1,4 +1,4 @@
-class GRangerFighterPreset implements FighterPreset {
+export class GRangerFighterPreset implements FighterPreset {
     const BOT_G_MAULER_70 = {
         name: "G Mauler (R)",
         items: [

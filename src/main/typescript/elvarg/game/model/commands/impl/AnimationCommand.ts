@@ -1,3 +1,9 @@
+import {Player} from '../../../entity/impl/player/Player';
+import {Command} from '../../../model/commands/Command';
+import { Animation } from '../../Animation';
+import {PlayerRights} from '../../../model/rights/PlayerRights';
+
+
 class AnimationCommand implements Command {
     execute(player: Player, command: string, parts: string[]): void {
         let anim = parseInt(parts[1]);

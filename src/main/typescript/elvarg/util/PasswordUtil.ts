@@ -1,6 +1,6 @@
 import * as crypto from 'crypto-js';
 
-class PasswordUtil {
+export class PasswordUtil {
     private static PBKDF2_ITERATIONS = 5000;
     private static PBKDF2_KEY_LENGTH = 512;
 

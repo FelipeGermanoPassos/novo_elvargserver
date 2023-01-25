@@ -1,4 +1,4 @@
-class MidTribridMaxFighterPreset implements FighterPreset {
+export class MidTribridMaxFighterPreset implements FighterPreset {
     private static RANDOM = new RandomGen();
     private CombatAction = new CombatAction();
     public static BOT_MID_TRIBRID: Presetable = new Presetable("Mid Tribrid",
