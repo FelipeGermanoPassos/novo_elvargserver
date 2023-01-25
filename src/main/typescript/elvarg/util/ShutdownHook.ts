@@ -1,4 +1,4 @@
-import * as World from '../game/Worlds'
+import {World} from '../game/Worlds'
 
 import { Logger } from 'winston-logger';
 

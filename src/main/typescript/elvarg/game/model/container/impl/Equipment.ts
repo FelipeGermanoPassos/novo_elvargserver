@@ -1,4 +1,4 @@
-class Equipment extends ItemContainer {
+export class Equipment extends ItemContainer {
     public static INVENTORY_INTERFACE_ID = 1688;
     public static EQUIPMENT_SCREEN_INTERFACE_ID = 15106;
     public static HEAD_SLOT = 0;

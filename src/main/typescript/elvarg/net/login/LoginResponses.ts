@@ -1,6 +1,13 @@
 import { LoginDetailsMessage } from '../login/LoginDetailsMessage';
+import { Server } from '../../Server';
+import { World } from '../../game/World';
+import { Player } from '../../game/entity/impl/player/Player';
+import { Misc } from '../../util/Misc';
+import { DiscordUtil } from '../../util/DiscordUtil';
+import { PlayerPunishment } from '../../util/PlayerPunishment';
+import { GameConstants } from '../../game/GameConstants';
 
-class LoginResponses {
+export class LoginResponses {
     public static LOGIN_SUCCESSFUL = 2;
     public static LOGIN_INVALID_CREDENTIALS = 3;
     public static LOGIN_DISABLED_ACCOUNT = 4;
@@ -15,8 +22,6 @@ class LoginResponses {
     public static INVALID_CREDENTIALS_COMBINATION = 28;
     public static OLD_CLIENT_VERSION = 30;
     public static NEW_ACCOUNT = -1;
-
-    //TODO: Importar Player, World
 
     public static evaluate(player: Player, msg: LoginDetailsMessage): number {
         if (World.getPlayers().isFull()) {
@@ -68,23 +73,23 @@ class LoginResponses {
             } else {
                 return LoginResponses.LOGIN_INVALID_CREDENTIALS;
             }
-    
+
             player.setUsername(discordInfo.username);
-    
-            let playerSave = PLAYER_PERSISTENCE.load(player.getUsername());
+
+            let playerSave = GameConstants.PLAYER_PERSISTENCE.load(player.getUsername());
             if (!playerSave) {
                 player.setDiscordLogin(true);
                 player.setCachedDiscordAccessToken(discordInfo.token);
                 player.setPasswordHashWithSalt(discordInfo.password);
                 return LoginResponses.NEW_ACCOUNT;
             }
-    
+
             playerSave.applyToPlayer(player);
             return LoginResponses.LOGIN_SUCCESSFUL;
-    
+
         } catch (ex) {
         }
-    
+
         return LoginResponses.LOGIN_INVALID_CREDENTIALS;
     }
 
@@ -93,24 +98,24 @@ class LoginResponses {
         if (msg.getIsDiscord()) {
             return LoginResponses.getDiscordResult(player, msg);
         }
-    
-        let playerSave = PLAYER_PERSISTENCE.load(player.getUsername());
+
+        let playerSave = GameConstants.PLAYER_PERSISTENCE.load(player.getUsername());
         if (!playerSave) {
-            player.setPasswordHashWithSalt(PLAYER_PERSISTENCE.encryptPassword(plainPassword));
+            player.setPasswordHashWithSalt(GameConstants.PLAYER_PERSISTENCE.encryptPassword(plainPassword));
             return LoginResponses.NEW_ACCOUNT;
         }
-    
+
         if (msg.getIsDiscord() !== playerSave.isDiscordLogin()) {
             // User attempting Discord login on a non-Discord account
             return LoginResponses.LOGIN_BAD_SESSION_ID;
         }
-    
-        if (!PLAYER_PERSISTENCE.checkPassword(plainPassword, playerSave)) {
+
+        if (!GameConstants.PLAYER_PERSISTENCE.checkPassword(plainPassword, playerSave)) {
             return LoginResponses.LOGIN_INVALID_CREDENTIALS;
         }
-    
+
         playerSave.applyToPlayer(player);
-    
+
         return LoginResponses.LOGIN_SUCCESSFUL;
     }
 }

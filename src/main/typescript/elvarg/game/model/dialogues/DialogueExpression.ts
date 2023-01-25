@@ -1,4 +1,4 @@
-enum DialogueExpression {
+export enum DialogueExpression {
     HAPPY = 588,
     CALM = 589,
     CALM_CONTINUED = 590,

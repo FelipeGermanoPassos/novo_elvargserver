@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@types/node": "^18.11.18",
+<<<<<<< HEAD
     "array": "^0.4.3",
     "big-integer": "^1.6.51",
     "buffer": "^6.0.3",
@@ -13,6 +14,13 @@
     "fs-extra": "^11.1.0",
     "gzip-js": "^0.3.2",
     "hashmap": "^2.4.0",
+=======
+    "@types/paper": "^0.12.3",
+    "array": "^0.4.3",
+    "big-integer": "^1.6.51",
+    "buffer": "^6.0.3",
+    "fs": "^0.0.1-security",
+>>>>>>> 03ef12a5e231898cd5dce5dce3b92cc40bac36ba
     "hashset": "^0.0.6",
     "iterator": "^0.0.0",
     "java.js": "^0.0.1",

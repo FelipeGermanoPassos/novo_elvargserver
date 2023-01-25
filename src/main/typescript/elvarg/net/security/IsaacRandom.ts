@@ -1,4 +1,4 @@
-class IsaacRandom {
+export class IsaacRandom {
     private static readonly GOLDEN_RATIO: number = 0x9e3779b9;
     private static readonly LOG_SIZE: number = Long.BYTES;
     private static readonly SIZE: number = 1 << LOG_SIZE;

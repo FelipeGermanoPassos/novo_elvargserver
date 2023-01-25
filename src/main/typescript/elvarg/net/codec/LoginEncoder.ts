@@ -2,9 +2,7 @@ import { ChannelHandlerContext, MessageToByteEncoder } from 'netty';
 import { LoginResponsePacket, LoginResponses } from '../login';
 
 /**
-
 Encodes login.
-
 @author Swiffy
 */
 export class LoginEncoder extends MessageToByteEncoder<LoginResponsePacket> {

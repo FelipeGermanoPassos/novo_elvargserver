@@ -1,4 +1,4 @@
-class EndDialogue extends Dialogue {
+export class EndDialogue extends Dialogue {
     constructor(index: number) {
         super(index);
     }

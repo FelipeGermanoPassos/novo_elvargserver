@@ -1,4 +1,4 @@
-class Inventory extends ItemContainer {
+export class Inventory extends ItemContainer {
 
     Copy code
     public static readonly INTERFACE_ID: number = 3214;

@@ -1,4 +1,4 @@
-class ActionDialogue extends Dialogue {
+export class ActionDialogue extends Dialogue {
     private action: Action;
 
     constructor(index: number, action: Action) {

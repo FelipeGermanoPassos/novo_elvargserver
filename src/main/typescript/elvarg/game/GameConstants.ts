@@ -4,6 +4,7 @@ import { FightStyleImpl } from './entity/playerbot/fightstyle/fightstyle.impl';
 import { Set } from 'collections-es6';
 
 export class GameConstants {
+<<<<<<< HEAD
     public static readonly NAME: string = "RspsApp";
     public static readonly CLIENT_UID: number = 8784521;
     public static readonly DEFINITIONS_DIRECTORY: string = "./data/definitions/";
@@ -22,6 +23,25 @@ export class GameConstants {
     42500, 147, 32000];
 
     public static readonly ALLOWED_SPAWNS: Set<number> = new Set([
+=======
+    public static NAME = "RspsApp";
+    public static CLIENT_UID = 8784521;
+    public static DEFINITIONS_DIRECTORY = "./data/definitions/";
+    public static CLIPPING_DIRECTORY = "./data/clipping/";
+    public static PLAYER_PERSISTENCE: PlayerPersistence = new JSONFilePlayerPersistence();
+    public static CONCURRENCY = (Runtime.getRuntime().availableProcessors() > 1);
+    public static GAME_ENGINE_PROCESSING_CYCLE_RATE = 600;
+    public static QUEUED_LOOP_THRESHOLD = 45;
+    public static DEFAULT_LOCATION = new Location(3089, 3524);
+    public static QUEUE_SWITCHING_REFRESH = true;
+    public static DROP_THRESHOLD = 2;
+    public static COMBAT_SKILLS_EXP_MULTIPLIER = 6;
+    public static REGULAR_SKILLS_EXP_MULTIPLIER = 18;
+    public static DEBUG_ATTACK_DISTANCE = false;
+    public static TAB_INTERFACES = [2423, 3917, 31000, 3213, 1644, 5608, -1, 37128, 5065, 5715, 2449,
+        42500, 147, 32000];
+    public static ALLOWED_SPAWNS = new Set<number>(Arrays.asList(
+>>>>>>> 03ef12a5e231898cd5dce5dce3b92cc40bac36ba
         13441, 3144, 391, 397, 385, 7946, 2436, 145, 147, 149, 2440, 157, 159, 161,
         2442, 163, 165, 167, 9739, 2444, 169, 171, 173, // potions and food
         3040, 3042, 3044, 3046, 2452, 2454, 2456, 2458, 2448, 181, 183, 185, 6685, 6687, 6689, 6691, 2450, 189, 191, 193, 3024, 3026, 3028, 3030, 2434, // potions and food

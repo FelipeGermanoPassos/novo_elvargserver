@@ -18,7 +18,7 @@ export class BCrypt {
         0x9216d5d9, 0x8979fb1b
     ];
 
-    private static readonly int S_orig: number[] = [
+    private static readonly S_orig: number[] = [
         0xd1310ba6, 0x98dfb5ac, 0x2ffd72db, 0xd01adfb7,
         0xb8e1afed, 0x6a267e96, 0xba7c9045, 0xf12c7f99,
         0x24a19947, 0xb3916cf7, 0x0801f2e2, 0x858efc16,

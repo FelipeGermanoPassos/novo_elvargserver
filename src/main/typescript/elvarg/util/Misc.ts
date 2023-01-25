@@ -1,11 +1,10 @@
-iexport class Misc {
+export class Misc {
     static getTicks(seconds: number): number {
-    return (int) (seconds / 0.6);
+    return (seconds / 0.6);
     }
     
-    Copy code
     static getSeconds(ticks: number): number {
-        return (int) (ticks * 0.6);
+        return (ticks * 0.6);
     }
     
     static readonly FORMATTER = new DecimalFormat("0.#");
@@ -436,7 +435,7 @@ iexport class Misc {
     }
 
     // Returns the delta between two locations
-    function delta(a: Location, b: Location) {
+    public function delta(a: Location, b: Location) {
         return {x: b.x - a.x, y: b.y - a.y};
     }
 

@@ -1,4 +1,4 @@
-class BonusManager {
+export class BonusManager {
     public static readonly ATTACK_STAB = 0;
     public static readonly ATTACK_SLASH = 1;
     public static readonly ATTACK_CRUSH = 2;
