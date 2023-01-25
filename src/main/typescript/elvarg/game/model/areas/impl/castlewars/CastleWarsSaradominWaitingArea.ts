@@ -1,3 +1,20 @@
+import {PlayerBot} from '../../../../entity/impl/playerbot/PlayerBot';
+import {Player} from '../../../../entity/impl/player/Player'
+import * as Mobile from '../../../../entity/impl/Mobile'
+import {Arrays} from 'collections'
+import Boundary from '../../../../model/Boundary';
+import {CastleWars} from '../../../../content/minigames/impl/CastleWars';
+import com.elvarg.game.model.Item;
+import {Item} from '../../../../model/Item';
+import static com.elvarg.util.ObjectIdentifiers.PORTAL_9;
+import {obj} from '../../../../../util/ObjectIdentifiers';
+import Misc from 'misc'
+import {Area} from '../../../../model/areas/Area';
+import * as from 'random';
+import {Item} from '../../../../model/Item';
+
+
+
 class CastleWarsSaradominWaitingArea extends Area {
     constructor() {
         super(Arrays.asList(new Boundary(2368, 2392, 9481, 9497)));
@@ -13,12 +30,12 @@ class CastleWarsSaradominWaitingArea extends Area {
             return;
         }
 
-        if (!START_GAME_TASK.isRunning() && CastleWars.ZAMORAK_WAITING_AREA.getPlayers().size > 0) {
+        if (!CastleWars.START_GAME_TASK.isRunning() && CastleWars.ZAMORAK_WAITING_AREA.getPlayers().size > 0) {
             // Ensure the game start timer is active
-            TaskManager.submit(START_GAME_TASK);
+            TaskManager.submit(CastleWars.START_GAME_TASK);
         }
 
-        let announcement = "Next Game Begins In: " + Misc.getSeconds(START_GAME_TASK.getRemainingTicks()) + " seconds.";
+        let announcement = "Next Game Begins In: " + Misc.getSeconds(CastleWars.START_GAME_TASK.getRemainingTicks()) + " seconds.";
         player.getPacketSender().sendMessage(announcement);
 
         // Announce the next game in the lobby via Lanthus
@@ -38,10 +55,10 @@ class CastleWarsSaradominWaitingArea extends Area {
             return;
         }
 
-        if (START_GAME_TASK.isRunning() && this.getPlayers().size === 0
+        if (CastleWars.START_GAME_TASK.isRunning() && Area.getPlayers().size === 0
                 && CastleWars.ZAMORAK_WAITING_AREA.getPlayers().size === 0) {
             // Ensure the game start timer is cancelled
-            TaskManager.cancelTasks(START_GAME_TASK);
+            TaskManager.cancelTasks(CastleWars.START_GAME_TASK);
         }
 
         if (logout) {
@@ -63,8 +80,8 @@ class CastleWarsSaradominWaitingArea extends Area {
 
     public handleObjectClick(player: Player, objectId: number, type: number): boolean {
         switch (objectId) {
-            case PORTAL_8:
-                player.moveTo(new Location(2439 + Misc.random(4),
+            case obj.PORTAL_8:
+                player.Mobile.moveTo(new Location(2439 + Misc.random(4),
                         3085 + Misc.random(5), 0));
                 return true;
         }
@@ -80,7 +97,7 @@ class CastleWarsSaradominWaitingArea extends Area {
 
          // Update the interface
          player.getPacketSender().sendString(CastleWars.START_GAME_TASK.isRunning() ?
-         "Time until next game starts: " + Math.floor(START_GAME_TASK.getRemainingTicks())
+         "Time until next game starts: " + Math.floor(CastleWars.START_GAME_TASK.getRemainingTicks())
          : "Waiting for players to join the other team.", 11480);
 
         // Send the interface

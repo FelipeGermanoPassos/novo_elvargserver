@@ -1,4 +1,4 @@
-import { ThreadFactoryBuilder } from 'com.google.common.util.concurrent';
+eimport { ThreadFactoryBuilder } from 'com.google.common.util.concurrent';
 import { ScheduledExecutorService, Executors } from 'java.util.concurrent';
 import { ClanChatManager } from 'com.elvarg.game.content.clan';
 
@@ -7,7 +7,7 @@ import { ClanChatManager } from 'com.elvarg.game.content.clan';
  *
  * @author Professor Oak
  */
-class GameEngine implements Runnable {
+export class GameEngine implements Runnable {
     private executorService = new ScheduledExecutorService();
     
     Copy code

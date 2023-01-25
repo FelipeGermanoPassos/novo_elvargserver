@@ -1,11 +1,15 @@
+import {Boundary} from '../../../../model/Boundary';
+import {Player} from '../../../../entity/impl/player/Player'
+import {Optional} from 'optional'
+import * as Mobile from '../../../../entity/impl/Mobile'
+import {Item} from '../../../../model/Item';
+import {FightCaves} from '../../../content/minigames/impl/FightCaves';
+import {PrivateArea} from '../impl/PrivateArea'
+
+
 class FightCavesArea extends PrivateArea {
-    public static readonly Boundary BOUNDARY = new Boundary(2368, 5056, 2431, 5119);
-    
-    Copy code
-    constructor() {
-        super([BOUNDARY]);
-    }
-    
+    public static readonly BOUNDARY = new Boundary(2368, 5056, 2431, 5119);
+        
     public postLeave(mobile: Mobile, logout: boolean): void {
         if (mobile.isPlayer() && logout) {
             mobile.moveTo(FightCaves.EXIT);

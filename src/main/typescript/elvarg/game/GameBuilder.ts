@@ -11,8 +11,11 @@ import { ShopDefinitionLoader } from "./definition/loader/impl/ShopDefinitionLoa
 import { NpcDefinitionLoader } from "./definition/loader/impl/NpcDefinitionLoader";
 import { NpcDropDefinitionLoader } from "./definition/loader/impl/NpcDropDefinitionLoader";
 import { NpcSpawnDefinitionLoader } from "./definition/loader/impl/NpcSpawnDefinitionLoader";
+import * as ArrayDeque from 'collections'
+import * as Queue from 'collections'
 
-class GameBuilder {
+
+export class GameBuilder {
     private backgroundLoader = new BackgroundLoader();
     
     public initialize(): void {

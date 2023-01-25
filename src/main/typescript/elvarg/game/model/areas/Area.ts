@@ -1,4 +1,4 @@
-abstract class Area {
+export abstract class Area {
     private boundaries: Boundary[];
     private npcs: { [key: number]: NPC } = {};
     private players: { [key: number]: Player } = {};

@@ -1,4 +1,4 @@
-class NetworkConstants {
+export class NetworkConstants {
     public static readonly GAME_PORT: number = 43595;
     public static readonly LOGIN_REQUEST_OPCODE: number = 14;
     public static readonly NEW_CONNECTION_OPCODE: number = 16;

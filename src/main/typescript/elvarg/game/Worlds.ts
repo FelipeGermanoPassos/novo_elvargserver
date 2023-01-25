@@ -1,12 +1,23 @@
-class World {
+import {ObjectManager} from '../../../entity/impl/object/ObjectManager';
+import {ItemOnGround} from '../../../entity/impl/grounditem/ItemOnGround'
+import {GameObject} from '../../../entity/impl/object/GameObject';
+import {Player} from '../game/entity/impl/player/Player'
+import {PlayerBot} from '../game/entity/impl/playerbot/PlayerBot'
+import * as MobileList from '../game/entity/impl/MobileList'
+import {NPC} from '../game/entity/impl/npc/NPC';
+package com.elvarg.game.entity.updating.sync;
+import {GameSyncExecutor} from '../game/entity/updating/sync/GameSyncExecutor'
+import {GameSyncTask} from '../game/entity/updating/sync/GameSyncTask'
+import {Lock} 'ts-lock'
 
-    Copy code
+export class World {
+
     private static MAX_PLAYERS = 500;
     
     /**
      * The collection of active {@link Player}s.
      */
-    private static players = new MobileList<Player>(MAX_PLAYERS);
+    private static players = new MobileList<Player>(World.MAX_PLAYERS);
     
     /**
      * The collection of active {@link PlayerBot}s.
@@ -58,36 +69,34 @@ class World {
      */
     private static executor = new GameSyncExecutor();
 
-    executor.sync(new GameSyncTask(false, false) {
-        execute(index: number) {
-            let npc = npcs.get(index);
+    constructor() {
+        this.executor.sync(new GameSyncTask(false, false, (index: number) => {
+            let npc = this.npcs.get(index);
             try {
                 npc.process();
             } catch (e) {
                 console.log(e);
             }
-        }
-    });
+        }));
 
-    executor.sync(new GameSyncTask(true) {
-        execute(index: number) {
-            let player = players.get(index);
-            synchronized(player) {
+        this.executor.sync(new GameSyncTask(true, false, (index: number) => {
+            let player = this.players[index];
+            this.lock.acquire().then(() => {
                 try {
                     PlayerUpdating.update(player);
                     NPCUpdating.update(player);
                 } catch (e) {
                     console.log(e);
                     player.requestLogout();
+                } finally {
+                    this.lock.release();
                 }
-            }
-        }
-    });
+            });
+        }));
 
-    executor.sync(new GameSyncTask(true) {
-        execute(index: number) {
-            let player = players.get(index);
-            synchronized(player) {
+        this.executor.sync(new GameSyncTask(true, false, (index: number) => {
+            let player = this.players[index];
+            this.lock.acquire().then(() => {
                 try {
                     player.resetUpdating();
                     player.setCachedUpdateBlock(null);
@@ -95,22 +104,25 @@ class World {
                 } catch (e) {
                     console.log(e);
                     player.requestLogout();
+                } finally {
+                    this.lock.release();
                 }
-            }
-        });
+            });
+        }));
 
-    executor.sync(new GameSyncTask(false) {
-        execute(index: number) {
-            let npc = npcs.get(index);
-            synchronized(npc) {
+        this.executor.sync(new GameSyncTask(false, false, (index: number) => {
+            let npc = this.npcs[index];
+            this.lock.acquire().then(() => {
                 try {
                     npc.resetUpdating();
                 } catch (e) {
                     console.log(e);
+                } finally {
+                    this.lock.release();
                 }
-            }
-        }
-    });
+            });
+        }));
+    }
 
 
     /**
@@ -194,7 +206,6 @@ class World {
         // Process all active {@link Task}s..
         TaskManager.process();
         
-        Copy code
         // Process all minigames
         MinigameHandler.process();
         

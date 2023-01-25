@@ -1,9 +1,9 @@
 import { PlayerBotDefinition, PlayerPersistence, PlayerRights, Location } from './game.definition';
 import { DynamoDBPlayerPersistence, JSONFilePlayerPersistence } from './entity/player/persistence';
 import { FightStyleImpl } from './entity/playerbot/fightstyle/fightstyle.impl';
-import { Set } from 'typescript';
+import { Set } from 'collections-es6';
 
-class GameConstants {
+export class GameConstants {
     public static readonly NAME: string = "RspsApp";
     public static readonly CLIENT_UID: number = 8784521;
     public static readonly DEFINITIONS_DIRECTORY: string = "./data/definitions/";
@@ -21,7 +21,7 @@ class GameConstants {
     public static readonly TAB_INTERFACES: number[] = [2423, 3917, 31000, 3213, 1644, 5608, -1, 37128, 5065, 5715, 2449,
     42500, 147, 32000];
 
-    const ALLOWED_SPAWNS: Set<number> = new Set([
+    public static readonly ALLOWED_SPAWNS: Set<number> = new Set([
         13441, 3144, 391, 397, 385, 7946, 2436, 145, 147, 149, 2440, 157, 159, 161,
         2442, 163, 165, 167, 9739, 2444, 169, 171, 173, // potions and food
         3040, 3042, 3044, 3046, 2452, 2454, 2456, 2458, 2448, 181, 183, 185, 6685, 6687, 6689, 6691, 2450, 189, 191, 193, 3024, 3026, 3028, 3030, 2434, // potions and food

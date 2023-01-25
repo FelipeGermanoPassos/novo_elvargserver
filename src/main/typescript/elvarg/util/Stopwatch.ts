@@ -5,30 +5,27 @@ class Stopwatch {
         this.time = 0;
     }
     
-    public headStart(startAt: number): this {
+    public start(startAt: number): void {
         this.time = Date.now() - startAt;
-        return this;
     }
     
-    public reset(i: number): this {
+    public reset(i: number): void {
         this.time = i;
-        return this;
     }
     
-    public reset(): this {
+    public Hasreset(): void {
         this.time = Date.now();
-        return this;
     }
     
     public elapsed(): number {
         return Date.now() - this.time;
     }
     
-    public elapsed(time: number): boolean {
+    public hasElapsed(time: number): boolean {
         return this.elapsed() >= time;
     }
     
     public getTime(): number {
         return this.time;
     }
-}
+    }

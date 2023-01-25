@@ -1,4 +1,4 @@
-class Mobile extends Entities {
+export class Mobile extends Entities {
     private index: number;
     private lastKnownRegion: Location;
     private timers = new TimerRepository();

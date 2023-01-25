@@ -1,33 +1,43 @@
-class BackgroundLoader {
+import { ExecutorService} from 'executor-service'
+import { Runnable } from 'runnable';
+import { Collection } from 'collections'
+import { ArrayDeque } from 'collections';
+import {ThreadFactoryBuilder} from 'java.js/java.util.concurrent'
+import {TimeUnit} from 'timeunit'
+
+export class BackgroundLoader {
     private service = new ExecutorService(
         new ThreadFactoryBuilder().setNameFormat("BackgroundLoaderThread").setDaemon(true).build()
     );
     private tasks = new ArrayDeque<Runnable>();
-    private shutdown = false;
+    private isShutdown = false;
 
     init(backgroundTasks: Collection<Runnable>) {
-        if (this.shutdown || this.service.isShutdown) {
+        if (this.isShutdown || this.service.isTerminated()) {
             throw new Error("This background loader has been shutdown!");
         }
-        this.tasks.push(...backgroundTasks);
+        this.tasks.addAll(backgroundTasks);
         let t: Runnable;
-        while ((t = this.tasks.shift()) != null) {
+        while ((t = this.tasks.poll()) != null) {
             this.service.execute(t);
         }
-        this.service.shutdown();
     }
 
     awaitCompletion(): boolean {
-        if (this.shutdown) {
+        if (this.isShutdown) {
             throw new Error("This background loader has been shutdown!");
         }
         try {
-            this.service.awaitTermination(Number.MAX_SAFE_INTEGER, TimeUnit.DAYS);
+            this.service.awaitTermination(1, TimeUnit.HOURS);
         } catch (e) {
             console.log(`The background service loader was interrupted. ${e}`);
             return false;
         }
-        this.shutdown = true;
+        this.isShutdown = true;
         return true;
+    }
+
+    stop() {
+        this.service.shutdown();
     }
 }

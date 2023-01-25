@@ -1,4 +1,4 @@
-class Flooder implements Runnable {
+export class Flooder implements Runnable {
     clients: Map<string, Client> = new Map<string, Client>();
     private running: boolean = false;
 

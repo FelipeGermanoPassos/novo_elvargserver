@@ -1,3 +1,9 @@
+import { Misc } from 'misc';
+import  {GameLogic } from '../game/GameLogic';
+import * as fs from 'fs-extra';
+
+import {array} from 'collections'
+
 class PlayerPunishment {
     private static readonly BAN_DIRECTORY = "./data/saves/";
     private static readonly MUTE_DIRECTORY = "./data/saves/";
@@ -98,47 +104,21 @@ class PlayerPunishment {
         this.initializeList(this.MUTE_DIRECTORY, "IPMutes", this.IPSMuted);
     }
 
-    public static deleteFromFile(file: string, name: string) {
-        GameLogic.submit(async () => {
-            try {
-                const r = new BufferedReader(new FileReader(file));
-                const contents: string[] = [];
-                while (true) {
-                    const line = await r.readLine();
-                    if (!line) {
-                        break;
-                    }
-                    if (line.trim() !== name) {
-                        contents.push(line);
-                    }
-                }
-                await r.close();
-                const w = new BufferedWriter(new FileWriter(file));
-                for (const line of contents) {
-                    w.write(line, 0, line.length);
-                    w.newLine();
-                }
-                await w.flush();
-                await w.close();
-            } catch (e) {
-                console.error(e);
-            }
-        });
+    public static deleteFromFile(file: string, player: string) {
+        try {
+            let data = fs.readFileSync(file, 'utf8');
+            data = data.split('\n').filter(p => p !== player).join('\n');
+            fs.writeFileSync(file, data);
+        } catch (e) {
+            console.error(e);
+        }
     }
 
-    public static addToFile(file: string, data: string) {
-        GameLogic.submit(async () => {
-            try {
-                const out = new BufferedWriter(new FileWriter(file, true));
-                try {
-                    out.write(data);
-                    out.newLine();
-                } finally {
-                    await out.close();
-                }
-            } catch (e) {
-                console.error(e);
-            }
-        });
+    public static addToFile(file: string, player: string) {
+        try {
+            fs.appendFileSync(file, player + '\n');
+        } catch (e) {
+            console.error(e);
+        }
     }
 }

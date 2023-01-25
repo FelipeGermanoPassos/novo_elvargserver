@@ -1,3 +1,11 @@
+import {Player} from '../../../../entity/impl/player/Player'
+import * as Mobile from '../../../../entity/impl/Mobile'
+import {Arrays} from 'collections'
+import Boundary from '../../../../model/Boundary';
+import {Barrows} from '../../../content/minigames/impl/Barrows';
+import {Area} from '../../../../model/areas/Area';
+import {Optional} from 'optional'
+
 class BarrowsArea extends Area {
     constructor() {
         super(Arrays.asList(new Boundary(3521, 3582, 9662, 9724), new Boundary(3545, 3583, 3265, 3306)));

@@ -1,4 +1,4 @@
-abstract class PrivateArea extends Area {
+export abstract class PrivateArea extends Area {
     public entities: Entity[];
     private clips: Map<Location, number>;
     private destroyed: boolean;
