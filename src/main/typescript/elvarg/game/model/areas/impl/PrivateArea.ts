@@ -12,9 +12,9 @@ export abstract class PrivateArea extends Area {
     public entities: Entity[];
     private clips: Map<Location, number>;
     private destroyed: boolean;
+<<<<<<< HEAD
     
     constructor(boundaries: Boundary[]) {
-    super(boundaries);
     this.entities = [];
     this.clips = new Map();
     this.destroyed = false;
@@ -85,3 +85,6 @@ export abstract class PrivateArea extends Area {
     return this.destroyed;
     }
 }
+=======
+
+    constructor(boundaries: Boundary[]) {

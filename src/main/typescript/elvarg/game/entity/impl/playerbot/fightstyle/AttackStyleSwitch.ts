@@ -1,4 +1,8 @@
-class AttackStyleSwitch {
+import { CombatType } from '../../../../content/combat/CombatType'
+import { CombatSwitch } from './CombatSwitch'
+
+
+export class AttackStyleSwitch {
     private combatType: CombatType;
     private combatSwitch: CombatSwitch;
     private maxHit: number;

@@ -1,3 +1,7 @@
+import { PlayerBotSession } from "../../../../net/PlayerBotSession";
+import { Mobile } from "../Mobile";
+
+
 export class Player extends Mobile {
     public increaseStats = new SecondsTimer();
     public decreaseStats = new SecondsTimer();
@@ -36,8 +40,7 @@ export class Player extends Mobile {
     private currentPreset: Presetable;
     private presets: Presetable[] = new Array(Presetables.MAX_PRESETS);
     private openPresetsOnDeath = true;
-    
-    Copy code
+
     private username: string;
     private passwordHashWithSalt: string;
     private hostAddress: string;
@@ -147,30 +150,53 @@ export class Player extends Mobile {
     private oldPosition: Location;
 
     /**
-     * Creates this player.
-     *
-     * @param playerIO
-     */
-    constructor(playerIO: PlayerSession) {
-        super(GameConstants.DEFAULT_LOCATION.clone());
-        this.session = playerIO;
-    }
-
-    /**
      * Creates this player with pre defined spawn location.
      *
      * @param playerIO
      */
-    constructor(playerIO: PlayerSession, spawnLocation: Location) {
-        super(spawnLocation);
+    constructor(playerIO: PlayerSession, spawnLocation?: Location) {
+        super(spawnLocation ?? GameConstants.DEFAULT_LOCATION.clone());
         this.session = playerIO;
     }
 
-    /**
-     * Actions that should be done when this character is added to the world.
-     */
+
     public onAdd() {
         this.onLogin();
+    }
+
+    resetAttributes() {
+        this.performAnimation(new Animation(65535));
+        this.setSpecialActivated(false);
+        CombatSpecial.updateBar(this);
+        this.setHasVengeance(false);
+        this.getCombat().getFireImmunityTimer().stop();
+        this.getCombat().getPoisonImmunityTimer().stop();
+        this.getCombat().getTeleBlockTimer().stop();
+        this.getTimers().cancel(TimerKey.FREEZE);
+        this.getCombat().getPrayerBlockTimer().stop();
+        this.setPoisonDamage(0);
+        this.setWildernessLevel(0);
+        this.setRecoilDamage(0);
+        this.setSkullTimer(0);
+        this.setSkullType(SkullType.WHITE_SKULL);
+        WeaponInterfaces.assign(this);
+        BonusManager.update(this);
+        PrayerHandler.deactivatePrayers(this);
+        this.getEquipment().refreshItems();
+        this.getInventory().refreshItems();
+        for (let skill of Skill.values())
+            this.getSkillManager().setCurrentLevel(skill, this.getSkillManager().getMaxLevel(skill));
+        this.setRunEnergy(100);
+        this.getPacketSender().sendRunEnergy();
+        this.getMovementQueue().setBlockMovement(false).reset();
+        this.getPacketSender().sendEffectTimer(0, EffectTimer.ANTIFIRE).sendEffectTimer(0, EffectTimer.FREEZE)
+            .sendEffectTimer(0, EffectTimer.VENGEANCE).sendEffectTimer(0, EffectTimer.TELE_BLOCK);
+        this.getPacketSender().sendPoisonType(0);
+        this.getPacketSender().sendSpecialAttackState(false);
+        this.setUntargetable(false);
+        this.isDying = false;
+
+        this.getUpdateFlag().flag(Flag.APPEARANCE);
     }
 
     /**
@@ -266,8 +292,7 @@ export class Player extends Mobile {
     public isPlayer(): boolean {
         return true;
     }
-        
-        Copy code
+
     @Override
     public equals(o: Object): boolean {
         if (!(o instanceof Player)) {
@@ -402,7 +427,7 @@ public loadingHouse: boolean; public portalSelected: number; public inBuildingMo
 Can the player logout?
 @returns Yes if they can logout, false otherwise.
 */
-canLogout(): boolean {
+canLogout(): boolean; {
     if (CombatFactory.isBeingAttacked(this)) {
         this.getPacketSender().sendMessage("You must wait a few seconds after being out of combat before doing this.");
         return false;
@@ -419,15 +444,14 @@ Requests a logout by sending the logout packet to the client. This leads to
 the connection being closed. The {@link ChannelEventHandler} will then add
 the player to the remove characters queue.
 */
-requestLogout() {
+requestLogout(); {
     this.getPacketSender().sendLogout();
 }
 
-onLogout() {
+onLogout(); {
     // Notify us
     console.log("[World] Deregistering player - [username, host] : [" + this.getUsername() + ", " + this.getHostAddress() + "]");
-    
-    Copy code
+
     this.getPacketSender().sendInterfaceRemoval();
 
     // Leave area
@@ -453,7 +477,7 @@ onLogout() {
  
 Called by the world's login queue!
 */
-onLogin() {
+public onLogin(); {
     // Attempt to register the player..
     console.log("[World] Registering player - [username, host] : [" + this.getUsername() + ", " + this.getHostAddress() + "]");
 
@@ -564,40 +588,6 @@ onLogin() {
     }
 }
 
-resetAttributes() {
-    this.performAnimation(new Animation(65535));
-    this.setSpecialActivated(false);
-    CombatSpecial.updateBar(this);
-    this.setHasVengeance(false);
-    this.getCombat().getFireImmunityTimer().stop();
-    this.getCombat().getPoisonImmunityTimer().stop();
-    this.getCombat().getTeleBlockTimer().stop();
-    this.getTimers().cancel(TimerKey.FREEZE);
-    this.getCombat().getPrayerBlockTimer().stop();
-    this.setPoisonDamage(0);
-    this.setWildernessLevel(0);
-    this.setRecoilDamage(0);
-    this.setSkullTimer(0);
-    this.setSkullType(SkullType.WHITE_SKULL);
-    WeaponInterfaces.assign(this);
-    BonusManager.update(this);
-    PrayerHandler.deactivatePrayers(this);
-    this.getEquipment().refreshItems();
-    this.getInventory().refreshItems();
-    for (let skill of Skill.values())
-        this.getSkillManager().setCurrentLevel(skill, this.getSkillManager().getMaxLevel(skill));
-    this.setRunEnergy(100);
-    this.getPacketSender().sendRunEnergy();
-    this.getMovementQueue().setBlockMovement(false).reset();
-    this.getPacketSender().sendEffectTimer(0, EffectTimer.ANTIFIRE).sendEffectTimer(0, EffectTimer.FREEZE)
-        .sendEffectTimer(0, EffectTimer.VENGEANCE).sendEffectTimer(0, EffectTimer.TELE_BLOCK);
-    this.getPacketSender().sendPoisonType(0);
-    this.getPacketSender().sendSpecialAttackState(false);
-    this.setUntargetable(false);
-    this.isDying = false;
-
-    this.getUpdateFlag().flag(Flag.APPEARANCE);
-}
 public busy(): boolean {
     if (this.interfaceId > 0) {
         return true;
@@ -654,7 +644,7 @@ public getUsername(): string {
     return this.username;
 }
 
-public setUsername(username: string): Player {
+export setUsername(username: string): Player; {
     this.username = username;
     return this;
 }
@@ -715,7 +705,7 @@ isDying(): boolean {
 }
 
 getLocalPlayers(): List < Player > {
-    return this.localPlayers;
+    return this.localPlayers,
 }
 
 getLocalNpcs(): List < NPC > {

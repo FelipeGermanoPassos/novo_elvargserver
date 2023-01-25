@@ -1,4 +1,4 @@
-class TradingInteraction {
+export class TradingInteraction {
 
     // The PlayerBot this trading interaction belongs to
     playerBot: PlayerBot;

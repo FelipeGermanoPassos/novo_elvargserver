@@ -1,4 +1,4 @@
-class CombatInteraction {
+export class CombatInteraction {
     playerBot: PlayerBot;
     private attackTarget: Mobile;
 

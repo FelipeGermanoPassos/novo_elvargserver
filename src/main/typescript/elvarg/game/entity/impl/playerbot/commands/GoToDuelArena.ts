@@ -1,7 +1,11 @@
-import { Task, TaskManager } from "./task.manager";
-import { TeleportHandler, TeleportType } from "./teleport.handler";
-import { CommandType, BotCommand } from "./bot.command";
-import { PlayerBot } from "../playerbot";
+import { PlayerBot } from "../PlayerBot";
+import { TeleportHandler } from "../../../../model/teleportation/TeleportHandler";
+import { TeleportType } from "../../../../model/teleportation/TeleportType";
+import { Task } from "../../../../task/Task";
+import { TaskManager } from "../../../../task/TaskManager";
+import { BotCommand } from "./BotCommand";
+import { CommandType } from "./CommandType";
+import { Teleportable } from "../../../../model/teleportation/Teleportable";
 
 export class GoToDuelArena implements BotCommand {
     triggers(): string[] {
@@ -11,12 +15,12 @@ export class GoToDuelArena implements BotCommand {
     start(playerBot: PlayerBot, args: string[]): void {
         playerBot.sendChat("Going to Duel Arena - see ya soon!");
 
-        TaskManager.submit(new Task(5, playerBot.getIndex(), false) {
-            execute(): void {
-                TeleportHandler.teleport(playerBot, DUEL_ARENA.getPosition(), TeleportType.NORMAL, false);
-                this.stop();
+        TaskManager.submit(new Task({ delay: 5, key: playerBot.getIndex(), immediate: false }) {
+            execute() {
+                TeleportHandler.teleport(playerBot, Teleportable.DUEL_ARENA.getPosition(), TeleportType.NORMAL, false)
+                stop();
             }
-        });
+        })
 
         playerBot.stopCommand();
     }
@@ -25,6 +29,6 @@ export class GoToDuelArena implements BotCommand {
     }
 
     supportedTypes(): CommandType[] {
-        return [PUBLIC_CHAT, PRIVATE_CHAT, CLAN_CHAT];
+        return [CommandType.PUBLIC_CHAT, CommandType.PRIVATE_CHAT, CommandType.CLAN_CHAT];
     }
 }

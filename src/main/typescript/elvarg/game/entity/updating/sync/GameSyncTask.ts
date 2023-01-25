@@ -1,4 +1,4 @@
-import World from '../../../Worlds'
+import { World } from '../../../Worlds'
 
 export abstract class GameSyncTask {
     private players: boolean;
@@ -7,10 +7,9 @@ export abstract class GameSyncTask {
     constructor(players: boolean, concurrent: boolean) {
         this.players = players;
         this.concurrent = concurrent;
+        this.players = true
     }
-    constructor(players: boolean) {
-        this(players, true);
-    }
+
 
     public abstract execute(index: number): void;
 

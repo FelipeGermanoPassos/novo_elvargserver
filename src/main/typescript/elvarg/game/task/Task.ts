@@ -16,7 +16,6 @@ class Task {
     }
     
     constructor(delay: number) {
-        this(delay, false);
         this.bind(DEFAULT_KEY);
         this.type = DEFAULT;
     }
@@ -51,40 +50,6 @@ class Task {
     public getKey(): Object {
         return Objects.requireNonNull(this.key);
     }
-    
-    public bind(key: Object): Task {
-        this.key = Objects.requireNonNull(key);
-        return this;
-    }
-    
-    public isImmediate(): boolean {
-        return this.immediate;
-    }
-    
-    public isRunning(): boolean {
-        return this.running;
-    }
-    
-    public start(): void {
-        if (this.running)
-            return;
-    
-        if (this.immediate) {
-            this.execute();
-        }
-    
-        this.running = true;
-    }
-    
-    public stop(): void {
-        this.running = false;
-    }
-    
-    public execute(): void {
-        if (!this.running)
-            return;
-    
-        this.countdown--;
     
         if (this.countdown == 0) {
             this.countdown = this.delay;

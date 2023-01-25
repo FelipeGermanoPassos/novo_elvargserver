@@ -1,4 +1,4 @@
-class JacksonAttributeConverter<T> {
+export class JacksonAttributeConverter<T> {
     private static gson = new GsonBuilder().create();
     private clazz: new () => T;
 
