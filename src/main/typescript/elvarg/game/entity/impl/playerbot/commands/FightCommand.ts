@@ -1,8 +1,14 @@
-class FightCommand implements BotCommand {
+import { World } from "../../../../Worlds";
+import { PlayerBot } from "../PlayerBot";
+import { CommandType } from "./CommandType";
+import { BotCommand } from "./BotCommand";
+
+
+export class FightCommand implements BotCommand {
     triggers(): string[] {
         return ["fight"];
     }
-    
+
     start(playerBot: PlayerBot, args: string[]): void {
         if (!args || args.length == 0 || args[0].toLowerCase() == "me") {
             playerBot.getCombat().attack(playerBot.getInteractingWith());

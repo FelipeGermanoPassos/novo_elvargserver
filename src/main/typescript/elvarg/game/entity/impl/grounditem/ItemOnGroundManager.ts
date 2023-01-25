@@ -3,7 +3,7 @@ import { Player, ItemOnGround, State, OperationType, GroundItemRespawnTask } fro
 import { Item } from "com.elvarg.game.model"
 import { Optional } from "java.util"
 
-class ItemOnGroundManager {
+export class ItemOnGroundManager {
     public static readonly STATE_UPDATE_DELAY: number = 50
 
     public static onRegionChange(player: Player): void {

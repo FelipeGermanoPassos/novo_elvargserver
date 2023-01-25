@@ -1,4 +1,4 @@
-public class TeleportHandler {
+export class TeleportHandler {
 
     /**
      * Teleports a player to the target location.

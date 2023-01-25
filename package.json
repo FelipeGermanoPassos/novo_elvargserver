@@ -1,8 +1,15 @@
 {
   "dependencies": {
     "array": "^0.4.3",
+    "big-integer": "^1.6.51",
     "buffer": "^6.0.3",
     "hashset": "^0.0.6",
+    "iterator": "^0.0.0",
+    "object-path": "^0.11.8",
+    "optional": "^0.1.4",
     "ts-hashset": "^1.0.0"
+  },
+  "devDependencies": {
+    "ts-loader": "^9.4.2"
   }
 }

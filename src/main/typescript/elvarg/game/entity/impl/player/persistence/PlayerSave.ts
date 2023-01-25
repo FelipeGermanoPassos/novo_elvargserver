@@ -1,4 +1,4 @@
-class PlayerSave {
+export class PlayerSave {
     private passwordHashWithSalt: string;
     private isDiscordLogin: boolean;
     private cachedDiscordAccessToken: string;

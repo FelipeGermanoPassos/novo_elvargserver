@@ -1,4 +1,4 @@
-class MovementQueue {
+export class MovementQueue {
 
     private static RANDOM: RandomGen = new RandomGen();
 
@@ -10,55 +10,55 @@ class MovementQueue {
     /**
      * An enum to represent a Player's Mobility
      */
-    public enum Mobility {
+     enum Mobility {
     INVALID,
-        BUSY,
-        FROZEN_SPELL,
-        STUNNED,
-        DUEL_MOVEMENT_DISABLED,
-        MOBILE,
+    BUSY,
+    FROZEN_SPELL,
+    STUNNED,
+    DUEL_MOVEMENT_DISABLED,
+    MOBILE,
 
-        /**
-         * Determines whether the player is able to move.
-         *
-         * @return {boolean} canMove
-         */
-        canMove(): boolean {
+    /**
+     * Determines whether the player is able to move.
+     *
+     * @return {boolean} canMove
+     */
+    canMove(): boolean {
         return this == Mobility.MOBILE;
     },
 
-    /**
-     * Sends the appropriate message to the player about their (lack of) mobility.
-     *
-     * @param player The player to send the message to.
-     */
-    sendMessage(player: Player) {
-        if (player == null) {
-            return;
-        }
-
-        let message: string;
-
-        switch (this) {
-            case Mobility.FROZEN_SPELL:
-                message = "A magical spell has made you unable to move.";
-                break;
-            case Mobility.STUNNED:
-                message = "You're stunned!";
-                break;
-            case Mobility.BUSY:
-                message = "You cannot do that right now.";
-                break;
-            case Mobility.DUEL_MOVEMENT_DISABLED:
-                message = "Movement has been disabled in this duel!";
-                break;
-            default:
-                // No message associated with this Mobility
-                return;
-        }
-
-        player.getPacketSender().sendMessage(message);
+        /**
+         * Sends the appropriate message to the player about their (lack of) mobility.
+         *
+         * @param player The player to send the message to.
+         */
+        sendMessage(player: Player) {
+    if (player == null) {
+        return;
     }
+
+    let message: string;
+
+    switch (this) {
+        case Mobility.FROZEN_SPELL:
+            message = "A magical spell has made you unable to move.";
+            break;
+        case Mobility.STUNNED:
+            message = "You're stunned!";
+            break;
+        case Mobility.BUSY:
+            message = "You cannot do that right now.";
+            break;
+        case Mobility.DUEL_MOVEMENT_DISABLED:
+            message = "Movement has been disabled in this duel!";
+            break;
+        default:
+            // No message associated with this Mobility
+            return;
+    }
+
+    player.getPacketSender().sendMessage(message);
+}
 }
 
 /**

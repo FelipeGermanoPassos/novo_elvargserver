@@ -1,19 +1,39 @@
-class MovementInteraction {
+import { RegionManager } from '../../../../collision/RegionManager'
+import { CombatFactory } from '../../../../content/combat/CombatFactory'
+import { PlayerBot } from '../PlayerBot'
+import { Location } from '../../../../model/Location'
+import { DuelArenaArea } from '../../../../model/areas/impl/DuelArenaArea'
+import { MovementQueue } from '../../../../model/movement/MovementQueue'
+import { TeleportHandler } from '../../../../model/teleportation/TeleportHandler'
+import { TeleportType } from '../../../../model/teleportation/TeleportType'
+import { Misc } from '../../../../../util/Misc'
+import { Mobile } from '../../Mobile'
+import { Player } from '../../player/Player'
+
+
+export enum InteractionState {
+    IDLE,
+
+    // Performing a job for a player
+    COMMAND
+}
+
+export class MovementInteraction {
     // The PlayerBot this interaction belongs to
     private playerBot: PlayerBot;
     constructor(_playerBot: PlayerBot) {
         this.playerBot = _playerBot;
     }
     public process(): void {
-        if (!this.playerBot.getMovementQueue().getMobility().canMove() || this.playerBot.busy()) {
+        if (Mobile.getMovementQueue().getMobility().canMove() || Player.busy()) {
             return;
         }
         switch (this.playerBot.getCurrentState()) {
-            case COMMAND:
+            case InteractionState.COMMAND:
                 // Player Bot is currently busy, do nothing
                 return;
-            case IDLE:
-                if (CombatFactory.inCombat(this.playerBot) || this.playerBot.getDueling().inDuel()) {
+            case InteractionState.IDLE:
+                if (CombatFactory.inCombat(this.playerBot) || Player.getDueling().inDuel()) {
                     return;
                 }
                 // Player bot is idle, let it walk somewhere random

@@ -7,7 +7,7 @@ import Entity from '../Entity'
 import NPC from '../impl/npc/NPC'
 import Player from '../impl/player/Player'
 
-export class Mobile extends Entity {
+export class Mobile extends Entity { 
     private index: number;
     private lastKnownRegion: Location;
     private timers = new TimerRepository();

@@ -1,4 +1,14 @@
-class ChatInteraction {
+import { GameConstants } from "../../../../GameConstants";
+import { Player } from "../../player/Player";
+import { PlayerBot } from "../PlayerBot";
+import { BotCommand } from "../commands/BotCommand";
+import { CommandType } from "../commands/CommandType";
+import {ChatMessage} from '../../../../model/ChatMessage'
+import { Misc } from "../../../../../util/Misc";
+import { Commandclass } from "../commands/CommandType";
+
+
+export class ChatInteraction {
     private static SPACE_LENGTH = 1;
 
     playerBot: PlayerBot;
@@ -54,7 +64,7 @@ class ChatInteraction {
      * @param fromPlayer
      * @param type
      */
-    private processCommand(chatMessage: string, fromPlayer: Player, type: CommandType) {
+    private processCommand(chatMessage: string, fromPlayer: Player, type: CommandType, typeclass: Commandclass) {
         if (chatMessage.includes("stop")) {
             if (this.playerBot.getActiveCommand() != null &&
                 (fromPlayer == this.playerBot.getInteractingWith() || GameConstants.PLAYER_BOT_OVERRIDE.includes(fromPlayer.getRights()))) {
@@ -79,7 +89,7 @@ class ChatInteraction {
 
                 if (!command.supportedTypes().includes(type)) {
                     // Command was triggered, but method not supported
-                    fromPlayer.getPacketSender().sendMessage("Sorry, this bot command can't be delivered via " + type.getLabel() + ".");
+                    fromPlayer.getPacketSender().sendMessage("Sorry, this bot command can't be delivered via " + typeclass.getLabel() + ".");
                     return;
                 }
 

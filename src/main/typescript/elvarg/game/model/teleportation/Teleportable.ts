@@ -1,94 +1,88 @@
-enum Teleportable {
-    EDGEVILLE_DITCH = {
+export class Teleportable {
+    readonly EDGEVILLE_DITCH = {
         button: TeleportButton.WILDERNESS,
         type: 0,
         index: 0,
         position: new Location(3088, 3520)
-    },
-    WEST_DRAGONS = {
+    }
+    readonly WEST_DRAGONS = {
         button: TeleportButton.WILDERNESS,
         type: 0,
         index: 1,
         position: new Location(2979, 3592)
-    },
-    EAST_DRAGONS = {
+    }
+    readonly EAST_DRAGONS = {
         button: TeleportButton.WILDERNESS,
         type: 0,
         index: 2,
         position: new Location(3356, 3675)
-    },
-    KING_BLACK_DRAGON = {
+    }
+    readonly KING_BLACK_DRAGON = {
         button: TeleportButton.BOSSES,
         type: 2,
         index: 1,
         position: new Location(3005, 3850)
-    },
-    CHAOS_ELEMENTAL = {
+    }
+    readonly CHAOS_ELEMENTAL = {
         button: TeleportButton.BOSSES,
         type: 2,
         index: 2,
         position: new Location(3267, 3916)
-    },
-    ELDER_CHAOS_DRUID = {
+    }
+    readonly ELDER_CHAOS_DRUID = {
         button: TeleportButton.BOSSES,
         type: 2,
         index: 3,
         position: new Location(3236, 3636)
-    },
-    CRAZY_ARCHAEOLOGIST = {
+    }
+    readonly CRAZY_ARCHAEOLOGIST = {
         button: TeleportButton.BOSSES,
         type: 2,
         index: 4,
         position: new Location(2980, 3708)
-    },
-    CHAOS_FANATIC = {
+    }
+    readonly CHAOS_FANATIC = {
         button: TeleportButton.BOSSES,
         type: 2,
         index: 5,
         position: new Location(2986, 3838)
-    },
-    VENENATIS = {
+    }
+    readonly VENENATIS = {
         button: TeleportButton.BOSSES,
         type: 2,
         index: 6,
         position: new Location(3346, 3727)
-    },
-    VET_ION = {
+    }
+    readonly VET_ION = {
         button: TeleportButton.BOSSES,
         type: 2,
         index: 7,
         position: new Location(3187, 3787)
-    },
-    CALLISTO = {
+    }
+    readonly CALLISTO = {
         button: TeleportButton.BOSSES,
         type: 2,
         index: 8,
         position: new Location(3312, 3830)
-    },
-    DUEL_ARENA = {
-        button: TeleportButton.MINIGAME,
-        type: 1,
-        index: 0,
-        position: new Location(3370, 3270)
-    },
-    BARROWS = {
+    }
+    static readonly DUEL_ARENA = new Teleportable(
+        TeleportButton.MINIGAME,
+        1,
+        0,
+        new Location(3370, 3270)
+    )
+    readonly BARROWS = new Teleportable(
         button: TeleportButton.MINIGAME,
         type: 1,
         index: 1,
         position: new Location(3565, 3313)
-    },
-    FIGHT_CAVES = {
-        button: TeleportButton.MINIGAME,
-        type: 1,
-        index: 2,
-        position: new Location(2439, 5171)
-    },
-    CASTLE_WARS = {
-        button: TeleportButton.MINIGAME,
-        type: 1,
-        index: 3,
-        position: CastleWars.LOBBY_TELEPORT
-    },
+    )
+    static readonly FIGHT_CAVES = new Teleportable(
+        TeleportButton.MINIGAME, 1, 2, new Location(2439, 5171)
+    )
+    static readonly CASTLE_WARS = new Teleportable(
+        TeleportButton.MINIGAME, 1, 3, CastleWars.LOBBY_TELEPORT
+    )
 
     private teleportButton: TeleportButton;
     private type: number;
@@ -102,19 +96,19 @@ enum Teleportable {
         this.position = position;
     }
 
-public getTeleportButton(): TeleportButton {
-    return this.teleportButton;
-}
+    public getTeleportButton(): TeleportButton {
+        return this.teleportButton;
+    }
 
-public getType(): number {
-    return this.type;
-}
+    public getType(): number {
+        return this.type;
+    }
 
-public getIndex(): number {
-    return this.index;
-}
+    public getIndex(): number {
+        return this.index;
+    }
 
-public getPosition(): Location {
-    return this.position;
-}
+    public getPosition(): Location {
+        return this.position;
+    }
 }

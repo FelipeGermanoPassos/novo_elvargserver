@@ -1,7 +1,9 @@
 import { PlayerBot } from "../PlayerBot";
 import { CommandType } from "./CommandType";
-import { Presetable, Presetables } from "../../../content/presets/Presetables";
-import { Misc } from "../../../util/Misc";
+import { Presetables } from '../../../../content/presets/Presetables'
+import { Presetable } from '../../../../content/presets/Presetable'
+import { Misc } from '../../../../../util/Misc'
+import { BotCommand } from "./BotCommand";
 
 export class LoadPreset implements BotCommand {
 

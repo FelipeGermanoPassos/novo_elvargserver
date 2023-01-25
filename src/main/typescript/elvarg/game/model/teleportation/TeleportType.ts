@@ -1,4 +1,4 @@
-enum TeleportType {
+export enum TeleportType {
     // Spellbooks
     NORMAL = { startTick: 3, startAnim: new Animation(714, Priority.HIGH), middleAnim: null, endAnim: new Animation(715, Priority.HIGH), startGraphic: new Graphic(308, 50, GraphicHeight.HIGH), middleGraphic: null, endGraphic: null },
     ANCIENT = { startTick: 5, startAnim: new Animation(1979, Priority.HIGH), middleAnim: null, endAnim: Animation.DEFAULT_RESET_ANIMATION, startGraphic: new Graphic(392, Priority.HIGH), middleGraphic: null, endGraphic: null },
@@ -13,7 +13,7 @@ enum TeleportType {
     PURO_PURO = { startTick: 9, startAnim: new Animation(6601, Priority.HIGH), middleAnim: null, endAnim: Animation.DEFAULT_RESET_ANIMATION, startGraphic: new Graphic(1118, Priority.HIGH), middleGraphic: null, endGraphic: null },
 }
 
-interface TeleportTypeProps {
+export interface TeleportTypeProps {
     startTick: number;
     startAnim: Animation;
     middleAnim: Animation;
@@ -23,26 +23,26 @@ interface TeleportTypeProps {
     endGraphic: Graphic;
 }
 
-function getStartAnimation(TeleportType: TeleportType): Animation {
+export function getStartAnimation(TeleportType: TeleportType): Animation {
     return TeleportType.startAnim;
 }
 
-function getEndAnimation(TeleportType: TeleportType): Animation {
+export function getEndAnimation(TeleportType: TeleportType): Animation {
     return TeleportType.endAnim;
 }
 
-function getStartGraphic(TeleportType: TeleportType): Graphic {
+export function getStartGraphic(TeleportType: TeleportType): Graphic {
     return TeleportType.startGraphic;
 }
 
-function getStartTick(TeleportType: TeleportType): number {
+export function getStartTick(TeleportType: TeleportType): number {
     return TeleportType.startTick;
 }
 
-function getMiddleAnim(TeleportType: TeleportType): Animation {
+export function getMiddleAnim(TeleportType: TeleportType): Animation {
     return TeleportType.middleAnim;
 }
 
-function getMiddleGraphic(TeleportType: TeleportType): Graphic {
+export function getMiddleGraphic(TeleportType: TeleportType): Graphic {
     return TeleportType.middleGraphic;
 }

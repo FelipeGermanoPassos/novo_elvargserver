@@ -1,4 +1,7 @@
-import { PlayerBot } from 'com.elvarg.game.entity.impl.playerbot';
+import { PlayerBot } from "../PlayerBot";
+import { BotCommand } from "./BotCommand";
+import { CommandType } from "./CommandType";
+
 
 export class HoldItems implements BotCommand {
     triggers(): string[] {

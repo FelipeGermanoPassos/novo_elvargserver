@@ -1,4 +1,4 @@
-class ChatMessage
+export class ChatMessage
 {
     // *
     // 	 * The color of the message.

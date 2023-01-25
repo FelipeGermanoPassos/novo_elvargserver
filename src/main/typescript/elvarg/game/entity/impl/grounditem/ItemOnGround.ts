@@ -1,3 +1,11 @@
+import { World } from "../../../Worlds";
+import { ItemOnGroundManager } from "../grounditem/ItemOnGroundManager"
+import { Player } from "../player/Player"
+import { Item } from "../../../model/Item"
+import { Location } from "../../../model/Location"
+import { PrivateArea } from "../../../model/areas/impl/PrivateArea";
+
+
 export class ItemOnGround {
     position: Location;
     state: State = State.SEEN_BY_PLAYER;

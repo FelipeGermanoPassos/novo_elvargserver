@@ -1,17 +1,17 @@
-import * as GameConstants from '../../game/GameConstants';
-import * as Animation from '../../game/model/Animation';
-import * as Graphic from '../../game/model/Graphic';
-import * as Location from '../../game/model/Location';
-import * as Area from '../../game/model/areas/Area';
-import * as PrivateArea from '../../game/model/areas/impl/PrivateArea';
+import { GameConstants } from '../../game/GameConstants';
+import { Animation } from '../../game/model/Animation';
+import { Graphic } from '../../game/model/Graphic';
+import { Location } from '../../game/model/Location';
+import { Area } from '../../game/model/areas/Area';
+import { PrivateArea } from '../../game/model/areas/impl/PrivateArea';
 
-abstract class Entities {
+
+export abstract class Entity {
     /**
      * Represents the {@link Location} of this {@link Entities}.
      */
     private location: Location = GameConstants.DEFAULT_LOCATION.clone();
     private area: Area;
-
     /**
      * The Entities constructor.
      *
@@ -20,6 +20,7 @@ abstract class Entities {
     constructor(position: Location) {
         this.location = position;
     }
+
 
     /**
      * Performs an {@link Animation}.
@@ -52,7 +53,7 @@ abstract class Entities {
      *
      * @param location the world position
      */
-    setLocation(location: Location): Entities {
+    setLocation(location: Location): Entity {
         this.location = location;
         return this;
     }

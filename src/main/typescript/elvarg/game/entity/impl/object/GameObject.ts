@@ -1,12 +1,10 @@
-import { World } from './world';
-import { ObjectDefinition } from './definition/object';
-import { Entity } from './entities';
-import { Player } from './player';
-import { Animation } from './animation';
-import { Graphic } from './graphic';
-import { PrivateArea } from './areas/private';
+import { Entity } from "../../Entity";
+import {ObjectDefinition} from "../../../definition/ObjectDefinition"
+import { World } from "../../../Worlds";
+import { Player } from "../player/Player";
 
-export class GameObject extends Entities {
+
+export class GameObject extends Entity {
     private id: number;
     private type: number;
     private face: number;
