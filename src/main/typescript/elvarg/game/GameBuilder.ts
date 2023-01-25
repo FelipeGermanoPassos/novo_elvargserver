@@ -1,4 +1,4 @@
-import { BackgroundLoader } from "./BackgroundLoader";
+import { BackgroundLoader } from "../util/BackgroundLoader";
 import { ClanChatManager } from "./content/clan/ClanChatManager";
 import { CombatPoisonData } from "./task/impl/CombatPoisonEffect/CombatPoisonData";
 import { PlayerPunishment } from "./util/PlayerPunishment";

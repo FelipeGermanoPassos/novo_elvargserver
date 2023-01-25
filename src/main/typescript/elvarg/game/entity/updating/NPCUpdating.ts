@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 package com.elvarg.game.entity.updating;
 
 import com.elvarg.game.World;
@@ -54,6 +55,36 @@ public class NPCUpdating {
                 updateMovement(npc, packet);
                 if (npc.getUpdateFlag().isUpdateRequired()) {
                     appendUpdates(npc, update);
+=======
+<<<<<<< Updated upstream
+=======
+import World from '../../Worlds'
+import Mobile from '../impl/Mobile'
+import NPC from '../impl/npc/NPC'
+import Player from '../impl/player/Player'
+import Flag from '../../model/Flag'
+import Location from '../../model/Location'
+import UpdateFlag from '../../model/Update'
+import AreaManager from '../../model/areas/AreaManager'
+
+
+export class NPCUpdating {
+    public static update(player: Player): void {
+        let update = new PacketBuilder();
+        let packet = new PacketBuilder(65, PacketType.VARIABLE_SHORT);
+        packet.initializeAccess(AccessType.BIT);
+        packet.putBits(8, player.getLocalNpcs().size());
+        for (let npcIterator of player.getLocalNpcs()) {
+            let npc = npcIterator;
+            if (World.getNpcs().get(npc.getIndex()) != null
+                && npc.isVisible()
+                && player.getLocation().isViewableFrom(npc.getLocation())
+                && !npc.isNeedsPlacement()
+                && npc.getPrivateArea() == player.getPrivateArea()) {
+                NPCUpdating.updateMovement(npc, packet);
+                if (npc.getUpdateFlag().isUpdateRequired()) {
+                    NPCUpdating.appendUpdates(npc, update);
+>>>>>>> 7052ca7d0e28eadf12625750f1d5d94c3ea0d2aa
                 }
             } else {
                 npcIterator.remove();
@@ -61,11 +92,19 @@ public class NPCUpdating {
                 packet.putBits(2, 3);
             }
         }
+<<<<<<< HEAD
         for (NPC npc : World.getNpcs()) {
             if (player.getLocalNpcs().size() >= 79) //Originally 255
                 break;
             if (npc == null || player.getLocalNpcs().contains(npc) || !npc.isVisible() || npc.isNeedsPlacement()
                     || npc.getPrivateArea() != player.getPrivateArea())
+=======
+        for (let npc of World.getNpcs()) {
+            if (player.getLocalNpcs().size() >= 79) //Originally 255
+                break;
+            if (npc == null || player.getLocalNpcs().contains(npc) || !npc.isVisible() || npc.isNeedsPlacement()
+                || npc.getPrivateArea() != player.getPrivateArea())
+>>>>>>> 7052ca7d0e28eadf12625750f1d5d94c3ea0d2aa
                 continue;
             if (npc.getLocation().isViewableFrom(player.getLocation())) {
                 player.getLocalNpcs().add(npc);
@@ -85,6 +124,7 @@ public class NPCUpdating {
         }
         player.getSession().write(packet);
     }
+<<<<<<< HEAD
 
     /**
      * Adds an npc to the associated player's client.
@@ -94,6 +134,9 @@ public class NPCUpdating {
      * @return The NPCUpdating instance.
      */
     private static addNPC(player:Player ,npc: NPC , builder: PacketBuilder): void {
+=======
+    private static addNPC(player: Player, npc: NPC, builder: PacketBuilder) {
+>>>>>>> 7052ca7d0e28eadf12625750f1d5d94c3ea0d2aa
         builder.putBits(14, npc.getIndex());
         builder.putBits(5, npc.getLocation().getY() - player.getLocation().getY());
         builder.putBits(5, npc.getLocation().getX() - player.getLocation().getX());
@@ -102,6 +145,7 @@ public class NPCUpdating {
         builder.putBits(1, npc.getUpdateFlag().isUpdateRequired() ? 1 : 0);
     }
 
+<<<<<<< HEAD
     /**
      * Updates the npc's movement queue.
      *
@@ -110,6 +154,9 @@ public class NPCUpdating {
      * @return The NPCUpdating instance.
      */
     private static updateMovement(npc:NPC ,out: PacketBuilder ): void {
+=======
+    private static updateMovement(npc: NPC, out: PacketBuilder) {
+>>>>>>> 7052ca7d0e28eadf12625750f1d5d94c3ea0d2aa
         if (npc.getRunningDirection().getId() == -1) {
             if (npc.getWalkingDirection().getId() == -1) {
                 if (npc.getUpdateFlag().isUpdateRequired()) {
@@ -132,6 +179,7 @@ public class NPCUpdating {
             out.putBits(1, npc.getUpdateFlag().isUpdateRequired() ? 1 : 0);
         }
     }
+<<<<<<< HEAD
 
     /**
      * Appends a mask update for {@code npc}.
@@ -143,6 +191,11 @@ public class NPCUpdating {
     private static  appendUpdates(npc:NPC , block: PacketBuilder):void {
         int mask = 0;
         UpdateFlag flag = npc.getUpdateFlag();
+=======
+    private static appendUpdates(npc: NPC, block: PacketBuilder) {
+        let mask = 0;
+        let flag = npc.getUpdateFlag();
+>>>>>>> 7052ca7d0e28eadf12625750f1d5d94c3ea0d2aa
         if (flag.flagged(Flag.ANIMATION) && npc.getAnimation() != null) {
             mask |= 0x10;
         }
@@ -178,7 +231,11 @@ public class NPCUpdating {
             updateSingleHit(block, npc);
         }
         if (flag.flagged(Flag.ENTITY_INTERACTION)) {
+<<<<<<< HEAD
             Mobile entity = npc.getInteractingMobile();
+=======
+            let entity = npc.getInteractingMobile();
+>>>>>>> 7052ca7d0e28eadf12625750f1d5d94c3ea0d2aa
             block.putShort(entity == null ? -1 : entity.getIndex() + (entity instanceof Player ? 32768 : 0));
         }
         if (flag.flagged(Flag.FORCED_CHAT) && npc.getForcedChat() != null) {
@@ -188,7 +245,11 @@ public class NPCUpdating {
             updateDoubleHit(block, npc);
         }
         if (flag.flagged(Flag.APPEARANCE)) {
+<<<<<<< HEAD
             boolean transform = npc.getNpcTransformationId() != -1;
+=======
+            let transform = npc.getNpcTransformationId() != -1;
+>>>>>>> 7052ca7d0e28eadf12625750f1d5d94c3ea0d2aa
 
             //Changes the npc's headicon.
             block.put(npc.getHeadIcon());
@@ -201,12 +262,18 @@ public class NPCUpdating {
                 block.putShort(npc.getNpcTransformationId(), ValueType.A, ByteOrder.LITTLE);
             }
         }
+<<<<<<< HEAD
         if (flag.flagged(Flag.FACE_POSITION) && npc.getPositionToFace() != null) {
             final Location position = npc.getPositionToFace();
+=======
+        if (npc.getUpdateFlag().flagged(Flag.FACE_POSITION) && npc.getPositionToFace() != null) {
+            const position = npc.getPositionToFace();
+>>>>>>> 7052ca7d0e28eadf12625750f1d5d94c3ea0d2aa
             block.putShort(position.getX() * 2 + 1, ByteOrder.LITTLE);
             block.putShort(position.getY() * 2 + 1, ByteOrder.LITTLE);
         }
     }
+<<<<<<< HEAD
 
     /**
      * Updates {@code npc}'s current animation and displays it for all local players.
@@ -216,6 +283,9 @@ public class NPCUpdating {
      * @return The NPCUpdating instance.
      */
     private static void updateAnimation(PacketBuilder builder, NPC npc) {
+=======
+    private static updateAnimation(builder: PacketBuilder, npc: NPC) {
+>>>>>>> 7052ca7d0e28eadf12625750f1d5d94c3ea0d2aa
         builder.putShort(npc.getAnimation().getId(), ByteOrder.LITTLE);
         builder.put(npc.getAnimation().getDelay());
     }
@@ -227,6 +297,7 @@ public class NPCUpdating {
      * @param npc     The npc to update graphics for.
      * @return The NPCUpdating instance.
      */
+<<<<<<< HEAD
     private static void updateGraphics(PacketBuilder builder, NPC npc) {
         builder.putShort(npc.getGraphic().getId());
         builder.putInt(((npc.getGraphic().getHeight().ordinal() * 50) << 16) + (npc.getGraphic().getDelay() & 0xffff));
@@ -240,10 +311,18 @@ public class NPCUpdating {
      * @return The NPCUpdating instance.
      */
     private static void updateSingleHit(PacketBuilder builder, NPC npc) {
+=======
+    private static updateGraphics(builder: PacketBuilder, npc: NPC) {
+        builder.putShort(npc.getGraphic().getId());
+        builder.putInt(((npc.getGraphic().getHeight().ordinal() * 50) << 16) + (npc.getGraphic().getDelay() & 0xffff));
+    }
+    private static updateSingleHit(builder: PacketBuilder, npc: NPC) {
+>>>>>>> 7052ca7d0e28eadf12625750f1d5d94c3ea0d2aa
         builder.putShort(npc.getPrimaryHit().getDamage());
         builder.put(npc.getPrimaryHit().getHitmask().ordinal());
         builder.putShort(npc.getHitpoints());
         builder.putShort(npc.getDefinition().getHitpoints());
+<<<<<<< HEAD
 
     }
 
@@ -255,9 +334,18 @@ public class NPCUpdating {
      * @return The NPCUpdating instance.
      */
     private static void updateDoubleHit(PacketBuilder builder, NPC npc) {
+=======
+    }
+
+    private static updateDoubleHit(builder: PacketBuilder, npc: NPC) {
+>>>>>>> 7052ca7d0e28eadf12625750f1d5d94c3ea0d2aa
         builder.putShort(npc.getSecondaryHit().getDamage());
         builder.put(npc.getSecondaryHit().getHitmask().ordinal());
         builder.putShort(npc.getHitpoints());
         builder.putShort(npc.getDefinition().getHitpoints());
     }
 }
+<<<<<<< HEAD
+=======
+>>>>>>> Stashed changes
+>>>>>>> 7052ca7d0e28eadf12625750f1d5d94c3ea0d2aa

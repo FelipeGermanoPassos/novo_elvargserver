@@ -1,47 +1,52 @@
-import * as Player from "../../Player";
-import * as PlayerPersistence from "../PlayerPersistence";
-import * as PlayerSave from "../PlayerSave";
-import * as PlayerBoth from "../../../playerbot/PlayerBot";
-
-
+import { Player, PlayerBot } from "../player/Player";
+import { PlayerPersistence } from "./PlayerPersistence";
+import { PlayerSave } from "./PlayerSave";
+import * as AWS from "aws-sdk";
+import { DynamoDbTable, DynamoDbEnhancedClient } from "aws-sdk-lib";
+import { PlayerSaveRecord } from "./PlayerSaveRecord";
 
 export class DynamoDBPlayerPersistence extends PlayerPersistence {
+    private static dynamoDbClient = new AWS.DynamoDB({ region: "eu-west-1" });
+    private static enhancedClient = new DynamoDbEnhancedClient({ client: DynamoDBPlayerPersistence.dynamoDbClient });
+    private static playerTableName = process.env.PLAYER_TABLE_NAME;
 
-    private static DynamoDbClient dynamoDbClient = DynamoDbClient.builder().region(Region.EU_WEST_1).build();
-    private static DynamoDbEnhancedClient enhancedClient = DynamoDbEnhancedClient.builder().dynamoDbClient(dynamoDbClient).build();
-    private static playerTableName: string = Window.getenv("PLAYER_TABLE_NAME");
+    private static readonly PLAYER_SAVE_TABLE_SCHEMA = TableSchema.fromObject(PlayerSaveRecord);
 
-    const Player = new Player();
-
-    @Override
     public save(player: Player): void {
         if (player instanceof PlayerBot) {
             return;
         }
-        var Date = new Date();
 
-        var playerSave = PlayerSave.fromPlayer(player);
-        DynamoDbTable < PlayerSaveRecord > playerTable = enhancedClient.table(playerTableName, PLAYER_SAVE_TABLE_SCHEMA);
+        const playerSave = PlayerSave.fromPlayer(player);
+        const playerTable: DynamoDbTable<PlayerSaveRecord> = DynamoDBPlayerPersistence.enhancedClient.table(
+            DynamoDBPlayerPersistence.playerTableName,
+            DynamoDBPlayerPersistence.PLAYER_SAVE_TABLE_SCHEMA
+        );
 
-        playerTable.putItem(new PlayerSaveRecord(player.getUsername(), playerSave, Date.gethours()));
+        playerTable.putItem({
+            username: player.username,
+            playerSave,
+            timestamp: new Date().toISOString()
+        });
     }
 
-    @Override
-    public PlayerSave(username: string) {
-        DynamoDbTable < PlayerSaveRecord > playerTable = enhancedClient.table(playerTableName, PLAYER_SAVE_TABLE_SCHEMA);
+    public load(username: string): PlayerSave | null {
+        const playerTable: DynamoDbTable<PlayerSaveRecord> = DynamoDBPlayerPersistence.enhancedClient.table(
+            DynamoDBPlayerPersistence.playerTableName,
+            DynamoDBPlayerPersistence.PLAYER_SAVE_TABLE_SCHEMA
+        );
 
-        var PlayerSaveRecord = playerTable.getItem(Key.builder().partitionValue(username).build());
+        const playerSaveRecord = playerTable.getItem({ partitionKey: { username } });
 
-        if (PlayerSaveRecord == null) {
+        if (!playerSaveRecord) {
             return null;
         }
 
-        return playerSaveRecord.getPlayerSave();
+        return playerSaveRecord.playerSave;
     }
 
-    @Override
     public exists(username: string): boolean {
+        // Have to do it properly later. Have to make sure we dont block main loop
         return true;
     }
-
 }

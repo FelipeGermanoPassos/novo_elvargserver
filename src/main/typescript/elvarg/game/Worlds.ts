@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import {ObjectManager} from '../../../entity/impl/object/ObjectManager';
 import {ItemOnGround} from '../../../entity/impl/grounditem/ItemOnGround'
 import {GameObject} from '../../../entity/impl/object/GameObject';
@@ -32,6 +33,13 @@ export class World {
     /**
      * The collection of active {@link ItemOnGround}s..
      */
+=======
+export class World {
+    private static readonly MAX_PLAYERS = 500;
+    private static players: MobileList<Player> = new MobileList<Player>(MAX_PLAYERS);
+    private static playerBots: Map<string, PlayerBot> = new Map<string, PlayerBot>();
+    private static npcs: MobileList<NPC> = new MobileList<NPC>(5000);
+>>>>>>> 7052ca7d0e28eadf12625750f1d5d94c3ea0d2aa
     private static items: ItemOnGround[] = [];
     
     /**
