@@ -1,5 +1,5 @@
-import { IsaacRandom } from "com/elvarg/net/security/IsaacRandom";
-import { Packet, PacketType } from "com/elvarg/net/packet/Packet";
+import { IsaacRandom } from "../security/IsaacRandom";
+import { Packet, PacketType } from "../packet/Packet";
 import { ByteBuf, Unpooled } from "netty";
 import { MessageToByteEncoder } from "netty";
 

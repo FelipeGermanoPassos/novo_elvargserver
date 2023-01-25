@@ -4,7 +4,7 @@ import { Packet } from './Packet'
 import { IsaacRandom } from './security/IsaacRandom'
 import { NetworkConstants } from './NetworkConstants'
 
-class PacketDecoder extends ByteToMessageDecoder {
+export class PacketDecoder extends ByteToMessageDecoder {
     // constructor(random: IsaacRandom) {
     //     this.random = random;
     //     this.opcode = -1;
@@ -37,7 +37,7 @@ class PacketDecoder extends ByteToMessageDecoder {
         if (session == null || session.getPlayer() == null) {
             return;
         }
-        
+
         let opcode = this.opcode;
         let size = this.size;
 
