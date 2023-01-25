@@ -4,7 +4,6 @@ import { ThreadFactoryBuilder } from 'com.google.common.util.concurrent';
 class GameLogic {
     private static logicService = GameLogic.createLogicService();
     
-    Copy code
     public static submit(t: () => void) {
         try {
             this.logicService.execute(t);

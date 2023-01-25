@@ -1,4 +1,4 @@
-class DiscordUtil {
+export class DiscordUtil {
     static httpClient: any;
 
     static DiscordConstants = {

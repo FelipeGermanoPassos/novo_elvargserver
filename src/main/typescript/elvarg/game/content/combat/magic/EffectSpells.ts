@@ -1,4 +1,4 @@
-class EffectSpells {
+export class EffectSpells {
     public static handleSpell(player: Player, button: number) {
         const spell: Optional<EffectSpell> = EffectSpell.forSpellId(button);
         if (!spell.isPresent()) {

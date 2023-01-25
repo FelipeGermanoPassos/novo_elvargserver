@@ -1,16 +1,16 @@
-import { Player } from './game/entity/impl/player/Player';
-import { World } from './game/World';
-import { PacketDecoder } from './net/codec/PacketDecoder';
-import { PacketEncoder } from './net/codec/PacketEncoder';
-import { LoginDetailsMessage } from './net/login/LoginDetailsMessage';
-import { LoginResponsePacket } from './net/login/LoginResponsePacket';
-import { LoginResponses } from './net/login/LoginResponses';
-import { Packet } from './net/packet/Packet';
-import { PacketBuilder } from './net/packet/PacketBuilder';
-import { PacketConstants } from './net/packet/PacketConstants';
-import { Misc } from './util/Misc';
-import { NetworkConstants } from './net/NetworkConstants';
-
+import { Player } from '../game/entity/impl/player/Player';
+import { World } from '../game/World';
+import { PacketDecoder } from './codec/PacketDecoder';
+import { PacketEncoder } from './codec/PacketEncoder';
+import { LoginDetailsMessage } from './login/LoginDetailsMessage';
+import { LoginResponsePacket } from './login/LoginResponsePacket';
+import { LoginResponses } from './login/LoginResponses';
+import { Packet } from './packet/Packet';
+import { PacketBuilder } from './packet/PacketBuilder';
+import { PacketConstants } from './packet/PacketConstants';
+import { Misc } from '../util/Misc';
+import { NetworkConstants } from './NetworkConstants';
+import { SocketIO } from 'socket.io';
 class PlayerSession {
     private packetsQueue: Packet[] = [];
     private lastPacketOpcodeQueue: number[] = [];

@@ -1,4 +1,13 @@
-class Emotes {
+import { CombatFactory } from './combat/CombatFactory';
+import { SkillManager } from './skill/SkillManager';
+import { Player } from '../entity/impl/player/Player';
+import { Animation } from '../model/Animation';
+import { Graphic } from '../model/Graphic';
+import { Skill } from '../model/Skill';
+import { Skillcape } from '../model/Skillcape';
+import { Equipment } from '../model/container/impl/Equipment';
+
+export class Emotes {
     public static doEmote(player: Player, button: number) {
         const data = EmoteData.forId(button);
         if (data) {
@@ -21,32 +30,32 @@ class Emotes {
                         // custom capes
                     }
                 }
-                animation(player, cape.getAnimation(), cape.getGraphic());
+                handleAnimation(player, cape.getAnimation(), cape.getGraphic());
             }
             return true;
         }
         return false;
     }
 
-    function animation(player: Player, anim: Animation, graphic: Graphic) {
-    if (CombatFactory.inCombat(player)) {
-        player.getPacketSender().sendMessage("You cannot do this right now.");
-        return;
-    }
+    handleAnimation(player: Player, anim: Animation, graphic: Graphic) {
+        if (CombatFactory.inCombat(player)) {
+            player.getPacketSender().sendMessage("You cannot do this right now.");
+            return;
+        }
 
-    player.getSkillManager().stopSkillable();
-    player.getMovementQueue().reset();
+        player.getSkillManager().stopSkillable();
+        player.getMovementQueue().reset();
 
-    if (anim) {
-        player.performAnimation(anim);
-    }
-    if (graphic) {
-        player.performGraphic(graphic);
+        if (anim) {
+            player.performAnimation(anim);
+        }
+        if (graphic) {
+            player.performGraphic(graphic);
+        }
     }
 }
 
 class EmoteData {
-    private static emotes: Map<number, EmoteData> = new Map();
 
     public animation: Animation;
     public graphic: Graphic;
@@ -59,7 +68,7 @@ class EmoteData {
     }
 
     static forId(button: number): EmoteData | undefined {
-        return EmoteData.emotes.get(button);
+        return EmoteDatas.emotes.get(button);
     }
 
     static init() {
@@ -72,10 +81,8 @@ class EmoteData {
     }
 }
 EmoteData.init();
-}
 
-
-enum EmoteData {
+enum EmoteDatas {
     YES = 168,
     NO = 169,
     BOW = 164,
@@ -114,15 +121,6 @@ enum EmoteData {
 		AIR_GUITAR(11101, new Animation(2414), new Graphic(1537)),
 		SNOWMAN_DANCE(11102, new Animation(7531), null),
 		FREEZE(11103, new Animation(11044), new Graphic(1973))*/;
-
-    constructor(
-        public readonly id: number,
-        public readonly animation: Animation,
-        public readonly graphic: Graphic
-    ) { }
-      
-        static forId(id: number): EmoteData | undefined {
-    return Object.values(EmoteData).find(emoteData => emoteData.id === id);
 }
 
 

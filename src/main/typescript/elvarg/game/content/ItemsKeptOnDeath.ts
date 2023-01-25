@@ -1,4 +1,4 @@
-class ItemsKeptOnDeath {
+export class ItemsKeptOnDeath {
     public static open(player: Player) {
         ItemsKeptOnDeath.clearInterfaceData(player); //To prevent sending multiple layers of items.
         ItemsKeptOnDeath.sendInterfaceData(player); //Send info on the interface.

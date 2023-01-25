@@ -1,3 +1,5 @@
+import { SecondsTimer } from '../../model/SecondsTimer';
+
 class BannedMember {
     private timer: SecondsTimer;
     private name: string;

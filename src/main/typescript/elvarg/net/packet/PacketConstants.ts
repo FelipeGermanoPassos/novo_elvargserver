@@ -1,4 +1,4 @@
-class PacketConstants {
+export class PacketConstants {
 	const PACKETS: PacketExecutor[] = new Array(257);
 	const TELEPORT_OPCODE = 183;
 	const SPECIAL_ATTACK_OPCODE = 184;

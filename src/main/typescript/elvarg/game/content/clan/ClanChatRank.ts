@@ -10,7 +10,6 @@ const chatRank = {
     STAFF: -1,
 }
 
-
 class ClanChatRank {
     private readonly actionMenuId: number;
     private readonly spriteId: number;

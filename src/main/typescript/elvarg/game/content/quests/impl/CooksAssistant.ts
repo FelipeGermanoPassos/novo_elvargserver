@@ -6,8 +6,8 @@ import { Skill } from '../../../model/Skill';
 import { DialogueExpression } from '../../../model/dialogues/DialogueExpression';
 import { DialogueChainBuilder } from '../../../model/dialogues/DialogueChainBuilder';
 import * as DialogueEntries from '../../../model/dialogues/entries/impl';
-import {NpcIdentifiers} from '../../../../util/NpcIdentifiers';
-class CooksAssistant implements Quest {
+import { NpcIdentifiers } from '../../../../util/NpcIdentifiers';
+export class CooksAssistant implements Quest {
 
     private static EGG = 1944;
     private static MILK = 1927;

@@ -1,4 +1,4 @@
-class MovementQueue {
+export class MovementQueue {
 
     private static RANDOM: RandomGen = new RandomGen();
 

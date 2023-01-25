@@ -1,3 +1,5 @@
+import {IsaacRandom} from '../security/IsaacRandom';
+
 export class LoginDetailsMessage {
     private readonly context: ChannelHandlerContext;
     private readonly username: string;

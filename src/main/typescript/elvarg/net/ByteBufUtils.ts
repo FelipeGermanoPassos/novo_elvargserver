@@ -1,7 +1,7 @@
 export class ByteBufUtils {
     public static J_STRING_TERMINATOR: string = '\n';
 
-    public static getMedium(buffer: ByteBuf) {
+    public static getMedium(buffer: number) {
         return (buffer.readShort() & 0xFFFF) << 8 | buffer.readByte() & 0xFF;
     }
 

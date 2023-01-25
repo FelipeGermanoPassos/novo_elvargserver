@@ -1,4 +1,4 @@
-class Autocasting {
+export class Autocasting {
 
     // Autocast buttons
     private static readonly REGULAR_AUTOCAST_BUTTON = 349;

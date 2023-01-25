@@ -1,4 +1,4 @@
-class Bank extends ItemContainer {
+export class Bank extends ItemContainer {
     public static readonly TOTAL_BANK_TABS = 11;
     public static readonly CONTAINER_START = 50300;
     public static readonly BANK_SEARCH_TAB_INDEX = TOTAL_BANK_TABS - 1;
@@ -6,7 +6,6 @@ class Bank extends ItemContainer {
     public static readonly BANK_TAB_INTERFACE_ID = 5383;
     public static readonly INVENTORY_INTERFACE_ID = 5064;
     
-    Copy code
     constructor(public player: Player) {
         super(player);
     }

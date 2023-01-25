@@ -1,4 +1,4 @@
-class CombatFactory {
+export class CombatFactory {
     private static readonly RANDOM = new RandomGen();
     /**
      * The default melee combat method.

@@ -10,7 +10,6 @@ import { ClanChatManager } from 'com.elvarg.game.content.clan';
 class GameEngine implements Runnable {
     private executorService = new ScheduledExecutorService();
     
-    Copy code
     constructor() {
         this.executorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("GameThread").build());
     }

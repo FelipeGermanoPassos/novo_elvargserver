@@ -1,4 +1,4 @@
-class TaskManager {
+export class TaskManager {
     private static pendingTasks: Queue<Task> = new LinkedList<Task>();
     private static activeTasks: List<Task> = new LinkedList<Task>();
     

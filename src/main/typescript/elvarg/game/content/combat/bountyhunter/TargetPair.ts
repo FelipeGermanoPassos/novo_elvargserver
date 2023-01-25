@@ -1,3 +1,5 @@
+import { Player } from '../../../entity/impl/player/Player';
+
 class TargetPair {
     private player1: Player;
     private player2: Player;

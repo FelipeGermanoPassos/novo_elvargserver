@@ -4,7 +4,7 @@ interface Minigame {
     process(): void;
 }
 
-class MinigameHandler {
+export class MinigameHandler {
     public static minigames = {
         CASTLEWARS: {
             name: "Castlewars",

@@ -1,4 +1,4 @@
-class ItemDefinition {
+export class ItemDefinition {
     public static definitions: Map<number, ItemDefinition> = new Map<number, ItemDefinition>();
     public static DEFAULT = new ItemDefinition();
 

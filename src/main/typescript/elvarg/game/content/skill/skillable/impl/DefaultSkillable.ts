@@ -1,4 +1,4 @@
-abstract class DefaultSkillable implements Skillable {
+class DefaultSkillable implements Skillable {
     private tasks: Task[] = [];
 
     start(player: Player) {
@@ -18,7 +18,7 @@ abstract class DefaultSkillable implements Skillable {
                     }
                 }
     
-                // Every cycle, call the abstract method..
+                // Every cycle, call the method..
                 this.onCycle(player);
     
                 // Sequence the skill, reward players
@@ -38,12 +38,12 @@ abstract class DefaultSkillable implements Skillable {
         this.tasks.push(task);
     }
     
-    abstract onCycle(player: Player): void;
-    abstract loopRequirements(): boolean;
-    abstract hasRequirements(player: Player): boolean;
-    abstract cyclesRequired(player: Player): number;
-    abstract finishedCycle(player: Player): void;
-    abstract startAnimationLoop(player: Player): void;
+    onCycle(player: Player): void;
+    loopRequirements(): boolean;
+    hasRequirements(player: Player): boolean;
+    cyclesRequired(player: Player): number;
+    finishedCycle(player: Player): void;
+    startAnimationLoop(player: Player): void;
 
     cancel(player: Player): void {
         // Stop all tasks..
@@ -80,7 +80,7 @@ abstract class DefaultSkillable implements Skillable {
         return Array.from(tasks);
     }
 
-    abstract loopRequirements(): boolean;
-    abstract allowFullInventory(): boolean;
+    loopRequirements(): boolean;
+    allowFullInventory(): boolean;
 
 }    

@@ -1,4 +1,4 @@
-class NpcIdentifiers {
+export class NpcIdentifiers {
 
     public static TOOL_LEPRECHAUN = 0;
     public static MOLANISK = 1;

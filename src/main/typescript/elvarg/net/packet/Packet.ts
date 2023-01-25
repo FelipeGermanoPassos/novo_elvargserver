@@ -1,6 +1,6 @@
 import { ByteBuf } from 'netty';
 
-class Packet {
+export class Packet {
     constructor(opcode: number, type: PacketType, buffer: ByteBuf) {
         this.opcode = opcode;
         this.type = type;
@@ -192,5 +192,5 @@ class Packet {
     }
 }
 
-    }
+    
 

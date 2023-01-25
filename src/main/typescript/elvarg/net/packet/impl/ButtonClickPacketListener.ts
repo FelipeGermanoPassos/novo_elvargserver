@@ -1,5 +1,23 @@
-export class ButtonClickPacketListener implements PacketExecutor {
+import { PacketExecutor } from '../PacketExecutor';
+import { Emotes } from '../../../game/content/Emotes';
+import { ItemsKeptOnDeath } from '../../../game/content/ItemsKeptOnDeath';
+import { PrayerHandler } from '../../../game/content/PrayerHandler';
+import { ClanChatManager } from '../../../game/content/clan/ClanChatManager';
+import { WeaponInterfaces } from '../../../game/content/combat/WeaponInterfaces';
+import { Autocasting } from '../../../game/content/combat/magic/Autocasting';
+import { EffectSpells } from '../../../game/content/combat/magic/EffectSpells';
+import { MinigameHandler } from '../../../game/content/minigames/MinigameHandler';
+import { Presetables } from '../../../game/content/presets/Presetables';
+import { QuestHandler } from '../../../game/content/quests/QuestHandler';
+import { Smithing } from '../../../game/content/skill/skillable/impl/Smithing';
+import { Player } from '../../../game/entity/impl/player/Player';
+import { Bank } from '../../../game/model/container/impl/Bank';
+import { DialogueOption } from '../../../game/model/dialogues/DialogueOption';
+import { BonusManager } from '../../../game/model/equipment/BonusManager';
+import { PlayerRights } from '../../../game/model/rights/PlayerRights';
+import { Packet } from '../Packet';
 
+export class ButtonClickPacketListener implements PacketExecutor {
   public static readonly FIRST_DIALOGUE_OPTION_OF_FIVE: number = 2494;
   public static readonly SECOND_DIALOGUE_OPTION_OF_FIVE: number = 2495;
   public static readonly THIRD_DIALOGUE_OPTION_OF_FIVE: number = 2496;
@@ -99,174 +117,175 @@ export class ButtonClickPacketListener implements PacketExecutor {
     return false;
   }
 
-    function execute(player: Player, packet: Packet): void {
-  let button = packet.readInt();
+  execute(player: Player, packet: Packet): void {
+    let button = packet.readInt();
 
-  if (player.getHitpoints() <= 0 || player.isTeleporting()) {
-    return;
-  }
+    if (player.getHitpoints() <= 0 || player.isTeleporting()) {
+      return;
+    }
 
-  if (player.getRights() == PlayerRights.DEVELOPER) {
-    player.getPacketSender().sendMessage("Button clicked: " + button.toString() + ".");
-  }
+    if (player.getRights() == PlayerRights.DEVELOPER) {
+      player.getPacketSender().sendMessage("Button clicked: " + button.toString() + ".");
+    }
 
-  if (handlers(player, button)) {
-    return;
-  }
+    if (handlers(player, button)) {
+      return;
+    }
 
-  switch (button) {
-    case OPEN_PRESETS:
-      if (player.busy()) {
+    switch (button) {
+      case ButtonClickPacketListener.OPEN_PRESETS:
+        if (player.busy()) {
+          player.getPacketSender().sendInterfaceRemoval();
+        }
+        Presetables.open(player);
+        break;
+
+      case ButtonClickPacketListener.OPEN_WORLD_MAP:
+        if (player.busy()) {
+          player.getPacketSender().sendInterfaceRemoval();
+        }
+        player.getPacketSender().sendInterface(54000);
+        break;
+
+      case ButtonClickPacketListener.LOGOUT:
+        if (player.canLogout()) {
+          player.requestLogout();
+        } else {
+          player.getPacketSender().sendMessage("You cannot log out at the moment.");
+        }
+        break;
+
+      case ButtonClickPacketListener.TOGGLE_RUN_ENERGY_ORB:
+      case ButtonClickPacketListener.TOGGLE_RUN_ENERGY_SETTINGS:
+        if (player.busy()) {
+          player.getPacketSender().sendInterfaceRemoval();
+        }
+        if (player.getRunEnergy() > 0) {
+          player.setRunning(!player.isRunning());
+        } else {
+          player.setRunning(false);
+        }
+        player.getPacketSender().sendRunStatus();
+        break;
+
+      case ButtonClickPacketListener.OPEN_ADVANCED_OPTIONS:
+        if (player.busy()) {
+          player.getPacketSender().sendInterfaceRemoval();
+        }
+        player.getPacketSender().sendInterface(23000);
+        break;
+
+      case ButtonClickPacketListener.OPEN_KEY_BINDINGS:
+        if (player.busy()) {
+          player.getPacketSender().sendInterfaceRemoval();
+        }
+        player.getPacketSender().sendInterface(53000);
+        break;
+
+      case ButtonClickPacketListener.OPEN_EQUIPMENT_SCREEN:
+        if (player.busy()) {
+          player.getPacketSender().sendInterfaceRemoval();
+        }
+        BonusManager.open(player);
+        break;
+
+      case ButtonClickPacketListener.OPEN_PRICE_CHECKER:
+        if (player.busy()) {
+          player.getPacketSender().sendInterfaceRemoval();
+        }
+        player.getPriceChecker().open();
+        break;
+
+      case ButtonClickPacketListener.OPEN_ITEMS_KEPT_ON_DEATH_SCREEN:
+        if (player.busy()) {
+          player.getPacketSender().sendInterfaceRemoval();
+        }
+        ItemsKeptOnDeath.open(player);
+        break;
+
+      case ButtonClickPacketListener.PRICE_CHECKER_WITHDRAW_ALL:
+        player.getPriceChecker().withdrawAll();
+        break;
+
+      case PRICE_CHECKER_DEPOSIT_ALL:
+        player.getPriceChecker().depositAll();
+        break;
+
+      case ButtonClickPacketListener.TRADE_ACCEPT_BUTTON_1:
+      case ButtonClickPacketListener.TRADE_ACCEPT_BUTTON_2:
+        player.getTrading().acceptTrade();
+        break;
+
+      case ButtonClickPacketListener.DUEL_ACCEPT_BUTTON_1:
+      case ButtonClickPacketListener.DUEL_ACCEPT_BUTTON_2:
+        player.getDueling().acceptDuel();
+        break;
+
+      case ButtonClickPacketListener.TOGGLE_AUTO_RETALIATE_328:
+      case ButtonClickPacketListener.TOGGLE_AUTO_RETALIATE_425:
+      case ButtonClickPacketListener.TOGGLE_AUTO_RETALIATE_3796:
+      case ButtonClickPacketListener.TOGGLE_AUTO_RETALIATE_776:
+      case ButtonClickPacketListener.TOGGLE_AUTO_RETALIATE_1764:
+      case ButtonClickPacketListener.TOGGLE_AUTO_RETALIATE_2276:
+      case ButtonClickPacketListener.TOGGLE_AUTO_RETALIATE_5570:
+      case ButtonClickPacketListener.TOGGLE_AUTO_RETALIATE_1698:
+        player.setAutoRetaliate(!player.autoRetaliate());
+        break;
+
+      case ButtonClickPacketListener.DESTROY_ITEM:
+        let item = player.getDestroyItem();
         player.getPacketSender().sendInterfaceRemoval();
-      }
-      Presetables.open(player);
-      break;
+        if (item != -1) {
+          player.getInventory().delete(item, player.getInventory().getAmount(item));
+        }
+        break;
 
-    case OPEN_WORLD_MAP:
-      if (player.busy()) {
+      case ButtonClickPacketListener.CANCEL_DESTROY_ITEM:
         player.getPacketSender().sendInterfaceRemoval();
-      }
-      player.getPacketSender().sendInterface(54000);
-      break;
+        break;
 
-    case LOGOUT:
-      if (player.canLogout()) {
-        player.requestLogout();
-      } else {
-        player.getPacketSender().sendMessage("You cannot log out at the moment.");
-      }
-      break;
+      case ButtonClickPacketListener.TOGGLE_EXP_LOCK:
+        player.setExperienceLocked(!player.experienceLocked());
+        if (player.experienceLocked()) {
+          player.getPacketSender().sendMessage("Your experience is now @red@locked.");
+        } else {
+          player.getPacketSender().sendMessage("Your experience is now @red@unlocked.");
+        }
+        break;
 
-    case TOGGLE_RUN_ENERGY_ORB:
-    case TOGGLE_RUN_ENERGY_SETTINGS:
-      if (player.busy()) {
+      case ButtonClickPacketListener.CLOSE_BUTTON_1:
+      case ButtonClickPacketListener.CLOSE_BUTTON_2:
+      case 16999:
         player.getPacketSender().sendInterfaceRemoval();
-      }
-      if (player.getRunEnergy() > 0) {
-        player.setRunning(!player.isRunning());
-      } else {
-        player.setRunning(false);
-      }
-      player.getPacketSender().sendRunStatus();
-      break;
+        break;
 
-    case OPEN_ADVANCED_OPTIONS:
-      if (player.busy()) {
-        player.getPacketSender().sendInterfaceRemoval();
-      }
-      player.getPacketSender().sendInterface(23000);
-      break;
-
-    case OPEN_KEY_BINDINGS:
-      if (player.busy()) {
-        player.getPacketSender().sendInterfaceRemoval();
-      }
-      player.getPacketSender().sendInterface(53000);
-      break;
-
-    case OPEN_EQUIPMENT_SCREEN:
-      if (player.busy()) {
-        player.getPacketSender().sendInterfaceRemoval();
-      }
-      BonusManager.open(player);
-      break;
-
-    case OPEN_PRICE_CHECKER:
-      if (player.busy()) {
-        player.getPacketSender().sendInterfaceRemoval();
-      }
-      player.getPriceChecker().open();
-      break;
-
-    case OPEN_ITEMS_KEPT_ON_DEATH_SCREEN:
-      if (player.busy()) {
-        player.getPacketSender().sendInterfaceRemoval();
-      }
-      ItemsKeptOnDeath.open(player);
-      break;
-
-    case PRICE_CHECKER_WITHDRAW_ALL:
-      player.getPriceChecker().withdrawAll();
-      break;
-
-    case PRICE_CHECKER_DEPOSIT_ALL:
-      player.getPriceChecker().depositAll();
-      break;
-
-    case TRADE_ACCEPT_BUTTON_1:
-    case TRADE_ACCEPT_BUTTON_2:
-      player.getTrading().acceptTrade();
-      break;
-
-    case DUEL_ACCEPT_BUTTON_1:
-    case DUEL_ACCEPT_BUTTON_2:
-      player.getDueling().acceptDuel();
-      break;
-
-    case TOGGLE_AUTO_RETALIATE_328:
-    case TOGGLE_AUTO_RETALIATE_425:
-    case TOGGLE_AUTO_RETALIATE_3796:
-    case TOGGLE_AUTO_RETALIATE_776:
-    case TOGGLE_AUTO_RETALIATE_1764:
-    case TOGGLE_AUTO_RETALIATE_2276:
-    case TOGGLE_AUTO_RETALIATE_5570:
-    case TOGGLE_AUTO_RETALIATE_1698:
-      player.setAutoRetaliate(!player.autoRetaliate());
-      break;
-
-    case DESTROY_ITEM:
-      let item = player.getDestroyItem();
-      player.getPacketSender().sendInterfaceRemoval();
-      if (item != -1) {
-        player.getInventory().delete(item, player.getInventory().getAmount(item));
-      }
-      break;
-
-    case CANCEL_DESTROY_ITEM:
-      player.getPacketSender().sendInterfaceRemoval();
-      break;
-
-    case TOGGLE_EXP_LOCK:
-      player.setExperienceLocked(!player.experienceLocked());
-      if (player.experienceLocked()) {
-        player.getPacketSender().sendMessage("Your experience is now @red@locked.");
-      } else {
-        player.getPacketSender().sendMessage("Your experience is now @red@unlocked.");
-      }
-      break;
-
-    case CLOSE_BUTTON_1:
-    case CLOSE_BUTTON_2:
-    case 16999:
-      player.getPacketSender().sendInterfaceRemoval();
-      break;
-
-    case FIRST_DIALOGUE_OPTION_OF_FIVE:
-    case FIRST_DIALOGUE_OPTION_OF_FOUR:
-    case FIRST_DIALOGUE_OPTION_OF_THREE:
-    case FIRST_DIALOGUE_OPTION_OF_TWO:
-      player.getDialogueManager().handleOption(player, DialogueOption.FIRST_OPTION);
-      break;
-    case SECOND_DIALOGUE_OPTION_OF_FIVE:
-    case SECOND_DIALOGUE_OPTION_OF_FOUR:
-    case SECOND_DIALOGUE_OPTION_OF_THREE:
-    case SECOND_DIALOGUE_OPTION_OF_TWO:
-      player.getDialogueManager().handleOption(player, DialogueOption.SECOND_OPTION);
-      break;
-    case THIRD_DIALOGUE_OPTION_OF_FIVE:
-    case THIRD_DIALOGUE_OPTION_OF_FOUR:
-    case THIRD_DIALOGUE_OPTION_OF_THREE:
-      player.getDialogueManager().handleOption(player, DialogueOption.THIRD_OPTION);
-      break;
-    case FOURTH_DIALOGUE_OPTION_OF_FIVE:
-    case FOURTH_DIALOGUE_OPTION_OF_FOUR:
-      player.getDialogueManager().handleOption(player, DialogueOption.FOURTH_OPTION);
-      break;
-    case FIFTH_DIALOGUE_OPTION_OF_FIVE:
-      player.getDialogueManager().handleOption(player, DialogueOption.FIFTH_OPTION);
-      break;
-    default:
-      // player.getPacketSender().sendMessage("Player "+player.getUsername()+", click button: "+button);
-      break;
+      case ButtonClickPacketListener.FIRST_DIALOGUE_OPTION_OF_FIVE:
+      case ButtonClickPacketListener.FIRST_DIALOGUE_OPTION_OF_FOUR:
+      case ButtonClickPacketListener.FIRST_DIALOGUE_OPTION_OF_THREE:
+      case ButtonClickPacketListener.FIRST_DIALOGUE_OPTION_OF_TWO:
+        player.getDialogueManager().handleOption(player, DialogueOption.FIRST_OPTION);
+        break;
+      case ButtonClickPacketListener.SECOND_DIALOGUE_OPTION_OF_FIVE:
+      case ButtonClickPacketListener.SECOND_DIALOGUE_OPTION_OF_FOUR:
+      case ButtonClickPacketListener.SECOND_DIALOGUE_OPTION_OF_THREE:
+      case ButtonClickPacketListener.SECOND_DIALOGUE_OPTION_OF_TWO:
+        player.getDialogueManager().handleOption(player, DialogueOption.SECOND_OPTION);
+        break;
+      case ButtonClickPacketListener.THIRD_DIALOGUE_OPTION_OF_FIVE:
+      case ButtonClickPacketListener.THIRD_DIALOGUE_OPTION_OF_FOUR:
+      case ButtonClickPacketListener.THIRD_DIALOGUE_OPTION_OF_THREE:
+        player.getDialogueManager().handleOption(player, DialogueOption.THIRD_OPTION);
+        break;
+      case ButtonClickPacketListener.FOURTH_DIALOGUE_OPTION_OF_FIVE:
+      case ButtonClickPacketListener.FOURTH_DIALOGUE_OPTION_OF_FOUR:
+        player.getDialogueManager().handleOption(player, DialogueOption.FOURTH_OPTION);
+        break;
+      case ButtonClickPacketListener.FIFTH_DIALOGUE_OPTION_OF_FIVE:
+        player.getDialogueManager().handleOption(player, DialogueOption.FIFTH_OPTION);
+        break;
+      default:
+        // player.getPacketSender().sendMessage("Player "+player.getUsername()+", click button: "+button);
+        break;
+    }
   }
 }

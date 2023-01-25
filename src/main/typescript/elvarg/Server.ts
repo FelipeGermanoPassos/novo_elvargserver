@@ -1,4 +1,4 @@
-class Server {
+export class Server {
     private static flooder = new Flooder();
     public static PRODUCTION = false;
     public static DEBUG_LOGGING = false;

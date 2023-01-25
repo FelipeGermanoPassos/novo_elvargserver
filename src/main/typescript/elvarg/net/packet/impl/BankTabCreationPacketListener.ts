@@ -1,6 +1,8 @@
-import { Player, PlayerStatus, Bank } from 'com.elvarg.game.entity.impl';
-import { Item } from 'com.elvarg.game.model';
-import { Packet, PacketExecutor } from 'com.elvarg.net.packet';
+import { Player } from '../../../game/entity/impl/player/Player';
+import { PlayerStatus } from '../../../game/model/PlayerStatus';
+import { Bank } from '../../../game/model/container/impl/Bank';
+import { Packet } from '../../packet/Packet';
+import { PacketExecutor } from '../../packet/PacketExecutor';
 
 export class BankTabCreationPacketListener implements PacketExecutor {
     execute(player: Player, packet: Packet) {

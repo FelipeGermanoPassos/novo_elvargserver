@@ -1,3 +1,5 @@
+import { SlayerMaster } from './SlayerMaster';
+import { SlayerTask } from './SlayerTask';
 class ActiveSlayerTask {
     private master: SlayerMaster;
     private task: SlayerTask;

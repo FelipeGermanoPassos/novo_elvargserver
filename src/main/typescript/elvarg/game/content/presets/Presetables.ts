@@ -1,4 +1,4 @@
-class Presetables {
+export class Presetables {
     /**
      * The max amount of premade/custom presets.
      */

@@ -1,4 +1,4 @@
-enum DialogueOption {
+export enum DialogueOption {
     FIRST_OPTION,
     SECOND_OPTION,
     THIRD_OPTION,
