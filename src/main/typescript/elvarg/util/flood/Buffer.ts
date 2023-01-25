@@ -1,4 +1,4 @@
-package com.elvarg.util.flood;
+
 
 //import com.elvarg.net.security.IsaacRandom;
 import * as IsaacRandom from '../../net/security/IsaacRandom';

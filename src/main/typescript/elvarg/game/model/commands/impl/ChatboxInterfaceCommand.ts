@@ -1,3 +1,7 @@
+import {Player} from '../../../entity/impl/player/Player';
+import {PlayerRights} from '../../../model/rights/PlayerRights';
+import {Command} from '../../../model/commands/Command';
+
 class ChatboxInterfaceCommand implements Command {
     execute(player: Player, command: string, parts: string[]): void {
         player.getPacketSender().sendChatboxInterface(parseInt(parts[1]));

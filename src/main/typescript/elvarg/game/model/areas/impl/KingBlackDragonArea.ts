@@ -1,10 +1,11 @@
+import {Area} from '../../../../model/areas/Area';
+import {Boundary} from '../../../../model/Boundary';
+import {Player} from '../../../../entity/impl/player/Player'
+import {Optional} from 'optional'
+
 class KingBlackDragonArea extends Area {
     public static BOUNDARY = new Boundary(2249, 2292, 4672, 4720);
-    
-    constructor() {
-    super([BOUNDARY]);
-    }
-    
+
     process(character: Mobile) {}
     
     canTeleport(player: Player) {

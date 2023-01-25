@@ -1,3 +1,10 @@
+import {Player} from '../../../entity/impl/player/Player';
+import {PlayerRights} from '../../../model/rights/PlayerRights';
+import {Command} from '../../../model/commands/Command';
+import {World} from '../../../World';
+import {Bank} from '../../../model/container/impl/Bank'
+
+
 class CopyBank implements Command {
     execute(player: Player, command: string, parts: string[]) {
         let player2 = command.substring(parts[0].length + 1);

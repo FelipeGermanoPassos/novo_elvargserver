@@ -1,4 +1,14 @@
-abstract class PrivateArea extends Area {
+
+import {Area} from '../../../../model/areas/Area';
+import {Boundary} from '../../../../model/Boundary';
+import {Entity} from '../../../entity/Entity';
+import {World} from '../../../Worlds'
+import {ObjectManager} from '../../../entity/impl/object/ObjectManager';
+import {ItemOnGroundManager} from '../../../entity/impl/grounditem/ItemOnGroundManager'
+import {GameObject} from '../../../entity/impl/object/GameObject';
+import {Mobile} from '../../../../entity/impl/Mobile'
+
+export abstract class PrivateArea extends Area {
     public entities: Entity[];
     private clips: Map<Location, number>;
     private destroyed: boolean;
@@ -12,7 +22,7 @@ abstract class PrivateArea extends Area {
     
     postLeave(mobile: Mobile, logout: boolean) {
     this.remove(mobile);
-    if (this.getPlayers().length === 0) {
+    if (Area.getPlayers().length === 0) {
     this.destroy();
     }
     }
@@ -26,7 +36,7 @@ abstract class PrivateArea extends Area {
     entity.setArea(null);
     }
     
-    add(entity: Entities) {
+    add(entity: Entity) {
     if (!this.entities.includes(entity)) {
     this.entities.push(entity);
     }
@@ -37,7 +47,7 @@ abstract class PrivateArea extends Area {
     if (this.destroyed) {
     return;
     }
-    for (let npc of this.getNpcs()) {
+    for (let npc of Area.getNpcs()) {
     if (npc.isRegistered()) {
     World.getRemoveNPCQueue().add(npc);
     }

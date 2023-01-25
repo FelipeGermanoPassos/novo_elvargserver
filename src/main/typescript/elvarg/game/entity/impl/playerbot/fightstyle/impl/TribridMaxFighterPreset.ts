@@ -1,4 +1,4 @@
-class TribridMaxFighterPreset implements FighterPreset {
+export class TribridMaxFighterPreset implements FighterPreset {
     private static BOT_HARD_TRIBRID: Presetable = new Presetable("Bot Tribrid", [
         new Item(ARMADYL_CROSSBOW), new Item(ARMADYL_GODSWORD), new Item(RANGING_POTION_4_), new Item(SUPER_COMBAT_POTION_4_),
         new Item(AVAS_ACCUMULATOR), new Item(KARILS_LEATHERSKIRT), new Item(KARILS_LEATHERTOP), new Item(SUPER_RESTORE_4_),

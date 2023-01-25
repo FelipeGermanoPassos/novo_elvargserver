@@ -1,4 +1,4 @@
-class ObjectIdentifiers {
+export class ObjectIdentifiers {
     public static CRATE = 1;
     public static CAVE_ENTRANCE = 2;
     public static DOOR = 3;

@@ -1,3 +1,5 @@
+import { Misc } from 'misc';
+
 enum Chance {
     ALWAYS = 100,
     VERY_COMMON = 90,
@@ -9,7 +11,7 @@ enum Chance {
     ALMOST_IMPOSSIBLE = 1
 }
 
-class Chance {
+class ChanceCalculator {
     private percentage: number;
 
     constructor(percentage: number) {

@@ -1,9 +1,19 @@
+import {Player} from '../../../entity/impl/player/Player';
+import {PlayerRights} from '../../../model/rights/PlayerRights';
+import {Command} from '../../../model/commands/Command';
+
+import static com.elvarg.game.GameConstants.PLAYER_PERSISTENCE;
+import { GameConstants } from '../../../GameConstants';
+
+import {World} from '../../../World';
+import {PlayerPunishment} from '../../../../util/PlayerPunishment';
+
 class BanPlayer implements Command {
     execute(player: Player, command: string, parts: string[]): void {
         let player2 = command.substring(parts[0].length + 1);
         let plr = World.getPlayerByName(player2);
 
-        if (!PLAYER_PERSISTENCE.exists(player2) && !plr) {
+        if (!GameConstants.PLAYER_PERSISTENCE.exists(player2) && !plr) {
             player.getPacketSender().sendMessage(`Player ${player2} is not a valid online player.`);
             return;
         }

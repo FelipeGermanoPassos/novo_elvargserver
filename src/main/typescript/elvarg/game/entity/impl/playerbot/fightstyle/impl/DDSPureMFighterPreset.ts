@@ -1,4 +1,4 @@
-class DDSPureMFighterPreset implements FighterPreset {
+export class DDSPureMFighterPreset implements FighterPreset {
     private static BOT_DDS_PURE_M_73: Presetable = {
         name: "DDS Pure (M)",
         items: [

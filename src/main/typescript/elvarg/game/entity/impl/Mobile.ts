@@ -1,13 +1,4 @@
-import Sound from '../../Sound'
-import Combat from '../../content/combat/Combat'
-import CombatType from '../../content/combat/CombatType'
-import HitDamage from '../../content/combat/hit/HitDamage'
-import PendingHit from '../../content/combat/hit/PendingHit'
-import Entity from '../Entity'
-import NPC from '../impl/npc/NPC'
-import Player from '../impl/player/Player'
-
-export class Mobile extends Entity {
+export class Mobile extends Entities {
     private index: number;
     private lastKnownRegion: Location;
     private timers = new TimerRepository();

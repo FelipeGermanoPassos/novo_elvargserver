@@ -1,4 +1,4 @@
-class NHPureFighterPreset implements FighterPreset {
+export class NHPureFighterPreset implements FighterPreset {
     public static readonly BOT_NH_PURE_83 = new Presetable("BOT NH Pure",
         [
             new Item(RUNE_CROSSBOW), new Item(BLACK_DHIDE_CHAPS), new Item(RANGING_POTION_4_), new Item(SUPER_STRENGTH_4_),

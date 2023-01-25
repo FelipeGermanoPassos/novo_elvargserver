@@ -1,9 +1,12 @@
+import * as Mobile from '../../../../entity/impl/Mobile'
+import {Player} from '../../../../entity/impl/player/Player'
+import {Optional} from 'optional'
+import {GodwarsFollower} from '../../../entity/impl/npc/impl/GodwarsFollower'
+import {Boundary} from '../../../../model/Boundary';
+import {Area} from '../../../../model/areas/Area';
+
 class GodwarsDungeonArea extends Area {
     public static BOUNDARY = new Boundary(2800, 2950, 5200, 5400);
-    
-    constructor() {
-    super([BOUNDARY]);
-    }
     
     postEnter(character: Mobile) {
     if (character.isPlayer()) {
