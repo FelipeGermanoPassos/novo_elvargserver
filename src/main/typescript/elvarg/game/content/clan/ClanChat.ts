@@ -17,7 +17,7 @@ export class ClanChat {
     private bannedMembers: BannedMember[] = new Array();
     private rankedNames: Map<string, ClanChatRank> = new Map<string, ClanChatRank>();
 
-    public ClanChat(ownerName: string, name: string, index: number) {
+    constructor(ownerName: any, name: any, index: number) {
         let o = World.getPlayerByName(ownerName);
         this.owner = o ? o : null;
         this.ownerName = ownerName;

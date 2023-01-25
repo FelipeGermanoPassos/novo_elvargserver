@@ -1,7 +1,7 @@
 import { ScheduledExecutorService, ScheduledThreadPoolExecutor, Executors, CallerRunsPolicy } from 'java.util.concurrent';
 import { ThreadFactoryBuilder } from 'com.google.common.util.concurrent';
 
-class GameLogic {
+export class GameLogic {
     private static logicService = GameLogic.createLogicService();
     
     public static submit(t: () => void) {
