@@ -1,4 +1,5 @@
 import { Direction } from './Direction';
+
 enum FacingDirections {
     NORTH = "NORTH",
     SOUTH = "SOUTH",
@@ -6,7 +7,7 @@ enum FacingDirections {
     WEST = "WEST",
 }
 
-class FacingDirection {
+export class FacingDirection {
     private direction: Direction;
     constructor(direction: Direction) {
         this.direction = direction;

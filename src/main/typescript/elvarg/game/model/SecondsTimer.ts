@@ -1,4 +1,4 @@
-class SecondsTimer {
+export class SecondsTimer {
     private seconds: number;
     private running: boolean;
     private startTime: any;

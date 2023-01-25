@@ -1,4 +1,4 @@
-class Ids {
+export class Ids {
     ids: number[] = [];
 
     Ids(target: any, key: string) {

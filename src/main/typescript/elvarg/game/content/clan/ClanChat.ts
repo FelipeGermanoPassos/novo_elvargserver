@@ -1,4 +1,9 @@
-class ClanChat {
+import { World } from "../../World";
+import { Player } from "../../entity/impl/player/Player";
+import { ClanChatRank } from "./ClanChatRank";
+import { BannedMember } from "./BannedMember";
+
+export class ClanChat {
     public static RANK_REQUIRED_TO_ENTER = 0;
     public static RANK_REQUIRED_TO_KICK = 1;
     public static RANK_REQUIRED_TO_TALK = 2;
@@ -10,14 +15,7 @@ class ClanChat {
     private rankRequirement: ClanChatRank[] = new Array(3);
     private members: Player[] = new Array();
     private bannedMembers: BannedMember[] = new Array();
-    private rankedNames: { [key: string]: ClanChatRank } = new Map();
-
-    public ClanChat(owner: Player, name: string, index: number) {
-        this.owner = owner;
-        this.name = name;
-        this.index = index;
-        this.ownerName = owner.getUsername();
-    }
+    private rankedNames: Map<string, ClanChatRank> = new Map<string, ClanChatRank>();
 
     public ClanChat(ownerName: string, name: string, index: number) {
         let o = World.getPlayerByName(ownerName);
@@ -77,11 +75,11 @@ class ClanChat {
         return this;
     }
 
-    public getRank(player: Player): ClanChatRank {
+    public getPlayerRank(player: Player): ClanChatRank {
         return this.getRank(player.getUsername());
     }
 
-    public giveRank(player: Player, rank: ClanChatRank): ClanChat {
+    public givePlayerRank(player: Player, rank: ClanChatRank): ClanChat {
         return this.giveRank(player.getUsername(), rank);
     }
 

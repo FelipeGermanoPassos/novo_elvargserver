@@ -1,4 +1,6 @@
-class ItemInSlot {
+import { Inventory } from "../model/container/impl/Inventory";
+
+export class ItemInSlot {
 
     /**
      * The item id.

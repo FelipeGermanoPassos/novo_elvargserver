@@ -1,5 +1,5 @@
-import {Animation} from './Animation';
-class AnimationLoop {
+import { Animation } from './Animation';
+export class AnimationLoop {
     anim: Animation;
     loopDelay: number;
 

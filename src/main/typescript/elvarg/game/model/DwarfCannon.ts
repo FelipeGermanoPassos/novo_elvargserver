@@ -1,4 +1,5 @@
-class DwarfCannon {
+import { GameObject } from "../entity/impl/object/GameObject";
+export class DwarfCannon {
     private ownerIndex: number;
     private object: GameObject;
     private cannonballs: number = 0;

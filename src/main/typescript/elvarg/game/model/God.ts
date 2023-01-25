@@ -1,8 +1,8 @@
-enum Gods {
-    ARMADYL = [],
-    BANDOS = [],
-    SARADOMIN = [],
-    ZAMORAK = [],
+const Gods = {
+    ARMADYL: [],
+    BANDOS: [],
+    SARADOMIN: [],
+    ZAMORAK: [],
 }
 
 class God {

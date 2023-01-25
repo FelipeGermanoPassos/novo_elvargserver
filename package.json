@@ -1,11 +1,11 @@
 {
   "dependencies": {
+    "@types/node": "^18.11.18",
+    "@types/paper": "^0.12.3",
     "array": "^0.4.3",
-<<<<<<< HEAD
-    "buffer": "^6.0.3",
-=======
     "big-integer": "^1.6.51",
->>>>>>> 12c18d8ac364f012eff5aad0f212187422988cf3
+    "buffer": "^6.0.3",
+    "fs": "^0.0.1-security",
     "hashset": "^0.0.6",
     "iterator": "^0.0.0",
     "object-path": "^0.11.8",

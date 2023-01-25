@@ -1,12 +1,12 @@
 import { SecondsTimer } from '../../model/SecondsTimer';
 
-class BannedMember {
+export class BannedMember {
     private timer: SecondsTimer;
     private name: string;
 
     constructor(name: string, seconds: number) {
         this.name = name;
-        this.timer = new SecondsTimer(seconds).start();
+        this.timer = new SecondsTimer();
     }
 
     public getTimer(): SecondsTimer {

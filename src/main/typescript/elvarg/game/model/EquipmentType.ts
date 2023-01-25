@@ -1,25 +1,6 @@
-enum EquipmentTypes {
-    HOODED_CAPE = "HOODED_CAPE",
-    CAPE = "CAPE",
-    SHIELD = "SHIELD",
-    GLOVES = "GLOVES",
-    BOOTS = "BOOTS",
-    AMULET = "AMULET",
-    RING = "RING",
-    ARROWS = "ARROWS",
-    COIF = "COIF",
-    HAT = "HAT",
-    MASK = "MASK",
-    MED_HELMET = "MED_HELMET",
-    FULL_HELMET = "FULL_HELMET",
-    BODY = "BODY",
-    PLATEBODY = "PLATEBODY",
-    LEGS = "LEGS",
-    WEAPON = "WEAPON",
-    NONE = "NONE",
-}
+import { Equipment } from "../model/container/impl/Equipment";
 
-enum Equipment {
+const EquipmentTypes = {
     HOODED_CAPE: Equipment.CAPE_SLOT,
     CAPE: Equipment.CAPE_SLOT,
     SHIELD: Equipment.SHIELD_SLOT,
@@ -39,8 +20,8 @@ enum Equipment {
     WEAPON: Equipment.WEAPON_SLOT,
     NONE: -1,
 }
-class EquipmentType {
-    const slot: number;
+export class EquipmentType {
+    private slot: number;
 
     private EquipmentType(slot: number) {
         this.slot = slot;

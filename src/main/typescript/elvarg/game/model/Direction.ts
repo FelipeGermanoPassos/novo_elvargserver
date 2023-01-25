@@ -1,5 +1,6 @@
-enum Directions {
+import { Misc } from "../../util/Misc";
 
+enum Directions {
     NORTH = 1,
     NORTH_EAST = 2,
     EAST = 4,
@@ -46,50 +47,50 @@ export class Direction {
         return this.diagonal;
     }
 
-    public static direction valueOf(id: number) {
+    public static valueOf(id: number) {
         switch (id) {
-            case 0: return Direction.NORTH_WEST;
-            case 1: return Direction.NORTH;
-            case 2: return Direction.NORTH_EAST;
-            case 3: return Direction.WEST;
-            case 4: return Direction.EAST;
-            case 5: return Direction.SOUTH_WEST;
-            case 6: return Direction.SOUTH;
-            case 7: return Direction.SOUTH_EAST;
-            default: return Direction.NONE;
+            case 0: return Directions.NORTH_WEST;
+            case 1: return Directions.NORTH;
+            case 2: return Directions.NORTH_EAST;
+            case 3: return Directions.WEST;
+            case 4: return Directions.EAST;
+            case 5: return Directions.SOUTH_WEST;
+            case 6: return Directions.SOUTH;
+            case 7: return Directions.SOUTH_EAST;
+            default: return Directions.NONE;
         }
     }
 
     public static random(): Direction {
-        return Direction.valueOf(Math.floor(Math.random() * 8));
+        return this.valueOf(Misc.inclusive(0, 7));
     }
-    
-    fromDeltas(dx: number, dy: number): Direction {
-        if(dx < 0) {
-            if(dy < 0) {
-                return Direction.SOUTH_WEST;
-            } else if(dy > 0) {
-                return Direction.NORTH_WEST;
+
+    fromDeltas(dx: number, dy: number): Directions {
+        if (dx < 0) {
+            if (dy < 0) {
+                return Directions.SOUTH_WEST;
+            } else if (dy > 0) {
+                return Directions.NORTH_WEST;
             } else {
-                return Direction.WEST;
+                return Directions.WEST;
             }
-        } else if(dx > 0) {
-            if(dy < 0) {
-                return Direction.SOUTH_EAST;
-            } else if(dy > 0) {
-                return Direction.NORTH_EAST;
+        } else if (dx > 0) {
+            if (dy < 0) {
+                return Directions.SOUTH_EAST;
+            } else if (dy > 0) {
+                return Directions.NORTH_EAST;
             } else {
-                return Direction.EAST;
+                return Directions.EAST;
             }
         } else {
-            if(dy < 0) {
-                return Direction.SOUTH;
-            } else if(dy > 0) {
-				return NORTH;
-			} else {
-				return NONE;
-			}
-		}
+            if (dy < 0) {
+                return Directions.SOUTH;
+            } else if (dy > 0) {
+                return Directions.NORTH;
+            } else {
+                return Directions.NONE;
+            }
+        }
     }
 
 }

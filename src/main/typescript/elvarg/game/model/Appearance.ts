@@ -1,4 +1,6 @@
-class Appearance {
+import { Player } from "../entity/impl/player/Player";
+import { Flag } from "./Flag";
+export class Appearance {
     static readonly HAIR_COLOUR = 8;
     static readonly TORSO_COLOUR = 9;
     static readonly LEG_COLOUR = 10;
@@ -55,7 +57,7 @@ class Appearance {
         return this.look;
     }
 
-    set(look: number[]): void {
+    setLookArray(look: number[]): void {
         if (look.length < 12) {
             throw new Error("Array length must be 12.");
         }
@@ -63,7 +65,7 @@ class Appearance {
         this.player.getUpdateFlag().flag(Flag.APPEARANCE);
     }
 
-    set(index: number, look: number): void {
+    setLook(index: number, look: number): void {
         this.look[index] = look;
         this.player.getUpdateFlag().flag(Flag.APPEARANCE);
     }

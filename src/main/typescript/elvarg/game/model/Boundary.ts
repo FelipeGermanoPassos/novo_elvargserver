@@ -1,10 +1,11 @@
+import { Location } from "./Location";
 export class Boundary {
     private readonly x: number;
     private readonly x2: number;
     private readonly y: number;
     private readonly y2: number;
     public height: number;
-    
+
     constructor(x: number, x2: number, y: number, y2: number, height: number) {
         this.x = x;
         this.x2 = x2;

@@ -10,9 +10,14 @@ const chatRank = {
     STAFF: -1,
 }
 
-class ClanChatRank {
+export class ClanChatRank {
     private readonly actionMenuId: number;
     private readonly spriteId: number;
+
+    constructor(actionMenuId: number, spriteId: number) {
+        this.actionMenuId = actionMenuId;
+        this.spriteId = spriteId;
+    }
 
     public static forId(id: number) {
         for (const rank in chatRank) {

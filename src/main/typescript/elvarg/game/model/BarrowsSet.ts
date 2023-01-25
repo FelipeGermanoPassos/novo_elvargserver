@@ -1,13 +1,15 @@
-enum BarrowsSets {
-    GUTHANS_SET = [12873, 4724, 4726, 4728, 4730],
-    VERACS_SET = [12875, 4753, 4755, 4757, 4759],
-    TORAGS_SET = [12879, 4745, 4747, 4749, 4751],
-    AHRIMS_SET = [12881, 4708, 4710, 4712, 4714],
-    KARILS_SET = [12883, 4732, 4734, 4736, 4738],
-    DHAROKS_SET = [12877, 4716, 4718, 4720, 4722],
+import { Player } from "../entity/impl/player/Player";
+
+const BarrowsSets = {
+    GUTHANS_SET: [12873, 4724, 4726, 4728, 4730],
+    VERACS_SET: [12875, 4753, 4755, 4757, 4759],
+    TORAGS_SET: [12879, 4745, 4747, 4749, 4751],
+    AHRIMS_SET: [12881, 4708, 4710, 4712, 4714],
+    KARILS_SET: [12883, 4732, 4734, 4736, 4738],
+    DHAROKS_SET: [12877, 4716, 4718, 4720, 4722],
 }
 
-class BarrowsSet {
+export class BarrowsSet {
     private static sets = new Map<number, BarrowsSet>();
 
     static init() {
