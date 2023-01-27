@@ -186,7 +186,7 @@ interface CombatSpecial {
     weaponType: any;
 }
 
-class CombatSpecial {
+export class CombatSpecial {
 
     const SPECIAL_ATTACK_WEAPON_IDS = new Set(CombatSpecial.values().flatMap((cs) => cs.identifiers));
 

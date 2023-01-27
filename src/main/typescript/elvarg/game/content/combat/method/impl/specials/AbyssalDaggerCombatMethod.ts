@@ -1,4 +1,12 @@
-class AbyssalDaggerCombatMethod extends MeleeCombatMethod {
+import { MeleeCombatMethod } from "../MeleeCombatMethod";
+import { Animation } from "../../../../../model/Animation";
+import { Graphic } from "../../../../../model/Graphic";
+import { Priority } from "../../../../../model/Priority";
+import { PendingHit } from "../../../hit/PendingHit";
+import { Mobile } from "../../../../../entity/impl/Mobile";
+import { CombatSpecial } from "../../../CombatSpecial";
+
+export class AbyssalDaggerCombatMethod extends MeleeCombatMethod {
     private static readonly ANIMATION = new Animation(3300, Priority.HIGH);
     private static readonly GRAPHIC = new Graphic(1283, Priority.HIGH);
 
@@ -15,8 +23,8 @@ class AbyssalDaggerCombatMethod extends MeleeCombatMethod {
 
     start(character: Mobile, target: Mobile) {
         CombatSpecial.drain(character, CombatSpecial.ABYSSAL_DAGGER.getDrainAmount());
-        character.performAnimation(ANIMATION);
-        character.performGraphic(GRAPHIC);
+        character.performAnimation(AbyssalDaggerCombatMethod.ANIMATION);
+        character.performGraphic(AbyssalDaggerCombatMethod.GRAPHIC);
     }
 }
 

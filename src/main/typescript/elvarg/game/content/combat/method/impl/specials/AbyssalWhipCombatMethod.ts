@@ -1,10 +1,19 @@
+import { MeleeCombatMethod } from "../MeleeCombatMethod";
+import { Animation } from "../../../../../model/Animation";
+import { Graphic } from "../../../../../model/Graphic";
+import { Priority } from "../../../../../model/Priority";
+import { PendingHit } from "../../../hit/PendingHit";
+import { Mobile } from "../../../../../entity/impl/Mobile";
+import { CombatSpecial } from "../../../CombatSpecial";
+import { GraphicHeight } from "../../../../../model/GraphicHeight";
+import { Player } from '../../../../../entity/impl/player/Player';
 class AbyssalWhipCombatMethod extends MeleeCombatMethod {
     private static readonly ANIMATION = new Animation(1658, Priority.HIGH);
     private static readonly GRAPHIC = new Graphic(341, GraphicHeight.HIGH, Priority.HIGH);
 
     start(character: Mobile, target: Mobile) {
         CombatSpecial.drain(character, CombatSpecial.ABYSSAL_WHIP.getDrainAmount());
-        character.performAnimation(ANIMATION);
+        character.performAnimation(AbyssalWhipCombatMethod.ANIMATION);
     }
 
     handleAfterHitEffects(hit: PendingHit) {
@@ -12,7 +21,7 @@ class AbyssalWhipCombatMethod extends MeleeCombatMethod {
         if (target.getHitpoints() <= 0) {
             return;
         }
-        target.performGraphic(GRAPHIC);
+        target.performGraphic(AbyssalWhipCombatMethod.GRAPHIC);
         if (target.isPlayer()) {
             const player = target as Player;
             let totalRunEnergy = player.getRunEnergy() - 25;

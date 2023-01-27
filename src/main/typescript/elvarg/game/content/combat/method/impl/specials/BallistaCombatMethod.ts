@@ -1,4 +1,14 @@
-class BallistaCombatMethod extends RangedCombatMethod {
+import { RangedCombatMethod } from "../RangedCombatMethod";
+import { Animation } from "../../../../../model/Animation";
+import { Priority } from "../../../../../model/Priority";
+import { PendingHit } from "../../../hit/PendingHit";
+import { Mobile } from "../../../../../entity/impl/Mobile";
+import { CombatSpecial } from "../../../CombatSpecial";
+import { RangedWeapon } from "../../../ranged/RangedData";
+import { CombatFactory } from "../../../CombatFactory";
+import { Projectile } from "../../../../../model/Projectile";
+
+export class BallistaCombatMethod extends RangedCombatMethod {
 
     private static readonly ANIMATION = new Animation(7222, Priority.HIGH);
 
@@ -23,7 +33,7 @@ class BallistaCombatMethod extends RangedCombatMethod {
     start(character: Mobile, target: Mobile): void {
         const player = character.getAsPlayer();
         CombatSpecial.drain(player, CombatSpecial.BALLISTA.getDrainAmount());
-        character.performAnimation(ANIMATION);
+        character.performAnimation(BallistaCombatMethod.ANIMATION);
         new Projectile(player, target, 1301, 70, 30, 43, 31).sendProjectile();
         CombatFactory.decrementAmmo(player, target.getLocation(), 1);
     }

@@ -1,12 +1,21 @@
-class BandosGodswordCombatMethod extends MeleeCombatMethod {
+import { MeleeCombatMethod } from "../MeleeCombatMethod";
+import { Animation } from "../../../../../model/Animation";
+import { Graphic } from "../../../../../model/Graphic";
+import { Priority } from "../../../../../model/Priority";
+import { PendingHit } from "../../../hit/PendingHit";
+import { Mobile } from "../../../../../entity/impl/Mobile";
+import { CombatSpecial } from "../../../CombatSpecial";
+import { Skill } from "../../../../../model/Skill";
+
+export class BandosGodswordCombatMethod extends MeleeCombatMethod {
 
     private static ANIMATION = new Animation(7642, Priority.HIGH);
     private static GRAPHIC = new Graphic(1212, Priority.HIGH);
 
     start(character: Mobile, target: Mobile) {
         CombatSpecial.drain(character, CombatSpecial.BANDOS_GODSWORD.getDrainAmount());
-        character.performAnimation(ANIMATION);
-        character.performGraphic(GRAPHIC);
+        character.performAnimation(BandosGodswordCombatMethod.ANIMATION);
+        character.performGraphic(BandosGodswordCombatMethod.GRAPHIC);
     }
 
     handleAfterHitEffects(hit: PendingHit) {
