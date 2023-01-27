@@ -1,5 +1,20 @@
-class AccuracyFormulasDpsCalc {
-    private static srand: any = new SecureRandom();
+import * as crypto from 'crypto';
+
+import { PrayerHandler } from "../../../content/PrayerHandler";
+import { CombatFactory } from "../CombatFactory";
+import { CombatType } from "../CombatType";
+import { FightStyle } from '../FightStyle';
+import { Misc } from "../../../../util/Misc";
+import { Mobile } from "../../../entity/impl/Mobile";
+import { BonusManager } from "../../../model/equipment/BonusManager";
+import { Skills } from "../../../model/Skill";
+import { CombatEquipment } from "../../combat/CombatEquipment";
+
+export class AccuracyFormulasDpsCalc {
+    static randomFloat() {
+        const randomByte = crypto.randomBytes(1);
+        return randomByte.readUInt8() / 255;
+    }
 
     public static rollAccuracy(entity: any, enemy: any, style: any) {
         if (style === CombatType.MELEE && CombatFactory.fullVeracs(entity) && Misc.getRandom(4) === 1) {
@@ -7,29 +22,29 @@ class AccuracyFormulasDpsCalc {
         }
 
         if (style === CombatType.MELEE) {
-            let attRoll = attackMeleeRoll(entity);
-            let defRoll = defenseMeleeRoll(entity, enemy);
+            let attRoll = AccuracyFormulasDpsCalc.attackMeleeRoll(entity);
+            let defRoll = AccuracyFormulasDpsCalc.defenseMeleeRoll(entity, enemy);
 
             let hitChance = this.hitChance(attRoll, defRoll);
-            return hitChance > srand.nextFloat();
+            return hitChance > this.randomFloat();
 
         } else if (style === CombatType.RANGED) {
-            let attRoll = attackRangedRoll(entity);
-            let defRoll = defenseRangedRoll(enemy);
+            let attRoll = AccuracyFormulasDpsCalc.attackRangedRoll(entity);
+            let defRoll = AccuracyFormulasDpsCalc.defenseRangedRoll(enemy);
 
             let hitChance = this.hitChance(attRoll, defRoll);
-            return hitChance > srand.nextFloat();
+            return hitChance > this.randomFloat();
         } else if (style === CombatType.MAGIC) {
-            let attRoll = attackMagicRoll(entity);
-            let defRoll = defenseMagicRoll(enemy);
+            let attRoll = AccuracyFormulasDpsCalc.attackMagicRoll(entity);
+            let defRoll = AccuracyFormulasDpsCalc.defenseMagicRoll(enemy);
 
             let hitChance = this.hitChance(attRoll, defRoll);
-            return hitChance > srand.nextFloat();
+            return hitChance > this.randomFloat();
         }
         return false;
     }
 
-    public static hitChance(attRoll: any, defRoll: any) {
+    public static hitChance(attRoll: number, defRoll: number) {
 
         if (attRoll > defRoll) {
             return 1 - ((defRoll + 2) / (2 * attRoll + 1));
@@ -38,7 +53,7 @@ class AccuracyFormulasDpsCalc {
         }
     }
 
-    private static effectiveAttackLevel(entity: Mobile) {
+    public static effectiveAttackLevel(entity: Mobile) {
         let att = 8;
 
         if (entity.isNpc()) {
@@ -48,7 +63,7 @@ class AccuracyFormulasDpsCalc {
 
         let player = entity.getAsPlayer();
 
-        att += player.getSkillManager().getCurrentLevel(Skill.ATTACK);
+        att += player.getSkillManager().getCurrentLevel(Skills.ATTACK);
 
         let prayerBonus = 1;
 
@@ -85,7 +100,7 @@ class AccuracyFormulasDpsCalc {
     }
 
     public static attackMeleeRoll(entity: Mobile) {
-        let attRoll = effectiveAttackLevel(entity);
+        let attRoll = AccuracyFormulasDpsCalc.effectiveAttackLevel(entity);
 
         if (entity.isNpc()) {
             // NPC's don't currently have stab/slash/crush bonuses
@@ -117,7 +132,7 @@ class AccuracyFormulasDpsCalc {
         return Math.floor(attRoll);
     }
 
-    private static effectiveDefenseLevel(enemy: Mobile) {
+    public static effectiveDefenseLevel(enemy: Mobile) {
         let def = 1;
 
         if (enemy.isNpc()) {
@@ -125,7 +140,7 @@ class AccuracyFormulasDpsCalc {
         }
 
         let player = enemy.getAsPlayer();
-        def = player.getSkillManager().getCurrentLevel(Skill.DEFENCE);
+        def = player.getSkillManager().getCurrentLevel(Skills.DEFENCE);
 
 
         let prayerBonus = 1;
@@ -162,14 +177,14 @@ class AccuracyFormulasDpsCalc {
         return def;
     }
 
-    private static defenseMeleeRoll(entity: Mobile, enemy: Mobile) {
+    private static calcDefenseMeleeRoll(entity: Mobile, enemy: Mobile) {
         let bonusType = (entity.isNpc() ? 3 /* Default case */ : entity.getAsPlayer().getFightType().getBonusType());
 
-        return defenseMeleeRoll(enemy, bonusType);
+        return AccuracyFormulasDpsCalc.defenseMeleeRoll(enemy, bonusType);
     }
 
     public static defenseMeleeRoll(enemy: Mobile, bonusType: number) {
-        let defLevel = effectiveDefenseLevel(enemy);
+        let defLevel = AccuracyFormulasDpsCalc.effectiveDefenseLevel(enemy);
 
         let enemyPlayer = enemy.getAsPlayer();
 
@@ -197,9 +212,8 @@ class AccuracyFormulasDpsCalc {
     }
 
     // Ranged
-
     public static defenseRangedRoll(enemy: Mobile) {
-        let defLevel = effectiveDefenseLevel(enemy);
+        let defLevel = AccuracyFormulasDpsCalc.effectiveDefenseLevel(enemy);
 
         const defRange = (enemy.isPlayer() ?
             enemy.getAsPlayer().getBonusManager().getDefenceBonus()[BonusManager.DEFENCE_RANGE]
@@ -219,7 +233,7 @@ class AccuracyFormulasDpsCalc {
         }
 
         let player = entity.getAsPlayer();
-        rngStrength += player.getSkillManager().getCurrentLevel(Skill.RANGED);
+        rngStrength += player.getSkillManager().getCurrentLevel(Skills.RANGED);
 
         // Prayers
         let prayerMod = 1.0;
@@ -250,7 +264,7 @@ class AccuracyFormulasDpsCalc {
     public static attackRangedRoll(entity: Mobile) {
         let accuracyBonus = (entity.isNpc() ? 0 : entity.getAsPlayer().getBonusManager().getAttackBonus()[BonusManager.ATTACK_RANGE]);
 
-        let attRoll = effectiveRangedAttack(entity);
+        let attRoll = AccuracyFormulasDpsCalc.effectiveRangedAttack(entity);
 
         attRoll *= (accuracyBonus + 64);
 
@@ -267,48 +281,11 @@ class AccuracyFormulasDpsCalc {
         }
 
         let player = entity.getAsPlayer();
-        mag += player.getSkillManager().getCurrentLevel(Skill.MAGIC);
+        mag += player.getSkillManager().getCurrentLevel(Skills.MAGIC);
 
         let prayerBonus = 1;
 
         // Prayer additions
-        if (PrayerHandler.isActivated(player, PrayerHandler.MYSTIC_WILL)) {
-            prayerBonus = 1.05;
-        } else if (PrayerHandler.isActivated(player, PrayerHandler.MYSTIC_LORE)) {
-            prayerBonus = 1.10;
-        } else if (PrayerHandler.isActivated(player, PrayerHandler.MYSTIC_MIGHT)) {
-            prayerBonus = 1.15;
-        } else if (PrayerHandler.isActivated(player, PrayerHandler.AUGURY)) {
-            prayerBonus = 1.25;
-        }
-
-        mag *= prayerBonus;
-
-        let fightStyle = player.getFightType().getStyle();
-        if (fightStyle == FightStyle.ACCURATE)
-            mag += 3;
-        else if (fightStyle == FightStyle.DEFENSIVE)
-            mag += 1;
-
-        if (CombatEquipment.wearingVoid(player, CombatType.MAGIC))
-            mag = (mag * 1.45f);
-
-        return mag;
-    }
-
-    private static effectiveMagicLevel(entity: Mobile): number {
-        let mag = 8;
-
-        if (entity.isNpc()) {
-            mag += entity.getAsNpc().getCurrentDefinition().getStats()[4];
-            return mag;
-        }
-
-        let player = entity.getAsPlayer();
-        mag += player.getSkillManager().getCurrentLevel(Skill.MAGIC);
-
-        let prayerBonus = 1;
-
         if (PrayerHandler.isActivated(player, PrayerHandler.MYSTIC_WILL)) {
             prayerBonus = 1.05;
         } else if (PrayerHandler.isActivated(player, PrayerHandler.MYSTIC_LORE)) {
@@ -334,7 +311,7 @@ class AccuracyFormulasDpsCalc {
     }
 
     public static defenseMagicRoll(enemy: Mobile): number {
-        let defLevel = effectiveMagicLevel(enemy);
+        let defLevel = AccuracyFormulasDpsCalc.effectiveMagicLevel(enemy);
 
         let defRange = (enemy.isNpc() ? 0 : enemy.getAsPlayer().getBonusManager().getDefenceBonus()[BonusManager.DEFENCE_MAGIC]);
 
@@ -346,7 +323,7 @@ class AccuracyFormulasDpsCalc {
     public static attackMagicRoll(entity: Mobile): number {
         let accuracyBonus = (entity.isNpc() ? 0 : entity.getAsPlayer().getBonusManager().getAttackBonus()[BonusManager.ATTACK_MAGIC]);
 
-        let attRoll = effectiveMagicLevel(entity);
+        let attRoll = AccuracyFormulasDpsCalc.effectiveMagicLevel(entity);
         attRoll *= (accuracyBonus + 64);
 
         return attRoll;

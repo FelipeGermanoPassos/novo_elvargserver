@@ -1,3 +1,5 @@
+
+import { CombatSpells } "./CombatSpells";
 export class Autocasting {
 
     // Autocast buttons
@@ -5,11 +7,9 @@ export class Autocasting {
     private static readonly DEFENSIVE_AUTOCAST_BUTTON = 24111;
     private static readonly CLOSE_REGULAR_AUTOCAST_BUTTON = 2004;
     private static readonly CLOSE_ANCIENT_AUTOCAST_BUTTON = 6161;
-
     private static readonly REGULAR_AUTOCAST_TAB = 1829;
     private static readonly ANCIENT_AUTOCAST_TAB = 1689;
     private static readonly IBANS_AUTOCAST_TAB = 12050;
-
     public static readonly ANCIENT_SPELL_AUTOCAST_STAFFS = new Set<number>([KODAI_WAND, MASTER_WAND,
         ANCIENT_STAFF, NIGHTMARE_STAFF, VOLATILE_NIGHTMARE_STAFF, ELDRITCH_NIGHTMARE_STAFF, TOXIC_STAFF_OF_THE_DEAD, ELDER_WAND, STAFF_OF_THE_DEAD, STAFF_OF_LIGHT]);
 

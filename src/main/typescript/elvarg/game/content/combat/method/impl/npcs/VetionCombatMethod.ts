@@ -1,4 +1,16 @@
-class VetionCombatMethod implements CombatMethod {
+import { CombatMethod } from "../../CombatMethod"
+import { Animation } from "../../../../../model/Animation";
+import { Graphic } from "../../../../../model/Graphic";
+import { CombatType } from "../../../CombatType";
+import { Mobile } from "../../../../../entity/impl/Mobile";
+import { PendingHit } from "../../../hit/PendingHit";
+import { Projectile } from "../../../../../model/Projectile";
+import { Misc } from "../../../../../../util/Misc";
+import { TaskManager } from "../../../../../task/TaskManager";
+import { HitMask } from "../../../hit/HitMask";
+import {TimerKey} from '../../../../../../util/timers/TimerKey';
+
+export class VetionCombatMethod implements CombatMethod {
     private attack = CombatType.MELEE;
     private static readonly MAGIC_END_GFX = new Graphic(281);
 
@@ -37,7 +49,7 @@ class VetionCombatMethod implements CombatMethod {
             TaskManager.submit(new Task(4, true) {
                 execute() {
                     for (const pos of attackPositions) {
-                        target.getAsPlayer().getPacketSender().sendGlobalGraphic(MAGIC_END_GFX, pos);
+                        target.getAsPlayer().getPacketSender().sendGlobalGraphic(VetionCombatMethod.MAGIC_END_GFX, pos);
                         for (const player of character.getAsNpc().getPlayersWithinDistance(10)) {
                             if (player.getLocation().equals(pos)) {
                                 player.getCombat().getHitQueue()

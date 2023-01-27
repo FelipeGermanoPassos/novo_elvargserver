@@ -15,7 +15,7 @@ const BrokenItems = {
     VOID_KNIGHT_MELEE_HELM: [11665, 20481]
 }
 
-class BrokenItem {
+export class BrokenItem {
     private static readonly REPAIR_COST_MULTIPLIER = 0.03;
     private static brokenItems = new Map<number, BrokenItem>();
 

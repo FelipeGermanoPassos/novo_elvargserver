@@ -1,29 +1,29 @@
 import { Misc } from '../../util/Misc';
 
-const Skills = {
-    ATTACK: { id: 6247, button: 8654 },
-    DEFENCE: { id: 6253, button: 8660 },
-    STRENGTH: { id: 6206, button: 8657 },
-    HITPOINTS: { id: 6216, button: 8655 },
-    RANGED: { id: 4443, button: 8663 },
-    PRAYER: { id: 6242, button: 8666 },
-    MAGIC: { id: 6211, button: 8669 },
-    COOKING: { id: 6226, button: 8665 },
-    WOODCUTTING: { id: 4272, button: 8671 },
-    FLETCHING: { id: 6231, button: 8670 },
-    FISHING: { id: 6258, button: 8662 },
-    FIREMAKING: { id: 4282, button: 8668 },
-    CRAFTING: { id: 6263, button: 8667 },
-    SMITHING: { id: 6221, button: 8659 },
-    MINING: { id: 4416, button: 8656 },
-    HERBLORE: { id: 6237, button: 8661 },
-    AGILITY: { id: 4277, button: 8658 },
-    THIEVING: { id: 4261, button: 8664 },
-    SLAYER: { id: 12122, button: 12162 },
-    FARMING: { id: 5267, button: 13928 },
-    RUNECRAFTING: { id: 4267, button: 8672 },
-    CONSTRUCTION: { id: 7267, button: 18801 },
-    HUNTER: { id: 8267, button: 18829 },
+export const Skills = {
+    ATTACK: [6247, 8654],
+    DEFENCE: [6253, 8660],
+    STRENGTH: [6206, 8657],
+    HITPOINTS: [6216, 8655],
+    RANGED: [4443, 8663],
+    PRAYER: [6242, 8666],
+    MAGIC: [6211, 8669],
+    COOKING: [6226, 8665],
+    WOODCUTTING: [4272, 8671],
+    FLETCHING: [6231, 8670],
+    FISHING: [6258, 8662],
+    FIREMAKING: [4282, 8668],
+    CRAFTING: [6263, 8667],
+    SMITHING: [6221, 8659],
+    MINING: [4416, 8656],
+    HERBLORE: [6237, 8661],
+    AGILITY: [4277, 8658],
+    THIEVING: [4261, 8664],
+    SLAYER: [12122, 12162],
+    FARMING: [5267, 13928],
+    RUNECRAFTING: [4267, 8672],
+    CONSTRUCTION: [7267, 18801],
+    HUNTER: [8267, 18829],
 }
 
 export class Skill {
@@ -68,7 +68,7 @@ export class Skill {
         return Skill.skillMap.get(button);
     }
 
-    public canSetLevel(): boolean {
+    public canSetLevel() {
         return Skill.ALLOWED_TO_SET_LEVELS.includes(this);
     }
 

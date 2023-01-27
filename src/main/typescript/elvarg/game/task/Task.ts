@@ -1,4 +1,4 @@
-class Task {
+export class Task {
     public static DEFAULT_KEY = new Object();
     private immediate: boolean;
     private delay: number;

@@ -1,8 +1,22 @@
-class KingBlackDragonMethod extends CombatMethod {
-    currentAttackType = CombatType.MAGIC;
-    currentBreath = Breath.DRAGON;
+import { CombatMethod } from "../../CombatMethod";
+import { PendingHit } from "../../../hit/PendingHit";
+import { Misc } from "../../../../../../util/Misc";
+import { CombatType } from "../../../CombatType";
+import { Mobile } from "../../../../../entity/impl/Mobile";
+import { Projectile } from "../../../../../model/Projectile";
+import { PrayerHandler } from "../../../../PrayerHandler";
+import { CombatEquipment } from "../../../CombatEquipment";
+import { CombatFactory } from "../../../CombatFactory";
 
-    start(character: Mobile, target: Mobile) {
+enum Breath {
+    ICE, POISON, SHOCK, DRAGON
+}
+
+export class KingBlackDragonMethod extends CombatMethod {
+    private static currentAttackType = CombatType.MAGIC;
+    private static currentBreath = Breath.DRAGON;
+
+    static start(character: Mobile, target: Mobile) {
         if (this.currentAttackType === CombatType.MAGIC) {
             character.performAnimation({ animationId: 84 });
             switch (this.currentBreath) {
@@ -26,23 +40,23 @@ class KingBlackDragonMethod extends CombatMethod {
         }
     }
 
-    attackSpeed(character: Mobile): number {
+    static attackSpeed(character: Mobile): number {
         return this.currentAttackType === CombatType.MAGIC ? 6 : 4;
     }
 
-    attackDistance(character: Mobile): number {
+    static attackDistance(character: Mobile): number {
         return 8;
     }
 
     type(): CombatType {
-        return this.currentAttackType;
+        return KingBlackDragonMethod.currentAttackType;
     }
 
     hits(character: Mobile, target: Mobile): PendingHit[] {
         let hit = new PendingHit(character, target, this, 1);
         if (target.isPlayer()) {
             let p = target.getAsPlayer();
-            if (this.currentAttackType === CombatType.MAGIC && this.currentBreath === Breath.DRAGON) {
+            if (KingBlackDragonMethod.currentAttackType === CombatType.MAGIC && KingBlackDragonMethod.currentBreath === Breath.DRAGON) {
                 if (PrayerHandler.isActivated(p, PrayerHandler.PROTECT_FROM_MAGIC) && CombatEquipment.hasDragonProtectionGear(p) && !p.getCombat().getFireImmunityTimer().finished()) {
                     target.getPacketSender().sendMessage("You're protected against the dragonfire breath.");
                     return [hit];
@@ -60,8 +74,8 @@ class KingBlackDragonMethod extends CombatMethod {
                 p.getPacketSender().sendMessage("The dragonfire burns you.");
                 hit.getHits()[0].incrementDamage(extendedHit);
             }
-            if (this.currentAttackType === CombatType.MAGIC) {
-                switch (this.currentBreath) {
+            if (KingBlackDragonMethod.currentAttackType === CombatType.MAGIC) {
+                switch (KingBlackDragonMethod.currentBreath) {
                     case Breath.ICE:
                         CombatFactory.freeze(hit.getTarget().getAsPlayer(), 5);
                         break;
@@ -76,7 +90,7 @@ class KingBlackDragonMethod extends CombatMethod {
         return [hit];
     }
 
-    finished(character: Mobile, target: Mobile) {
+    static finished(character: Mobile, target: Mobile) {
         if (character.getLocation().getDistance(target.getLocation()) <= 3) {
             if (Misc.randomInclusive(0, 2) === 0) {
                 this.currentAttackType = CombatType.MAGIC;
@@ -99,40 +113,4 @@ class KingBlackDragonMethod extends CombatMethod {
             }
         }
     }
-}
-
-enum Breath {
-    ICE, POISON, SHOCK, DRAGON
-}
-
-enum CombatType {
-    MAGIC,
-    MELEE
-}
-
-enum Breath {
-    DRAGON,
-    ICE,
-    POISON,
-    SHOCK
-}
-
-interface Mobile {
-    performAnimation(animation: Animation): void;
-}
-
-interface Animation {
-    animationId: number;
-}
-
-class Projectile {
-    constructor(
-        public character: Mobile,
-        public target: Mobile,
-        public projectileId: number,
-        public startHeight: number,
-        public endHeight: number,
-        public speed: number,
-        public delay: number
-    ) { }
 }

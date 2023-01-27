@@ -1,4 +1,4 @@
-class AreaManager {
+export class AreaManager {
 
     public static areas: Area[] = [];
 

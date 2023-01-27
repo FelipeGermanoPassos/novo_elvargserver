@@ -1,3 +1,15 @@
+import { Emblem } from "./Emblem";
+import { TargetPair } from "./TargetPair";
+import { WealthType } from "./WealthType";
+import { CombatFactory } from "../CombatFactory";
+import { ItemOnGroundManager } from "../../../entity/impl/grounditem/ItemOnGroundManager";
+import { Player } from "../../../entity/impl/player/Player";
+import { PlayerBot } from "../../../entity/impl/playerbot/PlayerBot";
+import { BrokenItem } from "../../../model/BrokenItem";
+import { Item } from "../../../model/Item";
+import { WildernessArea } from "../../../model/areas/impl/WildernessArea";
+import { ItemIdentifiers } from "../../../../util/ItemIdentifiers";
+import { Misc } from "../../../../util/Misc";
 class BountyHunter {
     public static PLAYERS_IN_WILD: Player[] = [];
     public static TARGET_PAIRS: TargetPair[] = [];
@@ -8,92 +20,70 @@ class BountyHunter {
     private static TARGET_ABANDON_DELAY_SECONDS = 120;
 
     static process(player: Player) {
-        let target = getTargetFor(player);
+        let target = BountyHunter.getTargetFor(player);
         if (player.getArea() instanceof WildernessArea) {
-
             if (!target) {
-
                 if (player.getTargetSearchTimer().finished()) {
-
-                    if (!validTargetContester(player)) {
+                    if (!BountyHunter.validTargetContester(player)) {
                         return;
                     }
-
-                    for (const player2 of PLAYERS_IN_WILD) {
-
-                        if (validTargetContester(player2)) {
-
+                    for (const player2 of BountyHunter.PLAYERS_IN_WILD) {
+                        if (BountyHunter.validTargetContester(player2)) {
                             // Check other stuff...
-
                             if (player === player2) {
                                 continue;
                             }
-
                             if (player instanceof PlayerBot && player2 instanceof PlayerBot) {
                                 continue;
                             }
-
                             if (player.getRecentKills().includes(player2.getHostAddress())) {
                                 continue;
                             }
+                            let combatDifference = CombatFactory.combatLevelDifference(
+                                player.getSkillManager().getCombatLevel(),
+                                player2.getSkillManager().getCombatLevel()
+                            );
 
-                            // Add target pair
-                            TARGET_PAIRS.push({ player, target: player2 });
-                            break;
+                            if (combatDifference < (player.getWildernessLevel() + 5) && combatDifference < (player2.getWildernessLevel() + 5)) {
+                                BountyHunter.assign(player, player2);
+                                break;
+                            }
                         }
                     }
-                    player.getTargetSearchTimer().reset();
+                    player.getTargetSearchTimer().start(BountyHunter.TARGET_SEARCH_DELAY_SECONDS);
                 }
             } else {
-                // Check if the target has abandoned.
-                if (target.getTargetAbandonTimer().finished()) {
-                    TARGET_PAIRS.splice(TARGET_PAIRS.indexOf({ player, target: target.target }), 1);
-                    target = null;
+                if (target) {
+                    let safeTimer = player.decrementAndGetSafeTimer();
+                    if (safeTimer === 180 || safeTimer === 120 || safeTimer === 60) {
+                        player.getPacketSender().sendMessage(`You have ${safeTimer} seconds to get back to the wilderness before you lose your target.`);
+                        target.get().getPacketSender().sendMessage(`Your target has ${safeTimer} seconds to get back to the wilderness before they lose you as target.`);
+                    }
+                    if (safeTimer === 0) {
+                        BountyHunter.unassign(player);
+                        player.getTargetSearchTimer().start(BountyHunter.TARGET_ABANDON_DELAY_SECONDS);
+                        player.getPacketSender().sendMessage("You have lost your target.");
+
+                        target.get().getPacketSender().sendMessage("You have lost your target and will be given a new one shortly.");
+                        target.get().getTargetSearchTimer().start((BountyHunter.TARGET_SEARCH_DELAY_SECONDS / 2));
+                    }
                 }
             }
-        }
-        let combatDifference = CombatFactory.combatLevelDifference(
-            player.getSkillManager().getCombatLevel(),
-            player2.getSkillManager().getCombatLevel()
-        );
-
-        if (combatDifference < (player.getWildernessLevel() + 5) && combatDifference < (player2.getWildernessLevel() + 5)) {
-            assign(player, player2);
-            break;
-        }
-
-        player.getTargetSearchTimer().start(TARGET_SEARCH_DELAY_SECONDS);
-
-    } else {
-    if (target) {
-        let safeTimer = player.decrementAndGetSafeTimer();
-        if (safeTimer === 180 || safeTimer === 120 || safeTimer === 60) {
-            player.getPacketSender().sendMessage(`You have ${safeTimer} seconds to get back to the wilderness before you lose your target.`);
-            target.get().getPacketSender().sendMessage(`Your target has ${safeTimer} seconds to get back to the wilderness before they lose you as target.`);
-        }
-
-        if (safeTimer === 0) {
-            unassign(player);
-            player.getTargetSearchTimer().start(TARGET_ABANDON_DELAY_SECONDS);
-            player.getPacketSender().sendMessage("You have lost your target.");
-
-            target.get().getPacketSender().sendMessage("You have lost your target and will be given a new one shortly.");
-            target.get().getTargetSearchTimer().start((TARGET_SEARCH_DELAY_SECONDS / 2));
         }
     }
 
     static assign(player1: Player, player2: Player) {
-        if (!getPairFor(player1) && !getPairFor(player2)) {
+        if (!BountyHunter.getPairFor(player1) && !BountyHunter.getPairFor(player2)) {
             let pair = new TargetPair(player1, player2);
-            TARGET_PAIRS.push(pair);
-            player1.getPacketSender().sendMessage(You've been assigned ${player2.getUsername()} as your target!);
-        player2.getPacketSender().sendMessage(You've been assigned ${player1.getUsername()} as your target!);
-        player1.getPacketSender().sendEntityHint(player2);
+            BountyHunter.TARGET_PAIRS.push(pair);
+            player1.getPacketSender().sendMessage(`You've been assigned ${player2.getUsername()} as your target!`);
+            player2.getPacketSender().sendMessage(`You've been assigned ${player1.getUsername()} as your target!`);
+            player1.getPacketSender().sendEntityHint(player2);
             player2.getPacketSender().sendEntityHint(player1);
             player1.resetSafingTimer();
             player2.resetSafingTimer();
-            updateInterface(player1);
-            updateInterface(player2);
+            BountyHunter.updateInterface(player1);
+            BountyHunter.updateInterface(player2);
             if (player1 instanceof PlayerBot) {
                 (player1 as PlayerBot).getCombatInteraction().targetAssigned(player2);
             } else if (player2 instanceof PlayerBot) {
@@ -103,25 +93,25 @@ class BountyHunter {
     }
 
     static unassign(player: Player) {
-        let pair = getPairFor(player);
+        let pair = BountyHunter.getPairFor(player);
         if (pair) {
-            TARGET_PAIRS.splice(TARGET_PAIRS.indexOf(pair), 1);
+            BountyHunter.TARGET_PAIRS.splice(BountyHunter.TARGET_PAIRS.indexOf(pair), 1);
             let p1 = pair.getPlayer1();
             let p2 = pair.getPlayer2();
 
             p1.getPacketSender().sendEntityHintRemoval(true);
             p2.getPacketSender().sendEntityHintRemoval(true);
-            updateInterface(p1);
-            updateInterface(p2);
-            p1.getTargetSearchTimer().start(TARGET_SEARCH_DELAY_SECONDS);
-            p2.getTargetSearchTimer().start(TARGET_SEARCH_DELAY_SECONDS);
+            BountyHunter.updateInterface(p1);
+            BountyHunter.updateInterface(p2);
+            p1.getTargetSearchTimer().start(BountyHunter.TARGET_SEARCH_DELAY_SECONDS);
+            p2.getTargetSearchTimer().start(BountyHunter.TARGET_SEARCH_DELAY_SECONDS);
         }
     }
 
-    
+
 
     static getTargetFor(player: Player): Player | undefined {
-        let pair = getPairFor(player);
+        let pair = BountyHunter.getPairFor(player);
         if (pair) {
             if (pair.getPlayer1() === player) {
                 return pair.getPlayer2();
@@ -133,8 +123,8 @@ class BountyHunter {
         return undefined;
     }
 
-    getPairFor(p: Player): TargetPair | undefined {
-        for (let pair of TARGET_PAIRS) {
+    static getPairFor(p: Player): TargetPair | undefined {
+        for (let pair of BountyHunter.TARGET_PAIRS) {
             if (p === pair.getPlayer1() || p === pair.getPlayer2()) {
                 return pair;
             }
@@ -174,7 +164,7 @@ class BountyHunter {
             killer.getRecentKills().push(killed.getHostAddress());
         }
 
-        const target = getTargetFor(killer);
+        const target = BountyHunter.getTargetFor(killer);
 
         // Check if the player killed was our target..
         if (target && target === killed) {
@@ -187,34 +177,34 @@ class BountyHunter {
             killer.incrementTargetKills();
 
             // Reset targets
-            unassign(killer);
+            BountyHunter.unassign(killer);
 
             // If player isnt farming kills..
             if (fullRewardPlayer && !(killed instanceof PlayerBot)) {
 
                 // Search for emblem in the player's inventory
-                const inventoryEmblem = null;
-                for (const e in Emblem.values()) {
-                    if (killer.getInventory().contains(e.id)) {
-                        inventoryEmblem = e;
+                let inventoryEmblem = null;
+                for (let i = 0; i < Emblem.length; i++) {
+                    if (killer.getInventory().contains(Emblem[i].id)) {
+                        inventoryEmblem = Emblem[i];
                         // Keep looping, find best emblem.
                     }
                 }
 
                 // This emblem can't be upgraded more..
                 if (inventoryEmblem != null) {
-                    if (inventoryEmblem != Emblem.MYSTERIOUS_EMBLEM_10) {
+                    if (inventoryEmblem != Emblem[9].name) {
 
                         // We found an emblem. Upgrade it!
                         // Double check that we have it inventory one more time
                         if (killer.getInventory().contains(inventoryEmblem.id)) {
                             killer.getInventory().delete(inventoryEmblem.id, 1);
 
-                            const nextEmblemId = 1;
+                            let nextEmblemId = 1;
 
                             // Mysterious emblem tier 1 has a noted version too...
                             // So add 2 instead of 1 to skip it.
-                            if (inventoryEmblem == Emblem.MYSTERIOUS_EMBLEM_1) {
+                            if (inventoryEmblem == Emblem[0].name) {
                                 nextEmblemId = 2;
                             }
 
@@ -231,7 +221,7 @@ class BountyHunter {
 
                 // Randomly drop an emblem (50% chance) when killing a target.
                 if (Misc.getRandom(10) <= 5) {
-                    ItemOnGroundManager.registerNonGlobal(killer, new Item(Emblem.MYSTERIOUS_EMBLEM_1.id),
+                    ItemOnGroundManager.registerNonGlobal(killer, new Item(Emblem[0].id, 1),
                         killed.getLocation());
                     killer.getPacketSender().sendMessage(
                         "@red@You have been awarded with a mysterious emblem for successfully killing your target.");
@@ -262,8 +252,8 @@ class BountyHunter {
                 .sendString(52033, "@or1@K/D Ratio: " + killer.getKillDeathRatio());
 
             if (!(killer instanceof PlayerBot)) {
-				// Reward player for the kill..
-				int rewardAmount = 130 + (100 * enemyKillstreak) + (150 * killer.getKillstreak())
+                // Reward player for the kill..
+                let rewardAmount: number = 130 + (100 * enemyKillstreak) + (150 * killer.getKillstreak())
                     + (10 * killer.getWildernessLevel()) + additionalBloodMoneyFromBrokenItems;
 
                 if (killer.getInventory().contains(ItemIdentifiers.BLOOD_MONEY)
@@ -300,8 +290,8 @@ class BountyHunter {
         }
 
         // Update interfaces
-        updateInterface(killer);
-        updateInterface(killed);
+        BountyHunter.updateInterface(killer);
+        BountyHunter.updateInterface(killed);
     }
 
     public static updateInterface(player: Player) {
@@ -345,21 +335,18 @@ class BountyHunter {
             player.getPacketSender().sendConfig(types.configId, state);
         }
     }
-    
+
     public static getValueForEmblems(player: Player, performSale: boolean) {
-        let list = new Array<Emblem>();
+        let list: any[];
         for (let emblem of Emblem.values()) {
             if (player.getInventory().contains(emblem.id)) {
                 list.push(emblem);
             }
         }
-
         if (list.length === 0) {
             return 0;
         }
-
         let value = 0;
-
         for (let emblem of list) {
             let amount = player.getInventory().getAmount(emblem.id);
             if (amount > 0) {
@@ -372,15 +359,12 @@ class BountyHunter {
                 value += (emblem.value * amount);
             }
         }
-
         return value;
     }
 
     private static validTargetContester(p: Player): boolean {
         return !(p == null || !p.isRegistered() || !(p.getArea() instanceof WildernessArea)
             || p.getWildernessLevel() <= 0 || p.isUntargetable() || p.getHitpoints() <= 0 || p.isNeedsPlacement()
-            || getPairFor(p).isPresent());
+            || BountyHunter.getPairFor(p).isPresent());
     }
 }
-
-

@@ -1,4 +1,11 @@
-class MeleeCombatMethod extends CombatMethod {
+import { CombatMethod } from "../CombatMethod";
+import { Mobile } from "../../../../entity/impl/Mobile";
+import { Sounds } from "../../../../Sounds";
+import { CombatType } from "../../CombatType";
+import { PendingHit } from "../../hit/PendingHit";
+import { Animation } from "../../../../model/Animation";
+import { WeaponInterface } from "../../WeaponInterfaces"
+export class MeleeCombatMethod extends CombatMethod {
     start(character: Mobile, target: Mobile) {
         const animation = character.getAttackAnim();
         if (animation !== -1) {

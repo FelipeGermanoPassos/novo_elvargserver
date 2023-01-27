@@ -1,4 +1,4 @@
-class RangedData {
+export class RangedData {
     private static rangedWeapons: Map<number, RangedWeapon> = new Map<number, RangedWeapon>();
     private static rangedAmmunition: Map<number, Ammunition> = new Map<number, Ammunition>();
 
@@ -292,7 +292,7 @@ class Ammunition {
     }
 }
 
-enum RangedWeaponType {
+export enum RangedWeaponType {
     KNIFE = "KNIFE",
     DART = "DART",
     TOKTZ_XIL_UL = "TOKTZ_XIL_UL",
@@ -309,7 +309,7 @@ interface IRangedWeaponType {
 }
 
 
-enum Ammunition {
+export enum Ammunitions {
     BRONZE_ARROW = 882,
     IRON_ARROW = 884,
     STEEL_ARROW = 886,
@@ -399,7 +399,7 @@ interface AmmunitionData {
     weight: number;
 }
 
-enum RangedWeapon {
+export enum RangedWeapon {
     LONGBOW = [839],
     [Ammunition.BRONZE_ARROW],
     RangedWeaponType.LONGBOW,

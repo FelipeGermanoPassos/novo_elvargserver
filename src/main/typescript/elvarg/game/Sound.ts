@@ -1,4 +1,4 @@
-enum Sound {
+export enum Sound {
 
     // crafting sounds
     CUTTING = { id: 375, volume: 1, delay: 0, loopType: 0 },

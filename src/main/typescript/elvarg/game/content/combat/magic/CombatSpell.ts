@@ -1,4 +1,4 @@
-abstract class CombatSpell extends Spell {
+export abstract class CombatSpell extends Spell {
     startCast(cast: Mobile, castOn: Mobile) {
         let castAnimation = -1;
         let npc = cast.isNpc() ? cast as NPC : null;
