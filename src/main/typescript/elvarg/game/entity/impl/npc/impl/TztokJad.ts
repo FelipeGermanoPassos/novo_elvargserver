@@ -4,7 +4,7 @@ import { Location } from "../../model/Location";
 import { FightCavesArea } from "../../model/areas/impl/FightCavesArea";
 import { TZTOK_JAD } from "../../../util/NpcIdentifiers";
 
-class TztokJad extends NPC {
+export class TztokJad extends NPC {
     private static readonly COMBAT_METHOD = new JadCombatMethod();
 
     constructor(player: Player, area: FightCavesArea, id: number, position: Location) {

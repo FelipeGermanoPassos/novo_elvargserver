@@ -1,3 +1,9 @@
+import { Location } from "../../../model/Location";
+import { World } from "../../../Worlds";
+import { TaskManager } from "../../../task/TaskManager";
+import { FightCavesArea } from "../../../model/areas/impl/FightCavesArea";
+import { TztokJad } from "../../../entity/impl/npc/impl/TztokJad";
+
 export class FightCaves {
     public static readonly ENTRANCE: Location = new Location(2413, 5117);
     public static readonly EXIT: Location = new Location(2438, 5168);
@@ -11,7 +17,7 @@ export class FightCaves {
             if (area.isDestroyed()) {
                 return;
             }
-            World.getAddNPCQueue().add(new TztokJad(player, area, JAD_NPC_ID, JAD_SPAWN_POS.clone()));
+            World.getAddNPCQueue().add(new TztokJad(player, area, FightCaves.JAD_NPC_ID, FightCaves.JAD_SPAWN_POS.clone()));
         }));
     }
 }
