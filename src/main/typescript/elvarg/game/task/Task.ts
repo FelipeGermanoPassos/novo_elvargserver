@@ -1,3 +1,5 @@
+import { TaskType } from "./TaskType";
+
 interface TaskContructor {
     immediate?: boolean;
     delay?: number;
@@ -19,7 +21,7 @@ export class Task {
         this.countdown = options.delay ?? 1;
         this.immediate = options.immediate ?? false;
         this.bind(options.key ?? Task.DEFAULT_KEY);
-        this.type = options.type ?? DEFAULT
+        this.type = options.type ?? TaskType.DEFAULT
     }
 
     public getKey(): Object {

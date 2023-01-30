@@ -1,7 +1,19 @@
-import { PlayerBotDefinition, PlayerPersistence, PlayerRights, Location } from './game.definition';
-import { DynamoDBPlayerPersistence, JSONFilePlayerPersistence } from './entity/player/persistence';
-import { FightStyleImpl } from './entity/playerbot/fightstyle/fightstyle.impl';
-import { Set } from 'typescript';
+import { PlayerBotDefinition } from "./definition/PlayerBotDefinition";
+import { DynamoDBPlayerPersistence } from "./entity/impl/player/persistence/dynamodb/DynamoDBPlayerPersistence";
+import { JSONFilePlayerPersistence } from "./entity/impl/player/persistence/jsonfile/JSONFilePlayerPersistence";
+import { TribridMaxFighterPreset } from "./entity/impl/playerbot/fightstyle/impl/TribridMaxFighterPreset"
+import { DDSPureMFighterPreset } from "./entity/impl/playerbot/fightstyle/impl/DDSPureMFighterPreset"
+import { DDSPureRFighterPreset } from "./entity/impl/playerbot/fightstyle/impl/DDSPureRFighterPreset"
+import { F2PMeleeFighterPreset } from "./entity/impl/playerbot/fightstyle/impl/F2PMeleeFighterPreset"
+import { GRangerFighterPreset } from "./entity/impl/playerbot/fightstyle/impl/GRangerFighterPreset"
+import { MidTribridMaxFighterPreset } from "./entity/impl/playerbot/fightstyle/impl/MidTribridMaxFighterPreset"
+import { NHPureFighterPreset } from "./entity/impl/playerbot/fightstyle/impl/NHPureFighterPreset"
+import { ObbyMaulerFighterPreset } from "./entity/impl/playerbot/fightstyle/impl/ObbyMaulerFighterPreset"
+import { PlayerPersistence } from "./entity/impl/player/persistence/PlayerPersistence";
+import { Location } from "./model/Location"
+import { PlayerRights } from "./model/rights/PlayerRights"
+
+
 
 export class GameConstants {
     public static NAME = "RspsApp";
@@ -20,7 +32,7 @@ export class GameConstants {
     public static DEBUG_ATTACK_DISTANCE = false;
     public static TAB_INTERFACES = [2423, 3917, 31000, 3213, 1644, 5608, -1, 37128, 5065, 5715, 2449,
         42500, 147, 32000];
-    public static ALLOWED_SPAWNS = new Set<number>(Arrays.asList(
+    public static ALLOWED_SPAWNS = new Set<number>(Array(
         13441, 3144, 391, 397, 385, 7946, 2436, 145, 147, 149, 2440, 157, 159, 161,
         2442, 163, 165, 167, 9739, 2444, 169, 171, 173, // potions and food
         3040, 3042, 3044, 3046, 2452, 2454, 2456, 2458, 2448, 181, 183, 185, 6685, 6687, 6689, 6691, 2450, 189, 191, 193, 3024, 3026, 3028, 3030, 2434, // potions and food

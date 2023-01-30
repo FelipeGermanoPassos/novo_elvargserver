@@ -1,7 +1,7 @@
-import { NPC } from "com.elvarg.game.entity.impl.npc";
-import { Player } from "com.elvarg.game.entity.impl.player";
-import { BankerDialogue } from "com.elvarg.game.model.dialogues.builders.impl";
-import { NPCInteraction } from "com.elvarg.game.entity.impl.npc";
+import { NPC } from "../NPC";
+import { Player } from "../../player/Player";
+import { BankerDialogue } from "../../../../model/dialogues/builders/impl/BankedDialogue"
+import { NPCInteraction } from "../NPCInteraction";
 
 class Banker implements NPCInteraction {
     firstOptionClick(player: Player, npc: NPC) {

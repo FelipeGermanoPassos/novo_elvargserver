@@ -1,4 +1,10 @@
-class VetionHellhound extends NPC {
+import { Mobile } from "../../Mobile";
+import {Location} from "../../../../model/Location"
+import { NPC } from "../NPC";
+import {Vetion} from "./Vetion"
+
+
+export class VetionHellhound extends NPC {
 
     private vetion: Vetion;
     private timer = 0;

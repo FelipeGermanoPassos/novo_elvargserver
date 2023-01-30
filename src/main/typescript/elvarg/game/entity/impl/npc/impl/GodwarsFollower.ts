@@ -1,7 +1,6 @@
-import { NPC } from 'com.elvarg.game.entity.impl.npc';
-import { Location } from 'com.elvarg.game.model';
-import { God } from 'com.elvarg.game.model';
-
+import { NPC } from "../NPC";
+import { God } from "../../../../model/God"
+import { Location } from "../../../../model/Location"
 export class GodwarsFollower extends NPC {
     private god: God;
     constructor(id: number, position: Location, god: God) {

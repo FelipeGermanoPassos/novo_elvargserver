@@ -1,4 +1,6 @@
-export class NPC {
+import { Mobile } from "../Mobile";
+
+export class NPC extends Mobile {
     private id: number;
     private movementCoordinator: NPCMovementCoordinator = new NPCMovementCoordinator(this);
     private hitpoints: number;
@@ -12,8 +14,16 @@ export class NPC {
     public barricadeFireTicks = 8;
     public barricadeOnFire: boolean;
 
-    constructor(id: number) {
+    constructor(id: number, position: Location) {
+        super(position)
         this.id = id;
+        this.spawnPosition = position;
+
+        if (this.getDefinition() == null) {
+            this.setHitpoints(this.hitpoints = 10);
+        } else {
+            this.setHitpoints(this.getDefinition().this.getHitpoints());
+        }
     }
     private static NPC_IMPLEMENTATION_MAP: Map<number, any>;
 

@@ -1,9 +1,10 @@
 import { World } from "../../../Worlds";
-import { ItemOnGroundManager } from "../grounditem/ItemOnGroundManager"
+import { ItemOnGroundManager, OperationType } from "../grounditem/ItemOnGroundManager"
 import { Player } from "../player/Player"
 import { Item } from "../../../model/Item"
 import { Location } from "../../../model/Location"
 import { PrivateArea } from "../../../model/areas/impl/PrivateArea";
+
 
 
 export class ItemOnGround {
@@ -11,8 +12,8 @@ export class ItemOnGround {
     state: State = State.SEEN_BY_PLAYER;
     owner: Optional<string> = Optional.empty();
     item: Item;
-    goesGlobal: boolean;
     tick: number;
+    goesGlobal: boolean;
     pendingRemoval: boolean;
     respawnTimer: number = -1;
     oldAmount: number;
@@ -28,42 +29,6 @@ export class ItemOnGround {
         this.privateArea = privateArea;
     }
 
-    incrementTick() {
-        this.tick++;
-    }
-
-    getTick() {
-        return this.tick;
-    }
-
-    setTick(tick: number) {
-        this.tick = tick;
-    }
-
-    goesGlobal() {
-        return this.goesGlobal;
-    }
-
-    getOwner() {
-        return this.owner;
-    }
-
-    getItem() {
-        return this.item;
-    }
-
-    setPendingRemoval(pendingRemoval: boolean) {
-        this.pendingRemoval = pendingRemoval;
-    }
-
-    respawns() {
-        return this.respawnTimer > 0;
-    }
-
-    setState(state: State) {
-        this.state = state;
-    }
-
     process() {
         this.incrementTick();
         switch (this.state) {
@@ -74,7 +39,7 @@ export class ItemOnGround {
                     this.setTick(0);
 
                     //Check if item is currently private and needs to go global..
-                    if (this.state == State.SEEN_BY_PLAYER && this.goesGlobal()) {
+                    if (this.state == State.SEEN_BY_PLAYER && this.getgoesGlobal()) {
 
                         //We make the item despawn for the owner..
                         if (this.getOwner().isPresent()) {
@@ -82,7 +47,7 @@ export class ItemOnGround {
 
                             let o = World.getPlayerByName(this.getOwner().get());
                             if (o.isPresent()) {
-                                ItemOnGroundManager.perform(o.get(), this, OperationType.DELETE);
+                                ItemOnGroundManager.performPlayer(o.get(), this, OperationType.DELETE);
                             }
                         }
 
@@ -138,7 +103,7 @@ export class ItemOnGround {
         this.tick++;
     }
 
-    public goesGlobal(): boolean {
+    public getgoesGlobal(): boolean {
         return this.goesGlobal;
     }
 
@@ -203,10 +168,11 @@ export class ItemOnGround {
         return "GroundItem, id: " + this.item.getId() + ", amount: " + this.item.getAmount() + ", current state: " + this.state.toString() + ", goesGlobal: " + this.goesGlobal + ", tick: " + this.tick + ", respawns: " + this.respawns();
     }
 
-    /**
-     * All the possible states a {@link ItemOnGround} can have.
-     */
-    export enum State {
-    SEEN_BY_PLAYER, SEEN_BY_EVERYONE
 }
+/**
+ * All the possible states a {@link ItemOnGround} can have.
+ */
+
+export enum State {
+    SEEN_BY_PLAYER, SEEN_BY_EVERYONE
 }

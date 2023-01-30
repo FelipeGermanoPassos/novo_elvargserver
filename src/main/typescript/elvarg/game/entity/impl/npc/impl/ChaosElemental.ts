@@ -1,12 +1,12 @@
-import { Ids } from 'com.elvarg.game.model';
-import { NPC } from 'com.elvarg.game.entity.impl.npc';
-import { Location } from 'com.elvarg.game.model';
-import { ChaosElementalCombatMethod } from 'com.elvarg.game.content.combat.method.impl.npcs';
-import { CombatMethod } from 'com.elvarg.game.content.combat.method';
+import { CombatMethod } from "../../../../content/combat/method/CombatMethod"
+import { ChaosElementalCombatMethod } from "../../../../content/combat/method/impl/npcs/ChaosElementalCombatMethod"
+import { NPC } from "../NPC";
+import { Ids } from "../../../../model/Ids"
+import { Location } from "../../../../model/Location"
+import { NpcIdentifiers } from "../../../../../util/NpcIdentifiers"
 
-const CHAOS_ELEMENTAL = 3200;
 
-@Ids({ CHAOS_ELEMENTAL })
+@Ids(NpcIdentifiers.CHAOS_ELEMENTAL)
 export class ChaosElemental extends NPC {
 
     private static COMBAT_METHOD = new ChaosElementalCombatMethod();

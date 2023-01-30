@@ -1,10 +1,13 @@
-import { NPC } from 'com.elvarg.game.entity.impl.npc';
-import { Location } from 'com.elvarg.game.model';
-import { RangedData } from 'com.elvarg.game.content.combat.ranged';
-import { CombatMethod } from 'com.elvarg.game.content.combat.method';
-import { RANGED_COMBAT } from 'com.elvarg.game.content.combat.CombatFactory';
+import { CombatMethod } from "../../../../content/combat/method/CombatMethod"
+import { RangedData } from "../../../../content/combat/ranged/RangedData"
+import { NPC } from "../NPC"
+import { Ids } from "../../../../model/Ids"
+import { Location } from "../../../../model/Location"
+import { CombatFactory } from "../../../../content/combat/CombatFactory"
+import { NpcIdentifiers } from "../../../../../util/NpcIdentifiers"
 
-@Ids({ KARIL_THE_TAINTED })
+
+@Ids(NpcIdentifiers.KARIL_THE_TAINTED)
 export class KarilTheTainted extends NPC {
 
     constructor(id: number, position: Location) {
@@ -15,6 +18,6 @@ export class KarilTheTainted extends NPC {
     }
 
     public getCombatMethod(): CombatMethod {
-        return RANGED_COMBAT;
+        return CombatFactory.RANGED_COMBAT;
     }
 }

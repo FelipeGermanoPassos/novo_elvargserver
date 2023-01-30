@@ -44,7 +44,7 @@ export abstract class Entity {
      *
      * @return the entity's world position
      */
-    getPosition(): Location {
+    getLocation(): Location {
         return this.location;
     }
 

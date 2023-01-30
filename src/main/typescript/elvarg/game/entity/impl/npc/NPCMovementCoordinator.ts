@@ -1,7 +1,15 @@
-class NPCMovementCoordinator {
+import { RegionManager } from "../../../collision/RegionManager"
+import { CombatFactory } from "../../../content/combat/CombatFactory";
+import { Location } from "../../../model/Location"
+import { PathFinder } from "../../../model/movement/path/PathFinder"
+import { Misc } from "../../../../util/Misc";
+import { NPC } from "./NPC";
+
+export class NPCMovementCoordinator {
     private npc: NPC;
     private coordinateState: CoordinateState;
     private radius: number;
+
 
     constructor(npc: NPC) {
         this.npc = npc;
@@ -164,10 +172,9 @@ class NPCMovementCoordinator {
     public setRadius(radius: number) {
         this.radius = radius;
     }
-
-    enum CoordinateState {
+}
+enum CoordinateState {
     HOME,
     AWAY,
     RETREATING
-}
 }

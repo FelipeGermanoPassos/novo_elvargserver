@@ -588,7 +588,8 @@ public onLogin(); {
     }
 }
 
-public busy(): boolean {
+
+busy(): boolean {
     if (this.interfaceId > 0) {
         return true;
     }
@@ -606,22 +607,22 @@ public busy(): boolean {
     }
     return false;
 }
-    
-    public isStaff(): boolean {
-    return (this.rights != PlayerRights.NONE);
+
+isStaff(): boolean {
+    return this.rights !== PlayerRights.NONE;
 }
-    
-    public isDonator(): boolean {
+
+isDonator(): boolean {
     return (this.donatorRights != DonatorRights.NONE);
 }
-    
-    public packetsBlocked: boolean;
-    
-    public isPacketsBlocked(): boolean {
+
+let packetsBlocked: boolean;
+
+isPacketsBlocked(): boolean  {
     return this.packetsBlocked;
 }
-    
-    public setPacketsBlocked(blocked: boolean): void {
+
+setPacketsBlocked(blocked: boolean); {
     this.packetsBlocked = blocked;
 }
 /*

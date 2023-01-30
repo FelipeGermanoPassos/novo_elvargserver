@@ -1,13 +1,14 @@
-import { Ids } from 'com.elvarg.game.model';
-import { NPC } from 'com.elvarg.game.entity.impl.npc';
-import { Location } from 'com.elvarg.game.model';
-import { CombatSpells } from 'com.elvarg.game.content.combat.magic';
-import { CombatMethod } from 'com.elvarg.game.content.combat.method';
-import { MAGIC_COMBAT } from 'com.elvarg.game.content.combat.CombatFactory';
+import { CombatSpells } from "../../../../content/combat/magic/CombatSpell"
+import { CombatMethod } from "../../../../content/combat/method/CombatMethod"
+import { RangedData } from "../../../../content/combat/ranged/RangedData"
+import { Ids } from "../../../../model/Ids"
+import { Location } from "../../../../model/Location"
+import { CombatFactory } from "../../../../content/combat/CombatFactory"
+import { NpcIdentifiers } from "../../../../../util/NpcIdentifiers"
+import { NPC } from "../NPC"
 
-const ELDER_CHAOS_DRUID = 3299;
 
-@Ids({ ELDER_CHAOS_DRUID })
+@Ids(NpcIdentifiers.ELDER_CHAOS_DRUID)
 export class ElderChaosDruid extends NPC {
 
     constructor(id: number, position: Location) {
@@ -17,6 +18,6 @@ export class ElderChaosDruid extends NPC {
     }
 
     public getCombatMethod(): CombatMethod {
-        return MAGIC_COMBAT;
+        return CombatFactory.MAGIC_COMBAT;
     }
 }

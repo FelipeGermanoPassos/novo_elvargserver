@@ -1,3 +1,8 @@
+import { PlayerBot } from "../PlayerBot";
+import { FollowPlayerPacketListener } from "../../../../../net/packet/impl/FollowPlayerPacketListener"
+import { BotCommand } from "./BotCommand"
+import { CommandType } from "./CommandType";
+
 export class FollowPlayer implements BotCommand {
 
     triggers(): string[] {

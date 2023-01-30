@@ -1,5 +1,5 @@
 import { GameConstants, World, Location, TaskManager } from "com.elvarg.game"
-import { Player, ItemOnGround, State, OperationType, GroundItemRespawnTask } from "com.elvarg.game.entity.impl.grounditem"
+import { Player, ItemOnGround, State, GroundItemRespawnTask } from "com.elvarg.game.entity.impl.grounditem"
 import { Item } from "com.elvarg.game.model"
 import { Optional } from "java.util"
 
@@ -24,7 +24,7 @@ export class ItemOnGroundManager {
         }
     }
 
-    public static perform(item: ItemOnGround, type: OperationType): void {
+    public static perform( item: ItemOnGround, type: OperationType): void {
         switch (item.getState()) {
             case State.SEEN_BY_PLAYER:
                 if (item.getOwner().isPresent()) {
@@ -43,7 +43,7 @@ export class ItemOnGroundManager {
                 break;
         }
     }
-    public static perform(player: Player, item: ItemOnGround, type: OperationType): void {
+    public static performPlayer(player: Player, item: ItemOnGround, type: OperationType): void {
         if (item.isPendingRemoval()) {
             type = OperationType.DELETE;
         }
@@ -192,7 +192,9 @@ export class ItemOnGroundManager {
         return false;
     }
 
-    export enum  OperationType {
-        CREATE, DELETE, ALTER
-    }
+
+}
+
+export enum OperationType {
+    CREATE, DELETE, ALTER
 }

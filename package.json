@@ -7,7 +7,10 @@
     "iterator": "^0.0.0",
     "object-path": "^0.11.8",
     "optional": "^0.1.4",
-    "ts-hashset": "^1.0.0"
+    "ts-collections": "^0.0.16",
+    "ts-essentials": "^9.3.0",
+    "ts-hashset": "^1.0.0",
+    "tstl": "^2.5.13"
   },
   "devDependencies": {
     "ts-loader": "^9.4.2"

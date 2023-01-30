@@ -1,9 +1,14 @@
-import { NPC, NPCInteraction, Player } from "../../..";
-import { ParduDialogue } from "../../../model/dialogues/builders/impl";
-import { PERDU } from "../../../util/NpcIdentifiers";
+import { NPC } from "../NPC";
+import { Player } from "../../player/Player";
+import {Ids} from "../../../../model/Ids"
+import {ParduDialogue} from "../../../../model/dialogues/builders/impl/ParduDialogue"
+import {NPCInteraction} from "../NPCInteraction"
+import {NpcIdentifiers} from "../../../../../util/NpcIdentifiers"
 
-@Ids(PERDU)
+
+@Ids(NpcIdentifiers.PERDU)
 export class Perdu implements NPCInteraction {
+    
     public firstOptionClick(player: Player, npc: NPC): void {
         player.getDialogueManager().start(new ParduDialogue());
     }

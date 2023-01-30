@@ -38,6 +38,11 @@ export class PlayerBot extends Player {
     private activeCommand: BotCommand | null;
     private definition: PlayerBotDefinition;
     private interactingWith: Player | null;
+
+    public  getInteractingWith(): Player | null {
+        return this.interactingWith;
+    }
+
     private movementInteraction: MovementInteraction;
     private chatInteraction: ChatInteraction;
     private tradingInteraction: TradingInteraction;
@@ -78,6 +83,10 @@ export class PlayerBot extends Player {
 
     public setCurrentState(interactionState: InteractionState): void {
         this.currentState = interactionState;
+    }
+
+    public manipulateHit(){
+
     }
 
     public getChatCommands(): BotCommand[] {

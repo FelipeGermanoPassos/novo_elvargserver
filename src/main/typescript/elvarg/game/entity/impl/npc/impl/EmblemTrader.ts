@@ -1,9 +1,9 @@
-import { NPCInteraction } from 'com.elvarg.game.entity.impl.npc.NPCInteraction';
-import { Player } from 'com.elvarg.game.entity.impl.player';
-import { ShopManager } from 'com.elvarg.game.model.container.shop';
-import { EmblemTraderDialogue } from 'com.elvarg.game.model.dialogues.builders.impl';
-import { NPC } from 'com.elvarg.game.entity.impl.npc';
-import { ShopIdentifiers } from 'com.elvarg.util';
+import { NPC } from "../NPC";
+import { Player } from "../../player/Player";
+import { ShopManager } from "../../../../model/container/shop/ShopManager"
+import { EmblemTraderDialogue } from "../../../../model/dialogues/builders/impl/EmblemTraderDialogue"
+import { NPCInteraction } from "../NPCInteraction"
+import { ShopIdentifiers } from "../../../../../util/ShopIdentifiers"
 
 export class EmblemTrader implements NPCInteraction {
 

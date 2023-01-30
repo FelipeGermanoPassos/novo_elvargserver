@@ -1,7 +1,11 @@
 import { Entity } from "../../Entity";
-import {ObjectDefinition} from "../../../definition/ObjectDefinition"
+import { ObjectDefinition } from "../../../definition/ObjectDefinition"
 import { World } from "../../../Worlds";
 import { Player } from "../player/Player";
+import { Animation } from "../../../model/Animation"
+import { Graphic } from "../../../model/Graphic"
+import { Location } from "../../../model/Location"
+import { PrivateArea } from "../../../model/areas/impl/PrivateArea"
 
 
 export class GameObject extends Entity {
@@ -35,6 +39,9 @@ export class GameObject extends Entity {
 
     public getFace(): number {
         return this.face;
+    }
+    public getSize(): void {
+
     }
 
     public setFace(face: number): void {
@@ -76,7 +83,7 @@ export class GameObject extends Entity {
     }
 
     public size(): number {
-        const definition = this.getDefinition();
+        const definition: ObjectDefinition = this.getDefinition();
         if (definition == null) {
             return 1;
         }
@@ -91,6 +98,6 @@ export class GameObject extends Entity {
     }
 
     clone(): GameObject {
-        return new GameObject(this.getId(), this.getLocation(), this.getType(), this.getFace(), this.getPrivateArea());
+        return new GameObject(this.getId(), this.getLocation(), this.getType(), this.getFace(), this.getPrivateArea()!);
     }
 }

@@ -1,12 +1,11 @@
-import { Ids } from 'com.elvarg.game.model';
-import { NPC } from 'com.elvarg.game.entity.impl.npc';
-import { Location } from 'com.elvarg.game.model';
-import { CrazyArchaeologistCombatMethod } from 'com.elvarg.game.content.combat.method.impl.npcs';
-import { CombatMethod } from 'com.elvarg.game.content.combat.method';
+import { CombatMethod } from "../../../../content/combat/method/CombatMethod"
+import { CrazyArchaeologistCombatMethod } from "../../../../content/combat/method/impl/npcs/CrazyArchaeologistCombatMethod"
+import { NPC } from "../NPC";
+import { Ids } from "../../../../model/Ids"
+import { Location } from "../../../../model/Location"
+import { NpcIdentifiers } from "../../../../../util/NpcIdentifiers"
 
-const CRAZY_ARCHAEOLOGIST = 6618;
-
-@Ids({ CRAZY_ARCHAEOLOGIST })
+@Ids(NpcIdentifiers.CRAZY_ARCHAEOLOGIST)
 export class CrazyArchaeologist extends NPC {
 
     private static COMBAT_METHOD = new CrazyArchaeologistCombatMethod();

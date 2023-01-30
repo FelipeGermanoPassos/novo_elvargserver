@@ -4,7 +4,10 @@ import { CombatAction } from "../fightstyle/CombatAction"
 export interface FighterPreset {
     getItemPreset(): Presetable;
     getCombatActions(): CombatAction[];
-     eatAtPercent(): number {
-    return 40;
-};
+    eatAtPercent(): number
+}
+export class FighterPreset{
+    eatAtPercent(){
+        return 40;
+    }
 }

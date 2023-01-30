@@ -1,7 +1,4 @@
-import { NPC } from "../../..";
-import { CombatMethod, RockCrabCombatMethod } from "../../../content/combat/method";
-import { Location } from "../../../model";
-import { ROCKS, ROCKS_2, ROCK_CRAB, ROCK_CRAB_2 } from "../../../util/NpcIdentifiers";
+
 
 @Ids([ROCKS, ROCKS_2])
 export class RockCrab extends NPC {

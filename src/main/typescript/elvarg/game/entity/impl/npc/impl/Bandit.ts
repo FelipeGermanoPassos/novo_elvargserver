@@ -1,12 +1,13 @@
-import { Location } from "com.elvarg.game.model";
-import { CombatMethod } from "com.elvarg.game.content.combat.method";
-import { BanditCombatMethod } from "com.elvarg.game.content.combat.method.impl.npcs";
-import { NPC } from "com.elvarg.game.entity.impl.npc";
-import { Player } from "com.elvarg.game.entity.impl.player";
-import { Equipment } from "com.elvarg.game.model.container.impl";
+import { CombatMethod } from "../../../../content/combat/method/CombatMethod"
+import { BanditCombatMethod } from "../../../../content/combat/method/impl/npcs/BanditCombtMethod"
+import { NPC } from "../NPC";
+import { Player } from "../../player/Player";
+import { Ids } from "../../../../model/Ids"
+import { Location } from "../../../../model/Location"
+import { Equipment } from "../../../../model/container/impl/Equipment"
+import { NpcIdentifiers } from "../../../../../util/NpcIdentifiers"
 
-const BANDIT = [0];
-
+@Ids(NpcIdentifiers.BANDIT)
 class Bandit extends NPC {
     private static COMBAT_METHOD: CombatMethod = new BanditCombatMethod();
 

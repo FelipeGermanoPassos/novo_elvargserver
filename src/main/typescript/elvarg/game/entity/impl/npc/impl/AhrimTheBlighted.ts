@@ -1,17 +1,19 @@
-import { Location } from "com.elvarg.game.model";
-import { CombatMethod } from "com.elvarg.game.content.combat.method";
-import { CombatSpells } from "com.elvarg.game.content.combat.magic";
-import { NPC } from "com.elvarg.game.entity.impl.npc";
+import { CombatSpells } from "../../../../content/combat/magic/CombatSpells"
+import { CombatMethod } from "../../../../content/combat/method/CombatMethod"
+import { NPC } from "../NPC";
+import { Ids } from "../../../../model/Ids"
+import { Location } from "../../../../model/Location"
+import { CombatFactory } from "../../../../content/combat/CombatFactory"
+import { NpcIdentifiers } from "../../../../../util/NpcIdentifiers"
 
-const AHRIM_THE_BLIGHTED = [0];
-
+@Ids(NpcIdentifiers.AHRIM_THE_BLIGHTED)
 class AhrimTheBlighted extends NPC {
     constructor(id: number, position: Location) {
         super(id, position);
-        this.combat.autocastSpell = CombatSpells.FIRE_WAVE.spell;
+        this.getCombat().setAutocastSpell(CombatSpells.FIRE_WAVE.getSpell());
     }
 
     public getCombatMethod(): CombatMethod {
-        return MAGIC_COMBAT;
+        return CombatFactory.MAGIC_COMBAT;
     }
 }

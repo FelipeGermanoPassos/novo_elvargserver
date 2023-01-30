@@ -1,4 +1,3 @@
-Copy code
 import { CombatType } from './CombatType';
 import { AttackStyleSwitch } from './AttackStyleSwitch';
 import { Mobile } from '../Mobile';

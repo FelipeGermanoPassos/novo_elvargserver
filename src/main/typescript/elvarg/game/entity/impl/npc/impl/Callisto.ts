@@ -1,12 +1,11 @@
-import { Ids } from 'com.elvarg.game.model';
-import { NPC } from 'com.elvarg.game.entity.impl.npc';
-import { Location } from 'com.elvarg.game.model';
-import { CallistoCombatMethod } from 'com.elvarg.game.content.combat.method.impl.npcs';
-import { CombatMethod } from 'com.elvarg.game.content.combat.method';
+import { CombatMethod } from "../../../../content/combat/method/CombatMethod"
+import { CallistoCombatMethod } from "../../../../content/combat/method/impl/npcs/CallistoCombatMethod"
+import { NPC } from "../NPC";
+import { Ids } from "../../../../model/Ids"
+import { Location } from "../../../../model/Location"
+import { NpcIdentifiers } from "../../../../../util/NpcIdentifiers"
 
-const CALLISTO = 6609;
-
-@Ids({ CALLISTO })
+@Ids(NpcIdentifiers.CALLISTO)
 export class Callisto extends NPC {
 
     private static COMBAT_METHOD = new CallistoCombatMethod();
