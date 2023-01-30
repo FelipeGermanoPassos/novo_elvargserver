@@ -1,4 +1,4 @@
 export enum TaskType {
     DEFAULT,
-    WALK_TO,
+    WALK_TO
 }

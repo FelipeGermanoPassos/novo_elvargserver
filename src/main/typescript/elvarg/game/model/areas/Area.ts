@@ -1,18 +1,27 @@
+import {Boundary} from '../../../game/model/Boundary';
+import {Player} from '../../entity/impl/player/Player'
+import {PlayerBot} from '../../entity/impl/playerbot/PlayerBot'
+
+import {Mobile} from '../../entity/impl/Mobile'
+import {Item} from '../../../game/model/Item'
+import {CombatFactory} from '../../content/combat/CombatFactory'
+
+
 export abstract class Area {
     private boundaries: Boundary[];
     private npcs: { [key: number]: NPC } = {};
     private players: { [key: number]: Player } = {};
     private playerBots: { [key: number]: PlayerBot } = {};
-
+    
     constructor(boundaries: Boundary[]) {
-        this.boundaries = boundaries;
+      this.boundaries = boundaries;
     }
-
+    
     enter(character: Mobile) {
         if (character.isPlayerBot()) {
             this.playerBots[character.getIndex()] = character.getAsPlayerBot();
         }
-
+    
         if (character.isPlayer()) {
             this.players[character.getIndex()] = character.getAsPlayer();
         } else if (character.isNpc()) {
@@ -20,14 +29,14 @@ export abstract class Area {
         }
         this.postEnter(character);
     }
-
-    postEnter(character: Mobile) { }
-
+    
+    postEnter(character: Mobile) {}
+    
     leave(character: Mobile, logout: boolean) {
         if (character.isPlayerBot()) {
             delete this.playerBots[character.getIndex()];
         }
-
+    
         if (character.isPlayer()) {
             delete this.players[character.getIndex()];
         } else if (character.isNpc()) {
@@ -35,24 +44,24 @@ export abstract class Area {
         }
         this.postLeave(character, logout);
     }
-
-    postLeave(character: Mobile, logout: boolean) { }
-
+    
+    postLeave(character: Mobile, logout: boolean) {}
+    
     process(character: Mobile) {
         // By default, do nothing in process.
     }
-
+    
     canTeleport(player: Player): boolean {
         // By default, Areas allow teleporting unless otherwise specified.
         return true;
     }
 
-    public canAttack(attacker: Mobile, target: Mobile): CanAttackResponse {
+    public canAttack(attacker: Mobile, target: Mobile): CombatFactory.CanAttackResponse {
         if (attacker.isPlayer() && target.isPlayer()) {
-            return CanAttackResponse.CANT_ATTACK_IN_AREA;
+            return CombatFactory.CanAttackResponse.CANT_ATTACK_IN_AREA;
         }
 
-        return CanAttackResponse.CAN_ATTACK;
+        return CombatFactory.CanAttackResponse.CAN_ATTACK;
     }
 
     public canPlayerBotIdle(playerBot: PlayerBot): boolean {

@@ -1,5 +1,4 @@
-enum PlayerStatus {
-
+export enum PlayerStatus {
     NONE,
     SHOPPING,
     TRADING,

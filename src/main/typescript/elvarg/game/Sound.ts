@@ -10,11 +10,9 @@
 
     COOKING_BURN = { id: 240, volume: 1, delay: 0, loopType: 0 }
 
-
     // runecrafting sounds
 
     CRAFT_RUNES = { id: 207, volume: 0, delay: 0, loopType: 0 }
-
 
     // mining sounds
 
@@ -26,11 +24,9 @@
 
     MINING_ROCK_EXPLODE = { id: 1021, volume: 1, delay: 0, loopType: 0 }
 
-
     // fishing sounds
 
     FISHING_FISH = { id: 379, volume: 1, delay: 10, loopType: 0 }
-
 
     // woodcutting sounds
 
@@ -88,4 +84,5 @@
 
 
 }
+
 

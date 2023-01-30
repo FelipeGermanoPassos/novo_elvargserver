@@ -1,4 +1,4 @@
-enum GraphicHeight {
+export enum GraphicHeight {
     LOW,
     MIDDLE,
     HIGH,

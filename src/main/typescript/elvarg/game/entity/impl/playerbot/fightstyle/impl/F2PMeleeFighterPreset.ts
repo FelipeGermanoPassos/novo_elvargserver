@@ -1,4 +1,4 @@
-class F2PMeleeFighterPreset implements FighterPreset {
+export class F2PMeleeFighterPreset implements FighterPreset {
 
 
 

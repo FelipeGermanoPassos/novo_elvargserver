@@ -1,16 +1,3 @@
-import { PrayerHandler } from "../../../../../content/PrayerHandler"
-import { CombatSpecial } from "../../../../../content/combat/CombatSpecial"
-import { Presetable } from "../../../../../content/presets/Presetable"
-import { Mobile } from "../../../Mobile";
-import { PlayerBot } from "../../PlayerBot";
-import { CombatAction } from "../../fightstyle/CombatAction"
-import { CombatSwitch } from "../../fightstyle/CombatSwitch"
-import { FighterPreset } from "../FighterPreset"
-import { Item } from "../../../../../model/Item"
-import {MagicSpellbook} from "../../../../../model/MagicSpellbook"
-import {ItemIdentifiers} from "../../../../../../util/ItemIdentifiers"
-
-
 export class GRangerFighterPreset implements FighterPreset {
     const BOT_G_MAULER_70 = {
         name: "G Mauler (R)",

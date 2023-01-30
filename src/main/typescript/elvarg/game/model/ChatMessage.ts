@@ -21,28 +21,13 @@ export class ChatMessage
         this.effects = effects;
         this.text = text;
     }
-    // *
-    // 	 * Gets the message's chat color.
-    // 	 *
-    // 	 * @return colour.
-    public getColour()
-    {
+    public getColour() {
         return this.colour;
     }
-    // *
-    // 	 * Gets the message's chat effect.
-    // 	 *
-    // 	 * @return effects.
-    public getEffects()
-    {
+    public getEffects() {
         return this.effects;
     }
-    // *
-    // 	 * Gets the message's actual text in byte form.
-    // 	 *
-    // 	 * @return text.
-    public getText()
-    {
+    public getText() {
         return this.text;
     }
 }

@@ -1,10 +1,38 @@
-export class World {
-    private static readonly MAX_PLAYERS = 500;
-    private static players: MobileList<Player> = new MobileList<Player>(MAX_PLAYERS);
-    private static playerBots: Map<string, PlayerBot> = new Map<string, PlayerBot>();
-    private static npcs: MobileList<NPC> = new MobileList<NPC>(5000);
-    private static items: ItemOnGround[] = [];
+import {ObjectManager} from '../../../entity/impl/object/ObjectManager';
+import {ItemOnGround} from '../../../entity/impl/grounditem/ItemOnGround'
+import {GameObject} from '../../../entity/impl/object/GameObject';
+import {Player} from '../game/entity/impl/player/Player'
+import {PlayerBot} from '../game/entity/impl/playerbot/PlayerBot'
+import * as MobileList from '../game/entity/impl/MobileList'
+import {NPC} from '../game/entity/impl/npc/NPC';
+package com.elvarg.game.entity.updating.sync;
+import {GameSyncExecutor} from '../game/entity/updating/sync/GameSyncExecutor'
+import {GameSyncTask} from '../game/entity/updating/sync/GameSyncTask'
+import {Lock} 'ts-lock'
 
+export class World {
+
+    private static MAX_PLAYERS = 500;
+    
+    /**
+     * The collection of active {@link Player}s.
+     */
+    private static players = new MobileList<Player>(World.MAX_PLAYERS);
+    
+    /**
+     * The collection of active {@link PlayerBot}s.
+     */
+    private static playerBots = new Map<string, PlayerBot>();
+    
+    /**
+     * The collection of active {@link NPC}s.
+     */
+    private static npcs = new MobileList<NPC>(5000);
+    
+    /**
+     * The collection of active {@link ItemOnGround}s..
+     */
+    private static items: ItemOnGround[] = [];
     /**
      * The collection of active {@link GameObject}s..
      */
@@ -94,6 +122,7 @@ executor.sync(new GameSyncTask(false) {
         }
     }
 });
+
 
 
     /**

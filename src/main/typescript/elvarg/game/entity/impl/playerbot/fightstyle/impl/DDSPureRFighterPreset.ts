@@ -1,4 +1,4 @@
-interface DDSPureRFighterPreset implements FighterPreset {
+export interface DDSPureRFighterPreset implements FighterPreset {
     BOT_DDS_PURE_R_73: Presetable = {
         name: "DDS Pure (R)",
         items: [

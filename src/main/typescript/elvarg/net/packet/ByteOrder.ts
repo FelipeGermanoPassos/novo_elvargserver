@@ -3,5 +3,5 @@ enum ByteOrder {
     BIG,
     MIDDLE,
     INVERSE_MIDDLE,
-    TRIPLE_INT,
+    TRIPLE_INT
 }

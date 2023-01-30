@@ -1,4 +1,4 @@
-enum PlayerRights {
+export enum PlayerRights {
     NONE = -1,
     MODERATOR = 618,
     ADMINISTRATOR = 619,
