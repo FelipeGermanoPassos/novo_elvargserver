@@ -1,3 +1,8 @@
+import { Mobile } from "../../../entity/impl/Mobile";
+import { Player } from "../../../entity/impl/player/Player";
+import { UpdateFlag } from "../../../model/UpdateFlag"
+import { Spell } from "./Spell";
+
 export class EffectSpells {
     public static handleSpell(player: Player, button: number) {
         const spell: Optional<EffectSpell> = EffectSpell.forSpellId(button);
@@ -8,8 +13,8 @@ export class EffectSpells {
             return true;
         }
         switch (spell.get()) {
-            case BONES_TO_PEACHES:
-            case BONES_TO_BANANAS:
+            case this.BONES_TO_PEACHES:
+            case this.BONES_TO_BANANAS:
                 if (!player.getClickDelay().elapsed(500)) {
                     return true;
                 }
@@ -63,10 +68,9 @@ export class EffectSpells {
         }
         return true;
     }
-}
 
-enum EffectSpell {
     BONES_TO_BANANAS = new Spell() {
+        
     spellId(): number {
         return 1159;
     }
@@ -90,8 +94,7 @@ enum EffectSpell {
     startCast(cast: Mobile, castOn: Mobile) { }
 }
 
-enum EffectSpell {
-    LOW_ALCHEMY = new Spell() {
+LOW_ALCHEMY = new Spell() {
     spellId(): number {
         return 1162;
     }
@@ -182,7 +185,7 @@ TELEKINETIC_GRAB(new TelekineticGrab()),
         }
     }
 
-class BonesToPeaches implements Spell {
+  BONES_TO_PEACHES  {
     spellId() {
         return 15877;
     }
@@ -254,32 +257,31 @@ class VengeanceOther implements Spell {
 BAKE_PIE(new BakePie()),
     VENGEANCE_OTHER(new VengeanceOther()),
 
-    enum EffectSpell {
     VENGEANCE = 'VENGEANCE',
-}
 
-class Vengeance implements Spell {
-    spellId() {
-        return 30306;
+
+    class Vengeance implements Spell {
+        spellId() {
+            return 30306;
+        }
+        levelRequired() {
+            return 94;
+        }
+        baseExperience() {
+            return 14000;
+        }
+        itemsRequired(player: Player) {
+            return Optional.of(new Item[]{ new Item(9075, 4), new Item(557, 10), new Item(560, 2) });
+        }
+        equipmentRequired(player: Player) {
+            return Optional.empty();
+        }
+        startCast(cast: Mobile, castOn: Mobile) {
+        }
+        getSpellbook() {
+            return MagicSpellbook.LUNAR;
+        }
     }
-    levelRequired() {
-        return 94;
-    }
-    baseExperience() {
-        return 14000;
-    }
-    itemsRequired(player: Player) {
-        return Optional.of(new Item[]{ new Item(9075, 4), new Item(557, 10), new Item(560, 2) });
-    }
-    equipmentRequired(player: Player) {
-        return Optional.empty();
-    }
-    startCast(cast: Mobile, castOn: Mobile) {
-    }
-    getSpellbook() {
-        return MagicSpellbook.LUNAR;
-    }
-}
 
 let spells: Map<number, EffectSpell> = new Map<number, EffectSpell>();
 spells.set(30306, EffectSpell.VENGEANCE);
@@ -287,4 +289,4 @@ spells.set(30306, EffectSpell.VENGEANCE);
 function forSpellId(spellId: number): EffectSpell | undefined {
     return spells.get(spellId);
 }
-
+}

@@ -1,11 +1,12 @@
-import { DefinitionLoader } from './DefinitionLoader';
-import { ItemDefinition } from './ItemDefinition';
-import { GameConstants } from './GameConstants';
+import { GameConstants } from "../../../GameConstants";
+import { ItemDefinition } from "../../ItemDefinition";
+import { DefinitionLoader } from "../DefinitionLoader";
+import fs from "fs";
 
 export class ItemDefinitionLoader extends DefinitionLoader {
     load() {
         ItemDefinition.definitions.clear();
-        const reader = new FileReader(this.file());
+        const reader = fs(this.file());
         const defs: ItemDefinition[] = JSON.parse(reader.readAsText());
         for (const def of defs) {
             ItemDefinition.definitions.set(def.getId(), def);

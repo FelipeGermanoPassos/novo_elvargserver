@@ -1,5 +1,15 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { GameLogic } from "../../GameLogic";
+import { World } from "../../World";
+import { DonatorRights } from "../../model/rights/DonatorRights";
+import { Player } from '../../entity/impl/player/Player';
+import { PlayerRights } from "../../model/rights/PlayerRights"
+import { Misc } from "../../../util/Misc";
+import { PlayerPunishment } from "../../../util/PlayerPunishment";
+import { ClanChat } from "./ClanChat";
+import { ClanChatRank } from './ClanChatRank';
+import { chatRank } from './ClanChatRank';
 export class ClanChatManager {
 
     public static CLAN_CHAT_SETUP_INTERFACE_ID = 38300;
@@ -24,20 +34,26 @@ export class ClanChatManager {
                 let owner = input.getUint8(1);
                 let index = input.getUint16(2);
                 let clan = new ClanChat(owner, name, index);
-                clan.setRankRequirements(ClanChat.RANK_REQUIRED_TO_ENTER, ClanChatRank.forId(input.read()));
-                clan.setRankRequirements(ClanChat.RANK_REQUIRED_TO_KICK, ClanChatRank.forId(input.read()));
-                clan.setRankRequirements(ClanChat.RANK_REQUIRED_TO_TALK, ClanChatRank.forId(input.read()));
-                let input = new DataView(data.buffer);
-                let totalRanks = input.readShort();
+                clan.setRankRequirements(ClanChat.RANK_REQUIRED_TO_ENTER, ClanChatRank.forId(input.getUint16(2)));
+                clan.setRankRequirements(ClanChat.RANK_REQUIRED_TO_KICK, ClanChatRank.forId(input.getUint16(2)));
+                clan.setRankRequirements(ClanChat.RANK_REQUIRED_TO_TALK, ClanChatRank.forId(input.getUint16(2)));
+                let offset = 2;
+                let totalRanks = input.getInt16(0);
                 for (let i = 0; i < totalRanks; i++) {
-                    clan.getRankedNames().set(input.readUTF(), ClanChatRank.forId(input.read()));
+                    let nameLength = input.getUint8(offset);
+                    offset++;
+                    let name = new TextDecoder("utf-8").decode(new Uint8Array(data.buffer, offset, nameLength));
+                    offset += nameLength;
+                    let rankId = input.getUint16(offset);
+                    offset += 2;
+                    clan.getRankedNames().set(name, ClanChatRank.forId(rankId));
                 }
-                let totalBans = input.readShort();
+                let totalBans = input.getInt16(0);
                 for (let i = 0; i < totalBans; i++) {
-                    clan.addBannedName(input.readUTF());
+                    let input = new DataView(data.buffer);
+                    clan.addBannedName(input.getUint8(0));
                 }
                 ClanChatManager.clans[index] = clan;
-                input.close();
             }
         } catch (exception) {
             console.log(exception);
@@ -47,13 +63,14 @@ export class ClanChatManager {
     public static writeFile(clan: ClanChat): void {
         GameLogic.submit(() => {
             try {
-                let file = new File(ClanChatManager.FILE_DIRECTORY + clan.getName());
-                if (file.exists())
-                    file.createNewFile();
-                let output = new DataOutputStream(new FileOutputStream(file));
-                output.writeUTF(clan.getName());
-                output.writeUTF(clan.getOwnerName());
-                output.writeShort(clan.getIndex());
+                let file = `${ClanChatManager.FILE_DIRECTORY}${clan.getName()}`;
+                if (!fs.existsSync(file)) {
+                    fs.writeFileSync(file, '');
+                }
+                let output = fs.createWriteStream(file);
+                fs.appendFileSync(file, clan.getName() + '\n');
+                fs.appendFileSync(file, clan.getOwnerName() + '\n');
+                fs.appendFileSync(file, clan.getIndex().toString() + '\n');
                 output.write(clan.getRankRequirement()[ClanChat.RANK_REQUIRED_TO_ENTER] != null
                     ? clan.getRankRequirement()[ClanChat.RANK_REQUIRED_TO_ENTER].ordinal()
                     : -1);
@@ -63,16 +80,16 @@ export class ClanChatManager {
                 output.write(clan.getRankRequirement()[ClanChat.RANK_REQUIRED_TO_TALK] != null
                     ? clan.getRankRequirement()[ClanChat.RANK_REQUIRED_TO_TALK].ordinal()
                     : -1);
-                output.writeShort(clan.getRankedNames().size());
+                fs.appendFileSync(file, clan.getRankedNames().size() + '\n');
                 for (let iterator of clan.getRankedNames().entries()) {
                     let name = iterator[0];
                     let rank = iterator[1].ordinal();
-                    output.writeUTF(name);
+                    fs.appendFileSync(file, name + '\n');
                     output.write(rank);
                 }
-                output.writeShort(clan.getBannedNames().length);
+                fs.appendFileSync(file, clan.getBannedNames().length + '\n');
                 for (let ban of clan.getBannedNames()) {
-                    output.writeUTF(ban.getName());
+                    fs.appendFileSync(file, ban.getName() + '\n');
                 }
                 output.close();
             } catch (e) {
@@ -96,8 +113,8 @@ export class ClanChatManager {
             return null;
         }
         ClanChatManager.clans[index] = new ClanChat(player, name, index);
-        ClanChatManager.clans[index].getRankedNames().set(player.getUsername(), ClanChatRank.OWNER);
-        ClanChatManager.clans[index].setRankRequirements(ClanChat.RANK_REQUIRED_TO_KICK, ClanChatRank.OWNER);
+        ClanChatManager.clans[index].getRankedNames().set(player.getUsername(), chatRank.OWNER);
+        ClanChatManager.clans[index].setRankRequirements(ClanChat.RANK_REQUIRED_TO_KICK, chatRank.OWNER);
         return ClanChatManager.clans[index];
     }
 
@@ -128,7 +145,7 @@ export class ClanChatManager {
             if (clan.getOwner() === null) {
                 clan.setOwner(player);
             }
-            clan.giveRank(player, ClanChatRank.OWNER);
+            clan.giveRank(player, chatRank.OWNER);
         }
         player.getPacketSender().sendMessage("Attempting to join channel...");
         if (clan.getMembers().length >= 100) {
@@ -301,7 +318,7 @@ export class ClanChatManager {
             player.getPacketSender().sendMessage("Your clanchat channel is already disabled.");
             return;
         }
-        let file = new File(FILE_DIRECTORY + clan.getName());
+        let file = `${ClanChatManager.FILE_DIRECTORY}${clan.getName()}`;
         for (let member of clan.getMembers()) {
             if (member != null) {
                 ClanChat.leave(member, false);
@@ -310,9 +327,9 @@ export class ClanChatManager {
         if (player.getClanChatName() != null && player.getClanChatName().toLowerCase() == clan.getName().toLowerCase()) {
             player.setClanChatName("");
         }
-        clans[clan.getIndex()] = null;
-        file.delete();
-        if (player.getInterfaceId() == CLAN_CHAT_SETUP_INTERFACE_ID) {
+        ClanChatManager.clans[clan.getIndex()] = null;
+        fs.unlinkSync(ClanChatManager.FILE_DIRECTORY + clan.getName());
+        if (player.getInterfaceId() == ClanChatManager.CLAN_CHAT_SETUP_INTERFACE_ID) {
             ClanChat.clanChatSetupInterface(player);
         }
     }
@@ -339,12 +356,12 @@ export class ClanChatManager {
         if (player2.isStaff()) {
             if (rank == null) {
                 clan.giveRank(player2, ClanChatRank.STAFF);
-                updateList(clan);
+                ClanChatManager.updateList(clan);
             }
         } else {
             if (rank == ClanChatRank.STAFF) {
                 clan.giveRank(player2, null);
-                updateList(clan);
+                ClanChatManager.updateList(clan);
             }
         }
     }
@@ -357,7 +374,7 @@ export class ClanChatManager {
 
         newName = newName.toLowerCase();
 
-        for (const c of clans) {
+        for (const c of ClanChatManager.clans) {
             if (c == null) {
                 continue;
             }
@@ -367,9 +384,9 @@ export class ClanChatManager {
             }
         }
 
-        let clan = getClanChat(player);
+        let clan = ClanChatManager.getClanChat(player);
         if (clan == null) {
-            clan = create(player, newName);
+            clan = ClanChatManager.create(player, newName);
         }
         if (clan == null) {
             return;
@@ -392,7 +409,7 @@ export class ClanChatManager {
         if (player.getCurrentClanChat() == null) {
             ClanChatManager.join(player, clan);
         }
-        if (player.getInterfaceId() == CLAN_CHAT_SETUP_INTERFACE_ID) {
+        if (player.getInterfaceId() == ClanChatManager.CLAN_CHAT_SETUP_INTERFACE_ID) {
             ClanChatManager.clanChatSetupInterface(player);
         }
     }
@@ -478,7 +495,7 @@ export class ClanChatManager {
             }
 
             const nameInterfaceId = 38752;
-            const rankInterfaceId = 38952;
+            let rankInterfaceId = 38952;
             for (let friend: player.getRelations().getFriendList()) {
                 let playerName = Misc.longToString(friend);
                 if (playerName == null || playerName.isEmpty())
@@ -490,7 +507,7 @@ export class ClanChatManager {
                     (rank == null ? "Friend" : Misc.ucFirst(rank.toString().toLowerCase())));
             }
 
-            player.getPacketSender().sendInterface(CLAN_CHAT_SETUP_INTERFACE_ID);
+            player.getPacketSender().sendInterface(ClanChatManager.CLAN_CHAT_SETUP_INTERFACE_ID);
         }
     }
 
@@ -550,7 +567,7 @@ export class ClanChatManager {
     }
 
     public static handleButton(player: Player, button: number, menuId: number): boolean {
-        if (player.interfaceId === CLAN_CHAT_SETUP_INTERFACE_ID) {
+        if (player.interfaceId === ClanChatManager.CLAN_CHAT_SETUP_INTERFACE_ID) {
             const clan = ClanChatManager.getClanChat(player);
             switch (button) {
                 case 38319:
@@ -567,7 +584,7 @@ export class ClanChatManager {
                         });
                         player.getPacketSender().sendEnterInputPrompt("What should your clanchat channel's name be?");
                     } else if (menuId === 1) {
-                        delete (player);
+                        ClanChatManager.delete(player);
                     }
                     return true;
                 case 38322:
@@ -604,7 +621,7 @@ export class ClanChatManager {
                         clan.setRankRequirements(ClanChat.RANK_REQUIRED_TO_ENTER, rank);
                         player.getPacketSender().sendMessage("You have changed your clanchat channel's settings.");
                         if (clan.getRankRequirement()[ClanChat.RANK_REQUIRED_TO_ENTER] != null) {
-                            for (Player member of clan.getMembers()) {
+                            for (let member of clan.getMembers()) {
                                 if (member === null)
                                     continue;
                                 const memberRank = clan.getRank(member);
@@ -612,7 +629,7 @@ export class ClanChatManager {
                                     .ordinal() > memberRank.ordinal()) {
                                     member.getPacketSender()
                                         .sendMessage("Your rank is not high enough to be in this channel.");
-                                    leave(member, false);
+                                    ClanChatManager.leave(member, false);
                                     player.getPacketSender()
                                         .sendMessage("@red@Warning! Changing that setting kicked the player "
                                             + member.getUsername() + " from the chat because")
@@ -723,14 +740,14 @@ export class ClanChatManager {
                     clan.getRankedNames().remove(target);
                     p2 = World.getPlayerByName(target);
                     if (p2.isPresent()) {
-                        updateRank(clan, p2.get());
+                        ClanChatManager.updateRank(clan, p2.get());
                         if (clan.getRankRequirement()[ClanChat.RANK_REQUIRED_TO_ENTER] != null) {
                             rank = clan.getRank(p2.get());
                             if (rank == null || clan.getRankRequirement()[ClanChat.RANK_REQUIRED_TO_ENTER].ordinal() > rank
                                 .ordinal()) {
                                 p2.get().getPacketSender()
                                     .sendMessage("Your rank is not high enough to be in this channel.");
-                                leave(p2.get(), false);
+                                ClanChatManager.leave(p2.get(), false);
                                 player.getPacketSender()
                                     .sendMessage("@red@Warning! Changing that setting kicked the player "
                                         + p2.get().getUsername() + " from the chat because")
@@ -740,7 +757,7 @@ export class ClanChatManager {
                         }
                     }
                     ClanChatManager.updateList(clan);
-                    if (player.getInterfaceId() == CLAN_CHAT_SETUP_INTERFACE_ID) {
+                    if (player.getInterfaceId() == ClanChatManager.CLAN_CHAT_SETUP_INTERFACE_ID) {
                         ClanChatManager.clanChatSetupInterface(player);
                     }
                     break;

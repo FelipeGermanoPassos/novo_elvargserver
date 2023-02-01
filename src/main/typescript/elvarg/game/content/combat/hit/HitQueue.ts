@@ -1,6 +1,11 @@
-import { PendingHit, Mobile } from "./types";
+import { HitDamage } from "./HitDamage"
+import { PendingHit } from "./PendingHit";
+import { Mobile } from "../../../entity/impl/Mobile";
+import { Flag } from "../../../model/Flag";
+import { CombatFactory } from "../../../content/combat/CombatFactory";
 
-class HitQueue {
+
+export class HitQueue {
     private pendingHits: PendingHit[] = [];
     private pendingDamage: HitDamage[] = [];
 
@@ -26,7 +31,7 @@ class HitQueue {
 
         if (this.pendingDamage.length > 0) {
             if (!character.getUpdateFlag().flagged(Flag.SINGLE_HIT)) {
-                const firstHit = pendingDamage.poll();
+                const firstHit = this.pendingDamage.shift();
 
                 // Check if it's present
                 if (!Objects.isNull(firstHit)) {
@@ -41,7 +46,7 @@ class HitQueue {
             if (!character.getUpdateFlag().flagged(Flag.DOUBLE_HIT)) {
 
                 // Attempt to fetch a second hit.
-                const secondHit = pendingDamage.poll();
+                const secondHit = this.pendingDamage.shift();
 
                 // Check if it's present
                 if (!Objects.isNull(secondHit)) {
@@ -81,5 +86,4 @@ class HitQueue {
         }
         return true;
     }
-
 }

@@ -1,6 +1,6 @@
 import {Flag} from "../model/Flag";
 
-class UpdateFlag {
+export class UpdateFlag {
     /**
     * A set containing the entity's update flags.
     */

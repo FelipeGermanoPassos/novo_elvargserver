@@ -1,6 +1,6 @@
 import {Location} from '../game/model/Location';
 
-class TileUtils {
+export class TileUtils {
 
     public static getDistance(source: Location, dest: Location): number {
         return TileUtils.calculateDistance(source.getX(), source.getY(), dest.getX(), dest.getY());

@@ -1,4 +1,14 @@
-class RangedCombatMethod extends CombatMethod {
+import { CombatMethod } from "../CombatMethod";
+import { CombatType } from "../../CombatType";
+import { CombatFactory } from "../../CombatFactory";
+import { PendingHit } from "../../hit/PendingHit";
+import { Ammunitions, RangedWeapon, RangedWeaponType, } from "../../ranged/RangedData";
+import { Mobile } from "../../../../entity/impl/Mobile";
+import { Animation } from "../../../../model/Animation";
+import { Projectile } from "../../../../model/Projectile";
+import { Sound } from "../../../../Sound";
+import { Sounds } from "../../../../Sounds";
+export class RangedCombatMethod extends CombatMethod {
     type(): CombatType {
         return CombatType.RANGED;
     }
@@ -35,34 +45,34 @@ class RangedCombatMethod extends CombatMethod {
         const ammo = character.getCombat().getAmmunition();
         const rangedWeapon = character.getCombat().getRangedWeapon();
         const animation = character.getAttackAnim();
-    
+
         if (animation !== -1) {
             character.performAnimation(new Animation(animation));
         }
-    
+
         if (ammo && ammo.getStartGraphic()) {
-    
+
             // Check toxic blowpipe, it shouldn't have any start gfx.
             if (character.getCombat().getRangedWeapon()) {
                 if (character.getCombat().getRangedWeapon() === RangedWeapon.TOXIC_BLOWPIPE) {
                     return;
                 }
             }
-    
+
             // Perform start gfx for ammo
             character.performGraphic(ammo.getStartGraphic());
         }
-    
+
         if (!ammo || !rangedWeapon) {
             return;
         }
-    
+
         let projectileId = ammo.getProjectileId();
         let delay = 40;
         let speed = 57;
         let heightEnd = 31;
         let heightStart = 43;
-    
+
         if (rangedWeapon.getType() === RangedWeaponType.CROSSBOW) {
             delay = 46;
             speed = 62;
@@ -75,29 +85,29 @@ class RangedCombatMethod extends CombatMethod {
             heightStart = 40;
             heightEnd = 35;
         }
-        if (ammo === Ammunition.TOKTZ_XIL_UL) {
+        if (ammo === Ammunitions.TOKTZ_XIL_UL) {
             delay = 30;
             speed = 55;
         }
-    
+
         // Fire projectile
         new Projectile(character, target, projectileId, delay, speed, heightStart, heightEnd).sendProjectile();
-    
+
         // Send sound
         Sounds.sendSound(character.getAsPlayer(), Sound.SHOOT_ARROW);
-    
+
         // Dark bow sends two arrows, so send another projectile and delete another
         // arrow.
         if (rangedWeapon === RangedWeapon.DARK_BOW) {
             new Projectile(character, target, ammo.getProjectileId(), delay - 7, speed + 4, heightStart + 5, heightEnd).sendProjectile();
-    
+
             // Decrement 2 ammo if d bow
             if (character.isPlayer()) {
                 CombatFactory.decrementAmmo(character.getAsPlayer(), target.getLocation(), 2);
             }
-    
+
         } else {
-    
+
             // Decrement 1 ammo
             if (character.isPlayer()) {
                 CombatFactory.decrementAmmo(character.getAsPlayer(), target.getLocation(), 1);
@@ -115,5 +125,5 @@ class RangedCombatMethod extends CombatMethod {
         }
         return 6;
     }
-    
+
 }

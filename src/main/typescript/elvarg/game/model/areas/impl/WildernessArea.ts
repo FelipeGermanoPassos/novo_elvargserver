@@ -1,4 +1,4 @@
-class WildernessArea extends Area {
+export class WildernessArea extends Area {
     getName(): string {
     return "the Wilderness";
     }

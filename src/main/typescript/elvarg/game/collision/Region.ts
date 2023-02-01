@@ -1,4 +1,4 @@
-import Location from '../model/Location';
+import { Location } from '../model/Location';
 
 export class Region {
     private regionId: number;
@@ -70,7 +70,7 @@ export class Region {
         return this.loaded;
     }
 
-    public setLoaded(loaded: boolean): void {
+    public setLoaded(loaded: boolean) {
         this.loaded = loaded;
     }
 

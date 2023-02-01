@@ -1,4 +1,4 @@
-class ForceMovementTask extends Task {
+export class ForceMovementTask extends Task {
     private player: Player;
     private end: Location;
     private start: Location;

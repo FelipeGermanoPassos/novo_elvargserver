@@ -173,7 +173,7 @@ export class NPCMovementCoordinator {
         this.radius = radius;
     }
 }
-enum CoordinateState {
+export enum CoordinateState {
     HOME,
     AWAY,
     RETREATING

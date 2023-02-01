@@ -1,4 +1,4 @@
-class Stopwatch {
+export class Stopwatch {
     private time: number = Date.now();
     
     constructor() {

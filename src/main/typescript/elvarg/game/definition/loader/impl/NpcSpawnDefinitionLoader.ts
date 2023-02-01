@@ -1,11 +1,15 @@
-import { DefinitionLoader } from './DefinitionLoader';
-import { NpcSpawnDefinition } from './NpcSpawnDefinition';
-import { GameConstants } from './GameConstants';
-import { World } from './World';
+import fs from "fs"
+import { GameConstants } from "../../../GameConstants";
+import { World } from "../../../World";
+import { NpcSpawnDefinition } from "../../NpcSpawnDefinition";
+import { DefinitionLoader } from "../DefinitionLoader";
+import { NPC } from "../../../entity/impl/npc/NPC";
+
+
 
 export class NpcSpawnDefinitionLoader extends DefinitionLoader {
     load() {
-        const reader = new FileReader(this.file());
+        const reader = fs(this.file());
         const defs: NpcSpawnDefinition[] = JSON.parse(reader.readAsText());
         for (const def of defs) {
             const npc = NPC.create(def.getId(), def.getPosition());

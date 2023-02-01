@@ -1,4 +1,7 @@
-class ObjectSpawnDefinition extends DefaultSpawnDefinition {
+import { Location } from "../model/Location";
+import { DefaultSpawnDefinition } from "./DefaultSpawnDefinition";
+
+export class ObjectSpawnDefinition extends DefaultSpawnDefinition {
 
     constructor(id: number, position: Location) {
 		super(id, position);

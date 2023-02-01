@@ -1,19 +1,20 @@
-import { DefinitionLoader } from './DefinitionLoader';
-import { NpcSpawnDefinition } from './NpcSpawnDefinition';
-import { GameConstants } from './GameConstants';
-import { FacingDirection } from './FacingDirection';
-import { Location } from './Location';
+import { DefinitionLoader } from '../DefinitionLoader';
+import { NpcSpawnDefinition } from "../../NpcSpawnDefinition"
+import { GameConstants } from '../../../GameConstants';
+import { FacingDirection } from '../../../model/FacingDirection';
+import { Location } from '../../../model/Location';
+import fs from "fs";
 
 export class NPCSpawnDumper extends DefinitionLoader {
     load() {
-        const r = new FileReader(this.file());
+        const r =  fs(this.file());
         let s: string;
 
         const path = Paths.get(GameConstants.DEFINITIONS_DIRECTORY, "gay.json");
         const file = path.toFile();
         file.parent.writable = true;
-        const w = new FileWriter(file, true);
-        const builder = new JSON();
+        const w =  fs(file, true);
+        const builder: JSON = new JSON().setPrettyPrinting().create();;
 
         while ((s = r.readLine()) != null) {
             if (s.startsWith("/"))

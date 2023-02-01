@@ -1,4 +1,6 @@
-class ShopDefinition {
+import { Item } from "../model/Item";
+
+export class ShopDefinition {
 
     private id: number;
     private name: string = "";

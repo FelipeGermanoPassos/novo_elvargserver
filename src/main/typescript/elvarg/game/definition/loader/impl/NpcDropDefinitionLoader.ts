@@ -1,11 +1,12 @@
-import { DefinitionLoader } from './DefinitionLoader';
-import { NpcDropDefinition } from './NpcDropDefinition';
-import { GameConstants } from './GameConstants';
+import { GameConstants } from "../../../GameConstants";
+import { DefinitionLoader } from "../DefinitionLoader";
+import { NpcDropDefinition } from "../../NpcDropDefinition";
+import { fs } from "fs"
 
 export class NpcDropDefinitionLoader extends DefinitionLoader {
     load() {
         NpcDropDefinition.definitions.clear();
-        const reader = new FileReader(this.file());
+        const reader = fs(this.file());
         const defs: NpcDropDefinition[] = JSON.parse(reader.readAsText());
         for (const def of defs) {
             for (const npcId of def.getNpcIds()) {

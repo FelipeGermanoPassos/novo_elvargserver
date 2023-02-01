@@ -1,4 +1,21 @@
-class Combat {
+import { Server } from "../../../Server"
+import { HitDamageCache } from "../../content/combat/hit/HitDamageCache"
+import { HitQueue } from "../../content/combat/hit/HitQueue"
+import { PendingHit } from "./hit/PendingHit";
+import { CombatSpell } from "./magic/CombatSpell";
+import { CombatMethod } from "./method/CombatMethod";
+import { GraniteMaulCombatMethod } from "./method/impl/specials/GraniteMaulCombatMethod";
+import { RangedData, RangedWeapon } from "./ranged/RangedData";
+import { Mobile } from "../../entity/impl/Mobile";
+import { Player } from "../../entity/impl/player/Player";
+import { SecondsTimer } from "../../model/SecondsTimer";
+import { StatementDialogue } from "../../model/dialogues/entries/impl/StatementDialogue";
+import { Stopwatch } from "../../../util/Stopwatch";
+import { TimerKey } from "../../../util/timers/TimerKey";
+import { CombatFactory } from "./CombatFactory";
+import { CombatSpecial } from "./CombatSpecial";
+
+export class Combat {
     private character: Mobile;
     private hitQueue: HitQueue;
     private damageMap: Map<Player, HitDamageCache> = new Map<Player, HitDamageCache>();
@@ -7,8 +24,8 @@ class Combat {
     private fireImmunityTimer = new SecondsTimer();
     private teleblockTimer = new SecondsTimer();
     private prayerBlockTimer = new SecondsTimer();
-    public rangedWeapon: RangedWeapon;
-    public rangeAmmoData: Ammunition;
+    public rangedWeapon: RangedData;
+    public rangeAmmoData: RangedData;
     private target: Mobile;
     private attacker: Mobile;
     private method: CombatMethod;
@@ -157,17 +174,17 @@ class Combat {
             }
             case CombatFactory.DUEL_MELEE_DISABLED: {
                 let p = this.character.getAsPlayer();
-                ConditionDialogue.send(p, "Melee has been disabled in this duel!");
+                StatementDialogue.send(p, "Melee has been disabled in this duel!");
                 p.getCombat().reset();
             }
             case CombatFactory.DUEL_RANGED_DISABLED: {
                 let p = this.character.getAsPlayer();
-                ConditionDialogue.send(p, "Ranged has been disabled in this duel!");
+                StatementDialogue.send(p, "Ranged has been disabled in this duel!");
                 p.getCombat().reset();
             }
             case CombatFactory.DUEL_MAGIC_DISABLED: {
                 let p = this.character.getAsPlayer();
-                ConditionDialogue.send(p, "Magic has been disabled in this duel!");
+                StatementDialogue.send(p, "Magic has been disabled in this duel!");
                 p.getCombat().reset();
             }
             case CombatFactory.TARGET_IS_IMMUNE: {
@@ -330,11 +347,19 @@ class Combat {
         this.rangedWeapon = rangedWeapon;
     }
 
-    public getRangeAmmoData(): Ammunition {
+    public getAmmunition(): RangedData.Ammunition {
         return this.rangeAmmoData;
     }
 
-    public setRangeAmmoData(rangeAmmoData: Ammunition) {
+    public setAmmunition(rangeAmmoData: RangedData.Ammunition) {
+        this.rangeAmmoData = rangeAmmoData;
+    }
+
+    public getRangeAmmoData(): RangedData.Ammunition {
+        return this.rangeAmmoData;
+    }
+
+    public setRangeAmmoData(rangeAmmoData: RangedData.Ammunition) {
         this.rangeAmmoData = rangeAmmoData;
     }
 
@@ -355,6 +380,6 @@ class Combat {
     }
 
     public getLastAttack(): Stopwatch {
-        return lastAttack;
+        return this.lastAttack;
     }
 }

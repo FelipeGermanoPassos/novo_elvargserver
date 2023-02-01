@@ -1,6 +1,8 @@
 import { Location } from "./Location";
 import { World } from '../World';
 import { Mobile } from "../entity/impl/Mobile";
+import { PrivateArea } from "./areas/impl/PrivateArea";
+
 export class Projectile {
     private start: Location;
     private end: Location;

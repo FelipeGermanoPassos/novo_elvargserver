@@ -1,3 +1,7 @@
+import { PlayerRights } from '../../../model/rights/PlayerRights';
+import { Command } from '../../../model/commands/Command';
+import { Player } from '../../../entity/impl/player/Player';
+
 class InfiniteHealth implements Command {
     execute(player: Player, command: string, parts: string[]) {
         player.setInfiniteHealth(!player.hasInfiniteHealth());

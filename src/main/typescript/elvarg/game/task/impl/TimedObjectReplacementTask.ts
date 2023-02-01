@@ -1,18 +1,22 @@
-class TimedObjectReplacementTask extends Task {
+import { GameObject } from "../../entity/impl/object/GameObject";
+import { ObjectManager } from "../../entity/impl/object/ObjectManager";
+import { Task } from "../Task";
+
+export class TimedObjectReplacementTask extends Task {
     private original: GameObject;
     private temp: GameObject;
     private ticks: number;
     private tick = 0;
     private sameTile = false;
-    
+
     constructor(original: GameObject, temp: GameObject, ticks: number) {
-        super(1, true);
+        super();
         this.original = original;
         this.temp = temp;
         this.ticks = ticks;
         this.sameTile = original.getLocation().equals(temp.getLocation());
     }
-    
+
     execute() {
         if (this.tick === 0) {
             ObjectManager.deregister(this.original, !this.sameTile);
@@ -20,8 +24,11 @@ class TimedObjectReplacementTask extends Task {
         } else if (this.tick >= this.ticks) {
             ObjectManager.deregister(this.temp, !this.sameTile);
             ObjectManager.register(this.original, true);
-            this.stop();
+            stop();
         }
         this.tick++;
+    }
+    onExecute() {
+
     }
 }

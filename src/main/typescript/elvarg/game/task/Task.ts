@@ -67,6 +67,5 @@ export class Task {
             this.onExecute();
         }
     }
-
     protected abstract onExecute(): void;
 }

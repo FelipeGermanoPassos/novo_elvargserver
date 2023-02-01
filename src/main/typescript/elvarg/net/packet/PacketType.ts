@@ -1,4 +1,4 @@
-enum PacketType {
+export enum PacketType {
     /**
      * A fixed size packet where the size never changes.
      */

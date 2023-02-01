@@ -2,6 +2,8 @@ import { Player } from '../entity/impl/player/Player';
 import { ObjectManager } from '../entity/impl/object/ObjectManager';
 import { MovementQueue } from '../model/movement/MovementQueue';
 import { TaskManager } from '../task/TaskManager';
+import { GameObject } from '../entity/impl/object/GameObject';
+
 class Gambling {
     public static MITHRIL_SEEDS = 299;
 

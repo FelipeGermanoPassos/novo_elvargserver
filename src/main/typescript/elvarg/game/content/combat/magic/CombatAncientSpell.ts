@@ -1,3 +1,9 @@
+import { Mobile } from "../../../entity/impl/Mobile";
+import { Player } from "../../../entity/impl/player/Player";
+import { Item } from "../../../model/Item";
+import { MagicSpellbook } from "../../../model/MagicSpellbook"
+import { CombatSpell } from "./CombatSpell";
+
 export abstract class CombatAncientSpell extends CombatSpell {
 
     public getSpellbook(): MagicSpellbook {
@@ -39,4 +45,4 @@ export abstract class CombatAncientSpell extends CombatSpell {
      * multiple entities.
      */
     public abstract spellRadius(): number;
-}    
+}

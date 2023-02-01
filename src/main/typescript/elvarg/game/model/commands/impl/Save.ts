@@ -1,9 +1,15 @@
+import { PlayerRights } from '../../../model/rights/PlayerRights';
+import { Command } from '../../../model/commands/Command';
+import { Player } from '../../../entity/impl/player/Player';
+import { GameConstants } from '../../../GameConstants';
+
+
 class Save implements Command {
     execute(player: Player, command: string, parts: string[]) {
-    PLAYER_PERSISTENCE.save(player);
-    player.getPacketSender().sendMessage("Saved player.");
+        GameConstants.PLAYER_PERSISTENCE.save(player);
+        player.getPacketSender().sendMessage("Saved player.");
     }
     canUse(player: Player) {
-    return (player.getRights() == PlayerRights.DEVELOPER || player.getRights() == PlayerRights.OWNER);
+        return (player.getRights() == PlayerRights.DEVELOPER || player.getRights() == PlayerRights.OWNER);
     }
 }

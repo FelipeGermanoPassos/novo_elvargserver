@@ -5,7 +5,7 @@ const Gods = {
     ZAMORAK: [],
 }
 
-class God {
+export class God {
     private items: number[];
     constructor(items: number[]) {
         this.items = items;

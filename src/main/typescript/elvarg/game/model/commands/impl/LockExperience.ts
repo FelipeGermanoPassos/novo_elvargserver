@@ -1,13 +1,15 @@
-public class LockExperience implements Command {
 
-    @Override
-    public void execute(Player player, String command, String[] parts) {
-        player.setExperienceLocked(!player.experienceLocked());
-        player.getPacketSender().sendMessage("Lock: " + player.experienceLocked());
+import { Command } from '../../../model/commands/Command';
+import { Player } from '../../../entity/impl/player/Player';
+
+export class LockExperience implements Command {
+
+    public execute(player: Player, command: string, parts: string[]): void {
+        player.setExperienceLocked(!player.experienceLocked);
+        player.getPacketSender().sendMessage(`Lock: ${player.experienceLocked}`);
     }
 
-    @Override
-    public boolean canUse(Player player) {
+    public canUse(player: Player): boolean {
         return true;
     }
 

@@ -1,3 +1,3 @@
-interface Action {
+export interface Action {
     execute(): void;
 }

@@ -1,5 +1,13 @@
-class SaradominSwordCombatMethod extends MeleeCombatMethod {
-    private static ENMEMY_GRAPHIC = new Graphic(1196, Priority.HIGH);
+import { MeleeCombatMethod } from "../MeleeCombatMethod";
+import { Animation } from "../../../../../model/Animation";
+import { Graphic } from "../../../../../model/Graphic";
+import { Priority } from "../../../../../model/Priority";
+import { Mobile } from "../../../../../entity/impl/Mobile";
+import { CombatSpecial } from "../../../CombatSpecial";
+import { PendingHit } from "../../../hit/PendingHit";
+
+export class SaradominSwordCombatMethod extends MeleeCombatMethod {
+    private static ENEMY_GRAPHIC = new Graphic(1196, Priority.HIGH);
     private static ANIMATION = new Animation(1132, Priority.HIGH);
     private static GRAPHIC = new Graphic(1213, Priority.HIGH);
 
@@ -12,11 +20,11 @@ class SaradominSwordCombatMethod extends MeleeCombatMethod {
 
     start(character: Mobile, target: Mobile) {
         CombatSpecial.drain(character, CombatSpecial.SARADOMIN_SWORD.getDrainAmount());
-        character.performAnimation(ANIMATION);
-        character.performGraphic(GRAPHIC);
+        character.performAnimation(SaradominSwordCombatMethod.ANIMATION);
+        character.performGraphic(SaradominSwordCombatMethod.GRAPHIC);
     }
 
     handleAfterHitEffects(hit: PendingHit) {
-        hit.getTarget().performGraphic(ENMEMY_GRAPHIC);
+        hit.getTarget().performGraphic(SaradominSwordCombatMethod.ENEMY_GRAPHIC);
     }
 }

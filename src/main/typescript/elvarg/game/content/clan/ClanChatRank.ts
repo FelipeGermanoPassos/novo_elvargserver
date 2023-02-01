@@ -1,4 +1,4 @@
-const chatRank = {
+export const chatRank = {
     FRIEND: -1,
     RECRUIT: 0,
     CORPORAL: 1,
@@ -11,15 +11,15 @@ const chatRank = {
 }
 
 export class ClanChatRank {
-    private readonly actionMenuId: number;
-    private readonly spriteId: number;
+    private readonly actionMenuId: any;
+    private readonly spriteId: any;
 
-    constructor(actionMenuId: number, spriteId: number) {
+    constructor(actionMenuId: any, spriteId: any) {
         this.actionMenuId = actionMenuId;
         this.spriteId = spriteId;
     }
 
-    public static forId(id: number) {
+    public static forId(id: any) {
         for (const rank in chatRank) {
             if (chatRank[rank] === id) {
                 return rank;

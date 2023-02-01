@@ -11,7 +11,7 @@ enum Chance {
     ALMOST_IMPOSSIBLE = 1
 }
 
-class ChanceCalculator {
+export class ChanceCalculator {
     private percentage: number;
 
     constructor(percentage: number) {

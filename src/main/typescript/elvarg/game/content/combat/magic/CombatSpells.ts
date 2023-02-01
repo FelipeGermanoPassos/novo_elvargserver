@@ -1,6 +1,6 @@
-enum CombatSpells {
+export enum CombatSpells {
     WIND_STRIKE = new CombatNormalSpell() {
-    castAnimation(): Optional < Animation > {
+    static castAnimation() {
         return Optional.of(new Animation(711));
     }
     castProjectile(cast: Mobile, castOn: Mobile): Optional < Projectile > {

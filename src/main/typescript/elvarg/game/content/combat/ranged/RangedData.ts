@@ -1,4 +1,4 @@
-class RangedData {
+export class RangedData {
     private static rangedWeapons: Map<number, RangedWeapon> = new Map<number, RangedWeapon>();
     private static rangedAmmunition: Map<number, Ammunition> = new Map<number, Ammunition>();
 
@@ -156,7 +156,7 @@ class RangedData {
         }
     }
 
-    const AMMUNITION_DATA: Map<Ammunition, AmmunitionData> = new Map<Ammunition, AmmunitionData>([
+    const Ammunition: Map<Ammunition, AmmunitionData> = new Map<Ammunition, AmmunitionData>([
         [Ammunition.BRONZE_ARROW, { graphic: new Graphic(19, GraphicHeight.HIGH), damage: 10, weight: 7 }],
         [Ammunition.IRON_ARROW, { graphic: new Graphic(18, GraphicHeight.HIGH), damage: 9, weight: 10 }],
         [Ammunition.STEEL_ARROW, { graphic: new Graphic(20, GraphicHeight.HIGH), damage: 11, weight: 16 }],
@@ -206,93 +206,93 @@ class RangedData {
 
     const NO_GROUND_DROP = new Set<Ammunition>([Ammunition.BRONZE_JAVELIN, Ammunition.IRON_JAVELIN, Ammunition.STEEL_JAVELIN, Ammunition.ADAMANT_JAVELIN, Ammunition.RUNE_JAVELIN, Ammunition.DRAGON_JAVELIN]);
 
-let rangedAmmunition = new Map<number, Ammunition>();
 
-class Ammunition {
+    let rangedAmmunition = new Map<number, Ammunition>();
+
     public static getFor(p: Player): Ammunition {
-        //First try to get a throw weapon as ammo
-        let weapon = p.getEquipment().getItems()[Equipment.WEAPON_SLOT].getId();
-        let throwWeapon = rangedAmmunition.get(weapon);
+    //First try to get a throw weapon as ammo
+    let weapon = p.getEquipment().getItems()[Equipment.WEAPON_SLOT].getId();
+    let throwWeapon = rangedAmmunition.get(weapon);
 
-        //Toxic blowpipe should always fire dragon darts.
-        if (weapon == 12926) {
-            return Ammunition.DRAGON_DART;
-        }
-
-        //Didnt find one. Try arrows
-        if (throwWeapon == null) {
-            return rangedAmmunition.get(p.getEquipment().getItems()[Equipment.AMMUNITION_SLOT].getId());
-        }
-
-        return throwWeapon;
+    //Toxic blowpipe should always fire dragon darts.
+    if (weapon == 12926) {
+        return Ammunition.DRAGON_DART;
     }
+
+    //Didnt find one. Try arrows
+    if (throwWeapon == null) {
+        return rangedAmmunition.get(p.getEquipment().getItems()[Equipment.AMMUNITION_SLOT].getId());
+    }
+
+    return throwWeapon;
+}
 
     private startGfx: Graphic;
     private itemId: number;
     private projectileId: number;
     private strength: number;
 
-    constructor(itemId: number, startGfx: Graphic, projectileId: number, strength: number) {
-        this.itemId = itemId;
-        this.startGfx = startGfx;
-        this.projectileId = projectileId;
-        this.strength = strength;
-        rangedAmmunition.set(itemId, this);
-    }
-
-    public static getFor(item: number): Ammunition {
-        //First try to get a throw weapon as ammo
-        let throwWeapon = rangedAmmunition.get(item);
-
-        //Didnt find one. Try arrows
-        if (throwWeapon == null) {
-            return rangedAmmunition.get(item);
-        }
-
-        return throwWeapon;
-    }
-
-    public getItemId(): number {
-        return this.itemId;
-    }
-
-    public getStartGraphic(): Graphic {
-        return this.startGfx;
-    }
-
-    public getProjectileId(): number {
-        return this.projectileId;
-    }
-
-    public getStrength(): number {
-        return this.strength;
-    }
-
-    public dropOnFloor(): boolean {
-        return !NO_GROUND_DROP.has(this);
-    }
-
-    const RangedWeaponTypes: { [key in RangedWeaponType]: IRangedWeaponType } = {
-        KNIFE: {longRangeFightType: FightType.KNIFE_LONGRANGE, defaultDistance: 4, longRangeDistance: 6 },
-        DART: {longRangeFightType: FightType.DART_LONGRANGE, defaultDistance: 3, longRangeDistance: 5 },
-        TOKTZ_XIL_UL: {longRangeFightType: FightType.OBBY_RING_LONGRANGE, defaultDistance: 5, longRangeDistance: 6 },
-        LONGBOW: {longRangeFightType: FightType.LONGBOW_LONGRANGE, defaultDistance: 9, longRangeDistance: 10 },
-    }
-
-    public getDefaultDistance() {
-        return defaultDistance;
-    }
-    
-    public getLongRangeDistance() {
-        return longRangeDistance;
-    }
-
-    public getLongRangeFightType(): FightType {
-        return longRangeFightType;
-    }
+constructor(itemId: number, startGfx: Graphic, projectileId: number, strength: number) {
+    this.itemId = itemId;
+    this.startGfx = startGfx;
+    this.projectileId = projectileId;
+    this.strength = strength;
+    rangedAmmunition.set(itemId, this);
 }
 
-enum RangedWeaponType {
+    public static getFor(item: number): Ammunition {
+    //First try to get a throw weapon as ammo
+    let throwWeapon = rangedAmmunition.get(item);
+
+    //Didnt find one. Try arrows
+    if (throwWeapon == null) {
+        return rangedAmmunition.get(item);
+    }
+
+    return throwWeapon;
+}
+
+    public getItemId(): number {
+    return this.itemId;
+}
+
+    public getStartGraphic(): Graphic {
+    return this.startGfx;
+}
+
+    public getProjectileId(): number {
+    return this.projectileId;
+}
+
+    public getStrength(): number {
+    return this.strength;
+}
+
+    public dropOnFloor(): boolean {
+    return !NO_GROUND_DROP.has(this);
+}
+
+const RangedWeaponTypes: { [key in RangedWeaponType]: IRangedWeaponType } = {
+    KNIFE: { longRangeFightType: FightType.KNIFE_LONGRANGE, defaultDistance: 4, longRangeDistance: 6 },
+    DART: { longRangeFightType: FightType.DART_LONGRANGE, defaultDistance: 3, longRangeDistance: 5 },
+    TOKTZ_XIL_UL: { longRangeFightType: FightType.OBBY_RING_LONGRANGE, defaultDistance: 5, longRangeDistance: 6 },
+    LONGBOW: { longRangeFightType: FightType.LONGBOW_LONGRANGE, defaultDistance: 9, longRangeDistance: 10 },
+}
+
+    public getDefaultDistance() {
+    return defaultDistance;
+}
+    
+    public getLongRangeDistance() {
+    return longRangeDistance;
+}
+
+    public getLongRangeFightType(): FightType {
+    return longRangeFightType;
+}
+}
+
+export enum RangedWeaponType {
     KNIFE = "KNIFE",
     DART = "DART",
     TOKTZ_XIL_UL = "TOKTZ_XIL_UL",
@@ -309,7 +309,7 @@ interface IRangedWeaponType {
 }
 
 
-enum Ammunition {
+export enum Ammunitions {
     BRONZE_ARROW = 882,
     IRON_ARROW = 884,
     STEEL_ARROW = 886,
@@ -399,7 +399,7 @@ interface AmmunitionData {
     weight: number;
 }
 
-enum RangedWeapon {
+export enum RangedWeapon {
     LONGBOW = [839],
     [Ammunition.BRONZE_ARROW],
     RangedWeaponType.LONGBOW,

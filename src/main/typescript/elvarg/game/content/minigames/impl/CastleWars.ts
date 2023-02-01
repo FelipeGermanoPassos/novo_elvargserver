@@ -1,4 +1,15 @@
-class CastleWars implements Minigame {
+enum Team {
+    ZAMORAK = "ZAMORAK",
+    SARADOMIN = "SARADOMIN",
+    GUTHIX = "GUTHIX",
+    area = Area,
+    waitingRoom = Location,
+    score = number,
+    players = Player[],
+    respawn_area_bounds = Boundary;
+}
+
+export class CastleWars implements Minigame {
     public static readonly CastleWarsSaradominWaitingArea SARADOMIN_WAITING_AREA = new CastleWarsSaradominWaitingArea();
     public static readonly CastleWarsZamorakWaitingArea ZAMORAK_WAITING_AREA = new CastleWarsZamorakWaitingArea();
     public static readonly CastleWarsGameArea GAME_AREA = new CastleWarsGameArea();
@@ -22,17 +33,6 @@ class CastleWars implements Minigame {
         player.heal(hp);
     }
 
-    enum Team {
-    ZAMORAK = "ZAMORAK",
-    SARADOMIN = "SARADOMIN",
-    GUTHIX = "GUTHIX",
-    area = Area,
-    waitingRoom = Location,
-    score = number,
-    players = Player[],
-    respawn_area_bounds = Boundary;
-    }
-
     Team(area?: Area, waitingRoom?: Location, respawn_area_bounds?: Boundary) {
         this.players = [];
         if (area) {
@@ -46,11 +46,11 @@ class CastleWars implements Minigame {
     addPlayer(player: Player) {
         this.players.push(player);
     }
-        
+
     static removePlayer(player: Player) {
         if (Team.ZAMORAK.players.includes(player)) {
             Team.ZAMORAK.players.splice(Team.ZAMORAK.players.indexOf(player), 1);
-    }
+        }
         if (Team.SARADOMIN.players.includes(player)) {
             Team.SARADOMIN.players.splice(Team.SARADOMIN.players.indexOf(player), 1);
         }
@@ -63,19 +63,19 @@ class CastleWars implements Minigame {
     public getWaitingPlayers(): number {
         return this.area.getPlayers().length;
     }
-            
+
     public getWaitingRoom(): Location {
         return this.waitingRoom;
     }
-            
+
     public getScore(): number {
         return this.score;
     }
-            
+
     public incrementScore(): void {
         this.score++;
     }
-            
+
     public static resetTeams(): void {
         Team.ZAMORAK.score = 0;
         Team.SARADOMIN.score = 0;
@@ -91,4 +91,5 @@ class CastleWars implements Minigame {
             return Team.ZAMORAK;
         }
         return null;
-    }    
+    }
+}

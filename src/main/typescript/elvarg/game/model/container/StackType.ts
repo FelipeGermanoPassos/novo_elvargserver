@@ -1,4 +1,4 @@
-enum StackType {
+export enum StackType {
     /*
      * Default type, items that will not stack, such as inventory items (excluding noted/stackable items).
      */

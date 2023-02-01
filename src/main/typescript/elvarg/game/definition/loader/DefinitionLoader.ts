@@ -13,3 +13,8 @@ export abstract class DefinitionLoader implements Runnable {
         }
     }
 }
+
+interface Runnable {
+
+    run();
+}

@@ -1,3 +1,19 @@
+import { CombatMethod } from "../CombatMethod";
+import { Graphic } from "../../../../model/Graphic";
+import { Sounds } from "../../../../Sounds";
+import { Sound } from "../../../../Sound";
+import { World } from "../../../../World";
+import { CombatFactory } from "../../CombatFactory";;
+import { CombatType } from "../../CombatType";
+import { PendingHit } from "../../hit/PendingHit";
+import { CombatAncientSpell } from "../../magic/CombatAncientSpell";
+import { Mobile } from "../../../../entity/impl/Mobile";
+import { NPC } from "../../../../entity/impl/npc/NPC";
+import { Player } from "../../../../entity/impl/player/Player";
+import { GraphicHeight } from "../../../../model/GraphicHeight";
+import { AreaManager } from "../../../../model/areas/AreaManager";
+
+
 export class MagicCombatMethod extends CombatMethod {
 
     public static SPLASH_GRAPHIC = new Graphic(85, GraphicHeight.MIDDLE);
@@ -36,10 +52,10 @@ export class MagicCombatMethod extends CombatMethod {
             }
 
             for (let next of it) {
-                if (!next || (next.isNpc() && !(next as NPC).getCurrentDefinition().isAttackable()) || (next.isPlayer() && AreaManager.canAttack(character, next as Player) != CombatFactory.CanAttackResponse.CAN_ATTACK) || !AreaManager.inMulti(next as Player) || !next.getLocation().isWithinDistance(target.getLocation(), spell.spellRadius()) || next == character || next == target || next.getHitpoints() <= 0) {
+                if (!next || (next.isNpc() && !(next as unknown as NPC).getCurrentDefinition().isAttackable()) || (next.isPlayer() && AreaManager.canAttack(character, next as Player) != CombatFactory.CanAttackResponse.CAN_ATTACK) || !AreaManager.inMulti(next as Player) || !next.getLocation().isWithinDistance(target.getLocation(), spell.spellRadius()) || next == character || next == target || next.getHitpoints() <= 0) {
                     continue;
                 }
-                let pendingHit: PendingHit = new PendingHit(character, next, this, false, 3);
+                let pendingHit: PendingHit = new PendingHit(character, next, this, 3, false);
                 multiCombatHits.push(pendingHit);
                 spell.onHitCalc(pendingHit);
             }
@@ -101,19 +117,19 @@ export class MagicCombatMethod extends CombatMethod {
         }
         character.getCombat().setPreviousCast(current);
     }
-    
+
     handleAfterHitEffects(hit: PendingHit) {
         const attacker = hit.getAttacker();
         const target = hit.getTarget();
         const accurate = hit.isAccurate();
         const damage = hit.getTotalDamage();
-    
+
         if (attacker.getHitpoints() <= 0 || target.getHitpoints() <= 0) {
             return;
         }
-    
+
         const previousSpell = attacker.getCombat().getPreviousCast();
-    
+
         if (previousSpell) {
             if (accurate) {
                 // Send proper end graphics for the spell because it was accurate
@@ -121,7 +137,7 @@ export class MagicCombatMethod extends CombatMethod {
                 Sounds.sendSound(target.getAsPlayer(), previousSpell.impactSound());
             } else {
                 // Send splash graphics for the spell because it wasn't accurate
-                target.performGraphic(SPLASH_GRAPHIC);
+                target.performGraphic(MagicCombatMethod.SPLASH_GRAPHIC);
                 Sounds.sendSound(attacker.getAsPlayer(), Sound.SPELL_FAIL_SPLASH);
             }
             previousSpell.finishCast(attacker, target, accurate, damage);

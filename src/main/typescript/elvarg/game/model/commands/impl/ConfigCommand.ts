@@ -1,6 +1,6 @@
-import {Player} from '../../../entity/impl/player/Player';
-import {PlayerRights} from '../../../model/rights/PlayerRights';
-import {Command} from '../../../model/commands/Command';
+import { Player } from '../../../entity/impl/player/Player';
+import { PlayerRights } from '../../../model/rights/PlayerRights';
+import { Command } from '../../../model/commands/Command';
 
 class ConfigCommand implements Command {
     execute(player: Player, command: string, parts: string[]) {

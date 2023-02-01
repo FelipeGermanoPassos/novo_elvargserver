@@ -1,3 +1,6 @@
+import { WeaponInterfaces } from "../content/combat/WeaponInterfaces";
+import { EquipmentType } from "../model/EquipmentType";
+
 export class ItemDefinition {
     public static definitions: Map<number, ItemDefinition> = new Map<number, ItemDefinition>();
     public static DEFAULT = new ItemDefinition();
@@ -78,75 +81,75 @@ export class ItemDefinition {
     public isSellable(): boolean {
         return this.sellable;
     }
-    
+
     public isDropable(): boolean {
         return this.dropable;
     }
-    
+
     public isNoted(): boolean {
         return this.noted;
     }
-    
+
     public getNoteId(): number {
         return this.noteId;
     }
-    
+
     public isDoubleHanded(): boolean {
         return this.doubleHanded;
     }
-    
+
     public getBlockAnim(): number {
         return this.blockAnim;
     }
-    
+
     public getStandAnim(): number {
         return this.standAnim;
     }
-    
+
     public getWalkAnim(): number {
         return this.walkAnim;
     }
-    
+
     public getRunAnim(): number {
         return this.runAnim;
     }
-    
+
     public getStandTurnAnim(): number {
         return this.standTurnAnim;
     }
-    
+
     public getTurn180Anim(): number {
         return this.turn180Anim;
     }
-    
+
     public getTurn90CWAnim(): number {
         return this.turn90CWAnim;
     }
-    
+
     public getTurn90CCWAnim(): number {
         return this.turn90CCWAnim;
     }
-    
+
     public getWeight(): number {
         return this.weight;
     }
-    
+
     public getBonuses(): number[] {
         return this.bonuses;
     }
-    
+
     public getRequirements(): number[] {
         return this.requirements;
     }
-    
-    public getWeaponInterface(): WeaponInterface {
+
+    public getWeaponInterface(): WeaponInterfaces {
         return this.weaponInterface;
     }
-    
+
     public getEquipmentType(): EquipmentType {
         return this.equipmentType;
     }
-    
+
     public unNote(): number {
         return ItemDefinition.forId(this.id - 1).getName().equals(this.name) ? this.id - 1 : this.id;
     }

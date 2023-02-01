@@ -1,9 +1,8 @@
 class NpcDefinition {
-    private static definitions: Map<number, NpcDefinition> = new Map<number, NpcDefinition>();
+    static definitions: Map<number, NpcDefinition> = new Map<number, NpcDefinition>();
     private static DEFAULT: NpcDefinition = new NpcDefinition();
     private static DEFAULT_STATS: number[] = [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     
-    Copy code
     private id: number;
     private name: string;
     private examine: string;

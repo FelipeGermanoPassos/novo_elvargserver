@@ -1,3 +1,6 @@
+import { ShopCurrency } from '../../../../../model/container/shop/currency/ShopCurrency'
+import { Player } from '../../../../../entity/impl/player/Player';
+
 class PointsCurrency implements ShopCurrency {
     getName(): string {
         return "Points";

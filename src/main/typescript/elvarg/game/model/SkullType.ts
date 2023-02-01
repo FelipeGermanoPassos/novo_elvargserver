@@ -1,9 +1,9 @@
-enum SkullTypes {
+export enum SkullTypes {
     WHITE_SKULL = 0,
     RED_SKULL = 1
 }
 
-class SkullType {
+export class SkullType {
     iconId: number;
 
     SkullType(iconId: number) {

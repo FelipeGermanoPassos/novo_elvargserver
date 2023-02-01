@@ -1,4 +1,4 @@
-class CombatEquipment {
+export class CombatEquipment {
     public static readonly MAGE_VOID_HELM = 11663;
     public static readonly RANGED_VOID_HELM = 11664;
     public static readonly MELEE_VOID_HELM = 11665;

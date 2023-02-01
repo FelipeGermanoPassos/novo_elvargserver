@@ -1,4 +1,4 @@
-class Prayerbook {
+export class Prayerbook {
     private interfaceId: number;
     private message: string;
 

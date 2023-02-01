@@ -1,11 +1,20 @@
-class DragonWarhammerCombatMethod extends MeleeCombatMethod {
+import { MeleeCombatMethod } from "../MeleeCombatMethod";
+import { Animation } from "../../../../../model/Animation";
+import { Graphic } from "../../../../../model/Graphic";
+import { Priority } from "../../../../../model/Priority";
+import { Mobile } from "../../../../../entity/impl/Mobile";
+import { CombatSpecial } from "../../../CombatSpecial";
+import { PendingHit } from "../../../hit/PendingHit";
+import { Skill } from "../../../../../model/Skill";
+
+export class DragonWarhammerCombatMethod extends MeleeCombatMethod {
     private static ANIMATION = new Animation(1378, Priority.HIGH);
     private static GRAPHIC = new Graphic(1292, Priority.HIGH);
 
     start(character: Mobile, target: Mobile): void {
         CombatSpecial.drain(character, CombatSpecial.DRAGON_WARHAMMER.getDrainAmount());
-        character.performAnimation(this.ANIMATION);
-        character.performGraphic(this.GRAPHIC);
+        character.performAnimation(DragonWarhammerCombatMethod.ANIMATION);
+        character.performGraphic(DragonWarhammerCombatMethod.GRAPHIC);
     }
 
     handleAfterHitEffects(hit: PendingHit): void {

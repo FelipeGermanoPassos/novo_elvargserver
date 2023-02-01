@@ -1,5 +1,5 @@
 
-import { NPC } from './game/entity/impl/npc/NPC';
+import { NPC } from '../game/entity/impl/npc/NPC';
 import requireAll from 'require-all';
 import reflect from 'reflect-metadata';
 export class Systems {

@@ -1,6 +1,20 @@
-public class DamageFormulas {
+import { BonusManager } from "../../../model/equipment/BonusManager";
+import { Skills } from "../../../model/Skill";
+import { PrayerHandler } from "../../PrayerHandler";
+import { CombatEquipment } from "../CombatEquipment";
+import { CombatFactory } from "../CombatFactory";
+import { CombatType } from "../CombatType";
+import { FightStyle } from "../FightStyle";
+import { Mobile } from "../../../entity/impl/Mobile";
+import { Player } from "../../../entity/impl/player/Player";
+import { NPC } from "../../../entity/impl/npc/NPC";
+import { Equipment } from "../../../model/container/impl/Equipment";
+import { ItemIdentifiers } from "../../../../util/ItemIdentifiers";
+
+
+export class DamageFormulas {
     private static effectiveStrengthLevel(player: Player): number {
-        let str = player.getSkillManager().getCurrentLevel(Skill.STRENGTH);
+        let str = player.getSkillManager().getCurrentLevel(Skills.STRENGTH);
 
         let prayerBonus = 1;
 
@@ -40,13 +54,13 @@ public class DamageFormulas {
         if (entity.isPlayer()) {
             let player = entity.getAsPlayer();
             let strengthBonus = player.getBonusManager().getOtherBonus()[BonusManager.STRENGTH];
-            maxHit = effectiveStrengthLevel(player) * (strengthBonus + 64);
+            maxHit = DamageFormulas.effectiveStrengthLevel(player) * (strengthBonus + 64);
             maxHit += 320;
             maxHit /= 640;
 
             if (CombatFactory.fullDharoks(player)) {
                 let hp = player.getHitpoints();
-                let max = player.getSkillManager().getMaxLevel(Skill.HITPOINTS);
+                let max = player.getSkillManager().getMaxLevel(Skills.HITPOINTS);
                 let mult = Math.max(0, ((max - hp) / max) * 100) + 100;
                 maxHit *= (mult / 100);
             }
@@ -59,7 +73,7 @@ public class DamageFormulas {
 
             if (CombatFactory.fullDharoks(entity)) {
                 let hitpoints = entity.getHitpoints();
-                maxHit += (int)((entity.getAsNpc().getDefinition().getHitpoints() - hitpoints) * 0.35);
+                maxHit += ((entity.getAsNpc().getDefinition().getHitpoints() - hitpoints) * 0.35);
             }
         }
         return Math.floor(maxHit);
@@ -96,7 +110,7 @@ public class DamageFormulas {
     }
 
     private static effectiveRangedStrength(player: Player): number {
-        let rngStrength = player.getSkillManager().getCurrentLevel(Skill.RANGED);
+        let rngStrength = player.getSkillManager().getCurrentLevel(Skills.RANGED);
         // Prayers
         let prayerMod = 1.0;
         if (PrayerHandler.isActivated(player, PrayerHandler.SHARP_EYE)) {
@@ -125,7 +139,7 @@ public class DamageFormulas {
 
     private static maximumRangeHitDpsCalc(player: Player) {
         let strengthBonus = player.getBonusManager().getOtherBonus()[BonusManager.RANGED_STRENGTH];
-        let maxHit = effectiveRangedStrength(player);
+        let maxHit = DamageFormulas.effectiveRangedStrength(player);
         maxHit *= (strengthBonus + 64);
         maxHit += 320;
         maxHit /= 640;
@@ -145,13 +159,13 @@ public class DamageFormulas {
     */
     public static calculateMaxRangedHit(entity: Mobile) {
         if (entity.isNpc()) {
-            let npc = entity as NPC;
+            let npc = entity as unknown as NPC;
             return npc.getCurrentDefinition().getMaxHit();
         }
 
         let player = entity as Player;
 
-        return maximumRangeHitDpsCalc(player);
+        return DamageFormulas.maximumRangeHitDpsCalc(player);
     }
 
 }

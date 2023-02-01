@@ -1,4 +1,4 @@
-class StatementDialogue extends Dialogue {
+export class StatementDialogue extends Dialogue {
     private static CHATBOX_INTERFACES = [356, 359, 363, 368, 374];
     private text: string;
 

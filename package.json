@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@types/node": "^18.11.18",
+    "@types/paper": "^0.12.3",
     "array": "^0.4.3",
     "big-integer": "^1.6.51",
     "buffer": "^6.0.3",
@@ -10,25 +11,12 @@
     "crypto-js": "^4.1.1",
     "enum-map": "^1.0.1",
     "executor-service": "^0.1.6",
+    "fs": "^0.0.1-security",
     "fs-extra": "^11.1.0",
     "gzip-js": "^0.3.2",
     "hashmap": "^2.4.0",
-    "@types/paper": "^0.12.3",
-    "array": "^0.4.3",
-    "big-integer": "^1.6.51",
-    "buffer": "^6.0.3",
-    "fs": "^0.0.1-security",
     "hashset": "^0.0.6",
     "iterator": "^0.0.0",
-    "object-path": "^0.11.8",
-    "optional": "^0.1.4",
-    "ts-collections": "^0.0.16",
-    "ts-essentials": "^9.3.0",
-    "ts-hashset": "^1.0.0",
-    "tstl": "^2.5.13"
-  },
-  "devDependencies": {
-    "ts-loader": "^9.4.2"
     "java.js": "^0.0.1",
     "js-base64": "^3.7.4",
     "library-name": "^1.1.0",
@@ -37,9 +25,12 @@
     "misc": "^1.0.2",
     "object-path": "^0.11.8",
     "optional": "^0.1.4",
+    "optional-typescript": "^1.6.1",
+    "pako": "^2.1.0",
     "random": "^4.1.0",
     "reflect-metadata": "^0.1.13",
     "require-all": "^3.0.0",
+    "requireall": "^1.0.0",
     "runnable": "^3.0.0",
     "set": "^1.1.1",
     "timer": "^1.0.1",
@@ -49,5 +40,8 @@
     "ts-lock": "^1.0.1",
     "winston": "^3.8.2",
     "winston-logger": "^1.0.1"
+  },
+  "devDependencies": {
+    "ts-loader": "^9.4.2"
   }
 }

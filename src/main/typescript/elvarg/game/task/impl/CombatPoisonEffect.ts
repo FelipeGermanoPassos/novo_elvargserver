@@ -1,4 +1,13 @@
-class CombatPoisonEffect extends Task {
+export export enum PoisonType {
+    VERY_WEAK = 2,
+    WEAK = 3,
+    MILD = 4,
+    EXTRA = 5,
+    SUPER = 6,
+    VENOM = 12
+    }
+
+export class CombatPoisonEffect extends Task {
     private entity: Mobile;
     private tick: number;
     
@@ -52,16 +61,7 @@ class CombatPoisonEffect extends Task {
         
         super.stop();
     }
-        
-        enum PoisonType {
-        VERY_WEAK = 2,
-        WEAK = 3,
-        MILD = 4,
-        EXTRA = 5,
-        SUPER = 6,
-        VENOM = 12
-        }
-        
+                
     class CombatPoisonData {
         private static CombatPoisonData.types = new Map<number, PoisonType>();
         

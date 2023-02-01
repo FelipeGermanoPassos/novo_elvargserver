@@ -1,3 +1,13 @@
+import { CombatMethod } from "../../CombatMethod";
+import { Graphic } from "../../../../../model/Graphic";
+import { Projectile } from "../../../../../model/Projectile";
+import { Mobile } from "../../../../../entity/impl/Mobile";
+import { CombatType } from "../../../CombatType";
+import { PendingHit } from "../../../hit/PendingHit";
+import { Animation } from "../../../../../model/Animation";
+import { Priority } from "../../../../../model/Priority";
+import { Misc } from "../../../../../../util/Misc";
+
 class JadCombatMethod extends CombatMethod {
 
     private static MAGIC_ATTACK_ANIM = new Animation(2656, Priority.MEDIUM);

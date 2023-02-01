@@ -1,3 +1,7 @@
+import { PlayerRights } from '../../../model/rights/PlayerRights';
+import { Command } from '../../../model/commands/Command';
+import { Player } from '../../../entity/impl/player/Player';
+import { Server } from '../../../../Server'
 class FloodCommand implements Command {
     execute(player: Player, command: string, parts: string[]) {
         let amt = parseInt(parts[1]);

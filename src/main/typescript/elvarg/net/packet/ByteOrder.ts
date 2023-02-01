@@ -1,4 +1,4 @@
-enum ByteOrder {
+export enum ByteOrder {
     LITTLE,
     BIG,
     MIDDLE,

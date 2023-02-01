@@ -1,3 +1,11 @@
+import { CombatFactory } from "../CombatFactory";
+import { HitDamage } from "./HitDamage";
+import { CombatType } from "../CombatType";
+import { CombatMethod } from "../method/CombatMethod";
+import { Mobile } from "../../../entity/impl/Mobile";
+import { Player } from "../../../entity/impl/player/Player";
+import { AccuracyFormulasDpsCalc } from "../formula/AccuracyFormulasDpsCalc";
+import { HitMask } from "./HitMask";
 export class PendingHit {
     private attacker: Mobile;
     private target: Mobile;
@@ -8,34 +16,15 @@ export class PendingHit {
     private delay: number;
     private accurate: boolean;
     private handleAfterHitEffects: boolean;
-    constructor(attacker: Mobile, target: Mobile, method: CombatMethod) {
-        this(attacker, target, method, true, 0);
-    }
 
-    constructor(attacker: Mobile, target: Mobile, method: CombatMethod, delay: number) {
-        this(attacker, target, method, true, delay);
-    }
-
-    constructor(attacker: Mobile, target: Mobile, method: CombatMethod, rollAccuracy: boolean, delay: number) {
-        this(attacker, target, method, rollAccuracy, 1, delay);
-    }
-
-    constructor(attacker: Mobile, target: Mobile, method: CombatMethod, rollAccuracy: boolean, hitAmount: number, delay: number) {
+    constructor(attacker: Mobile, target: Mobile, method: CombatMethod, delay?: number, handleAfterHitEffects?: boolean) {
         this.attacker = attacker;
         this.target = target;
         this.method = method;
         this.combatType = method.type();
-        this.hits = this.prepareHits(hitAmount, rollAccuracy);
-        this.delay = delay;
-        this.handleAfterHitEffects = true;
-    }
-
-    public getAttacker(): Mobile {
-        return this.attacker;
-    }
-
-    public getTarget(): Mobile {
-        return this.target;
+        this.hits = this.prepareHits(1, true);
+        this.delay = delay ? delay : 0;
+        this.handleAfterHitEffects = handleAfterHitEffects ? handleAfterHitEffects : true;
     }
 
     public getAttacker(): Mobile {
@@ -82,7 +71,7 @@ export class PendingHit {
         return this;
     }
 
-    public handleAfterHitEffects(): boolean {
+    public getHandleAfterHitEffects(): boolean {
         return this.handleAfterHitEffects;
     }
 
@@ -96,7 +85,7 @@ export class PendingHit {
                 "Illegal number of hits! The minimum number of hits per turn is 0.");
         }
 
-        if (attacker == null || target == null) {
+        if (this.attacker == null || this.target == null) {
             return null;
         }
 

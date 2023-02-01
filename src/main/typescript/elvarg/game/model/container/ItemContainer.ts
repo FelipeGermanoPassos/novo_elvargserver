@@ -1,4 +1,4 @@
-abstract class ItemContainer {
+export class ItemContainer {
     private player: Player;
     private items: Item[] = new Array(this.capacity());
     

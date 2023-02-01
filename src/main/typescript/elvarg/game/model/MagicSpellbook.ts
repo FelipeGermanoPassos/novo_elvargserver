@@ -8,7 +8,7 @@ const MagicSpellbooks = {
     LUNAR: { id: 29999, type: TeleportType.LUNAR }
 }
 
-class MagicSpellbook {
+export class MagicSpellbook {
     private interfaceId: number;
     /**
     * The spellbook's teleport type

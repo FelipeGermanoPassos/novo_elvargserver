@@ -2,35 +2,35 @@
 
     // crafting sounds
 
-    CUTTING = { id: 375, volume: 1, delay: 0, loopType: 0 }
+    public static CUTTING = { id: 375, volume: 1, delay: 0, loopType: 0 }
 
     // cooking sounds
 
-    COOKING_COOK = { id: 1039, volume: 1, delay: 10, loopType: 0 }
+    public static COOKING_COOK = { id: 1039, volume: 1, delay: 10, loopType: 0 }
 
-    COOKING_BURN = { id: 240, volume: 1, delay: 0, loopType: 0 }
+    public static COOKING_BURN = { id: 240, volume: 1, delay: 0, loopType: 0 }
 
     // runecrafting sounds
 
-    CRAFT_RUNES = { id: 207, volume: 0, delay: 0, loopType: 0 }
+    public static CRAFT_RUNES = { id: 207, volume: 0, delay: 0, loopType: 0 }
 
     // mining sounds
 
-    MINING_MINE = { id: 432, volume: 1, delay: 15, loopType: 0 }
+    public static MINING_MINE = { id: 432, volume: 1, delay: 15, loopType: 0 }
 
-    MINING_ROCK_GONE = { id: 431, volume: 1, delay: 0, loopType: 0 }
+    public static MINING_ROCK_GONE = { id: 431, volume: 1, delay: 0, loopType: 0 }
 
-    MINING_ROCK_RESTORE = { id: 463, volume: 1, delay: 0, loopType: 0 }
+    public static MINING_ROCK_RESTORE = { id: 463, volume: 1, delay: 0, loopType: 0 }
 
-    MINING_ROCK_EXPLODE = { id: 1021, volume: 1, delay: 0, loopType: 0 }
+    public static MINING_ROCK_EXPLODE = { id: 1021, volume: 1, delay: 0, loopType: 0 }
 
     // fishing sounds
 
-    FISHING_FISH = { id: 379, volume: 1, delay: 10, loopType: 0 }
+    public static FISHING_FISH = { id: 379, volume: 1, delay: 10, loopType: 0 }
 
     // woodcutting sounds
 
-    WOODCUTTING_CHOP = { id: 472, volume: 1, delay: 10, loopType: 0 }
+    public static WOODCUTTING_CHOP = { id: 472, volume: 1, delay: 10, loopType: 0 }
 
     WOODCUTTING_TREE_DOWN = { id: 473, volume: 1, delay: 0, loopType: 0 }
 
@@ -57,7 +57,7 @@
 
     WEAPON_SCIMITAR = { id: 396, volume: 1, delay: 25, loopType: 0 }
 
-    WEAPON_WHIP = { id: 1080, volume: 1, delay: 25, loopType: 0 }
+    public static WEAPON_WHIP = { id: 1080, volume: 1, delay: 25, loopType: 0 }
 
     // Special attack
     DRAGON_DAGGER_SPECIAL = { id: 385, volume: 1, delay: 25, loopType: 0 }

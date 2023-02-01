@@ -1,5 +1,5 @@
 
-class RandomGen {
+export class RandomGen {
     private random:number = Math.random();
 
     public getRandom() {

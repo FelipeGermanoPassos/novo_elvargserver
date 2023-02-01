@@ -1,9 +1,5 @@
-interface Minigame {
-    firstClickObject(player: Player, object: GameObject): boolean;
-    handleButtonClick(player: Player, button: number): boolean;
-    process(): void;
-}
-
+import { Minigame } from "./Minigame";
+import { CastleWars } from "./impl/CastleWars";
 export class MinigameHandler {
     public static minigames = {
         CASTLEWARS: {
@@ -11,7 +7,7 @@ export class MinigameHandler {
             minigame: new CastleWars()
         }
     }
-    public static getAll(): Minigame[] {
+    public static getAll() {
         return Object.values(this.minigames).filter(m => m.minigame != null).map(m => m.minigame);
     }
 

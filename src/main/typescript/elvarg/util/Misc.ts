@@ -44,6 +44,14 @@ export class Misc {
     public static getRandomDouble(length: number): number {
         return Math.random() * length;
     }
+    return random;
+}
+
+function concatWithCollection<T>(array1: T[], array2: T[]): T[] {
+    const resultList = [...array1, ...array2];
+    return resultList as T[];
+}
+
 
     public static getRandomDouble(): number {
         return Math.random();

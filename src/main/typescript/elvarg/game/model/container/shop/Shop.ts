@@ -1,4 +1,4 @@
-class Shop {
+export class Shop {
     public static SALES_TAX_MODIFIER = 0.85;
     public static MAX_SHOP_ITEMS = 1000;
     public static MAX_SHOPS = 5000;

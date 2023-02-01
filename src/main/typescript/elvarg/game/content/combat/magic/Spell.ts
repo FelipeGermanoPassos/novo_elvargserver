@@ -1,4 +1,4 @@
-class Spell {
+export class Spell {
     public canCast(player: Player, delete: boolean): boolean {
     if (player.skillManager.getCurrentLevel(Skill.MAGIC) < levelRequired()) {
         player.packetSender.sendMessage(
@@ -67,7 +67,7 @@ getSpellbook(): MagicSpellbook {
 
 
 
-interface Spell {
+interface Spells {
     spellId(): number;
     levelRequired(): number;
     baseExperience(): number;

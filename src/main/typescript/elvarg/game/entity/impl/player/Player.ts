@@ -762,41 +762,41 @@ getPlayerInteractingOption(): PlayerInteractingOption {
     return this.playerInteractingOption;
 }
 
-public setPlayerInteractingOption(playerInteractingOption: PlayerInteractingOption): Player {
+function setPlayerInteractingOption(playerInteractingOption: PlayerInteractingOption): Player {
     this.playerInteractingOption = playerInteractingOption;
     return this;
 }
 
-public getFrameUpdater(): FrameUpdater {
+function getFrameUpdater(): FrameUpdater {
     return this.frameUpdater;
 }
 
-public getBonusManager(): BonusManager {
+function getBonusManager(): BonusManager {
     return this.bonusManager;
 }
 
-public getMultiIcon(): number {
+function getMultiIcon(): number {
     return this.multiIcon;
 }
 
-public setMultiIcon(multiIcon: number): Player {
+function setMultiIcon(multiIcon: number): Player {
     this.multiIcon = multiIcon;
     return this;
 }
 
-public getInventory(): Inventory {
+function getInventory(): Inventory {
     return this.inventory;
 }
 
-public getEquipment(): Equipment {
+function getEquipment(): Equipment {
     return this.equipment;
 }
 
-public getForceMovement(): ForceMovement {
+function getForceMovement(): ForceMovement {
     return this.forceMovement;
 }
 
-public setForceMovement(forceMovement: ForceMovement): Player {
+function setForceMovement(forceMovement: ForceMovement): Player {
     this.forceMovement = forceMovement;
     if (this.forceMovement != null) {
         this.getUpdateFlag().flag(Flag.FORCED_MOVEMENT);
@@ -804,76 +804,76 @@ public setForceMovement(forceMovement: ForceMovement): Player {
     return this;
 }
 
-public getSkillAnimation(): number {
+function getSkillAnimation(): number {
     return this.skillAnimation;
 }
 
-public setSkillAnimation(animation: number): Player {
+function setSkillAnimation(animation: number): Player {
     this.skillAnimation = animation;
     return this;
 }
 
-public getRunEnergy(): number {
+function getRunEnergy(): number {
     return this.runEnergy;
 }
 
-public setRunEnergy(runEnergy: number) {
+function setRunEnergy(runEnergy: number) {
     this.runEnergy = runEnergy;
 }
 
-public isDrainingPrayer(): boolean {
+function isDrainingPrayer(): boolean {
     return this.drainingPrayer;
 }
 
-public setDrainingPrayer(drainingPrayer: boolean) {
+function setDrainingPrayer(drainingPrayer: boolean) {
     this.drainingPrayer = drainingPrayer;
 }
 
-public getPrayerPointDrain(): number {
+function getPrayerPointDrain(): number {
     return this.prayerPointDrain;
 }
 
-public setPrayerPointDrain(prayerPointDrain: number) {
+function setPrayerPointDrain(prayerPointDrain: number) {
     this.prayerPointDrain = prayerPointDrain;
 }
 
-public getLastItemPickup(): Stopwatch {
+function getLastItemPickup(): Stopwatch {
     return this.lastItemPickup;
 }
 
-public getCombatSpecial(): CombatSpecial {
+public static function getCombatSpecial(): CombatSpecial {
     return this.combatSpecial;
 }
 
-public setCombatSpecial(combatSpecial: CombatSpecial) {
+function setCombatSpecial(combatSpecial: CombatSpecial) {
     this.combatSpecial = combatSpecial;
 }
 
-public getRecoilDamage(): number {
+function getRecoilDamage(): number {
     return this.recoilDamage;
 }
 
-public setRecoilDamage(recoilDamage: number) {
+function setRecoilDamage(recoilDamage: number) {
     this.recoilDamage = recoilDamage;
 }
 
-public getSpellbook(): MagicSpellbook {
+function getSpellbook(): MagicSpellbook {
     return this.spellbook;
 }
 
-public setSpellbook(spellbook: MagicSpellbook) {
+function setSpellbook(spellbook: MagicSpellbook) {
     this.spellbook = spellbook;
 }
 
-public getVengeanceTimer(): SecondsTimer {
+function getVengeanceTimer(): SecondsTimer {
     return this.vengeTimer;
 }
 
-public getWildernessLevel(): number {
+function getWildernessLevel(): number {
     return this.wildernessLevel;
 }
 
-public setWildernessLevel(wildernessLevel: number) {
+function setWildernessLevel(wildernessLevel: number) {
     this.wildernessLevel = wildernessLevel;
 }
 

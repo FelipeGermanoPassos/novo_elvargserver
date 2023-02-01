@@ -1,11 +1,11 @@
-enum EffectTimers {
+export enum EffectTimers {
     VENGEANCE = 157,
     FREEZE = 158,
     ANTIFIRE = 159,
     OVERLOAD = 160,
     TELE_BLOCK = 161
 }
-class EffectTimer {
+export class EffectTimer {
     clientSprite: number;
 
     constructor(clientSprite: number) {

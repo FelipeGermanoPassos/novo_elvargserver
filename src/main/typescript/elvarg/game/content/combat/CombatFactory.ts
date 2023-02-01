@@ -1,3 +1,51 @@
+import { Sound } from "../../Sound";
+import { Sounds } from "../../Sounds";
+import { RegionManager } from "../../collision/RegionManager";
+import { PrayerHandler } from "../PrayerHandler";
+import { Dueling } from "../Duelling";
+import { WeaponInterfaces } from "./WeaponInterfaces";
+import { DamageFormulas } from "./formula/DamageFormulas";
+import { HitDamage } from "./hit/HitDamage";
+import { HitMask } from "./hit/HitMask";
+import { PendingHit } from "./hit/PendingHit";
+import { CombatSpells } from "./magic/CombatSpells";
+import { CombatMethod } from "./method/CombatMethod";
+import { MagicCombatMethod } from "./method/impl/MagicCombatMethod";
+import { MeleeCombatMethod } from "./method/impl/MeleeCombatMethod";
+import { RangedCombatMethod } from "./method/impl/RangedCombatMethod";
+import { RangedData, RangedWeapon, RangedWeaponType } from "./ranged/RangedData";
+import { Mobile } from "../../entity/impl/Mobile";
+import { NPC } from "../../entity/impl/npc/NPC";
+import { CoordinateState, NPCMovementCoordinator } from "../../entity/impl/npc/NPCMovementCoordinator";
+import { Player } from "../../entity/impl/player/Player";
+import { PlayerBot } from "../../entity/impl/playerbot/PlayerBot";
+import { Animation } from "../../model/Animation";
+import { EffectTimer } from "../../model/EffectTimer"
+import { Flag } from "../../model/Flag";
+import { Graphic } from "../../model/Graphic";
+import { GraphicHeight } from "../../model/GraphicHeight";
+import { Item } from "../../model/Item";
+import { Location } from "../../model/Location";
+import { Skill } from "../../model/Skill";
+import { SkullType } from "../../model/SkullType"
+import { AreaManager } from "../../model/areas/AreaManager";
+import { WildernessArea } from "../../model/areas/impl/WildernessArea";
+import { Equipment } from "../../model/container/impl/Equipment";
+import { MovementQueue } from "../../model/movement/MovementQueue";
+import { PathFinder } from "../../model/movement/path/PathFinder";
+import { PlayerRights } from "../../model/rights/PlayerRights";
+import { Task } from "../../task/Task";
+import { TaskManager } from "../../task/TaskManager";
+import { CombatPoisonEffect } from "../../task/impl/CombatPoisonEffect"
+import { ItemIdentifiers } from "../../../util/ItemIdentifiers";
+import { Misc } from "../../../util/Misc";
+import { NpcIdentifiers } from "../../../util/NpcIdentifiers";
+import { RandomGen } from "../../../util/RandomGen";
+import { TimerKey } from "../../../util/timers/TimerKey";
+import { CombatType } from "./CombatType";
+import { CombatSpecial } from "./CombatSpecial";
+
+
 export class CombatFactory {
     private static readonly RANDOM = new RandomGen();
     /**
@@ -17,17 +65,17 @@ export class CombatFactory {
 
     static getMethod(attacker: Mobile) {
         if (attacker.isPlayer()) {
-            let p = attacker.getAsPlayer();
+            let p: Player = attacker.getAsPlayer();
             // Update player data..
             // Update ranged ammo / weapon
-            p.getCombat().setAmmunition(Ammunition.getFor(p));
-            p.getCombat().setRangedWeapon(RangedWeapon.getFor(p));
+            p.getCombat().setAmmunition(RangedData.Ammunition.getFor(p));
+            p.getCombat().setRangedWeapon(RangedData.RangedWeapon.getFor(p));
 
             // Check if player is maging..
             if (p.getCombat().getCastSpell() != null ||
                 // Ensure player needs staff equipped to use autocast
                 (p.getCombat().getAutocastSpell() != null && p.getEquipment().hasStaffEquipped())) {
-                return MAGIC_COMBAT;
+                return this.MAGIC_COMBAT;
             }
 
             // Check special attacks..
@@ -39,7 +87,7 @@ export class CombatFactory {
 
             // Check if player is ranging..
             if (p.getCombat().getRangedWeapon() != null) {
-                return RANGED_COMBAT;
+                return this.RANGED_COMBAT;
             }
 
         } else if (attacker.isNpc()) {
@@ -47,7 +95,7 @@ export class CombatFactory {
         }
 
         // Return melee by default
-        return MELEE_COMBAT;
+        return this.MELEE_COMBAT;
     }
 
     static getHitDamage(entity: Mobile, victim: Mobile, type: CombatType) {
@@ -82,7 +130,7 @@ export class CombatFactory {
                         damage = 48;
                     }
                 }
-                if (player.getWeapon() == WeaponInterface.CROSSBOW && Misc.getRandom(10) == 1) {
+                if (player.getWeapon() == WeaponInterfaces.CROSSBOW && Misc.getRandom(10) == 1) {
                     let multiplier = RangedData.getSpecialEffectsMultiplier(player, victim, damage);
                     damage *= multiplier;
                 }
@@ -155,7 +203,7 @@ export class CombatFactory {
     }
 
     static canReach(attacker: Mobile, method: CombatMethod, target: Mobile) {
-        if (!validTarget(attacker, target)) {
+        if (!CombatFactory.validTarget(attacker, target)) {
             attacker.getCombat().reset();
             return true;
         }
@@ -213,7 +261,7 @@ export class CombatFactory {
         // Don't allow diagonal attacks for smaller entities
         if (method.type() == CombatType.MELEE && attacker.size() == 1 && target.size() == 1 && !isMoving && !target.getMovementQueue().isMoving()) {
             if (PathFinder.isDiagonalLocation(attacker, target)) {
-                stepOut(attacker, target);
+                CombatFactory.stepOut(attacker, target);
                 return false;
             }
         }
@@ -240,14 +288,14 @@ export class CombatFactory {
     }
 
     canAttack(attacker: Mobile, method: CombatMethod, target: Mobile): CanAttackResponse {
-        if (!validTarget(attacker, target)) {
+        if (!CombatFactory.validTarget(attacker, target)) {
             return CanAttackResponse.INVALID_TARGET;
         }
 
         // Here we check if we are already in combat with another entity.
         // Only check if we aren't in multi.
         if (!(AreaManager.inMulti(attacker) && AreaManager.inMulti(target))) {
-            if (isBeingAttacked(attacker) && attacker.getCombat().getAttacker() != target
+            if (CombatFactory.isBeingAttacked(attacker) && attacker.getCombat().getAttacker() != target
                 && attacker.getCombat().getAttacker().getHitpoints() > 0
                 || !attacker.getCombat().getHitQueue().isEmpty(target)) {
 
@@ -255,7 +303,7 @@ export class CombatFactory {
             }
 
             // Here we check if we are already in combat with another entity.
-            if (isBeingAttacked(target) && target.getCombat().getAttacker() != attacker
+            if (CombatFactory.isBeingAttacked(target) && target.getCombat().getAttacker() != attacker
                 || !target.getCombat().getHitQueue().isEmpty(attacker)) {
                 return CanAttackResponse.ALREADY_UNDER_ATTACK;
             }
@@ -272,7 +320,7 @@ export class CombatFactory {
         }
 
         if (attacker.isPlayer()) {
-            let p = attacker.getAsPlayer();
+            let p: Player = attacker.getAsPlayer();
 
             // Check if we're using a special attack..
             if (p.isSpecialActivated() && p.getCombatSpecial() != null) {
@@ -318,11 +366,11 @@ export class CombatFactory {
 
         if (attacker.isPlayer()) {
             // Reward the player experience for this attack..
-            rewardExp(attacker.getAsPlayer(), qHit);
+            CombatFactory.rewardExp(attacker.getAsPlayer(), qHit);
 
             // Check if the player should be skulled for making this attack..
             if (target.isPlayer()) {
-                handleSkull(attacker.getAsPlayer(), target.getAsPlayer());
+                CombatFactory.handleSkull(attacker.getAsPlayer(), target.getAsPlayer());
             }
         }
 
@@ -375,11 +423,11 @@ export class CombatFactory {
             if (qHit.isAccurate()) {
 
                 if (PrayerHandler.isActivated(p_, PrayerHandler.REDEMPTION)) {
-                    handleRedemption(attacker, p_, damage);
+                    CombatFactory.handleRedemption(attacker, p_, damage);
                 }
 
                 if (PrayerHandler.isActivated(attacker, PrayerHandler.SMITE)) {
-                    handleSmite(attacker, p_, damage);
+                    CombatFactory.handleSmite(attacker, p_, damage);
                 }
             }
         }
@@ -426,8 +474,8 @@ export class CombatFactory {
                 if (Math.floor(Math.random() * 10) >= 8) {
 
                     // Apply Guthan's effect..
-                    if (fullGuthans(p_)) {
-                        handleGuthans(p_, target, qHit.getTotalDamage());
+                    if (this.fullGuthans(p_)) {
+                        CombatFactory.handleGuthans(p_, target, qHit.getTotalDamage());
                     }
 
                     // Other barrows effects here..
@@ -447,16 +495,16 @@ export class CombatFactory {
             if (target.isPlayer()) {
                 let player = target.getAsPlayer();
                 if (player.getEquipment().get(Equipment.RING_SLOT).getId() === ItemIdentifiers.RING_OF_RECOIL) {
-                    handleRecoil(player, attacker, qHit.getTotalDamage());
+                    CombatFactory.handleRecoil(player, attacker, qHit.getTotalDamage());
                 }
             }
             if (target.hasVengeance()) {
-                handleVengeance(target, attacker, qHit.getTotalDamage());
+                CombatFactory.handleVengeance(target, attacker, qHit.getTotalDamage());
             }
         }
 
         // Auto retaliate if needed
-        handleRetaliation(attacker, target);
+        CombatFactory.handleRetaliation(attacker, target);
 
         // Set under attack
         target.getCombat().setUnderAttack(attacker);
@@ -514,7 +562,7 @@ export class CombatFactory {
     }
 
     public static inCombat(character: Mobile): boolean {
-        return isAttacking(character) || isBeingAttacked(character);
+        return CombatFactory.isAttacking(character) || CombatFactory.isBeingAttacked(character);
     }
 
     public static poisonEntity(entity: Mobile, poisonType: PoisonType) {
@@ -620,7 +668,7 @@ export class CombatFactory {
             return;
         }
 
-        skull(attacker, SkullType.WHITE_SKULL, 300);
+        CombatFactory.skull(attacker, SkullType.WHITE_SKULL, 300);
     }
 
     static skull(player: Player, type: SkullType, seconds: number) {
@@ -911,7 +959,7 @@ export class CombatFactory {
 }
 
 
-enum CanAttackResponse {
+export enum CanAttackResponse {
     INVALID_TARGET,
     ALREADY_UNDER_ATTACK,
     CANT_ATTACK_IN_AREA,

@@ -1,4 +1,4 @@
-class ShopManager extends ShopIdentifiers {
+export class ShopManager extends ShopIdentifiers {
     public static shops: Map<number, Shop> = new Map<number, Shop>();
     
     Copy code

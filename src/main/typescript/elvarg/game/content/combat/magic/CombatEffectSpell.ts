@@ -1,37 +1,21 @@
-const CombatEffectSpell = (() => {
-    class CombatEffectSpell extends CombatSpell {
-        public maximumHit(): number {
-            return -1;
-        }
-        public equipmentRequired(player: Player): Optional<Item[]> {
-            return Optional.empty();
-        }
-        public finishCast(cast: Mobile, castOn: Mobile, accurate: boolean, damage: number): void {
-            if (accurate) {
-                this.spellEffect(cast, castOn);
-            }
-        }
-        public abstract spellEffect(cast: Mobile, castOn: Mobile): void;
-    }
-    return CombatEffectSpell;
-})();
+import { Mobile } from "../../../entity/impl/Mobile";
+import { Player } from "../../../entity/impl/player/Player";
+import { Item } from "../../../model/Item";
+import { CombatSpell } from "./CombatSpell";
 
-const CombatAncientSpell = (() => {
-    class CombatAncientSpell extends CombatSpell {
-        public getSpellbook(): MagicSpellbook {
-            return MagicSpellbook.ANCIENT;
-        }
-        public finishCast(cast: Mobile, castOn: Mobile, accurate: boolean, damage: number): void {
-            if (!accurate || damage <= 0) {
-                return;
-            }
-            this.spellEffect(cast, castOn, damage);
-        }
-        public equipmentRequired(player: Player): Optional<Item[]> {
-            return Optional.empty();
-        }
-        public spellEffect(cast: Mobile, castOn: Mobile, damage: number): void { }
-        public abstract spellRadius(): number;
+export class CombatEffectSpell extends CombatSpell {
+    public maximumHit(): number {
+        return -1;
     }
-    return CombatAncientSpell;
-})();
+    public equipmentRequired(player: Player): Optional<Item[]> {
+        return Optional.empty();
+    }
+    public finishCast(cast: Mobile, castOn: Mobile, accurate: boolean, damage: number): void {
+        if (accurate) {
+            this.spellEffect(cast, castOn);
+        }
+    }
+    public spellEffect(cast: Mobile, castOn: Mobile) {
+
+    }
+}

@@ -1,4 +1,4 @@
-class ShopIdentifiers {
+export class ShopIdentifiers {
     public static GENERAL_STORE: number = 0;
     public static FOOD_SHOP: number = 1;
     public static PVP_SHOP: number = 2;

@@ -1,64 +1,64 @@
-import * as Mobile from '../../../../entity/impl/Mobile'
-import {Player} from '../../../../entity/impl/player/Player'
-import {Optional} from 'optional'
-import {GodwarsFollower} from '../../../entity/impl/npc/impl/GodwarsFollower'
-import {Boundary} from '../../../../model/Boundary';
-import {Area} from '../../../../model/areas/Area';
+import { Mobile } from '../../../entity/impl/Mobile'
+import { Player } from '../../../entity/impl/player/Player'
+import { Optional } from 'optional'
+import { GodwarsFollower } from '../../../entity/impl/npc/impl/GodwarsFollower'
+import { Boundary } from '../../../model/Boundary';
+import { Area } from '../../../model/areas/Area';
 
 class GodwarsDungeonArea extends Area {
-    public static BOUNDARY = new Boundary(2800, 2950, 5200, 5400);
-    
+    public static BOUNDARY = new Boundary(2800, 2950, 5200, 5400, 0);
+
     postEnter(character: Mobile) {
-    if (character.isPlayer()) {
-    let player = character.getAsPlayer();
-    this.updateInterface(player);
-    player.getPacketSender().sendWalkableInterface(42569);
+        if (character.isPlayer()) {
+            let player = character.getAsPlayer();
+            this.updateInterface(player);
+            player.getPacketSender().sendWalkableInterface(42569);
+        }
     }
-    }
-    
+
     postLeave(character: Mobile, logout: boolean) {
-    if (character.isPlayer()) {
-    let player = character.getAsPlayer();
-    player.getPacketSender().sendWalkableInterface(-1);
-    for (let i = 0; i < player.getGodwarsKillcount().length; i++) {
-    player.setGodwarsKillcount(i, 0);
+        if (character.isPlayer()) {
+            let player = character.getAsPlayer();
+            player.getPacketSender().sendWalkableInterface(-1);
+            for (let i = 0; i < player.getGodwarsKillcount().length; i++) {
+                player.setGodwarsKillcount(i, 0);
+            }
+            player.getPacketSender().sendMessage("Your Godwars killcount has been reset.");
+        }
     }
-    player.getPacketSender().sendMessage("Your Godwars killcount has been reset.");
-    }
-    }
-    
-    process(character: Mobile) {}
-    
+
+    process(character: Mobile) { }
+
     canTeleport(player: Player) {
-    return true;
+        return true;
     }
-    
+
     canTrade(player: Player, target: Player) {
-    return true;
+        return true;
     }
-    
+
     isMulti(character: Mobile) {
-    return true;
+        return true;
     }
-    
+
     canEat(player: Player, itemId: number) {
-    return true;
+        return true;
     }
-    
+
     canDrink(player: Player, itemId: number) {
-    return true;
+        return true;
     }
-    
+
     dropItemsOnDeath(player: Player, killer: Optional<Player>) {
-    return true;
+        return true;
     }
-    
+
     handleDeath(player: Player, killer: Optional<Player>) {
-    return false;
+        return false;
     }
-    
-    onPlayerRightClick(player: Player, rightClicked: Player, option: number) {}
-    
+
+    onPlayerRightClick(player: Player, rightClicked: Player, option: number) { }
+
     defeated(player: Player, character: Mobile) {
         if (character instanceof GodwarsFollower) {
             let gwdFollower = character as GodwarsFollower;
@@ -68,14 +68,14 @@ class GodwarsDungeonArea extends Area {
             this.updateInterface(player);
         }
     }
-    
+
     handleObjectClick(player: Player, objectId: number, type: number) {
-    return false;
+        return false;
     }
-    
+
     private updateInterface(player: Player) {
         for (let i = 0; i < player.getGodwarsKillcount().length; i++) {
-        player.getPacketSender().sendString(42575 + i, player.getGodwarsKillcount()[i].toString());
+            player.getPacketSender().sendString(42575 + i, player.getGodwarsKillcount()[i].toString());
         }
     }
 }

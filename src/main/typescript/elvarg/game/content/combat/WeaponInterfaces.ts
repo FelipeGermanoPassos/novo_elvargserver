@@ -1,3 +1,9 @@
+import { Equipment } from "../../model/container/impl/Equipment";
+import { Item } from "../../model/Item";
+import { Player } from "../../entity/impl/player/Player";
+import { FightType } from "../combat/FightType"
+import { CombatSpecial } from "./CombatSpecial";
+
 export class WeaponInterfaces {
 
     /**
@@ -429,155 +435,438 @@ export class WeaponInterfaces {
         }
         return false;
     }
-}
 
-export enum WeaponInterface {
     STAFF = {
         interfaceId: 328,
         nameLineId: 355,
-        childId: 5,
+        speed: 5,
         fightType: [FightType.STAFF_BASH, FightType.STAFF_POUND, FightType.STAFF_FOCUS]
-    },
+    }
     WARHAMMER = {
         interfaceId: 425,
         nameLineId: 428,
-        childId: 6,
+        speed: 6,
         fightType: [FightType.WARHAMMER_POUND,
         FightType.WARHAMMER_PUMMEL, FightType.WARHAMMER_BLOCK],
         parentId: 7474,
-        childId: 7486
-    },
+        specialMeter: 7486
+    }
     MAUL = {
         interfaceId: 425,
         nameLineId: 428,
-        childId: 7,
+        speed: 7,
         fightType: [FightType.MAUL_POUND,
         FightType.MAUL_PUMMEL, FightType.MAUL_BLOCK],
         parentId: 7474,
-        childId: 7486
-    },
+        specialMeter: 7486
+    }
     GRANITE_MAUL = {
         interfaceId: 425,
         nameLineId: 428,
-        childId: 7,
+        speed: 7,
         fightType: [FightType.GRANITE_MAUL_POUND,
         FightType.GRANITE_MAUL_PUMMEL, FightType.GRANITE_MAUL_BLOCK],
         parentId: 7474,
-        childId: 7486
-    },
+        specialMeter: 7486
+    }
     VERACS_FLAIL = {
         interfaceId: 3796,
         nameLineId: 3799,
-        childId: 5,
+        speed: 5,
         fightType: [FightType.VERACS_FLAIL_POUND,
         FightType.VERACS_FLAIL_PUMMEL, FightType.VERACS_FLAIL_SPIKE,
         FightType.VERACS_FLAIL_BLOCK],
         parentId: 7624,
-        childId: 7636
-    },
+        specialMeter: 7636
+    }
     SCYTHE = {
         interfaceId: 776,
         nameLineId: 779,
-        childId: 4,
+        speed: 4,
         fightType: [FightType.SCYTHE_REAP,
         FightType.SCYTHE_CHOP, FightType.SCYTHE_JAB,
         FightType.SCYTHE_BLOCK]
-    },
+    }
     BATTLEAXE = {
         interfaceId: 1698,
         nameLineId: 1701,
-        childId: 5,
+        speed: 5,
         fightType: [FightType.BATTLEAXE_CHOP,
         FightType.BATTLEAXE_HACK, FightType.BATTLEAXE_SMASH,
         FightType.BATTLEAXE_BLOCK],
-        parentId: 7499,
-        childId: 7511
-    },
+        specialBar: 7499,
+        specialMeter: 7511
+    }
     GREATAXE = {
         interfaceId: 1698,
         nameLineId: 1701,
-        childId: 7,
+        speed: 7,
         fightType: [FightType.GREATAXE_CHOP,
         FightType.GREATAXE_HACK, FightType.GREATAXE_SMASH,
         FightType.GREATAXE_BLOCK],
-        parentId: 7499,
-        childId: 7511
-    },
-    CROSSBOW = {
+        specialBar: 7499,
+        specialMeter: 7511
+    }
+    public static CROSSBOW = {
         interfaceId: 1764,
         nameLineId: 1767,
-        childId: 6,
+        speed: 6,
         fightType: [FightType.CROSSBOW_ACCURATE,
         FightType.CROSSBOW_RAPID, FightType.CROSSBOW_LONGRANGE],
-        parentId: 7549,
-        childId: 7561
-    },
+        specialBar: 7549,
+        specialMeter: 7561
+    }
     BALLISTA = {
         interfaceId: 1764,
         nameLineId: 1767,
-        childId: 7,
+        speed: 7,
         fightType: [FightType.BALLISTA_ACCURATE,
         FightType.BALLISTA_RAPID, FightType.BALLISTA_LONGRANGE],
-        parentId: 7549,
-        childId: 7561
-        },
-        BLOWPIPE = {
+        specialBar: 7549,
+        specialMeter: 7561
+    }
+    BLOWPIPE = {
         interfaceId: 1764,
         nameLineId: 1767,
-        childId: 3,
+        speed: 3,
         fightType: [FightType.BLOWPIPE_ACCURATE,
         FightType.BLOWPIPE_RAPID, FightType.BLOWPIPE_LONGRANGE],
-        parentId: 7549,
-        childId: 7561
-        },
-        KARILS_CROSSBOW = {
+        specialBar: 7549,
+        specialMeter: 7561
+    }
+    KARILS_CROSSBOW = {
         interfaceId: 1764,
         nameLineId: 1767,
-        childId: 4,
+        speed: 4,
         fightType: [FightType.KARILS_CROSSBOW_ACCURATE,
         FightType.KARILS_CROSSBOW_RAPID, FightType.KARILS_CROSSBOW_LONGRANGE],
-        parentId: 7549,
-        childId: 7561
-        },
-        SHORTBOW = {
+        specialBar: 7549,
+        specialMeter: 7561
+    }
+    SHORTBOW = {
         interfaceId: 1764,
         nameLineId: 1767,
-        childId: 4,
+        speed: 4,
         fightType: [FightType.SHORTBOW_ACCURATE,
         FightType.SHORTBOW_RAPID, FightType.SHORTBOW_LONGRANGE],
-        parentId: 7549,
-        childId: 7561
-        },
-        LONGBOW = {
+        specialBar: 7549,
+        specialMeter: 7561
+    }
+    LONGBOW = {
         interfaceId: 1764,
         nameLineId: 1767,
-        childId: 6,
+        speed: 6,
         fightType: [FightType.LONGBOW_ACCURATE,
         FightType.LONGBOW_RAPID, FightType.LONGBOW_LONGRANGE],
-        parentId: 7549,
-        childId: 7561
-        },
-        DRAGON_DAGGER = {
+        specialBar: 7549,
+        specialMeter: 7561
+    }
+    DRAGON_DAGGER = {
         interfaceId: 2276,
         nameLineId: 2279,
-        childId: 4,
+        speed: 4,
         fightType: [FightType.DRAGON_DAGGER_STAB,
         FightType.DRAGON_DAGGER_LUNGE, FightType.DRAGON_DAGGER_SLASH,
         FightType.DRAGON_DAGGER_BLOCK],
-        parentId: 7574,
-        childId: 7586
-        },
-        ABYSSAL_DAGGER = {
+        specialBar: 7574,
+        specialMeter: 7586
+    }
+    ABYSSAL_DAGGER = {
         interfaceId: 2276,
         nameLineId: 2279,
-        childId: 4,
+        speed: 4,
         fightType: [FightType.DRAGON_DAGGER_STAB,
         FightType.DRAGON_DAGGER_LUNGE, FightType.DRAGON_DAGGER_SLASH,
         FightType.DRAGON_DAGGER_BLOCK],
-        parentId: 7574,
-        childId: 7586
-        }
+        specialBar: 7574,
+        specialMeter: 7586
+    }
 
+    DAGGER = {
+        interfaceId: 2276,
+        nameLineId: 2279,
+        speed: 4,
+        fightType: [FightType.DAGGER_STAB,
+        FightType.DAGGER_LUNGE, FightType.DAGGER_SLASH,
+        FightType.DAGGER_BLOCK],
+        specialBar: 7574,
+        specialMeter: 7586
+    }
+
+    SWORD = {
+        interfaceId: 2276,
+        nameLineId: 2279,
+        speed: 5,
+        fightType: [FightType.SWORD_STAB,
+        FightType.SWORD_LUNGE, FightType.SWORD_SLASH,
+        FightType.SWORD_BLOCK],
+        specialBar: 7574,
+        specialMeter: 7586
+    }
+
+    SCIMITAR = {
+        interfaceId: 2423,
+        nameLineId: 2426,
+        speed: 4,
+        fightType: [FightType.SCIMITAR_CHOP,
+        FightType.SCIMITAR_SLASH, FightType.SCIMITAR_LUNGE,
+        FightType.SCIMITAR_BLOCK],
+        specialBar: 7599,
+        specialMeter: 7611
+    }
+
+    LONGSWORD = {
+        interfaceId: 2423,
+        nameLineId: 2426,
+        speed: 5,
+        fightType: [FightType.LONGSWORD_CHOP,
+        FightType.LONGSWORD_SLASH, FightType.LONGSWORD_LUNGE,
+        FightType.LONGSWORD_BLOCK],
+        specialBar: 7599,
+        specialMeter: 7611
+    }
+
+    MACE = {
+        interfaceId: 3796,
+        nameLineId: 3799,
+        speed: 5,
+        fightType: [FightType.MACE_POUND,
+        FightType.MACE_PUMMEL, FightType.MACE_SPIKE,
+        FightType.MACE_BLOCK],
+        specialBar: 7624,
+        specialMeter: 7636
+    }
+
+    KNIFE = {
+        interfaceId: 4446,
+        nameLineId: 4449,
+        speed: 3,
+        fightType: [FightType.KNIFE_ACCURATE,
+        FightType.KNIFE_RAPID, FightType.KNIFE_LONGRANGE],
+        specialBar: 7649,
+        specialMeter: 7661
+    }
+
+    OBBY_RINGS = {
+        interfaceId: 4446,
+        nameLineId: 4449,
+        speed: 4,
+        fightType: [FightType.OBBY_RING_ACCURATE,
+        FightType.OBBY_RING_RAPID, FightType.OBBY_RING_LONGRANGE],
+        specialBar: 7649,
+        specialMeter: 7661
+    }
+
+    SPEAR = {
+        interfaceId: 4679,
+        nameLineId: 4682,
+        speed: 5,
+        fightType: [FightType.SPEAR_LUNGE,
+        FightType.SPEAR_SWIPE, FightType.SPEAR_POUND,
+        FightType.SPEAR_BLOCK],
+        specialBar: 7674,
+        specialMeter: 7686
+    }
+
+    TWO_HANDED_SWORD = {
+        interfaceId: 4705,
+        nameLineId: 4708,
+        speed: 7,
+        fightType: [FightType.TWOHANDEDSWORD_CHOP, FightType.TWOHANDEDSWORD_SLASH,
+        FightType.TWOHANDEDSWORD_SMASH, FightType.TWOHANDEDSWORD_BLOCK],
+        specialBar: 7699,
+        specialMeter: 7711
+    }
+
+    PICKAXE = {
+        interfaceId: 5570,
+        nameLineId: 5573,
+        speed: 5,
+        fightType: [FightType.PICKAXE_SPIKE,
+        FightType.PICKAXE_IMPALE, FightType.PICKAXE_SMASH,
+        FightType.PICKAXE_BLOCK]
+    }
+
+    CLAWS = {
+        interfaceId: 7762,
+        nameLineId: 7765,
+        speed: 4,
+        fightType: [FightType.CLAWS_CHOP,
+        FightType.CLAWS_SLASH, FightType.CLAWS_LUNGE,
+        FightType.CLAWS_BLOCK],
+        specialBar: 7800,
+        specialMeter: 7812
+    }
+
+    HALBERD = {
+        interfaceId: 8460,
+        nameLineId: 8463,
+        speed: 7,
+        fightType: [FightType.HALBERD_JAB,
+        FightType.HALBERD_SWIPE, FightType.HALBERD_FEND],
+        specialBar: 8493,
+        specialMeter: 8505
+    }
+
+    UNARMED = {
+        interfaceId: 5855,
+        nameLineId: 5857,
+        speed: 4,
+        fightType: [FightType.UNARMED_PUNCH,
+        FightType.UNARMED_KICK, FightType.UNARMED_BLOCK]
+    }
+
+    WHIP = {
+        interfaceId: 12290,
+        nameLineId: 12293,
+        speed: 4,
+        fightType: [FightType.WHIP_FLICK,
+        FightType.WHIP_LASH, FightType.WHIP_DEFLECT],
+        specialBar: 12323,
+        specialMeter: 12335
+    }
+
+    THROWNAXE = {
+        interfaceId: 4446,
+        nameLineId: 4449,
+        speed: 4,
+        fightType: [FightType.THROWNAXE_ACCURATE, FightType.THROWNAXE_RAPID,
+        FightType.THROWNAXE_LONGRANGE],
+        specialBar: 7649,
+        specialMeter: 7661
+    }
+
+    DART = {
+        interfaceId: 4446,
+        nameLineId: 4449,
+        speed: 3,
+        fightType: [FightType.DART_ACCURATE,
+        FightType.DART_RAPID, FightType.DART_LONGRANGE],
+        specialBar: 7649,
+        specialMeter: 7661
+    }
+
+    JAVELIN = {
+        interfaceId: 4446,
+        nameLineId: 4449,
+        speed: 3,
+        fightType: [FightType.JAVELIN_ACCURATE,
+        FightType.JAVELIN_RAPID, FightType.JAVELIN_LONGRANGE],
+        specialBar: 7649,
+        specialMeter: 7661
+    }
+
+    ANCIENT_STAFF = {
+        interfaceId: 328,
+        nameLineId: 355,
+        speed: 4,
+        fightType: [FightType.STAFF_BASH, FightType.STAFF_POUND, FightType.STAFF_FOCUS]
+    }
+
+    DARK_BOW = {
+        interfaceId: 1764,
+        nameLineId: 1767,
+        speed: 8,
+        fightType: [FightType.LONGBOW_ACCURATE,
+        FightType.LONGBOW_RAPID, FightType.LONGBOW_LONGRANGE],
+        specialBar: 7549,
+        specialMeter: 7561
+    }
+
+    GODSWORD = {
+        interfaceId: 4705,
+        nameLineId: 4708,
+        speed: 6,
+        fightType: [FightType.GODSWORD_CHOP, FightType.GODSWORD_SLASH,
+        FightType.GODSWORD_SMASH, FightType.GODSWORD_BLOCK],
+        specialBar: 7699,
+        specialMeter: 7711
+    }
+
+    ABYSSAL_BLUDGEON = {
+        interfaceId: 4705,
+        nameLineId: 4708,
+        speed: 4,
+        fightType: [FightType.ABYSSAL_BLUDGEON_CHOP, FightType.ABYSSAL_BLUDGEON_SLASH,
+        FightType.ABYSSAL_BLUDGEON_SMASH, FightType.ABYSSAL_BLUDGEON_BLOCK],
+        specialBar: 7699,
+        specialMeter: 7711
+    }
+
+    SARADOMIN_SWORD = {
+        interfaceId: 4705,
+        nameLineId: 4708,
+        speed: 4,
+        fightType: [FightType.TWOHANDEDSWORD_CHOP, FightType.TWOHANDEDSWORD_SLASH,
+        FightType.TWOHANDEDSWORD_SMASH, FightType.TWOHANDEDSWORD_BLOCK],
+        specialBar: 7699,
+        specialMeter: 7711
+    }
+
+    ELDER_MAUL = {
+        interfaceId: 425,
+        nameLineId: 428,
+        speed: 6,
+        fightType: [FightType.ELDER_MAUL_POUND,
+        FightType.ELDER_MAUL_PUMMEL, FightType.ELDER_MAUL_BLOCK],
+        specialBar: 7474,
+        specialMeter: 7486
+    }
+
+    GHRAZI_RAPIER = {
+        interfaceId: 2276,
+        nameLineId: 2279,
+        speed: 4,
+        fightType: [FightType.GHRAZI_RAPIER_STAB,
+        FightType.GHRAZI_RAPIER_LUNGE, FightType.GHRAZI_RAPIER_SLASH,
+        FightType.GHRAZI_RAPIER_BLOCK],
+        specialBar: 7574,
+        specialMeter: 7586
+    }
+
+    private interfaceId: number;
+    private nameLineId: number;
+    private speed: number;
+    private fightType: FightType[];
+    private specialBar: number;
+    private specialMeter: number;
+
+    private WeaponInterfaceMeter(interfaceId: number, nameLineId: number, speed: number,
+        fightType: FightType[], specialBar: number, specialMeter: number) {
+        this.interfaceId = interfaceId;
+        this.nameLineId = nameLineId;
+        this.speed = speed;
+        this.fightType = fightType;
+        this.specialBar = specialBar;
+        this.specialMeter = specialMeter;
+    }
+
+    private WeaponInterface(interfaceId: number, nameLineId: number, speed: number,
+        fightType: FightType[]) {
+        this.WeaponInterfaceMeter(interfaceId, nameLineId, speed, fightType, -1, -1);
+    }
+
+    public getInterfaceId(): number {
+        return this.interfaceId;
+    }
+
+    public getNameLineId(): number {
+        return this.nameLineId;
+    }
+
+    public getSpeed(): number {
+        return this.speed;
+    }
+
+    public getFightType(): FightType[] {
+        return this.fightType;
+    }
+
+    public getSpecialBar(): number {
+        return this.specialBar;
+    }
+
+    public getSpecialMeter(): number {
+        return this.specialMeter;
+    }
 }
-
-

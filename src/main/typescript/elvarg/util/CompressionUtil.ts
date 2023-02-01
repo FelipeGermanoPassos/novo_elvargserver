@@ -1,7 +1,7 @@
 import { ungzip } from "gzip-js";
 import * as Bzip2 from 'bzip2';
 
-class CompressionUtil {
+export class CompressionUtil {
     private constructor() {
         throw new Error("static-utility classes may not be instantiated.");
     }

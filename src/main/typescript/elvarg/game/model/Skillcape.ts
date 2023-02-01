@@ -29,7 +29,7 @@ const Skillcapes = {
     QUEST_POINT: [9813, 9814, 10662, 4945, 816, 19],
 }
 
-class Skillcape {
+export class Skillcape {
     private static dataMap = new Map<number, Skillcape>();
     static {
         for (let data of Object.values(Skillcape)) {

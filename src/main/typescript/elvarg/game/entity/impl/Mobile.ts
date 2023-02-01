@@ -536,10 +536,3 @@ export class Mobile extends Entities {
         this.getAsPlayer()?.getPacketSender()?.sendMessage(message);
     }
 }
-
-
-
-
-
-
-

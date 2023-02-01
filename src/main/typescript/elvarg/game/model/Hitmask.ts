@@ -1,4 +1,4 @@
-enum Hitmask {
+export enum Hitmask {
 
     /*
      * A normal red hitmask.

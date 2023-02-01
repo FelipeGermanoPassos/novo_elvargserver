@@ -1,4 +1,4 @@
-class ForceMovement {
+export class ForceMovement {
     private start: Location;
     private end: Location;
     private speed: number;

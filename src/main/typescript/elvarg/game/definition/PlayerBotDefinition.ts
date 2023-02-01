@@ -1,3 +1,6 @@
+import { Location } from "../model/Location";
+import { FighterPreset } from "../entity/impl/playerbot/fightstyle/FighterPreset";
+
 export class PlayerBotDefinition {
 
     private readonly username: string;
