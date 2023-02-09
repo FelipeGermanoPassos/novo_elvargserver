@@ -26,31 +26,35 @@ import { ItemIdentifiers } from "../../../../../../util/ItemIdentifiers";
 import { TimerKey } from "../../../../../../util/timers/TimerKey";
 
 export class TribridMaxFighterPreset implements FighterPreset {
-    private static BOT_HARD_TRIBRID: Presetable = new Presetable("Bot Tribrid", [
-        new Item(ItemIdentifiers.ARMADYL_CROSSBOW), new Item(ItemIdentifiers.ARMADYL_GODSWORD), new Item(ItemIdentifiers.RANGING_POTION_4_), new Item(ItemIdentifiers.SUPER_COMBAT_POTION_4_),
-        new Item(ItemIdentifiers.AVAS_ACCUMULATOR), new Item(ItemIdentifiers.KARILS_LEATHERSKIRT), new Item(ItemIdentifiers.KARILS_LEATHERTOP), new Item(ItemIdentifiers.SUPER_RESTORE_4_),
-        new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.COOKED_KARAMBWAN),
-        new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.COOKED_KARAMBWAN),
-        new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.COOKED_KARAMBWAN),
-        new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.ANGLERFISH),
-        new Item(ItemIdentifiers.WATER_RUNE, 10000), new Item(ItemIdentifiers.BLOOD_RUNE, 10000), new Item(ItemIdentifiers.DEATH_RUNE, 10000), new Item(ItemIdentifiers.TELEPORT_TO_HOUSE, 1),
-    ], [
-        new Item(ItemIdentifiers.HELM_OF_NEITIZNOT),
-        new Item(ItemIdentifiers.INFERNAL_CAPE),
-        new Item(ItemIdentifiers.STAFF_OF_THE_DEAD),
-        new Item(ItemIdentifiers.AMULET_OF_FURY),
-        new Item(ItemIdentifiers.AHRIMS_ROBESKIRT),
-        new Item(ItemIdentifiers.BLESSED_SPIRIT_SHIELD),
-        new Item(ItemIdentifiers.AHRIMS_ROBETOP),
-        new Item(ItemIdentifiers.BARROWS_GLOVES),
-        new Item(ItemIdentifiers.CLIMBING_BOOTS),
-        new Item(ItemIdentifiers.RING_OF_RECOIL),
-        new Item(ItemIdentifiers.DRAGONSTONE_DRAGON_BOLTS_E_, 135),
-    ], [
-        99, 99, 99, 99, 99, 99, 99
-    ], MagicSpellbooks.ANCIENT, true)
+    private static BOT_HARD_TRIBRID: Presetable = new Presetable("Bot Tribrid",
+        [
+            new Item(ItemIdentifiers.ARMADYL_CROSSBOW), new Item(ItemIdentifiers.ARMADYL_GODSWORD), new Item(ItemIdentifiers.RANGING_POTION_4_), new Item(ItemIdentifiers.SUPER_COMBAT_POTION_4_),
+            new Item(ItemIdentifiers.AVAS_ACCUMULATOR), new Item(ItemIdentifiers.KARILS_LEATHERSKIRT), new Item(ItemIdentifiers.KARILS_LEATHERTOP), new Item(ItemIdentifiers.SUPER_RESTORE_4_),
+            new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.COOKED_KARAMBWAN),
+            new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.COOKED_KARAMBWAN),
+            new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.COOKED_KARAMBWAN),
+            new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.ANGLERFISH),
+            new Item(ItemIdentifiers.WATER_RUNE, 10000), new Item(ItemIdentifiers.BLOOD_RUNE, 10000), new Item(ItemIdentifiers.DEATH_RUNE, 10000), new Item(ItemIdentifiers.TELEPORT_TO_HOUSE, 1),
+        ],
+        [
+            new Item(ItemIdentifiers.HELM_OF_NEITIZNOT),
+            new Item(ItemIdentifiers.INFERNAL_CAPE),
+            new Item(ItemIdentifiers.STAFF_OF_THE_DEAD),
+            new Item(ItemIdentifiers.AMULET_OF_FURY),
+            new Item(ItemIdentifiers.AHRIMS_ROBESKIRT),
+            new Item(ItemIdentifiers.BLESSED_SPIRIT_SHIELD),
+            new Item(ItemIdentifiers.AHRIMS_ROBETOP),
+            new Item(ItemIdentifiers.BARROWS_GLOVES),
+            new Item(ItemIdentifiers.CLIMBING_BOOTS),
+            new Item(ItemIdentifiers.RING_OF_RECOIL),
+            new Item(ItemIdentifiers.DRAGONSTONE_DRAGON_BOLTS_E_, 135),
+        ],
+        [99, 99, 99, 99, 99, 99, 99],
+        MagicSpellbooks.ANCIENT,
+        true
+    )
     const COMBAT_ACTIONS: CombatAction[] = [
-        new CombatAction() {
+        new CombatAction(), {
 
             shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
                 const food = ItemInSlot.getFromInventory(ItemIdentifiers.MANTA_RAY, playerBot.getInventory());
@@ -102,14 +106,10 @@ export class TribridMaxFighterPreset implements FighterPreset {
                 return false;
             }
         },
-        class CombatSwitch {
-            private items: number[];
-            private prayers: PrayerData[];
+        new CombatSwitch([ItemIdentifiers.ARMADYL_GODSWORD, ItemIdentifiers.INFERNAL_CAPE, ItemIdentifiers.KARILS_LEATHERSKIRT, ItemIdentifiers.KARILS_LEATHERTOP]),
+        new PrayerData[]([PrayerData.PROTECT_ITEM, PrayerData.PIETY]), {
 
-            constructor(items: number[], prayers: PrayerData[]) {
-                this.items = items;
-                this.prayers = prayers;
-            }
+
 
             shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
                 let canAttackNextTick = playerBot.getTimers().willEndIn(TimerKey.COMBAT_ATTACK, 1);
@@ -119,7 +119,7 @@ export class TribridMaxFighterPreset implements FighterPreset {
                     && !enemy.getPrayerActive()[PrayerHandler.PROTECT_FROM_MELEE];
             }
 
-            performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void {
+    performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void {
                 console.log("AGS Spec");
                 playerBot.getCombat().setCastSpell(null);
                 if (!playerBot.isSpecialActivated()) {
@@ -244,13 +244,14 @@ export class TribridMaxFighterPreset implements FighterPreset {
             let canAttackNextTick = playerBot.getTimers().willEndIn(TimerKey.COMBAT_ATTACK, 1);
             return canAttackNextTick;
         },
-        getItemPreset(): Presetable, {
-            return BOT_HARD_TRIBRID;
-        },
-        getCombatActions(): CombatAction[], {
-            return COMBAT_ACTIONS;
-        },
-        eatAtPercent(): number, {
-            return 62;
-        },
+    ];
+    getItemPreset(): Presetable, {
+    return BOT_HARD_TRIBRID;
+},
+getCombatActions(): CombatAction[], {
+    return COMBAT_ACTIONS;
+},
+    eatAtPercent(): number, {
+        return 62;
+    },
     }

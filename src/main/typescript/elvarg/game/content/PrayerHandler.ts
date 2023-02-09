@@ -472,34 +472,100 @@ export class PrayerHandler {
     }
 }
 }
-export enum PrayerData {
-    THICK_SKIN = 1,
-    BURST_OF_STRENGTH,
-    CLARITY_OF_THOUGHT,
-    SHARP_EYE,
-    MYSTIC_WILL,
-    ROCK_SKIN,
-    SUPERHUMAN_STRENGTH,
-    IMPROVED_REFLEXES,
-    RAPID_RESTORE,
-    RAPID_HEAL,
-    PROTECT_ITEM,
-    HAWK_EYE,
-    MYSTIC_LORE,
-    STEEL_SKIN,
-    ULTIMATE_STRENGTH,
-    INCREDIBLE_REFLEXES,
-    PROTECT_FROM_MAGIC,
-    PROTECT_FROM_MISSILES,
-    PROTECT_FROM_MELEE,
-    EAGLE_EYE,
-    MYSTIC_MIGHT,
-    RETRIBUTION,
-    REDEMPTION,
-    SMITE,
-    PRESERVE,
-    CHIVALRY,
-    PIETY,
-    RIGOUR,
-    AUGURY
+export class PrayerData {
+    public static THICK_SKIN = [1, 5, 5609, 83]
+    public static BURST_OF_STRENGTH = [4, 5, 5610, 84]
+    public static CLARITY_OF_THOUGHT = [7, 5, 5611, 85]
+    public static SHARP_EYE = [8, 5, 19812, 700]
+    public static MYSTIC_WILL = [9, 5, 19814, 701]
+    public static ROCK_SKIN = [10, 10, 5612, 86]
+    public static SUPERHUMAN_STRENGTH = [13, 10, 5613, 87]
+    public static IMPROVED_REFLEXES = [16, 10, 5614, 88]
+    public static RAPID_RESTORE = [19, 2.3, 5615, 89]
+    public static RAPID_HEAL = [22, 3, 5616, 90]
+    public static PROTECT_ITEM = [25, 3, 5617, 91]
+    public static HAWK_EYE = [26, 10, 19816, 702]
+    public static MYSTIC_LORE = [27, 10, 19818, 703]
+    public static STEEL_SKIN = [28, 20, 5618, 92]
+    public static ULTIMATE_STRENGTH = [31, 20, 5619, 93]
+    public static INCREDIBLE_REFLEXES = [34, 20, 5620, 94]
+    public static PROTECT_FROM_MAGIC = [37, 20, 5621, 95, 2]
+    public static PROTECT_FROM_MISSILES = [40, 20, 5622, 96, 1]
+    public static PROTECT_FROM_MELEE = [43, 20, 5623, 97, 0]
+    public static EAGLE_EYE = [44, 20, 19821, 704]
+    public static MYSTIC_MIGHT = [45, 20, 19823, 705]
+    public static RETRIBUTION = [46, 5, 683, 98, 4]
+    public static REDEMPTION = [49, 10, 684, 99, 5]
+    public static SMITE = [52, 32.0, 685, 100, 100, 6]
+    public static PRESERVE = [55, 3, 28001, 708]
+    public static CHIVALRY = [60, 38.5, 19825, 706]
+    public static PIETY = [70, 38.5, 19827, 707]
+    public static RIGOUR = [74, 38.5, 28004, 710]
+    public static AUGURY = [77, 38.5, 28007, 712]
+
+    /**
+         * Contains the PrayerData with their corresponding prayerId.
+         */
+    private static  prayerData: HashMap<Integer, PrayerData> = new HashMap<Integer, PrayerData>();
+    /**
+     * Contains the PrayerData with their corresponding buttonId.
+     */
+    private static  actionButton: HashMap<Integer, PrayerData> = new HashMap<Integer, PrayerData>();
+
+    /**
+     * Populates the prayerId and buttonId maps.
+     */
+    static {
+        for (const pd of Object.values(PrayerData)) {
+            this.prayerData.set(pd.ordinal(), pd);
+            this.actionButton.set(pd.buttonId, pd);
+        }
+    }
+
+    /**
+     * The prayer's level requirement for player to be able to activate it.
+     */
+    private requirement: number;
+    /**
+     * The prayer's action button id in prayer tab.
+     */
+    private buttonId: number;
+    /**
+     * The prayer's config id to switch their glow on/off by sending the sendConfig
+     * packet.
+     */
+    private configId: number;
+    /**
+     * The rate of which the player's prayer points will be drained at 
+     * per minute.
+     */
+    private drainRate: number;
+    /**
+     * The prayer's head icon hint index.
+     */
+    private hint: number = -1;
+    /**
+     * The prayer's formatted name.
+     */
+    private name: string;
+
+    constructor(requirement: number, drainRate: number, buttonId: number, configId: number, hint: number[]) {
+        this.requirement = requirement;
+        this.drainRate = drainRate;
+        this.buttonId = buttonId;
+        this.configId = configId;
+        if (hint.length > 0)
+            this.hint = hint[0];
+    }
+
+    /**
+     * Gets the prayer's formatted name.
+     *
+     * @return The prayer's name
+     */
+    private static getPrayerName(): string {
+        if (this.name == null)
+            return Misc.capitalizeWords(toString().toLowerCase().replaceAll("_", " "));
+        return this.name;
+    }
 }

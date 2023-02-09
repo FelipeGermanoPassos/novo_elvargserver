@@ -11,7 +11,8 @@ import { ItemIdentifiers } from "../../../../../../util/ItemIdentifiers";
 
 
 
-export interface DDSPureRFighterPreset implements FighterPreset {
+export class DDSPureRFighterPreset implements FighterPreset {
+
     public BOT_DDS_PURE_R_73: Presetable = new Presetable("DDS Pure (R)",
         [
             new Item(ItemIdentifiers.RUNE_CROSSBOW),
@@ -54,21 +55,13 @@ export interface DDSPureRFighterPreset implements FighterPreset {
             new Item(ItemIdentifiers.RING_OF_RECOIL),
             new Item(ItemIdentifiers.RUNE_ARROW, 75)
         ],
-        {
-            atk: 60,
-            def: 1,
-            str: 99,
-            hp: 85,
-            range: 99,
-            pray: 1,
-            mage: 1
-        },
+        [60, 1, 99, 85, 99, 1, 1],
         MagicSpellbooks.NORMAL,
         true
     )
 
     public COMBAT_ACTIONS: CombatAction[] = [
-        new CombatSwitch(new number[]{ DRAGON_DAGGER_P_PLUS_PLUS_ }) {
+        new CombatSwitch([ItemIdentifiers.DRAGON_DAGGER_P_PLUS_PLUS_]), {
             shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
                 return playerBot.getSpecialPercentage() >= 25 &&
                     enemy.getHitpoints() < 45;
@@ -80,7 +73,7 @@ export interface DDSPureRFighterPreset implements FighterPreset {
                 playerBot.getCombat().attack(enemy);
             }
         },
-        new CombatSwitch(new int[]{ RUNE_CROSSBOW, DRAGON_BOLTS_E_ }) {
+        new CombatSwitch([ItemIdentifiers.RUNE_CROSSBOW, ItemIdentifiers.DRAGON_BOLTS_E_]), {
             shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
                 return enemy.getHitpoints() < 40;
             },
@@ -88,7 +81,7 @@ export interface DDSPureRFighterPreset implements FighterPreset {
                 playerBot.getCombat().attack(enemy);
             }
         },
-        new CombatSwitch(new int[]{ MAGIC_SHORTBOW, RUNE_ARROW }) {
+        new CombatSwitch([ItemIdentifiers.MAGIC_SHORTBOW, ItemIdentifiers.RUNE_ARROW]), {
             shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
                 return true;
             },
@@ -98,11 +91,16 @@ export interface DDSPureRFighterPreset implements FighterPreset {
             }
         },
     ];
-    getItemPreset(): Presetable {
-    return BOT_DDS_PURE_R_73;
-};
 
-getCombatActions(): CombatAction[] {
-    return COMBAT_ACTIONS;
-}
+    getItemPreset(): Presetable {
+        return this.BOT_DDS_PURE_R_73;
+    };
+
+    getCombatActions(): CombatAction[] {
+        return this.COMBAT_ACTIONS;
+    };
+
+    eatAtPercent(): number {
+        return 40;
+    }
 }
