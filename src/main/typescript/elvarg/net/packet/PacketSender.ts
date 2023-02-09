@@ -1,4 +1,7 @@
-class PacketSender {
+import { Player } from "../../game/entity/impl/player/Player";
+
+
+export class PacketSender {
     private player: Player;
     constructor(player: Player) {
         this.player = player;
@@ -20,13 +23,6 @@ class PacketSender {
         out.putShort(this.player.getLocation().getRegionY() + 6);
         this.player.getSession().write(out);
         return this;
-    }
-
-    class PacketSender {
-    private player: Player;
-
-    constructor(player: Player) {
-        this.player = player;
     }
 
     sendLogout(): this {
@@ -185,7 +181,7 @@ class PacketSender {
         return this;
     }
 
-    sendRunEnergy(): this {
+    public sendRunEnergy(): this {
         const out = new PacketBuilder(110);
         out.put(this.player.getRunEnergy());
         this.player.getSession().write(out);

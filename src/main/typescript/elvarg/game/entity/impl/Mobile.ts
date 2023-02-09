@@ -1,12 +1,33 @@
-export class Mobile extends Entities {
+import { Entity } from "../Entity";
+import { Sound } from "../../Sound";
+import { Combat } from "../../content/combat/Combat";
+import { CombatType } from "../../content/combat/CombatType";
+import { HitDamage } from "../../content/combat/hit/HitDamage";
+import { PendingHit } from "../../content/combat/hit/PendingHit";
+import { NPC } from "./npc/NPC";
+import { Player } from "./player/Player";
+import { PlayerBot } from "./playerbot/PlayerBot";
+import { Animation } from "../../model/Animation";
+import { Direction } from "../../model/Direction";
+import { Flag } from "../../model/Flag";
+import { Graphic } from "../../model/Graphic";
+import { Location } from "../../model/Location";
+import { UpdateFlag } from "../../model/UpdateFlag";
+import { MovementQueue } from "../../model/movement/MovementQueue";
+import { Task } from "../../task/Task";
+import { TaskManager } from "../../task/TaskManager";
+import { Stopwatch } from "../../../util/Stopwatch";
+import {TimerRepository} from "../../../util/timers/TimerRepository";
+
+export class Mobile extends Entity {
     private index: number;
     private lastKnownRegion: Location;
     private timers = new TimerRepository();
     private combat = new Combat(this);
     private movementQueue = new MovementQueue(this);
     private forcedChat: string;
-    private walkingDirection: Direction = Direction.NONE;
-    private runningDirection: Direction = Direction.NONE;
+    private walkingDirection: Direction = Directions.NONE;
+    private runningDirection: Direction = Directions.NONE;
     private lastCombat = new Stopwatch();
     private updateFlag = new UpdateFlag();
     private positionToFace: Location;
@@ -14,7 +35,6 @@ export class Mobile extends Entities {
     private graphic: Graphic;
     private following: Mobile;
     
-    Copy code
     private attributes = new Map<Object, Object>();
 
     public getAttribute(name: Object) {
@@ -218,7 +238,7 @@ export class Mobile extends Entities {
      * Getters and setters Also contains methods.
      */
 
-    isTeleporting(): boolean {
+    isTeleportingReturn(): boolean {
         return this.isTeleporting;
     }
 
@@ -398,7 +418,7 @@ export class Mobile extends Entities {
         this.needsPlacement = needsPlacement;
     }
 
-    hasVengeance(): boolean {
+    public hasVengeanceReturn(): boolean {
         return this.hasVengeance;
     }
     setHasVengeance(hasVengeance: boolean): void {

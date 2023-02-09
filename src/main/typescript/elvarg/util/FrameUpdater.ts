@@ -1,6 +1,6 @@
 import {HashMap} from 'hashmap';
 
-class Frame126 {
+export class Frame126 {
     id: number;
     currentState: string;
 
@@ -10,7 +10,7 @@ class Frame126 {
     }
 }
 
-class FrameUpdater {
+export class FrameUpdater {
     private interfaceTextMap = new HashMap<number, Frame126>();
     shouldUpdate(text: string, id: number): boolean {
         if (!this.interfaceTextMap.has(id)) {

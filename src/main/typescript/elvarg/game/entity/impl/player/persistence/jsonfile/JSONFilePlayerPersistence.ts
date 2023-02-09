@@ -1,21 +1,24 @@
-import { PlayerSave } from './PlayerSave';
-import { Player } from '../Player';
-import { PlayerPersistence } from './PlayerPersistence';
-import { Misc } from '../../../util/Misc';
-import { Gson, GsonBuilder } from 'google-gson';
-import { FileReader, FileWriter, File } from 'file-io';
-import { Path, Paths } from 'node-path';
+import { Server } from "../../../../../../Server";
+import { Player } from "../../Player";
+import { PlayerPersistence } from "../PlayerPersistence";
+import { PlayerSave } from "../PlayerSave";
+import { Misc } from "../../../../../../util/Misc";
+import fs from "fs"
+import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
+import * as Path from "path";
+
+
 
 export class JSONFilePlayerPersistence extends PlayerPersistence {
     private static PATH = './data/saves/characters/';
-    private static BUILDER = new GsonBuilder().create();
+    private static BUILDER = new new JsonConvert(OperationMode.ENABLE, ValueCheckingMode.DISALLOW_NULL);
 
     public load(username: string): PlayerSave {
         if (!this.exists(username)) {
             return null;
         }
 
-        const path: Path = Paths.get(JSONFilePlayerPersistence.PATH, username + '.json');
+        const path: Path = path.get(JSONFilePlayerPersistence.PATH, username + '.json');
         const file: File = path.toFile();
 
         try (const fileReader = new FileReader(file)) {

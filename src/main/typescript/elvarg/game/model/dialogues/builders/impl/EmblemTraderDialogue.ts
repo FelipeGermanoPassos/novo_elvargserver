@@ -1,4 +1,4 @@
-class EmblemTraderDialogue extends DynamicDialogueBuilder {
+export class EmblemTraderDialogue extends DynamicDialogueBuilder {
 
     public build(player: Player) {
         add(new OptionDialogue(0, (option) => {

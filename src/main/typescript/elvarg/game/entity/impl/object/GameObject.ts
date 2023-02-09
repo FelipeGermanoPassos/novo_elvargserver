@@ -89,7 +89,7 @@ export class GameObject extends Entity {
         }
         return (definition.getSizeX() + definition.getSizeY()) - 1;
     }
-    override equals(o: any): boolean {
+    equals(o: any): boolean {
         if (!(o instanceof GameObject))
             return false;
         let object = o as GameObject;

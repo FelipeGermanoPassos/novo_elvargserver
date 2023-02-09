@@ -1,19 +1,20 @@
-export enum PlayerRights {
-    NONE = -1,
-    MODERATOR = 618,
-    ADMINISTRATOR = 619,
-    OWNER = 620,
-    DEVELOPER = 621
+export class PlayerRights {
+    public static NONE = -1
+    public static MODERATOR = 618
+    public static ADMINISTRATOR = 619
+    public static OWNER = 620
+    public static DEVELOPER = 621
+
     private spriteId: number;
     private yellTag: string;
     constructor(spriteId: number, yellTag: string) {
         this.spriteId = spriteId;
         this.yellTag = yellTag;
     }
-getSpriteId() {
-    return this.spriteId;
-}
-getYellTag() {
-    return this.yellTag;
-}
+    public getSpriteId() {
+        return this.spriteId;
     }
+    public getYellTag() {
+        return this.yellTag;
+    }
+}

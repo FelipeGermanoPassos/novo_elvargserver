@@ -8,7 +8,7 @@ import { PrivateArea } from '../impl/PrivateArea'
 import { NpcIdentifiers } from '../../../../util/NpcIdentifiers'
 
 
-class FightCavesArea extends PrivateArea {
+export class FightCavesArea extends PrivateArea {
     public static readonly BOUNDARY = new Boundary(2368, 5056, 2431, 5119, 0);
 
     public postLeave(mobile: Mobile, logout: boolean): void {

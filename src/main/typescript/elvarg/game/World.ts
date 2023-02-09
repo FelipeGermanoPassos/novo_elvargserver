@@ -327,8 +327,4 @@ executor.sync(new GameSyncTask(false) {
             .forEach(p => p.getPacketSender().sendGraphic(new Graphic(id), position));
     }
 }
-
-
-
-
-
+}

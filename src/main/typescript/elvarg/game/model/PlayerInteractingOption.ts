@@ -1,4 +1,4 @@
-enum PlayerInteractingOptions {
+export enum PlayerInteractingOptions {
     NONE,
     CHALLENGE,
     ATTACK

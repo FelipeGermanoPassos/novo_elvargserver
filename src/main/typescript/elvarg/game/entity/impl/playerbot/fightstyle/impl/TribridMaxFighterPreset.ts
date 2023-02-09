@@ -1,32 +1,59 @@
+import { GameConstants } from "../../../../../GameConstants";
+import { PotionConsumable } from "../../../../../content/PotionConsumable";
+import { PrayerData, PrayerHandler } from "../../../../../content/PrayerHandler";
+import { CombatFactory } from "../../../../../content/combat/CombatFactory";
+import { CombatSpecial } from "../../../../../content/combat/CombatSpecial";
+import { CombatType } from "../../../../../content/combat/CombatType";
+import { CombatSpells } from "../../../../../content/combat/magic/CombatSpells";
+import { CombatMethod } from "../../../../../content/combat/method/CombatMethod";
+import { Presetable } from "../../../../../content/presets/Presetable";
+import { Mobile } from "../../../Mobile";
+import { PlayerBot } from "../../PlayerBot";
+import { AttackStyleSwitch } from "../AttackStyleSwitch";
+import { CombatAction } from "../CombatAction";
+import { CombatSwitch } from "../CombatSwitch";
+import { EnemyDefenseAwareCombatSwitch } from "../EnemyDefenseAwareCombatSwitch";
+import { FighterPreset } from "../FighterPreset";
+import { Item } from "../../../../../model/Item";
+import { ItemInSlot } from "../../../../../model/ItemInSlot";
+import { MagicSpellbook, MagicSpellbooks } from "../../../../../model/MagicSpellbook";
+import { Skill } from "../../../../../model/Skill";
+import { BonusManager } from "../../../../../model/equipment/BonusManager";
+import { MovementQueue } from "../../../../../model/movement/MovementQueue";
+import { TeleportHandler } from "../../../../../model/teleportation/TeleportHandler";
+import { TeleportType } from "../../../../../model/teleportation/TeleportType";
+import { ItemIdentifiers } from "../../../../../../util/ItemIdentifiers";
+import { TimerKey } from "../../../../../../util/timers/TimerKey";
+
 export class TribridMaxFighterPreset implements FighterPreset {
     private static BOT_HARD_TRIBRID: Presetable = new Presetable("Bot Tribrid", [
-        new Item(ARMADYL_CROSSBOW), new Item(ARMADYL_GODSWORD), new Item(RANGING_POTION_4_), new Item(SUPER_COMBAT_POTION_4_),
-        new Item(AVAS_ACCUMULATOR), new Item(KARILS_LEATHERSKIRT), new Item(KARILS_LEATHERTOP), new Item(SUPER_RESTORE_4_),
-        new Item(COOKED_KARAMBWAN), new Item(MANTA_RAY), new Item(MANTA_RAY), new Item(COOKED_KARAMBWAN),
-        new Item(COOKED_KARAMBWAN), new Item(MANTA_RAY), new Item(MANTA_RAY), new Item(COOKED_KARAMBWAN),
-        new Item(COOKED_KARAMBWAN), new Item(MANTA_RAY), new Item(MANTA_RAY), new Item(COOKED_KARAMBWAN),
-        new Item(MANTA_RAY), new Item(MANTA_RAY), new Item(MANTA_RAY), new Item(ANGLERFISH),
-        new Item(WATER_RUNE, 10000), new Item(BLOOD_RUNE, 10000), new Item(DEATH_RUNE, 10000), new Item(TELEPORT_TO_HOUSE, 1),
+        new Item(ItemIdentifiers.ARMADYL_CROSSBOW), new Item(ItemIdentifiers.ARMADYL_GODSWORD), new Item(ItemIdentifiers.RANGING_POTION_4_), new Item(ItemIdentifiers.SUPER_COMBAT_POTION_4_),
+        new Item(ItemIdentifiers.AVAS_ACCUMULATOR), new Item(ItemIdentifiers.KARILS_LEATHERSKIRT), new Item(ItemIdentifiers.KARILS_LEATHERTOP), new Item(ItemIdentifiers.SUPER_RESTORE_4_),
+        new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.COOKED_KARAMBWAN),
+        new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.COOKED_KARAMBWAN),
+        new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.COOKED_KARAMBWAN),
+        new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.ANGLERFISH),
+        new Item(ItemIdentifiers.WATER_RUNE, 10000), new Item(ItemIdentifiers.BLOOD_RUNE, 10000), new Item(ItemIdentifiers.DEATH_RUNE, 10000), new Item(ItemIdentifiers.TELEPORT_TO_HOUSE, 1),
     ], [
-        new Item(HELM_OF_NEITIZNOT),
-        new Item(INFERNAL_CAPE),
-        new Item(STAFF_OF_THE_DEAD),
-        new Item(AMULET_OF_FURY),
-        new Item(AHRIMS_ROBESKIRT),
-        new Item(BLESSED_SPIRIT_SHIELD),
-        new Item(AHRIMS_ROBETOP),
-        new Item(BARROWS_GLOVES),
-        new Item(CLIMBING_BOOTS),
-        new Item(RING_OF_RECOIL),
-        new Item(DRAGONSTONE_DRAGON_BOLTS_E_, 135),
+        new Item(ItemIdentifiers.HELM_OF_NEITIZNOT),
+        new Item(ItemIdentifiers.INFERNAL_CAPE),
+        new Item(ItemIdentifiers.STAFF_OF_THE_DEAD),
+        new Item(ItemIdentifiers.AMULET_OF_FURY),
+        new Item(ItemIdentifiers.AHRIMS_ROBESKIRT),
+        new Item(ItemIdentifiers.BLESSED_SPIRIT_SHIELD),
+        new Item(ItemIdentifiers.AHRIMS_ROBETOP),
+        new Item(ItemIdentifiers.BARROWS_GLOVES),
+        new Item(ItemIdentifiers.CLIMBING_BOOTS),
+        new Item(ItemIdentifiers.RING_OF_RECOIL),
+        new Item(ItemIdentifiers.DRAGONSTONE_DRAGON_BOLTS_E_, 135),
     ], [
         99, 99, 99, 99, 99, 99, 99
-    ], MagicSpellbook.ANCIENT, true)
+    ], MagicSpellbooks.ANCIENT, true)
     const COMBAT_ACTIONS: CombatAction[] = [
         new CombatAction() {
 
             shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-                const food = ItemInSlot.getFromInventory(MANTA_RAY, playerBot.getInventory());
+                const food = ItemInSlot.getFromInventory(ItemIdentifiers.MANTA_RAY, playerBot.getInventory());
 
                 return food == null;
             },
@@ -55,19 +82,19 @@ export class TribridMaxFighterPreset implements FighterPreset {
                 const magicAccuracy = (enemy.isNpc() ? 0 : enemy.getAsPlayer().getBonusManager().getAttackBonus()[BonusManager.ATTACK_MAGIC]);
 
                 if (!CombatFactory.canReach(enemy, combatMethod, playerBot) && magicAccuracy < 35) {
-                    PrayerHandler.activatePrayer(playerBot, PrayerHandler.PrayerData.SMITE);
+                    PrayerHandler.activatePrayer(playerBot, PrayerData.SMITE);
                     return;
                 }
 
                 if (combatType == CombatType.MELEE && CombatFactory.canReach(enemy, combatMethod, playerBot)) {
-                    PrayerHandler.activatePrayer(playerBot, PrayerHandler.PrayerData.PROTECT_FROM_MELEE);
+                    PrayerHandler.activatePrayer(playerBot, PrayerData.PROTECT_FROM_MELEE);
                     return;
                 }
 
                 if (combatType == CombatType.RANGED) {
-                    PrayerHandler.activatePrayer(playerBot, PrayerHandler.PrayerData.PROTECT_FROM_MISSILES);
+                    PrayerHandler.activatePrayer(playerBot, PrayerData.PROTECT_FROM_MISSILES);
                 } else {
-                    PrayerHandler.activatePrayer(playerBot, PrayerHandler.PrayerData.PROTECT_FROM_MAGIC);
+                    PrayerHandler.activatePrayer(playerBot, PrayerData.PROTECT_FROM_MAGIC);
                 }
             },
 
@@ -77,9 +104,9 @@ export class TribridMaxFighterPreset implements FighterPreset {
         },
         class CombatSwitch {
             private items: number[];
-            private prayers: PrayerHandler.PrayerData[];
+            private prayers: PrayerData[];
 
-            constructor(items: number[], prayers: PrayerHandler.PrayerData[]) {
+            constructor(items: number[], prayers: PrayerData[]) {
                 this.items = items;
                 this.prayers = prayers;
             }
@@ -114,7 +141,7 @@ export class TribridMaxFighterPreset implements FighterPreset {
                     && !enemy.getMovementQueue().getMobility().canMove()
                     && distance == 1
                     && CombatFactory.canReach(enemy, combatMethod, playerBot);
-            }
+            },
 
             perform(playerBot: PlayerBot, enemy: Mobile): void {
                 console.log("Retreat");
@@ -125,7 +152,7 @@ export class TribridMaxFighterPreset implements FighterPreset {
 
         new CombatAction(), {
             shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-                let pot = Arrays.stream(SUPER_RESTORE_POTIONS.getIds())
+                let pot = Array.stream(PotionConsumable.SUPER_RESTORE_POTIONS.getIds())
                     .mapToObj(id => ItemInSlot.getFromInventory(id, playerBot.getInventory()))
                     .filter(Objects.nonNull)
                     .findFirst();
@@ -133,7 +160,7 @@ export class TribridMaxFighterPreset implements FighterPreset {
             },
             perform(playerBot: PlayerBot, enemy: Mobile): void {
                 console.log("Pot up");
-                let pot = SUPER_RESTORE_POTIONS.getIds().map(id => ItemInSlot.getFromInventory(id, playerBot.getInventory()))
+                let pot = PotionConsumable.SUPER_RESTORE_POTIONS.getIds().map(id => ItemInSlot.getFromInventory(id, playerBot.getInventory()))
                     .filter(item => item !== null)
                     .find(item => item !== undefined);
                 if (pot !== undefined) {
@@ -144,8 +171,8 @@ export class TribridMaxFighterPreset implements FighterPreset {
 
         new CombatAction(), {
             private itemsToEquip: number[],
-            private prayersToActivate: PrayerHandler.PrayerData[],
-            constructor(itemsToEquip: number[], prayersToActivate: PrayerHandler.PrayerData[]) {
+            private prayersToActivate: PrayerHandler.prayerData[],
+            constructor(itemsToEquip: number[], prayersToActivate: PrayerData[]) {
                 this.itemsToEquip = itemsToEquip;
                 this.prayersToActivate = prayersToActivate;
             },

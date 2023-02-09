@@ -8,7 +8,7 @@ import { Animation } from "../../../../../model/Animation";
 import { Priority } from "../../../../../model/Priority";
 import { Misc } from "../../../../../../util/Misc";
 
-class JadCombatMethod extends CombatMethod {
+export class JadCombatMethod extends CombatMethod {
 
     private static MAGIC_ATTACK_ANIM = new Animation(2656, Priority.MEDIUM);
     private static RANGED_ATTACK_ANIM = new Animation(2652, Priority.MEDIUM);

@@ -1,4 +1,4 @@
-class EquipPacketListener implements PacketExecutor {
+export class EquipPacketListener implements PacketExecutor {
 
 	public static resetWeapon(player: Player, deactivateSpecialAttack: boolean) {
 		if (deactivateSpecialAttack) {

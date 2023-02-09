@@ -1,5 +1,76 @@
-import { PlayerBotSession } from "../../../../net/PlayerBotSession";
+import { GameConstants } from "../../../GameConstants";
+import { Sound } from "../../../Sound";
+import { World } from "../../../World";
+import { PrayerData, PrayerHandler } from "../../../content/PrayerHandler";
+import { ClanChat } from "../../../content/clan/ClanChat";
+import { ClanChatManager } from "../../../content/clan/ClanChatManager";
+import { CombatFactory } from "../../../content/combat/CombatFactory";
+import { CombatSpecial } from "../../../content/combat/CombatSpecial";
+import { CombatType } from "../../../content/combat/CombatType";
+import { FightType } from "../../../content/combat/FightType";
+import { WeaponInterfaces } from "../../../content/combat/WeaponInterfaces";
+import { BountyHunter } from "../../../content/combat/bountyhunter/BountyHunter"
+import { PendingHit } from "../../../content/combat/hit/PendingHit";
+import { Autocasting } from "../../../content/combat/magic/Autocasting";
+import { Barrows } from "../../../content/minigames/impl/Barrows"
+import { Presetable } from "../../../content/presets/Presetable";
+import { Presetables } from "../../../content/presets/Presetables";
+import { SkillManager } from "../../../content/skill/SkillManager";
+import { Skillable } from "../../../content/skill/skillable/Skillable";
+import { Runecrafting, PouchContainer, Pouch } from "../../../content/skill/skillable/impl/Runecrafting"
+import { ActiveSlayerTask } from "../../../content/skill/slayer/ActiveSlayerTask"
+import { ItemDefinition } from "../../../definition/ItemDefinition";
+import { PlayerBotDefinition } from "../../../definition/PlayerBotDefinition";
 import { Mobile } from "../Mobile";
+import { NPC } from "../npc/NPC";
+import { NpcAggression } from "../npc/NpcAggression";
+import { PlayerBot } from "../playerbot/PlayerBot";
+import { Animation } from "../../../model/Animation";
+import { Appearance } from "../../../model/Appearance";
+import { ChatMessage } from "../../../model/ChatMessage";
+import { EffectTimer, EffectTimers } from "../../../model/EffectTimer";
+import { EnteredAmountAction } from "../../../model/EnteredAmountAction";
+import { EnteredSyntaxAction } from "../../../model/EnteredSyntaxAction";
+import { Flag } from "../../../model/Flag";
+import { ForceMovement } from "../../../model/ForceMovement";
+import { God } from "../../../model/God";
+import { Item } from "../../../model/Item";
+import { Location } from "../../../model/Location";
+import { MagicSpellbook, MagicSpellbooks } from "../../../model/MagicSpellbook";
+import { PlayerInteractingOption, PlayerInteractingOptions } from "../../../model/PlayerInteractingOption";
+import { PlayerRelations } from "../../../model/PlayerRelations";
+import { PlayerStatus } from "../../../model/PlayerStatus";
+import { SecondsTimer } from "../../../model/SecondsTimer";
+import { Skill, Skills } from "../../../model/Skill";
+import { SkullType, SkullTypes } from "../../../model/SkullType";
+import { AreaManager } from "../../../model/areas/AreaManager";
+import { Bank } from "../../../model/container/impl/Bank";
+import { Equipment } from "../../../model/container/impl/Equipment";
+import { Inventory } from "../../../model/container/impl/Inventory";
+import { PriceChecker } from "../../../model/container/impl/PriceChecker"
+import { Shop } from "../../../model/container/shop/Shop";
+import { DialogueManager } from "../../../model/dialogues/DialogueManager"
+import { BonusManager } from "../../../model/equipment/BonusManager";
+import { CreationMenu } from "../../../model/menu/CreationMenu"
+import { MovementQueue } from "../../../model/movement/MovementQueue";
+import { DonatorRights } from "../../../model/rights/DonatorRights"
+import { PlayerRights } from "../../../model/rights/PlayerRights";
+import { TeleportButton } from "../../../model/teleportation/TeleportButton"
+import { TaskManager } from "../../../task/TaskManager";
+import { CombatPoisonEffect } from "../../../task/impl/CombatPoisonEffect";
+import { PlayerDeathTask } from "../../../task/impl/PlayerDeath"
+import { RestoreSpecialAttackTask } from "../../../task/impl/RestoreSpecialAttackTask"
+import { PlayerSession } from "../../../../net/PlayerSession"
+import { ChannelEventHandler } from "../../../../net/channel/ChannelEventHandler";
+import { PacketSender } from "../../../../net/packet/PacketSender"
+import { FrameUpdater } from "../../../../util/FrameUpdater"
+import { Misc } from "../../../../util/Misc";
+import { NpcIdentifiers } from "../../../../util/NpcIdentifiers";
+import { Stopwatch } from "../../../../util/Stopwatch";
+import { TimerKey } from "../../../../util/timers/TimerKey";
+import { Trading } from "../../../content/Trading";
+import { Dueling } from "../../../content/Duelling";
+import { QuickPrayers } from "../../../content/QuickPrayers";
 
 
 export class Player extends Mobile {
@@ -8,14 +79,14 @@ export class Player extends Mobile {
     private localPlayers: Player[] = [];
     private localNpcs: NPC[] = [];
     private packetSender = new PacketSender(this);
-    private appearance = new Appearance(this);
-    private skillManager = new SkillManager(this);
-    private relations = new PlayerRelations(this);
+    public appearance = new Appearance(this);
+    public skillManager = new SkillManager(this);
+    public relations = new PlayerRelations(this);
     private frameUpdater = new FrameUpdater();
     private bonusManager = new BonusManager();
-    private quickPrayers = new QuickPrayers(this);
-    private inventory = new Inventory(this);
-    private equipment = new Equipment(this);
+    public quickPrayers = new QuickPrayers(this);
+    public inventory = new Inventory(this);
+    public equipment = new Equipment(this);
     private priceChecker = new PriceChecker(this);
     private clickDelay = new Stopwatch();
     private lastItemPickup = new Stopwatch();
@@ -26,8 +97,9 @@ export class Player extends Mobile {
     /*
     * Fields
     */
+    private vengeTimer: SecondsTimer = new SecondsTimer();
     private targetSearchTimer = new SecondsTimer();
-    private recentKills: string[] = []; // Contains ip addresses of recent kills
+    public recentKills: string[] = []; // Contains ip addresses of recent kills
     private chatMessageQueue = new Array<ChatMessage>();
     private currentChatMessage: ChatMessage;
     // Logout
@@ -38,22 +110,24 @@ export class Player extends Mobile {
     private dialogueManager = new DialogueManager(this);
     // Presets
     private currentPreset: Presetable;
-    private presets: Presetable[] = new Array(Presetables.MAX_PRESETS);
+    public presets: Presetable[] = new Array(Presetables.MAX_PRESETS);
     private openPresetsOnDeath = true;
 
     private username: string;
     private passwordHashWithSalt: string;
     private hostAddress: string;
-    private isDiscordLogin: boolean;
+    private isDiscordLogin
     private cachedDiscordAccessToken: string;
     private longUsername: number;
     private session: PlayerSession;
-    private playerInteractingOption: PlayerInteractingOption = PlayerInteractingOption.NONE;
+    private playerInteractingOption = PlayerInteractingOptions.NONE;
     private status: PlayerStatus = PlayerStatus.NONE;
     private currentClanChat: ClanChat;
     private clanChatName: string;
     private shop: Shop;
-    private interfaceId = -1, walkableInterfaceId = -1, multiIcon;
+    private interfaceId: number = -1
+    private walkableInterfaceId: number = -1
+    private multiIcon: number;
     private isRunning = true;
     private runEnergy = 100;
     private lastRunRecovery = new Stopwatch();
@@ -65,7 +139,7 @@ export class Player extends Mobile {
     private skillAnimation: number;
     private drainingPrayer: boolean;
     private prayerPointDrain: number;
-    private spellbook: MagicSpellbook = MagicSpellbook.NORMAL;
+    private spellbook = MagicSpellbooks.NORMAL;
     private previousTeleports = new Map<TeleportButton, Location>();
     private teleportInterfaceOpen: boolean;
     private destroyItem = -1;
@@ -74,8 +148,8 @@ export class Player extends Mobile {
     private packetsBlocked = false;
     private regionHeight: number;
 
-    private questPoints: number;
-    private questProgress = new Map<number, number>();
+    public questPoints: number;
+    public questProgress = new Map<number, number>();
     // Skilling
     private skill: Skillable;
     private creationMenu: CreationMenu;
@@ -84,9 +158,9 @@ export class Player extends Mobile {
     private enteredSyntaxAction: EnteredSyntaxAction;
 
     // Time the account was created
-    private creationDate: Date;
+    private creationDate = new Date();
     // RC
-    private pouches: PouchContainer[] = [new PouchContainer(Pouch.SMALL_POUCH),
+    public pouches: PouchContainer[] = [new PouchContainer(Pouch.SMALL_POUCH),
     new PouchContainer(Pouch.MEDIUM_POUCH), new PouchContainer(Pouch.LARGE_POUCH),
     new PouchContainer(Pouch.GIANT_POUCH)];
     // Slayer
@@ -95,28 +169,28 @@ export class Player extends Mobile {
     private consecutiveTasks: number;
 
     // Combat
-    private skullType: SkullType = SkullType.WHITE_SKULL;
-    private combatSpecial: CombatSpecial;
+    public skullType: SkullTypes = SkullTypes.WHITE_SKULL;
+    public combatSpecial: CombatSpecial;
     private recoilDamage: number;
     private vengeanceTimer = new SecondsTimer();
     private wildernessLevel: number;
-    private skullTimer: number;
-    private points: number;
+    public skullTimer: number;
+    public points: number;
     private amountDonated: number;
     // Blowpipe
-    private blowpipeScales: number;
+    public blowpipeScales: number;
     // Bounty hunter
-    private targetKills: number;
-    private normalKills: number;
-    private totalKills: number;
-    private killstreak: number;
-    private highestKillstreak: number;
-    private deaths: number;
+    public targetKills: number;
+    public normalKills: number;
+    public totalKills: number;
+    public killstreak: number;
+    public highestKillstreak: number;
+    public deaths: number;
     private safeTimer = 180;
     // Barrows
-    private barrowsCrypt: number;
-    private barrowsChestsLooted: number;
-    private killedBrothers: boolean[] = Array(Brother.values().length).fill(false);
+    public barrowsCrypt: number;
+    public barrowsChestsLooted: number;
+    public killedBrothers: boolean[] = Array(Barrows.Brother.values().length).fill(false);
     private currentBrother: NPC;
     private preserveUnlocked: boolean;
     private rigourUnlocked: boolean;
@@ -124,19 +198,19 @@ export class Player extends Mobile {
     private targetTeleportUnlocked: boolean;
     // Banking
     private currentBankTab: number;
-    private banks: Bank[] = Array(Bank.TOTAL_BANK_TABS).fill(null); // last index is for bank searches
+    public banks: Bank[] = Array(Bank.TOTAL_BANK_TABS).fill(null); // last index is for bank searches
     private noteWithdrawal: boolean;
     private insertMode: boolean;
     private searchingBank: boolean;
     private searchSyntax = "";
     private placeholders = true;
     private infiniteHealth: boolean;
-    private fightType: FightType = FightType.UNARMED_KICK;
-    private weapon: WeaponInterface;
+    private fightType = FightType.UNARMED_KICK;
+    private weapon: WeaponInterfaces;
     private autoRetaliate = true;
 
     // GWD
-    private godwarsKillcount: number[] = Array(God.values().length).fill(0);
+    public godwarsKillcount: number[] = Array(God.values().length).fill(0);
 
     // Rights
     private rights = PlayerRights.NONE;
@@ -178,7 +252,7 @@ export class Player extends Mobile {
         this.setWildernessLevel(0);
         this.setRecoilDamage(0);
         this.setSkullTimer(0);
-        this.setSkullType(SkullType.WHITE_SKULL);
+        this.setSkullType(SkullTypes.WHITE_SKULL);
         WeaponInterfaces.assign(this);
         BonusManager.update(this);
         PrayerHandler.deactivatePrayers(this);
@@ -189,8 +263,8 @@ export class Player extends Mobile {
         this.setRunEnergy(100);
         this.getPacketSender().sendRunEnergy();
         this.getMovementQueue().setBlockMovement(false).reset();
-        this.getPacketSender().sendEffectTimer(0, EffectTimer.ANTIFIRE).sendEffectTimer(0, EffectTimer.FREEZE)
-            .sendEffectTimer(0, EffectTimer.VENGEANCE).sendEffectTimer(0, EffectTimer.TELE_BLOCK);
+        this.getPacketSender().sendEffectTimer(0, EffectTimers.ANTIFIRE).sendEffectTimer(0, EffectTimers.FREEZE)
+            .sendEffectTimer(0, EffectTimers.VENGEANCE).sendEffectTimer(0, EffectTimers.TELE_BLOCK);
         this.getPacketSender().sendPoisonType(0);
         this.getPacketSender().sendSpecialAttackState(false);
         this.setUntargetable(false);
@@ -214,7 +288,7 @@ export class Player extends Mobile {
     }
 
     public getHitpoints(): number {
-        return this.getSkillManager().getCurrentLevel(Skill.HITPOINTS);
+        return this.getSkillManager().getCurrentLevel(Skills.HITPOINTS);
     }
 
 
@@ -229,7 +303,7 @@ export class Player extends Mobile {
     public getBlockAnim(): number {
         let shield = this.getEquipment().getItems()[Equipment.SHIELD_SLOT];
         let weapon = this.getEquipment().getItems()[Equipment.WEAPON_SLOT];
-        let definition = shield.getId() > 0 ? shield.getDefinition() : weapon.getDefinition();
+        let definition: ItemDefinition = shield.getId() > 0 ? shield.getDefinition() : weapon.getDefinition();
         return definition.getBlockAnim();
     }
 
@@ -239,39 +313,39 @@ export class Player extends Mobile {
         }
 
         if (this.infiniteHealth) {
-            if (this.getSkillManager().getCurrentLevel(Skill.HITPOINTS) > hitpoints) {
+            if (this.getSkillManager().getCurrentLevel(Skills.HITPOINTS) > hitpoints) {
                 return this;
             }
         }
 
-        this.getSkillManager().setCurrentLevel(Skill.HITPOINTS, hitpoints);
-        this.getPacketSender().sendSkill(Skill.HITPOINTS);
+        this.getSkillManager().setCurrentLevel(Skills.HITPOINTS, hitpoints);
+        this.getPacketSender().sendSkill(Skills.HITPOINTS);
         if (this.getHitpoints() <= 0 && !this.isDying)
             this.appendDeath();
         return this;
     }
     public heal(amount: number) {
-        let level = this.getSkillManager().getMaxLevel(Skill.HITPOINTS);
-        if ((this.getSkillManager().getCurrentLevel(Skill.HITPOINTS) + amount) >= level) {
+        let level = this.getSkillManager().getMaxLevel(Skills.HITPOINTS);
+        if ((this.getSkillManager().getCurrentLevel(Skills.HITPOINTS) + amount) >= level) {
             this.setHitpoints(level);
         } else {
-            this.setHitpoints(this.getSkillManager().getCurrentLevel(Skill.HITPOINTS) + amount);
+            this.setHitpoints(this.getSkillManager().getCurrentLevel(Skills.HITPOINTS) + amount);
         }
     }
 
 
     public getBaseAttack(type: CombatType): number {
         if (type == CombatType.RANGED)
-            return this.getSkillManager().getCurrentLevel(Skill.RANGED);
+            return this.getSkillManager().getCurrentLevel(Skills.RANGED);
         else if (type == CombatType.MAGIC)
-            return this.getSkillManager().getCurrentLevel(Skill.MAGIC);
-        return this.getSkillManager().getCurrentLevel(Skill.ATTACK);
+            return this.getSkillManager().getCurrentLevel(Skills.MAGIC);
+        return this.getSkillManager().getCurrentLevel(Skills.ATTACK);
     }
 
     public getBaseDefence(type: CombatType): number {
         if (type == CombatType.MAGIC)
-            return this.getSkillManager().getCurrentLevel(Skill.MAGIC);
-        return this.getSkillManager().getCurrentLevel(Skill.DEFENCE);
+            return this.getSkillManager().getCurrentLevel(Skills.MAGIC);
+        return this.getSkillManager().getCurrentLevel(Skills.DEFENCE);
     }
 
     public getBaseAttackSpeed(): number {
@@ -293,7 +367,6 @@ export class Player extends Mobile {
         return true;
     }
 
-    @Override
     public equals(o: Object): boolean {
         if (!(o instanceof Player)) {
             return false;
@@ -302,7 +375,6 @@ export class Player extends Mobile {
         return p.getUsername() == this.username;
     }
 
-    @Override
     public size(): number {
         return 1;
     }
@@ -348,7 +420,7 @@ export class Player extends Mobile {
 
         // Send queued chat messages
         if (!this.getChatMessageQueue().isEmpty()) {
-            this.setCurrentChatMessage(this.getChatMessageQueue().poll());
+            this.setCurrentChatMessage(this.getChatMessageQueue().shift());
             this.getUpdateFlag().flag(Flag.CHAT);
         } else {
             this.setCurrentChatMessage(null);
@@ -356,7 +428,7 @@ export class Player extends Mobile {
 
         // Increase run energy
         if (this.runEnergy < 100 && (!this.getMovementQueue().isMoving() || !this.isRunning)) {
-            if (this.lastRunRecovery.elapsed(MovementQueue.runEnergyRestoreDelay(this))) {
+            if (this.lastRunRecovery.elapsedTime(MovementQueue.runEnergyRestoreDelay(this))) {
                 this.runEnergy++;
                 this.getPacketSender().sendRunEnergy();
                 this.lastRunRecovery.reset();
@@ -366,1169 +438,1193 @@ export class Player extends Mobile {
         if (this instanceof PlayerBot) {
             (this as PlayerBot).getMovementInteraction().process();
         }
-    }
-    // Decrease boosted stats Increase lowered stats
-    if(getHitpoints() > 0) {
-    if (increaseStats.finished() || decreaseStats.secondsElapsed() >= (PrayerHandler.isActivated(this, PrayerHandler.PRESERVE) ? 72 : 60)) {
-        for (let skill of Object.values(Skill)) {
-            let current = this.getSkillManager().getCurrentLevel(skill);
-            let max = this.getSkillManager().getMaxLevel(skill);
+        // Decrease boosted stats Increase lowered stats
+        if (this.getHitpoints() > 0) {
+            if (this.increaseStats.finished() || this.decreaseStats.secondsElapsed() >= (PrayerHandler.isActivated(this, PrayerHandler.PRESERVE) ? 72 : 60)) {
+                for (let skill of Object.values(Skill)) {
+                    let current = this.getSkillManager().getCurrentLevel(skill);
+                    let max = this.getSkillManager().getMaxLevel(skill);
 
-            // Should lowered stats be increased?
-            if (current < max) {
-                if (increaseStats.finished()) {
-                    let restoreRate = 1;
+                    // Should lowered stats be increased?
+                    if (current < max) {
+                        if (this.increaseStats.finished()) {
+                            let restoreRate = 1;
 
-                    // Rapid restore effect - 2x restore rate for all stats except hp/prayer
-                    // Rapid heal - 2x restore rate for hitpoints
-                    if (skill != Skill.HITPOINTS && skill != Skill.PRAYER) {
-                        if (PrayerHandler.isActivated(this, PrayerHandler.RAPID_RESTORE)) {
-                            restoreRate = 2;
+                            // Rapid restore effect - 2x restore rate for all stats except hp/prayer
+                            // Rapid heal - 2x restore rate for hitpoints
+                            if (skill != Skills.HITPOINTS && skill != Skills.PRAYER) {
+                                if (PrayerHandler.isActivated(this, PrayerHandler.RAPID_RESTORE)) {
+                                    restoreRate = 2;
+                                }
+                            } else if (skill == Skills.HITPOINTS) {
+                                if (PrayerHandler.isActivated(this, PrayerHandler.RAPID_HEAL)) {
+                                    restoreRate = 2;
+                                }
+                            }
+
+                            this.getSkillManager().increaseCurrentLevel(skill, restoreRate, max);
                         }
-                    } else if (skill == Skill.HITPOINTS) {
-                        if (PrayerHandler.isActivated(this, PrayerHandler.RAPID_HEAL)) {
-                            restoreRate = 2;
+                    } else if (current > max) {
+
+                        // Should boosted stats be decreased?
+                        if (this.decreaseStats.secondsElapsed() >= (PrayerHandler.isActivated(this, PrayerHandler.PRESERVE) ? 72 : 60)) {
+
+                            // Never decrease Hitpoints / Prayer
+                            if (skill != Skills.HITPOINTS && skill != Skills.PRAYER) {
+                                this.getSkillManager().decreaseCurrentLevel(skill, 1, 1);
+                            }
+
                         }
                     }
-
-                    this.getSkillManager().increaseCurrentLevel(skill, restoreRate, max);
                 }
-            } else if (current > max) {
-
-                // Should boosted stats be decreased?
-                if (decreaseStats.secondsElapsed() >= (PrayerHandler.isActivated(this, PrayerHandler.PRESERVE) ? 72 : 60)) {
-
-                    // Never decrease Hitpoints / Prayer
-                    if (skill != Skill.HITPOINTS && skill != Skill.PRAYER) {
-                        this.getSkillManager().decreaseCurrentLevel(skill, 1, 1);
-                    }
-
+                // Reset timers
+                if (this.increaseStats.finished()) {
+                    this.increaseStats.start(60);
+                }
+                if (this.decreaseStats
+                    .secondsElapsed() >= (PrayerHandler.isActivated(this, PrayerHandler.PRESERVE) ? 72 : 60)) {
+                    this.decreaseStats.start((PrayerHandler.isActivated(this, PrayerHandler.PRESERVE) ? 72 : 60));
                 }
             }
         }
-        // Reset timers
-        if (increaseStats.finished()) {
-            increaseStats.start(60);
+    }
+
+    // Construction
+    /*
+     
+    public loadingHouse: boolean; public portalSelected: number; public inBuildingMode: boolean; public toConsCoords: number[]; public buildFurnitureId: number; public buildFurnitureX: number; public buildFurnitureY: number; public houseRooms: Room[][][] = new Array(5).fill(new Array(13).fill(new Array(13).fill(new Room()))); public playerFurniture: PlayerFurniture[] = []; public portals: Portal[] = [];
+    */
+    /**
+     
+    Can the player logout?
+    @returns Yes if they can logout, false otherwise.
+    */
+    canLogout(): boolean {
+        if (CombatFactory.isBeingAttacked(this)) {
+            this.getPacketSender().sendMessage("You must wait a few seconds after being out of combat before doing this.");
+            return false;
         }
-        if (decreaseStats
-            .secondsElapsed() >= (PrayerHandler.isActivated(this, PrayerHandler.PRESERVE) ? 72 : 60)) {
-            decreaseStats.start((PrayerHandler.isActivated(this, PrayerHandler.PRESERVE) ? 72 : 60));
+        if (this.busy()) {
+            this.getPacketSender().sendMessage("You cannot log out at the moment.");
+            return false;
+        }
+        return true;
+    }
+    /**
+     
+    Requests a logout by sending the logout packet to the client. This leads to
+    the connection being closed. The {@link ChannelEventHandler} will then add
+    the player to the remove characters queue.
+    */
+    requestLogout() {
+        this.getPacketSender().sendLogout();
+    }
+
+    onLogout() {
+        // Notify us
+        console.log("[World] Deregistering player - [username, host] : [" + this.getUsername() + ", " + this.getHostAddress() + "]");
+
+        this.getPacketSender().sendInterfaceRemoval();
+
+        // Leave area
+        if (this.getArea() != null) {
+            this.getArea().leave(this, true);
+        }
+
+        // Do stuff...
+        Barrows.brotherDespawn(this);
+        PetHandler.pickup(this, this.getCurrentPet());
+        this.getRelations().updateLists(false);
+        BountyHunter.unassign(this);
+        ClanChatManager.leave(this, false);
+        TaskManager.cancelTasks(this);
+        GameConstants.PLAYER_PERSISTENCE.save(this);
+
+        if (this.getSession() != null && this.getSession().getChannel().isOpen()) {
+            this.getSession().getChannel().close();
         }
     }
-}
 
-// Construction
-/*
- 
-public loadingHouse: boolean; public portalSelected: number; public inBuildingMode: boolean; public toConsCoords: number[]; public buildFurnitureId: number; public buildFurnitureX: number; public buildFurnitureY: number; public houseRooms: Room[][][] = new Array(5).fill(new Array(13).fill(new Array(13).fill(new Room()))); public playerFurniture: PlayerFurniture[] = []; public portals: Portal[] = [];
-*/
-/**
- 
-Can the player logout?
-@returns Yes if they can logout, false otherwise.
-*/
-canLogout(): boolean; {
-    if (CombatFactory.isBeingAttacked(this)) {
-        this.getPacketSender().sendMessage("You must wait a few seconds after being out of combat before doing this.");
-        return false;
-    }
-    if (this.busy()) {
-        this.getPacketSender().sendMessage("You cannot log out at the moment.");
-        return false;
-    }
-    return true;
-}
-/**
- 
-Requests a logout by sending the logout packet to the client. This leads to
-the connection being closed. The {@link ChannelEventHandler} will then add
-the player to the remove characters queue.
-*/
-requestLogout(); {
-    this.getPacketSender().sendLogout();
-}
+    /**
+     
+    Called by the world's login queue!
+    */
+    public onLogin() {
+        // Attempt to register the player..
+        console.log("[World] Registering player - [username, host] : [" + this.getUsername() + ", " + this.getHostAddress() + "]");
 
-onLogout(); {
-    // Notify us
-    console.log("[World] Deregistering player - [username, host] : [" + this.getUsername() + ", " + this.getHostAddress() + "]");
+        this.setNeedsPlacement(true);
+        this.getPacketSender().sendMapRegion().sendDetails(); // Map region, player index and player rights
+        this.getPacketSender().sendTabs(); // Client sideicons
+        this.getPacketSender().sendMessage("Welcome to " + GameConstants.NAME + ".");
+        if (this.isDiscordLogin()) {
+            this.getPacketSender().sendMessage(":discordtoken:" + this.getCachedDiscordAccessToken());
+        }
 
-    this.getPacketSender().sendInterfaceRemoval();
+        let totalExp = 0;
+        let skill: Skill;
+        for (skill of Skill.values()) {
+            this.getSkillManager().updateSkill(skill);
+            totalExp += this.getSkillManager().getExperience(skill);
+        }
+        this.getPacketSender().sendTotalExp(totalExp);
 
-    // Leave area
-    if (this.getArea() != null) {
-        this.getArea().leave(this, true);
-    }
+        // Send friends and ignored players lists...
+        this.getRelations().setPrivateMessageId(1).onLogin(this).updateLists(true);
 
-    // Do stuff...
-    Barrows.brotherDespawn(this);
-    PetHandler.pickup(this, this.getCurrentPet());
-    this.getRelations().updateLists(false);
-    BountyHunter.unassign(this);
-    ClanChatManager.leave(this, false);
-    TaskManager.cancelTasks(this);
-    PLAYER_PERSISTENCE.save(this);
+        // Reset prayer configs...
+        PrayerHandler.resetAll(this);
+        this.getPacketSender().sendConfig(709, PrayerHandler.canUse(this, PrayerData.PRESERVE, false) ? 1 : 0);
+        this.getPacketSender().sendConfig(711, PrayerHandler.canUse(this, PrayerData.RIGOUR, false) ? 1 : 0);
+        this.getPacketSender().sendConfig(713, PrayerHandler.canUse(this, PrayerData.AUGURY, false) ? 1 : 0);
 
-    if (this.getSession() != null && this.getSession().getChannel().isOpen()) {
-        this.getSession().getChannel().close();
-    }
-}
+        // Refresh item containers..
+        this.getInventory().refreshItems();
+        this.getEquipment().refreshItems();
 
-/**
- 
-Called by the world's login queue!
-*/
-public onLogin(); {
-    // Attempt to register the player..
-    console.log("[World] Registering player - [username, host] : [" + this.getUsername() + ", " + this.getHostAddress() + "]");
+        // Interaction options on right click...
+        this.getPacketSender().sendInteractionOption("Follow", 3, false);
+        this.getPacketSender().sendInteractionOption("Trade With", 4, false);
 
-    this.setNeedsPlacement(true);
-    this.getPacketSender().sendMapRegion().sendDetails(); // Map region, player index and player rights
-    this.getPacketSender().sendTabs(); // Client sideicons
-    this.getPacketSender().sendMessage("Welcome to " + GameConstants.NAME + ".");
-    if (this.isDiscordLogin()) {
-        this.getPacketSender().sendMessage(":discordtoken:" + this.getCachedDiscordAccessToken());
-    }
+        // Sending run energy attributes...
+        this.getPacketSender().sendRunStatus();
+        this.getPacketSender().sendRunEnergy();
 
-    let totalExp = 0;
-    for (let skill of Skill.values()) {
-        this.getSkillManager().updateSkill(skill);
-        totalExp += this.getSkillManager().getExperience(skill);
-    }
-    this.getPacketSender().sendTotalExp(totalExp);
+        // Sending player's rights..
+        this.getPacketSender().sendRights();
 
-    // Send friends and ignored players lists...
-    this.getRelations().setPrivateMessageId(1).onLogin(this).updateLists(true);
+        // Close all interfaces, just in case...
+        this.getPacketSender().sendInterfaceRemoval();
 
-    // Reset prayer configs...
-    PrayerHandler.resetAll(this);
-    this.getPacketSender().sendConfig(709, PrayerHandler.canUse(this, PrayerData.PRESERVE, false) ? 1 : 0);
-    this.getPacketSender().sendConfig(711, PrayerHandler.canUse(this, PrayerData.RIGOUR, false) ? 1 : 0);
-    this.getPacketSender().sendConfig(713, PrayerHandler.canUse(this, PrayerData.AUGURY, false) ? 1 : 0);
+        // Update weapon data and interfaces..
+        WeaponInterfaces.assign(this);
+        // Update weapon interface configs
+        this.getPacketSender().sendConfig(this.getFightType().getParentId(), this.getFightType().getChildId())
+            .sendConfig(172, this.autoRetaliateReturn() ? 1 : 0).updateSpecialAttackOrb();
 
-    // Refresh item containers..
-    this.getInventory().refreshItems();
-    this.getEquipment().refreshItems();
+        // Reset autocasting
+        Autocasting.setAutocast(this, null);
 
-    // Interaction options on right click...
-    this.getPacketSender().sendInteractionOption("Follow", 3, false);
-    this.getPacketSender().sendInteractionOption("Trade With", 4, false);
+        // Send pvp stats..
+        this.getPacketSender().sendString(52029, "@or1@Killstreak: " + this.getKillstreak())
+            .sendString(52030, "@or1@Kills: " + this.getTotalKills()).sendString(52031, "@or1@Deaths: " + this.getDeaths())
+            .sendString(52033, "@or1@K/D Ratio: " + this.getKillDeathRatio())
+            .sendString(52034, "@or1@Donated: " + this.getAmountDonated());
 
-    // Sending run energy attributes...
-    this.getPacketSender().sendRunStatus();
-    this.getPacketSender().sendRunEnergy();
+        // Join clanchat
+        ClanChatManager.onLogin(this);
 
-    // Sending player's rights..
-    this.getPacketSender().sendRights();
+        // Handle timers and run tasks
+        if (this.isPoisoned()) {
+            this.getPacketSender().sendPoisonType(1);
+            TaskManager.submit(new CombatPoisonEffect(this));
+        }
+        if (this.getSpecialPercentage() < 100) {
+            TaskManager.submit(new RestoreSpecialAttackTask(this));
+        }
 
-    // Close all interfaces, just in case...
-    this.getPacketSender().sendInterfaceRemoval();
+        if (!this.getVengeanceTimer().finished()) {
+            this.getPacketSender().sendEffectTimer(this.getVengeanceTimer().secondsRemaining(), EffectTimers.VENGEANCE);
+        }
+        if (!this.getCombat().getFireImmunityTimer().finished()) {
+            this.getPacketSender().sendEffectTimer(this.getCombat().getFireImmunityTimer().secondsRemaining(),
+                EffectTimers.ANTIFIRE);
+        }
+        if (!this.getCombat().getTeleBlockTimer().finished()) {
+            this.getPacketSender().sendEffectTimer(this.getCombat().getTeleBlockTimer().secondsRemaining(),
+                EffectTimers.TELE_BLOCK);
+        }
 
-    // Update weapon data and interfaces..
-    WeaponInterfaces.assign(this);
-    // Update weapon interface configs
-    this.getPacketSender().sendConfig(this.getFightType().getParentId(), this.getFightType().getChildId())
-        .sendConfig(172, this.autoRetaliate() ? 1 : 0).updateSpecialAttackOrb();
+        this.decreaseStats.start(60);
+        this.increaseStats.start(60);
 
-    // Reset autocasting
-    Autocasting.setAutocast(this, null);
+        this.getUpdateFlag().flag(Flag.APPEARANCE);
 
-    // Send pvp stats..
-    this.getPacketSender().sendString(52029, "@or1@Killstreak: " + this.getKillstreak())
-        .sendString(52030, "@or1@Kills: " + this.getTotalKills()).sendString(52031, "@or1@Deaths: " + this.getDeaths())
-        .sendString(52033, "@or1@K/D Ratio: " + this.getKillDeathRatio())
-        .sendString(52034, "@or1@Donated: " + this.getAmountDonated());
+        if (this.newPlayer) {
+            let presetIndex = Misc.randomInclusive(0, Presetables.GLOBAL_PRESETS.length - 1);
+            Presetables.load(this, Presetables.GLOBAL_PRESETS[presetIndex]);
+        }
 
-    // Join clanchat
-    ClanChatManager.onLogin(this);
+        if (!(this instanceof PlayerBot)) {
+            let definition: PlayerBotDefinition
+            // Spawn player bots when a real player logs in
+            for (definition of GameConstants.PLAYER_BOTS) {
+                if (World.getPlayerBots().has(definition.getUsername())) {
+                    continue;
+                }
 
-    // Handle timers and run tasks
-    if (this.isPoisoned()) {
-        this.getPacketSender().sendPoisonType(1);
-        TaskManager.submit(new CombatPoisonEffect(this));
-    }
-    if (this.getSpecialPercentage() < 100) {
-        TaskManager.submit(new RestoreSpecialAttackTask(this));
-    }
+                let playerBot = new PlayerBot(definition);
 
-    if (!this.getVengeanceTimer().finished()) {
-        this.getPacketSender().sendEffectTimer(this.getVengeanceTimer().secondsRemaining(), EffectTimer.VENGEANCE);
-    }
-    if (!this.getCombat().getFireImmunityTimer().finished()) {
-        this.getPacketSender().sendEffectTimer(this.getCombat().getFireImmunityTimer().secondsRemaining(),
-            EffectTimer.ANTIFIRE);
-    }
-    if (!this.getCombat().getTeleBlockTimer().finished()) {
-        this.getPacketSender().sendEffectTimer(this.getCombat().getTeleBlockTimer().secondsRemaining(),
-            EffectTimer.TELE_BLOCK);
-    }
-
-    this.decreaseStats.start(60);
-    this.increaseStats.start(60);
-
-    this.getUpdateFlag().flag(Flag.APPEARANCE);
-
-    if (this.newPlayer) {
-        let presetIndex = Misc.randomInclusive(0, Presetables.GLOBAL_PRESETS.length - 1);
-        Presetables.load(this, Presetables.GLOBAL_PRESETS[presetIndex]);
-    }
-
-    if (!(this instanceof PlayerBot)) {
-        // Spawn player bots when a real player logs in
-        for (let definition of GameConstants.PLAYER_BOTS) {
-            if (World.getPlayerBots().has(definition.getUsername())) {
-                continue;
+                World.getPlayerBots().set(definition.getUsername(), playerBot);
             }
 
-            let playerBot = new PlayerBot(definition);
-
-            World.getPlayerBots().set(definition.getUsername(), playerBot);
+            console.log(`${GameConstants.PLAYER_BOTS.length} player bots now online.`);
         }
-
-        console.log(`${GameConstants.PLAYER_BOTS.length} player bots now online.`);
     }
-}
 
 
-busy(): boolean {
-    if (this.interfaceId > 0) {
-        return true;
+    busy(): boolean {
+        if (this.interfaceId > 0) {
+            return true;
+        }
+        if (this.getHitpoints() <= 0) {
+            return true;
+        }
+        if (this.isNeedsPlacement() || this.isTeleportingReturn()) {
+            return true;
+        }
+        if (this.status != PlayerStatus.NONE) {
+            return true;
+        }
+        if (this.forceMovement != null) {
+            return true;
+        }
+        return false;
     }
-    if (this.hitpoints <= 0) {
-        return true;
+
+    isStaff(): boolean {
+        return this.rights !== PlayerRights.NONE;
     }
-    if (this.needsPlacement || this.teleporting) {
-        return true;
+
+    isDonator(): boolean {
+        return (this.donatorRights != DonatorRights.NONE);
     }
-    if (this.status != PlayerStatus.NONE) {
-        return true;
+
+
+    isPacketsBlocked(): boolean {
+        return this.packetsBlocked;
     }
-    if (this.forceMovement != null) {
-        return true;
+
+    setPacketsBlocked(blocked: boolean) {
+        this.packetsBlocked = blocked;
     }
-    return false;
-}
+    /*
+         * Getters/Setters
+         */
+    public static Data = new Date();
 
-isStaff(): boolean {
-    return this.rights !== PlayerRights.NONE;
-}
-
-isDonator(): boolean {
-    return (this.donatorRights != DonatorRights.NONE);
-}
-
-let packetsBlocked: boolean;
-
-isPacketsBlocked(): boolean  {
-    return this.packetsBlocked;
-}
-
-setPacketsBlocked(blocked: boolean); {
-    this.packetsBlocked = blocked;
-}
-/*
-     * Getters/Setters
-     */
-
-public getCreationDate(): Timestamp {
-    return this.creationDate;
-}
-
-public setCreationDate(timestamp: Timestamp) {
-    this.creationDate = timestamp;
-}
-
-public getSession(): PlayerSession {
-    return this.session;
-}
-
-public getUsername(): string {
-    return this.username;
-}
-
-export setUsername(username: string): Player; {
-    this.username = username;
-    return this;
-}
-
-public getLongUsername(): Long {
-    return this.longUsername;
-}
-
-public setLongUsername(longUsername: Long): Player {
-    this.longUsername = longUsername;
-    return this;
-}
-
-public getPasswordHashWithSalt(): string {
-    return this.passwordHashWithSalt;
-}
-
-public setPasswordHashWithSalt(passwordHashWithSalt: string): Player {
-    this.passwordHashWithSalt = passwordHashWithSalt;
-    return this;
-}
-getHostAddress(): string {
-    return this.hostAddress;
-}
-
-setHostAddress(hostAddress: string): this {
-    this.hostAddress = hostAddress;
-    return this;
-}
-
-getRights(): PlayerRights {
-    return this.rights;
-}
-
-setRights(rights: PlayerRights): this {
-    this.rights = rights;
-    return this;
-}
-
-getPacketSender(): PacketSender {
-    return this.packetSender;
-}
-
-getSkillManager(): SkillManager {
-    return this.skillManager;
-}
-
-getAppearance(): Appearance {
-    return this.appearance;
-}
-
-getForcedLogoutTimer(): SecondsTimer {
-    return this.forcedLogoutTimer;
-}
-
-isDying(): boolean {
-    return this.isDying;
-}
-
-getLocalPlayers(): List < Player > {
-    return this.localPlayers,
-}
-
-getLocalNpcs(): List < NPC > {
-    return this.localNpcs;
-}
-getInterfaceId(): number {
-    return this.interfaceId;
-}
-
-setInterfaceId(interfaceId: number): this {
-    this.interfaceId = interfaceId;
-    return this;
-}
-
-experienceLocked(): boolean {
-    return this.experienceLocked;
-}
-
-setExperienceLocked(experienceLocked: boolean) {
-    this.experienceLocked = experienceLocked;
-}
-
-getRelations(): PlayerRelations {
-    return this.relations;
-}
-
-isAllowRegionChangePacket(): boolean {
-    return this.allowRegionChangePacket;
-}
-
-setAllowRegionChangePacket(allowRegionChangePacket: boolean): void {
-    this.allowRegionChangePacket = allowRegionChangePacket;
-}
-
-getWalkableInterfaceId(): number {
-    return this.walkableInterfaceId;
-}
-
-setWalkableInterfaceId(interfaceId: number) {
-    this.walkableInterfaceId = interfaceId;
-}
-
-isRunning(): boolean {
-    return this.isRunning;
-}
-
-setRunning(isRunning: boolean): this {
-    this.isRunning = isRunning;
-    return this;
-}
-
-getPlayerInteractingOption(): PlayerInteractingOption {
-    return this.playerInteractingOption;
-}
-
-function setPlayerInteractingOption(playerInteractingOption: PlayerInteractingOption): Player {
-    this.playerInteractingOption = playerInteractingOption;
-    return this;
-}
-
-function getFrameUpdater(): FrameUpdater {
-    return this.frameUpdater;
-}
-
-function getBonusManager(): BonusManager {
-    return this.bonusManager;
-}
-
-function getMultiIcon(): number {
-    return this.multiIcon;
-}
-
-function setMultiIcon(multiIcon: number): Player {
-    this.multiIcon = multiIcon;
-    return this;
-}
-
-function getInventory(): Inventory {
-    return this.inventory;
-}
-
-function getEquipment(): Equipment {
-    return this.equipment;
-}
-
-function getForceMovement(): ForceMovement {
-    return this.forceMovement;
-}
-
-function setForceMovement(forceMovement: ForceMovement): Player {
-    this.forceMovement = forceMovement;
-    if (this.forceMovement != null) {
-        this.getUpdateFlag().flag(Flag.FORCED_MOVEMENT);
+    public getCreationDate(): Date {
+        return this.creationDate;
     }
-    return this;
-}
 
-function getSkillAnimation(): number {
-    return this.skillAnimation;
-}
-
-function setSkillAnimation(animation: number): Player {
-    this.skillAnimation = animation;
-    return this;
-}
-
-function getRunEnergy(): number {
-    return this.runEnergy;
-}
-
-function setRunEnergy(runEnergy: number) {
-    this.runEnergy = runEnergy;
-}
-
-function isDrainingPrayer(): boolean {
-    return this.drainingPrayer;
-}
-
-function setDrainingPrayer(drainingPrayer: boolean) {
-    this.drainingPrayer = drainingPrayer;
-}
-
-function getPrayerPointDrain(): number {
-    return this.prayerPointDrain;
-}
-
-function setPrayerPointDrain(prayerPointDrain: number) {
-    this.prayerPointDrain = prayerPointDrain;
-}
-
-function getLastItemPickup(): Stopwatch {
-    return this.lastItemPickup;
-}
-
-public static function getCombatSpecial(): CombatSpecial {
-    return this.combatSpecial;
-}
-
-function setCombatSpecial(combatSpecial: CombatSpecial) {
-    this.combatSpecial = combatSpecial;
-}
-
-function getRecoilDamage(): number {
-    return this.recoilDamage;
-}
-
-function setRecoilDamage(recoilDamage: number) {
-    this.recoilDamage = recoilDamage;
-}
-
-function getSpellbook(): MagicSpellbook {
-    return this.spellbook;
-}
-
-function setSpellbook(spellbook: MagicSpellbook) {
-    this.spellbook = spellbook;
-}
-
-function getVengeanceTimer(): SecondsTimer {
-    return this.vengeTimer;
-}
-
-function getWildernessLevel(): number {
-    return this.wildernessLevel;
-}
-
-function setWildernessLevel(wildernessLevel: number) {
-    this.wildernessLevel = wildernessLevel;
-}
-
-public isSpawnedBarrows(): boolean {
-    return this.spawnedBarrows;
-}
-
-public setSpawnedBarrows(spawnedBarrows: boolean) {
-    this.spawnedBarrows = spawnedBarrows;
-}
-
-public getDestroyItem(): number {
-    return this.destroyItem;
-}
-
-public setDestroyItem(destroyItem: number) {
-    this.destroyItem = destroyItem;
-}
-
-public isSkulled(): boolean {
-    return this.skullTimer > 0;
-}
-
-public getAndDecrementSkullTimer(): number {
-    return this.skullTimer--;
-}
-
-public getSkullTimer(): number {
-    return this.skullTimer;
-}
-
-public setSkullTimer(skullTimer: number): void {
-    this.skullTimer = skullTimer;
-}
-
-public getPoints(): number {
-    return this.points;
-}
-
-public setPoints(points: number): void {
-    this.points = points;
-}
-
-public incrementPoints(points: number): void {
-    this.points += points;
-}
-
-public isUpdateInventory(): boolean {
-    return this.updateInventory;
-}
-
-public setUpdateInventory(updateInventory: boolean): void {
-    this.updateInventory = updateInventory;
-}
-
-public getClickDelay(): Stopwatch {
-    return this.clickDelay;
-}
-
-public getShop(): Shop {
-    return this.shop;
-}
-
-public setShop(shop: Shop): Player {
-    this.shop = shop;
-    return this;
-}
-
-public getStatus(): PlayerStatus {
-    return this.status;
-}
-
-public setStatus(status: PlayerStatus): Player {
-    this.status = status;
-    return this;
-}
-
-public getCurrentBankTab(): number {
-    return this.currentBankTab;
-}
-
-public setCurrentBankTab(tab: number): Player {
-    this.currentBankTab = tab;
-    return this;
-}
-
-public setNoteWithdrawal(noteWithdrawal: boolean): void {
-    this.noteWithdrawal = noteWithdrawal;
-}
-
-public withdrawAsNote(): boolean {
-    return this.noteWithdrawal;
-}
-
-public setInsertMode(insertMode: boolean): void {
-    this.insertMode = insertMode;
-}
-
-public insertMode(): boolean {
-    return this.insertMode;
-}
-
-public getBanks(): Bank[] {
-    return this.banks;
-}
-
-public getBank(index: number): Bank {
-    if (this.banks[index] == null) {
-        this.banks[index] = new Bank(this);
+    public setCreationDate(timestamp: Date) {
+        this.creationDate = timestamp;
     }
-    return this.banks[index];
-}
 
-public setBank(index: number, bank: Bank): Player {
-    this.banks[index] = bank;
-    return this;
-}
-
-public isNewPlayer(): boolean {
-    return this.newPlayer;
-}
-
-public setNewPlayer(newPlayer: boolean): void {
-    this.newPlayer = newPlayer;
-}
-
-public isSearchingBank(): boolean {
-    return this.searchingBank;
-}
-
-public setSearchingBank(searchingBank: boolean): void {
-    this.searchingBank = searchingBank;
-}
-
-public getSearchSyntax(): string {
-    return this.searchSyntax;
-}
-
-public setSearchSyntax(searchSyntax: string): void {
-    this.searchSyntax = searchSyntax;
-}
-
-public getPreserveUnlocked(): boolean {
-    return this.preserveUnlocked;
-}
-
-public setPreserveUnlocked(preserveUnlocked: boolean): void {
-    this.preserveUnlocked = preserveUnlocked;
-}
-
-public getRigourUnlocked(): boolean {
-    return this.rigourUnlocked;
-}
-
-public setRigourUnlocked(rigourUnlocked: boolean): void {
-    this.rigourUnlocked = rigourUnlocked;
-}
-
-public getAuguryUnlocked(): boolean {
-    return this.auguryUnlocked;
-}
-
-public setAuguryUnlocked(auguryUnlocked: boolean): void {
-    this.auguryUnlocked = auguryUnlocked;
-}
-
-public getPriceChecker(): PriceChecker {
-    return this.priceChecker;
-}
-
-public getCurrentClanChat(): ClanChat {
-    return this.currentClanChat;
-}
-
-public setCurrentClanChat(currentClanChat: ClanChat): void {
-    this.currentClanChat = currentClanChat;
-}
-
-public getClanChatName(): string {
-    return this.clanChatName;
-}
-
-public setClanChatName(clanChatName: string): void {
-    this.clanChatName = clanChatName;
-}
-
-public getTrading(): Trading {
-    return this.trading;
-}
-
-public getQuickPrayers(): QuickPrayers {
-    return this.quickPrayers;
-}
-
-public getTargetTeleportUnlocked(): boolean {
-    return this.targetTeleportUnlocked;
-}
-
-public setTargetTeleportUnlocked(targetTeleportUnlocked: boolean): void {
-    this.targetTeleportUnlocked = targetTeleportUnlocked;
-}
-
-public getYellDelay(): SecondsTimer {
-    return this.yellDelay;
-}
-
-public getAmountDonated(): number {
-    return this.amountDonated;
-}
-
-public setAmountDonated(amountDonated: number): void {
-    this.amountDonated = amountDonated;
-}
-
-public incrementAmountDonated(amountDonated: number): void {
-    this.amountDonated += amountDonated;
-}
-
-public incrementTargetKills(): void {
-    this.targetKills++;
-}
-
-public getTargetKills(): number {
-    return this.targetKills;
-}
-
-public setTargetKills(targetKills: number): void {
-    this.targetKills = targetKills;
-}
-
-public incrementKills(): void {
-    this.normalKills++;
-}
-
-public getNormalKills(): number {
-    return this.normalKills;
-}
-
-public setNormalKills(normalKills: number): void {
-    this.normalKills = normalKills;
-}
-
-public getTotalKills(): number {
-    return this.totalKills;
-}
-
-public setTotalKills(totalKills: number): void {
-    this.totalKills = totalKills;
-}
-
-public incrementTotalKills(): void {
-    this.totalKills++;
-}
-
-public incrementDeaths(): void {
-    this.deaths++;
-}
-
-public getDeaths(): number {
-    return this.deaths;
-}
-
-public setDeaths(deaths: number): void {
-    this.deaths = deaths;
-}
-
-public resetSafingTimer(): void {
-    this.setSafeTimer(180);
-}
-
-public getHighestKillstreak(): number {
-    return this.highestKillstreak;
-}
-
-public setHighestKillstreak(highestKillstreak: number): void {
-    this.highestKillstreak = highestKillstreak;
-}
-
-public getKillstreak(): number {
-    return this.killstreak;
-}
-
-public setKillstreak(killstreak: number): void {
-    this.killstreak = killstreak;
-}
-
-incrementKillstreak() {
-    this.killstreak++;
-}
-
-getKillDeathRatio(): string {
-    let kc = 0;
-    if (this.deaths == 0) {
-        kc = this.totalKills / 1;
-    } else {
-        kc = (this.totalKills / this.deaths);
+    public getSession(): PlayerSession {
+        return this.session;
     }
-    return Misc.FORMATTER.format(kc);
-}
 
-getRecentKills(): string[] {
-    return this.recentKills;
-}
+    public getUsername(): string {
+        return this.username;
+    }
 
-getSafeTimer(): number {
-    return this.safeTimer;
-}
+    public setUsername(username: string): Player {
+        this.username = username;
+        return this;
+    }
 
-setSafeTimer(safeTimer: number) {
-    this.safeTimer = safeTimer;
-}
+    public getLongUsername(): number {
+        return this.longUsername;
+    }
 
-decrementAndGetSafeTimer(): number {
-    return this.safeTimer--;
-}
+    public setLongUsername(longUsername: number): Player {
+        this.longUsername = longUsername;
+        return this;
+    }
 
-getTargetSearchTimer(): SecondsTimer {
-    return this.targetSearchTimer;
-}
+    public getPasswordHashWithSalt(): string {
+        return this.passwordHashWithSalt;
+    }
 
-getSpecialAttackRestore(): SecondsTimer {
-    return this.specialAttackRestore;
-}
+    public setPasswordHashWithSalt(passwordHashWithSalt: string): Player {
+        this.passwordHashWithSalt = passwordHashWithSalt;
+        return this;
+    }
+    public getHostAddress(): string {
+        return this.hostAddress;
+    }
 
-getSkullType(): SkullType {
-    return this.skullType;
-}
+    public setHostAddress(hostAddress: string): this {
+        this.hostAddress = hostAddress;
+        return this;
+    }
 
-setSkullType(skullType: SkullType) {
-    this.skullType = skullType;
-}
+    public getRights(): typeof PlayerRights.NONE {
+        return this.rights;
+    }
 
-getDueling(): Dueling {
-    return this.dueling;
-}
+    public setRights(rights: typeof PlayerRights.NONE): this {
+        this.rights = rights;
+        return this;
+    }
 
-getBlowpipeScales(): number {
-    return this.blowpipeScales;
-}
+    public getPacketSender(): PacketSender {
+        return this.packetSender;
+    }
 
-setBlowpipeScales(blowpipeScales: number) {
-    this.blowpipeScales = blowpipeScales;
-}
+    public getSkillManager(): SkillManager {
+        return this.skillManager;
+    }
 
-incrementBlowpipeScales(blowpipeScales: number) {
-    this.blowpipeScales += blowpipeScales;
-}
+    public getAppearance(): Appearance {
+        return this.appearance;
+    }
 
-decrementAndGetBlowpipeScales(): number {
-    return this.blowpipeScales--;
-}
+    public getForcedLogoutTimer(): SecondsTimer {
+        return this.forcedLogoutTimer;
+    }
 
-getCurrentPet(): NPC {
-    return this.currentPet;
-}
+    public isDyingReturn(): boolean {
+        return this.isDying;
+    }
 
-setCurrentPet(currentPet: NPC) {
-    this.currentPet = currentPet;
-}
+    public getLocalPlayers(): Player[] {
+        return this.localPlayers;
+    }
 
-getAggressionTolerance(): SecondsTimer {
-    return this.aggressionTolerance;
-}
+    public getLocalNpcs(): NPC[] {
+        return this.localNpcs;
+    }
+    public getInterfaceId(): number {
+        return this.interfaceId;
+    }
 
-getCachedUpdateBlock(): ByteBuf {
-    return this.cachedUpdateBlock;
-}
+    public setInterfaceId(interfaceId: number): this {
+        this.interfaceId = interfaceId;
+        return this;
+    }
 
-setCachedUpdateBlock(cachedUpdateBlock: ByteBuf) {
-    this.cachedUpdateBlock = cachedUpdateBlock;
-}
+    public experienceLockedReturn(): boolean {
+        return this.experienceLocked;
+    }
 
-getRegionHeight(): number {
-    return this.regionHeight;
-}
+    public setExperienceLocked(experienceLocked: boolean) {
+        this.experienceLocked = experienceLocked;
+    }
 
-setRegionHeight(regionHeight: number) {
-    this.regionHeight = regionHeight;
-}
+    public getRelations(): PlayerRelations {
+        return this.relations;
+    }
 
-getSkill(): Skillable | undefined {
-    return this.skill;
-}
+    public isAllowRegionChangePacket(): boolean {
+        return this.allowRegionChangePacket;
+    }
 
-setSkill(skill: Skillable | undefined) {
-    this.skill = skill;
-}
+    public setAllowRegionChangePacket(allowRegionChangePacket: boolean): void {
+        this.allowRegionChangePacket = allowRegionChangePacket;
+    }
 
-public getCreationMenu(): CreationMenu {
-    return this.creationMenu;
-}
+    public getWalkableInterfaceId(): number {
+        return this.walkableInterfaceId;
+    }
 
-public setCreationMenu(creationMenu: CreationMenu): void {
-    this.creationMenu = creationMenu;
-}
+    public setWalkableInterfaceId(interfaceId: number) {
+        this.walkableInterfaceId = interfaceId;
+    }
 
-public getPouches(): PouchContainer[] {
-    return this.pouches;
-}
+    public isRunningReturn(): boolean {
+        return this.isRunning;
+    }
 
-public setPouches(pouches: PouchContainer[]): void {
-    this.pouches = pouches;
-}
+    public setRunning(isRunning: boolean): this {
+        this.isRunning = isRunning;
+        return this;
+    }
 
-public getLoyaltyTitle(): string {
-    return this.loyaltyTitle;
-}
+    public getPlayerInteractingOption(): PlayerInteractingOption {
+        return this.playerInteractingOption;
+    }
 
-public setLoyaltyTitle(loyaltyTitle: string): void {
-    this.loyaltyTitle = loyaltyTitle;
-    this.getUpdateFlag().flag(Flag.APPEARANCE);
-}
+    public setPlayerInteractingOption(playerInteractingOption: PlayerInteractingOptions): Player {
+        this.playerInteractingOption = playerInteractingOption;
+        return this;
+    }
 
-public hasInfiniteHealth(): boolean {
-    return this.infiniteHealth;
-}
+    public getFrameUpdater(): FrameUpdater {
+        return this.frameUpdater;
+    }
 
-public setInfiniteHealth(infiniteHealth: boolean): void {
-    this.infiniteHealth = infiniteHealth;
-}
+    public getBonusManager(): BonusManager {
+        return this.bonusManager;
+    }
 
-public getDonatorRights(): DonatorRights {
-    return this.donatorRights;
-}
+    public getMultiIcon(): number {
+        return this.multiIcon;
+    }
 
-public setDonatorRights(donatorPrivilege: DonatorRights): void {
-    this.donatorRights = donatorPrivilege;
-}
+    public setMultiIcon(multiIcon: number): Player {
+        this.multiIcon = multiIcon;
+        return this;
+    }
 
-public getCurrentBrother(): NPC {
-    return this.currentBrother;
-}
+    public getInventory(): Inventory {
+        return this.inventory;
+    }
 
-public setCurrentBrother(brother: NPC): void {
-    this.currentBrother = brother;
-}
+    public getEquipment(): Equipment {
+        return this.equipment;
+    }
 
-public getBarrowsCrypt(): number {
-    return this.barrowsCrypt;
-}
+    public getForceMovement(): ForceMovement {
+        return this.forceMovement;
+    }
 
-public setBarrowsCrypt(crypt: number): void {
-    this.barrowsCrypt = crypt;
-}
+    public setForceMovement(forceMovement: ForceMovement): Player {
+        this.forceMovement = forceMovement;
+        if (this.forceMovement != null) {
+            this.getUpdateFlag().flag(Flag.FORCED_MOVEMENT);
+        }
+        return this;
+    }
 
-public getKilledBrothers(): boolean[] {
-    return this.killedBrothers;
-}
+    public getSkillAnimation(): number {
+        return this.skillAnimation;
+    }
 
-public setKilledBrothers(killedBrothers: boolean[]): void {
-    this.killedBrothers = killedBrothers;
-}
+    public setSkillAnimation(animation: number): Player {
+        this.skillAnimation = animation;
+        return this;
+    }
 
-public setKilledBrother(index: number, state: boolean): void {
-    this.killedBrothers[index] = state;
-}
+    public getRunEnergy(): number {
+        return this.runEnergy;
+    }
 
-public getBarrowsChestsLooted(): number {
-    return this.barrowsChestsLooted;
-}
+    public setRunEnergy(runEnergy: number) {
+        this.runEnergy = runEnergy;
+    }
 
-public setBarrowsChestsLooted(chestsLooted: number): void {
-    this.barrowsChestsLooted = chestsLooted;
-}
+    public isDrainingPrayer(): boolean {
+        return this.drainingPrayer;
+    }
 
-public isPlaceholders(): boolean {
-    return this.placeholders;
-}
+    public setDrainingPrayer(drainingPrayer: boolean) {
+        this.drainingPrayer = drainingPrayer;
+    }
 
-public setPlaceholders(placeholders: boolean): void {
-    this.placeholders = placeholders;
-}
+    public getPrayerPointDrain(): number {
+        return this.prayerPointDrain;
+    }
 
-public getPresets(): Presetable[] {
-    return this.presets;
-}
+    public setPrayerPointDrain(prayerPointDrain: number) {
+        this.prayerPointDrain = prayerPointDrain;
+    }
 
-public setPresets(sets: Presetable[]): void {
-    this.presets = sets;
-}
+    public getLastItemPickup(): Stopwatch {
+        return this.lastItemPickup;
+    }
 
-public isOpenPresetsOnDeath(): boolean {
-    return this.openPresetsOnDeath;
-}
+    public static getCombatSpecial(): CombatSpecial {
+        return this.combatSpecial;
+    }
 
-public setOpenPresetsOnDeath(openPresetsOnDeath: boolean): void {
-    this.openPresetsOnDeath = openPresetsOnDeath;
-}
+    public setCombatSpecial(combatSpecial: CombatSpecial) {
+        Player.combatSpecial = combatSpecial;
+    }
 
-public getCurrentPreset(): Presetable {
-    return this.currentPreset;
-}
+    public getRecoilDamage(): number {
+        return this.recoilDamage;
+    }
 
-public setCurrentPreset(currentPreset: Presetable): void {
-    this.currentPreset = currentPreset;
-}
+    public setRecoilDamage(recoilDamage: number) {
+        this.recoilDamage = recoilDamage;
+    }
 
-public getChatMessageQueue(): Queue < ChatMessage > {
-    return this.chatMessageQueue;
-}
+    public getSpellbook() {
+        return this.spellbook;
+    }
 
-public getCurrentChatMessage(): ChatMessage {
-    return this.currentChatMessage;
-}
+    public setSpellbook(spellbook: typeof MagicSpellbooks.NORMAL) {
+        this.spellbook = spellbook;
+    }
 
-public setCurrentChatMessage(currentChatMessage: ChatMessage): void {
-    this.currentChatMessage = currentChatMessage;
-}
+    public getVengeanceTimer(): SecondsTimer {
+        return this.vengeTimer;
+    }
 
-public getPreviousTeleports(): Map < TeleportButton, Location > {
-    return this.previousTeleports;
-}
+    public getWildernessLevel(): number {
+        return this.wildernessLevel;
+    }
 
-public isTeleportInterfaceOpen(): boolean {
-    return this.teleportInterfaceOpen;
-}
+    public setWildernessLevel(wildernessLevel: number) {
+        this.wildernessLevel = wildernessLevel;
+    }
 
-public setTeleportInterfaceOpen(teleportInterfaceOpen: boolean): void {
-    this.teleportInterfaceOpen = teleportInterfaceOpen;
-}
+    public isSpawnedBarrows(): boolean {
+        return this.spawnedBarrows;
+    }
 
-public manipulateHit(hit: PendingHit): PendingHit {
-    let attacker = hit.getAttacker();
+    public setSpawnedBarrows(spawnedBarrows: boolean) {
+        this.spawnedBarrows = spawnedBarrows;
+    }
 
-    if (attacker.isNpc()) {
-        let npc = attacker.getAsNpc();
-        if (npc.getId() == NpcIdentifiers.TZTOK_JAD) {
-            if (PrayerHandler.isActivated(this, PrayerHandler.getProtectingPrayer(hit.getCombatType()))) {
-                hit.setTotalDamage(0);
+    public getDestroyItem(): number {
+        return this.destroyItem;
+    }
+
+    public setDestroyItem(destroyItem: number) {
+        this.destroyItem = destroyItem;
+    }
+
+    public isSkulled(): boolean {
+        return this.skullTimer > 0;
+    }
+
+    public getAndDecrementSkullTimer(): number {
+        return this.skullTimer--;
+    }
+
+    public getSkullTimer(): number {
+        return this.skullTimer;
+    }
+
+    public setSkullTimer(skullTimer: number): void {
+        this.skullTimer = skullTimer;
+    }
+
+    public getPoints(): number {
+        return this.points;
+    }
+
+    public setPoints(points: number): void {
+        this.points = points;
+    }
+
+    public incrementPoints(points: number): void {
+        this.points += points;
+    }
+
+    public isUpdateInventory(): boolean {
+        return this.updateInventory;
+    }
+
+    public setUpdateInventory(updateInventory: boolean): void {
+        this.updateInventory = updateInventory;
+    }
+
+    public getClickDelay(): Stopwatch {
+        return this.clickDelay;
+    }
+
+    public getShop(): Shop {
+        return this.shop;
+    }
+
+    public setShop(shop: Shop): Player {
+        this.shop = shop;
+        return this;
+    }
+
+    public getStatus(): PlayerStatus {
+        return this.status;
+    }
+
+    public setStatus(status: PlayerStatus): Player {
+        this.status = status;
+        return this;
+    }
+
+    public getCurrentBankTab(): number {
+        return this.currentBankTab;
+    }
+
+    public setCurrentBankTab(tab: number): Player {
+        this.currentBankTab = tab;
+        return this;
+    }
+
+    public setNoteWithdrawal(noteWithdrawal: boolean): void {
+        this.noteWithdrawal = noteWithdrawal;
+    }
+
+    public withdrawAsNote(): boolean {
+        return this.noteWithdrawal;
+    }
+
+    public setInsertMode(insertMode: boolean): void {
+        this.insertMode = insertMode;
+    }
+
+    public insertModeReturn(): boolean {
+        return this.insertMode;
+    }
+
+    public getBanks(): Bank[] {
+        return this.banks;
+    }
+
+    public getBank(index: number): Bank {
+        if (this.banks[index] == null) {
+            this.banks[index] = new Bank(this);
+        }
+        return this.banks[index];
+    }
+
+    public setBank(index: number, bank: Bank): Player {
+        this.banks[index] = bank;
+        return this;
+    }
+
+    public isNewPlayer(): boolean {
+        return this.newPlayer;
+    }
+
+    public setNewPlayer(newPlayer: boolean): void {
+        this.newPlayer = newPlayer;
+    }
+
+    public isSearchingBank(): boolean {
+        return this.searchingBank;
+    }
+
+    public setSearchingBank(searchingBank: boolean): void {
+        this.searchingBank = searchingBank;
+    }
+
+    public getSearchSyntax(): string {
+        return this.searchSyntax;
+    }
+
+    public setSearchSyntax(searchSyntax: string): void {
+        this.searchSyntax = searchSyntax;
+    }
+
+    public isPreserveUnlocked(): boolean {
+        return this.preserveUnlocked;
+    }
+
+    public getPreserveUnlocked(): boolean {
+        return this.preserveUnlocked;
+    }
+
+    public setPreserveUnlocked(preserveUnlocked: boolean): void {
+        this.preserveUnlocked = preserveUnlocked;
+    }
+
+    public isRigourUnlocked(): boolean {
+        return this.rigourUnlocked;
+    }
+
+    public getRigourUnlocked(): boolean {
+        return this.rigourUnlocked;
+    }
+
+    public setRigourUnlocked(rigourUnlocked: boolean): void {
+        this.rigourUnlocked = rigourUnlocked;
+    }
+
+
+    public getAuguryUnlocked(): boolean {
+        return this.auguryUnlocked;
+    }
+
+    public setAuguryUnlocked(auguryUnlocked: boolean): void {
+        this.auguryUnlocked = auguryUnlocked;
+    }
+
+    public getPriceChecker(): PriceChecker {
+        return this.priceChecker;
+    }
+
+    public getCurrentClanChat(): ClanChat {
+        return this.currentClanChat;
+    }
+
+    public setCurrentClanChat(currentClanChat: ClanChat): void {
+        this.currentClanChat = currentClanChat;
+    }
+
+    public getClanChatName(): string {
+        return this.clanChatName;
+    }
+
+    public setClanChatName(clanChatName: string): void {
+        this.clanChatName = clanChatName;
+    }
+
+    public getTrading(): Trading {
+        return this.trading;
+    }
+
+    public getQuickPrayers(): QuickPrayers {
+        return this.quickPrayers;
+    }
+
+    public isTargetTeleportUnlocked(): boolean {
+        return this.targetTeleportUnlocked;
+    }
+
+
+    public getTargetTeleportUnlocked(): boolean {
+        return this.targetTeleportUnlocked;
+    }
+
+    public setTargetTeleportUnlocked(targetTeleportUnlocked: boolean): void {
+        this.targetTeleportUnlocked = targetTeleportUnlocked;
+    }
+
+    public getYellDelay(): SecondsTimer {
+        return this.yellDelay;
+    }
+
+    public getAmountDonated(): number {
+        return this.amountDonated;
+    }
+
+    public setAmountDonated(amountDonated: number): void {
+        this.amountDonated = amountDonated;
+    }
+
+    public incrementAmountDonated(amountDonated: number): void {
+        this.amountDonated += amountDonated;
+    }
+
+    public incrementTargetKills(): void {
+        this.targetKills++;
+    }
+
+    public getTargetKills(): number {
+        return this.targetKills;
+    }
+
+    public setTargetKills(targetKills: number): void {
+        this.targetKills = targetKills;
+    }
+
+    public incrementKills(): void {
+        this.normalKills++;
+    }
+
+    public getNormalKills(): number {
+        return this.normalKills;
+    }
+
+    public setNormalKills(normalKills: number): void {
+        this.normalKills = normalKills;
+    }
+
+    public getTotalKills(): number {
+        return this.totalKills;
+    }
+
+    public setTotalKills(totalKills: number): void {
+        this.totalKills = totalKills;
+    }
+
+    public incrementTotalKills(): void {
+        this.totalKills++;
+    }
+
+    public incrementDeaths(): void {
+        this.deaths++;
+    }
+
+    public getDeaths(): number {
+        return this.deaths;
+    }
+
+    public setDeaths(deaths: number): void {
+        this.deaths = deaths;
+    }
+
+    public resetSafingTimer(): void {
+        this.setSafeTimer(180);
+    }
+
+    public getHighestKillstreak(): number {
+        return this.highestKillstreak;
+    }
+
+    public setHighestKillstreak(highestKillstreak: number): void {
+        this.highestKillstreak = highestKillstreak;
+    }
+
+    public getKillstreak(): number {
+        return this.killstreak;
+    }
+
+    public setKillstreak(killstreak: number): void {
+        this.killstreak = killstreak;
+    }
+
+    public incrementKillstreak() {
+        this.killstreak++;
+    }
+
+    public getKillDeathRatio(): string {
+        let kc = 0;
+        if (this.deaths == 0) {
+            kc = this.totalKills / 1;
+        } else {
+            kc = (this.totalKills / this.deaths);
+        }
+        return Misc.FORMATTER.format(kc);
+    }
+
+    public getRecentKills(): string[] {
+        return this.recentKills;
+    }
+
+    public getSafeTimer(): number {
+        return this.safeTimer;
+    }
+
+    public setSafeTimer(safeTimer: number) {
+        this.safeTimer = safeTimer;
+    }
+
+    public decrementAndGetSafeTimer(): number {
+        return this.safeTimer--;
+    }
+
+    public getTargetSearchTimer(): SecondsTimer {
+        return this.targetSearchTimer;
+    }
+
+    public getSpecialAttackRestore(): SecondsTimer {
+        return this.specialAttackRestore;
+    }
+
+    public getSkullType(): SkullTypes {
+        return this.skullType;
+    }
+
+    public setSkullType(skullType: SkullTypes) {
+        this.skullType = skullType;
+    }
+
+    public getDueling(): Dueling {
+        return this.dueling;
+    }
+
+    public getBlowpipeScales(): number {
+        return this.blowpipeScales;
+    }
+
+    public setBlowpipeScales(blowpipeScales: number) {
+        this.blowpipeScales = blowpipeScales;
+    }
+
+    public incrementBlowpipeScales(blowpipeScales: number) {
+        this.blowpipeScales += blowpipeScales;
+    }
+
+    public decrementAndGetBlowpipeScales(): number {
+        return this.blowpipeScales--;
+    }
+
+    public getCurrentPet(): NPC {
+        return this.currentPet;
+    }
+
+    public setCurrentPet(currentPet: NPC) {
+        this.currentPet = currentPet;
+    }
+
+    public getAggressionTolerance(): SecondsTimer {
+        return this.aggressionTolerance;
+    }
+
+    public getCachedUpdateBlock(): Buffer {
+        return this.cachedUpdateBlock;
+    }
+
+    public setCachedUpdateBlock(cachedUpdateBlock: Buffer) {
+        this.cachedUpdateBlock = cachedUpdateBlock;
+    }
+
+    public getRegionHeight(): number {
+        return this.regionHeight;
+    }
+
+    public setRegionHeight(regionHeight: number) {
+        this.regionHeight = regionHeight;
+    }
+
+    public getSkill(): Skillable | undefined {
+        return this.skill;
+    }
+
+    public setSkill(skill: Skillable | undefined) {
+        this.skill = skill;
+    }
+
+    public public getCreationMenu(): CreationMenu {
+        return this.creationMenu;
+    }
+
+    public setCreationMenu(creationMenu: CreationMenu): void {
+        this.creationMenu = creationMenu;
+    }
+
+    public getPouches(): PouchContainer[] {
+        return this.pouches;
+    }
+
+    public setPouches(pouches: PouchContainer[]): void {
+        this.pouches = pouches;
+    }
+
+    public getLoyaltyTitle(): string {
+        return this.loyaltyTitle;
+    }
+
+    public setLoyaltyTitle(loyaltyTitle: string): void {
+        this.loyaltyTitle = loyaltyTitle;
+        this.getUpdateFlag().flag(Flag.APPEARANCE);
+    }
+
+    public hasInfiniteHealth(): boolean {
+        return this.infiniteHealth;
+    }
+
+    public setInfiniteHealth(infiniteHealth: boolean): void {
+        this.infiniteHealth = infiniteHealth;
+    }
+
+    public getDonatorRights(): DonatorRights {
+        return this.donatorRights;
+    }
+
+    public setDonatorRights(donatorPrivilege: typeof DonatorRights.NONE): void {
+        this.donatorRights = donatorPrivilege;
+    }
+
+    public getCurrentBrother(): NPC {
+        return this.currentBrother;
+    }
+
+    public setCurrentBrother(brother: NPC): void {
+        this.currentBrother = brother;
+    }
+
+    public getBarrowsCrypt(): number {
+        return this.barrowsCrypt;
+    }
+
+    public setBarrowsCrypt(crypt: number): void {
+        this.barrowsCrypt = crypt;
+    }
+
+    public getKilledBrothers(): boolean[] {
+        return this.killedBrothers;
+    }
+
+    public setKilledBrothers(killedBrothers: boolean[]): void {
+        this.killedBrothers = killedBrothers;
+    }
+
+    public setKilledBrother(index: number, state: boolean): void {
+        this.killedBrothers[index] = state;
+    }
+
+    public getBarrowsChestsLooted(): number {
+        return this.barrowsChestsLooted;
+    }
+
+    public setBarrowsChestsLooted(chestsLooted: number): void {
+        this.barrowsChestsLooted = chestsLooted;
+    }
+
+    public isPlaceholders(): boolean {
+        return this.placeholders;
+    }
+
+    public setPlaceholders(placeholders: boolean): void {
+        this.placeholders = placeholders;
+    }
+
+    public getPresets(): Presetable[] {
+        return this.presets;
+    }
+
+    public setPresets(sets: Presetable[]): void {
+        this.presets = sets;
+    }
+
+    public isOpenPresetsOnDeath(): boolean {
+        return this.openPresetsOnDeath;
+    }
+
+    public setOpenPresetsOnDeath(openPresetsOnDeath: boolean): void {
+        this.openPresetsOnDeath = openPresetsOnDeath;
+    }
+
+    public getCurrentPreset(): Presetable {
+        return this.currentPreset;
+    }
+
+    public setCurrentPreset(currentPreset: Presetable): void {
+        this.currentPreset = currentPreset;
+    }
+
+    public getChatMessageQueue(): Array<ChatMessage> {
+        return this.chatMessageQueue;
+    }
+
+    public getCurrentChatMessage(): ChatMessage {
+        return this.currentChatMessage;
+    }
+
+    public setCurrentChatMessage(currentChatMessage: ChatMessage): void {
+        this.currentChatMessage = currentChatMessage;
+    }
+
+    public getPreviousTeleports(): Map<TeleportButton, Location> {
+        return this.previousTeleports;
+    }
+
+    public isTeleportInterfaceOpen(): boolean {
+        return this.teleportInterfaceOpen;
+    }
+
+    public setTeleportInterfaceOpen(teleportInterfaceOpen: boolean): void {
+        this.teleportInterfaceOpen = teleportInterfaceOpen;
+    }
+
+    public manipulateHit(hit: PendingHit): PendingHit {
+        let attacker = hit.getAttacker();
+
+        if (attacker.isNpc()) {
+            let npc = attacker.getAsNpc();
+            if (npc.getId() == NpcIdentifiers.TZTOK_JAD) {
+                if (PrayerHandler.isActivated(this, PrayerHandler.getProtectingPrayer(hit.getCombatType()))) {
+                    hit.setTotalDamage(0);
+                }
             }
         }
+
+        return hit;
     }
 
-    return hit;
-}
+    public getOldPosition(): Location {
+        return this.oldPosition;
+    }
 
-public getOldPosition(): Location {
-    return this.oldPosition;
-}
+    public setOldPosition(oldPosition: Location): void {
+        this.oldPosition = oldPosition;
+    }
 
-public setOldPosition(oldPosition: Location): void {
-    this.oldPosition = oldPosition;
-}
+    public getGodwarsKillcount(): number[] {
+        return this.godwarsKillcount;
+    }
 
-public getGodwarsKillcount(): number[] {
-    return this.godwarsKillcount;
-}
+    public setGodwarsKillcountArray(godwarsKillcount: number[]): void {
+        this.godwarsKillcount = godwarsKillcount;
+    }
 
-public setGodwarsKillcount(godwarsKillcount: number[]): void {
-    this.godwarsKillcount = godwarsKillcount;
-}
+    public setGodwarsKillcount(index: number, value: number): void {
+        this.godwarsKillcount[index] = value;
+    }
 
-public setGodwarsKillcount(index: number, value: number): void {
-    this.godwarsKillcount[index] = value;
-}
+    public setGodwarsKillcountReturn(godwarsKillcount: number[]) {
+        this.godwarsKillcount = godwarsKillcount;
+    }
 
-public getEnteredAmountAction(): EnteredAmountAction {
-    return this.enteredAmountAction;
-}
+    public getEnteredAmountAction(): EnteredAmountAction {
+        return this.enteredAmountAction;
+    }
 
-public setEnteredAmountAction(enteredAmountAction: EnteredAmountAction): void {
-    this.enteredAmountAction = enteredAmountAction;
-}
+    public setEnteredAmountAction(enteredAmountAction: EnteredAmountAction): void {
+        this.enteredAmountAction = enteredAmountAction;
+    }
 
-public getEnteredSyntaxAction(): EnteredSyntaxAction {
-    return this.enteredSyntaxAction;
-}
+    public getEnteredSyntaxAction(): EnteredSyntaxAction {
+        return this.enteredSyntaxAction;
+    }
 
-public setEnteredSyntaxAction(enteredSyntaxAction: EnteredSyntaxAction): void {
-    this.enteredSyntaxAction = enteredSyntaxAction;
-}
+    public setEnteredSyntaxAction(enteredSyntaxAction: EnteredSyntaxAction): void {
+        this.enteredSyntaxAction = enteredSyntaxAction;
+    }
 
-public getSlayerTask(): ActiveSlayerTask {
-    return this.slayerTask;
-}
+    public getSlayerTask(): ActiveSlayerTask {
+        return this.slayerTask;
+    }
 
-public setSlayerTask(slayerTask: ActiveSlayerTask): void {
-    this.slayerTask = slayerTask;
-}
+    public setSlayerTask(slayerTask: ActiveSlayerTask): void {
+        this.slayerTask = slayerTask;
+    }
 
-public getConsecutiveTasks(): number {
-    return this.consecutiveTasks;
-}
+    public getConsecutiveTasks(): number {
+        return this.consecutiveTasks;
+    }
 
-public setConsecutiveTasks(consecutiveTasks: number): void {
-    this.consecutiveTasks = consecutiveTasks;
-}
+    public setConsecutiveTasks(consecutiveTasks: number): void {
+        this.consecutiveTasks = consecutiveTasks;
+    }
 
-public getSlayerPoints(): number {
-    return this.slayerPoints;
-}
+    public getSlayerPoints(): number {
+        return this.slayerPoints;
+    }
 
-public setSlayerPoints(slayerPoints: number): void {
-    this.slayerPoints = slayerPoints;
-}
+    public setSlayerPoints(slayerPoints: number): void {
+        this.slayerPoints = slayerPoints;
+    }
 
-public getDialogueManager(): DialogueManager {
-    return this.dialogueManager;
-}
+    public getDialogueManager(): DialogueManager {
+        return this.dialogueManager;
+    }
 
-public getWeapon(): WeaponInterface {
-    return this.weapon;
-}
+    public getWeapon(): WeaponInterfaces {
+        return this.weapon;
+    }
 
-public setWeapon(weapon: WeaponInterface): void {
-    this.weapon = weapon;
-}
+    public setWeapon(weapon: WeaponInterfaces): void {
+        this.weapon = weapon;
+    }
 
-public getFightType(): FightType {
-    return this.fightType;
-}
+    public getFightType(): FightType {
+        return this.fightType;
+    }
 
-public setFightType(fightType: FightType): void {
-    this.fightType = fightType;
-}
+    public setFightType(fightType: typeof FightType.UNARMED_KICK): void {
+        this.fightType = fightType;
+    }
 
-public autoRetaliate(): boolean {
-    return this.autoRetaliate;
-}
+    public autoRetaliateReturn(): boolean {
+        return this.autoRetaliate;
+    }
 
-public setAutoRetaliate(autoRetaliate: boolean): void {
-    this.autoRetaliate = autoRetaliate;
-}
+    public setAutoRetaliate(autoRetaliate: boolean): void {
+        this.autoRetaliate = autoRetaliate;
+    }
 
-public isDiscordLogin(): boolean {
-    return this.isDiscordLogin;
-}
-public setDiscordLogin(discordLogin: boolean) {
-    this.isDiscordLogin = discordLogin;
-}
-    
+    public isDiscordLoginReturn(): boolean {
+        return this.isDiscordLogin;
+    }
+    public setDiscordLogin(discordLogin: boolean) {
+        this.isDiscordLogin = discordLogin;
+    }
+
     public getCachedDiscordAccessToken(): string {
-    return this.cachedDiscordAccessToken;
-}
-    
-    public setCachedDiscordAccessToken(cachedDiscordAccessToken: string) {
-    this.cachedDiscordAccessToken = cachedDiscordAccessToken;
-}
-    
-    public getQuestProgress(): Map < number, number > {
-    return this.questProgress;
-}
-    
-    public getQuestPoints(): number {
-    return this.questPoints;
-}
-    
-    public setQuestPoints(questPoints: number) {
-    this.questPoints = questPoints;
-}
-    
-    public setQuestProgress(questProgress: Map<number, number>) {
-    if (!questProgress) {
-        return;
+        return this.cachedDiscordAccessToken;
     }
-    this.questProgress = questProgress;
-}
+
+    public setCachedDiscordAccessToken(cachedDiscordAccessToken: string) {
+        this.cachedDiscordAccessToken = cachedDiscordAccessToken;
+    }
+
+    public getQuestProgress(): Map<number, number> {
+        return this.questProgress;
+    }
+
+    public getQuestPoints(): number {
+        return this.questPoints;
+    }
+
+    public setQuestPoints(questPoints: number) {
+        this.questPoints = questPoints;
+    }
+
+    public setQuestProgress(questProgress: Map<number, number>) {
+        if (!questProgress) {
+            return;
+        }
+        this.questProgress = questProgress;
+    }
+
+    getSize() {
+
+    }
 }

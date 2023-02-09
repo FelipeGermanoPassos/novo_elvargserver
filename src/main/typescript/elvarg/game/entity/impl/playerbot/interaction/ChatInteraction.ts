@@ -3,7 +3,7 @@ import { Player } from "../../player/Player";
 import { PlayerBot } from "../PlayerBot";
 import { BotCommand } from "../commands/BotCommand";
 import { CommandType } from "../commands/CommandType";
-import {ChatMessage} from '../../../../model/ChatMessage'
+import { ChatMessage } from '../../../../model/ChatMessage'
 import { Misc } from "../../../../../util/Misc";
 import { Commandclass } from "../commands/CommandType";
 
@@ -78,9 +78,9 @@ export class ChatInteraction {
 
             return;
         }
-        let chatCommands = this.playerBot.getChatCommands();
+        let chatCommands: BotCommand[] = this.playerBot.getChatCommands();
         for (let i = 0; i < chatCommands.length; i++) {
-            let command = chatCommands[i];
+            let command: BotCommand = chatCommands[i];
             for (let trigger of command.triggers()) {
                 if (!chatMessage.includes(trigger)) {
                     // Command wasn't triggered

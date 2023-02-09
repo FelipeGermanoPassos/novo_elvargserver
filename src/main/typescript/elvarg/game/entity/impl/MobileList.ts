@@ -1,6 +1,6 @@
 import { Mobile } from './Mobile';
 
-class MobileList<E extends Mobile> implements Iterable<E> {
+export class MobileList<E extends Mobile> implements Iterable<E> {
     private slotQueue: Queue<number> = new ArrayDeque<number>();
     private capacity: number;
     private characters: E[];
@@ -86,16 +86,13 @@ class MobileList<E extends Mobile> implements Iterable<E> {
         return this.characters[slot];
     }
 
-    public size(): number {
+    public sizeReturn(): number {
         return this.size;
     }
 
-    public capacity(): number {
+    public capacityReturn(): number {
         return this.capacity
-    }class MobileList<E extends Mobile> {
-    private capacity: number;
-    private size: number;
-    private characters: E[];
+    }
 
     public spaceLeft(): number {
         return this.capacity - this.size;
@@ -118,8 +115,9 @@ class MobileList<E extends Mobile> implements Iterable<E> {
     private remove(item: E): void {
         // implementation of remove method
     }
+}
 
-    export function CharacterListIterator<E extends Mobile> implements Iterator <E> {
+export class CharacterListIterator<E extends Mobile> implements Iterator<E> {
     private list: MobileList<E>;
     private index: number;
     private lastIndex: number = -1;
@@ -127,12 +125,12 @@ class MobileList<E extends Mobile> implements Iterable<E> {
     constructor(list: MobileList<E>) {
         this.list = list;
     }
-    
-            public hasNext(): boolean {
+
+    public hasNext(): boolean {
         return !(this.index + 1 > this.list.capacity);
     }
-    
-            public next(): E {
+
+    public next(): E {
         if (this.index >= this.list.capacity) {
             throw new ArrayIndexOutOfBoundsException("There are no " + "elements left to iterate over!");
         }
@@ -140,8 +138,8 @@ class MobileList<E extends Mobile> implements Iterable<E> {
         this.index++;
         return this.list.characters[this.lastIndex];
     }
-    
-            public remove(): void {
+
+    public remove(): void {
         if (this.lastIndex == -1) {
             throw new Error("This method can only be " + "called once after \"next\".");
         }
@@ -149,6 +147,3 @@ class MobileList<E extends Mobile> implements Iterable<E> {
         this.lastIndex = -1;
     }
 } 
-
-}
-}

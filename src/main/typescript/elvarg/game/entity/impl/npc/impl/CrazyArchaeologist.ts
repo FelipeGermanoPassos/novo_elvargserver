@@ -5,7 +5,6 @@ import { Ids } from "../../../../model/Ids"
 import { Location } from "../../../../model/Location"
 import { NpcIdentifiers } from "../../../../../util/NpcIdentifiers"
 
-@Ids(NpcIdentifiers.CRAZY_ARCHAEOLOGIST)
 export class CrazyArchaeologist extends NPC {
 
     private static COMBAT_METHOD = new CrazyArchaeologistCombatMethod();
@@ -14,7 +13,12 @@ export class CrazyArchaeologist extends NPC {
         super(id, position);
     }
 
-    public getCombatMethod(): CombatMethod {
+    public static getCombatMethod() {
         return CrazyArchaeologist.COMBAT_METHOD;
     }
+
+    getSize(): void {
+        
+    }
+
 }

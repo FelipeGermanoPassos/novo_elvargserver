@@ -1,6 +1,8 @@
-class PriceChecker extends ItemContainer {
+import { Player } from "../../../entity/impl/player/Player";
 
-    Copy code
+
+export class PriceChecker extends ItemContainer {
+
     public static readonly INTERFACE_ID: number = 42000;
     public static readonly CONTAINER_ID: number = 18500;
     private static readonly TEXT_START_ROW_1: number = 18300;

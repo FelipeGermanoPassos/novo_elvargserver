@@ -1,4 +1,4 @@
-interface Skillable {
+export interface Skillable {
     start(player: Player): void;
     cancel(player: Player): void;
     hasRequirements(player: Player): boolean;

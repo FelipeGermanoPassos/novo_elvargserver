@@ -1,3 +1,6 @@
+import { ItemContainer } from "../ItemContainer";
+import { Player } from "../../../entity/impl/player/Player";
+
 export class Equipment extends ItemContainer {
     public static INVENTORY_INTERFACE_ID = 1688;
     public static EQUIPMENT_SCREEN_INTERFACE_ID = 15106;
@@ -14,7 +17,6 @@ export class Equipment extends ItemContainer {
     public static AMMUNITION_SLOT = 13;
     public static NO_ITEM = new Item(-1);
     
-    Copy code
     constructor(public player: Player) {
         super(player);
     }

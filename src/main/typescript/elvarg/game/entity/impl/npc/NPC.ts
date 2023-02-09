@@ -1,4 +1,23 @@
 import { Mobile } from "../Mobile";
+import { Sound } from "../../../Sound";
+import { World } from "../../../World";
+import { CombatFactory } from "../../../content/combat/CombatFactory";
+import { CombatType } from "../../../content/combat/CombatType";
+import { PendingHit } from "../../../content/combat/hit/PendingHit";
+import { CombatMethod } from "../../../content/combat/method/CombatMethod";
+import { NpcDefinition } from "../../../definition/NpcDefinition";
+import { CoordinateState, NPCMovementCoordinator } from "./NPCMovementCoordinator";
+import { Barricades } from "./impl/Barricades";
+import { Player } from "../player/Player";
+import { FacingDirection } from "../../../model/FacingDirection";
+import { Ids } from "../../../model/Ids";
+import { Location } from "../../../model/Location";
+import { AreaManager } from "../../../model/areas/AreaManager";
+import { WildernessArea } from "../../../model/areas/impl/WildernessArea";
+import { TaskManager } from "../../../task/TaskManager";
+import { NPCDeathTask } from "../../../task/impl/NPCDeathTask"
+import * as util from 'util';
+
 
 export class NPC extends Mobile {
     private id: number;
@@ -47,7 +66,7 @@ export class NPC extends Mobile {
      * @return
      */
     public static create(id: number, location: Location) {
-        let implementationClass = NPC_IMPLEMENTATION_MAP.get(id);
+        let implementationClass = NPC.NPC_IMPLEMENTATION_MAP.get(id);
         if (implementationClass != null) {
             // If this NPC has been implemented by its own class, instantiate that first
             try {
@@ -258,7 +277,7 @@ export class NPC extends Mobile {
         this.visible = visible;
     }
 
-    isDying(): boolean {
+    isDyingFunction(): boolean {
         return this.isDying;
     }
 
@@ -321,11 +340,11 @@ export class NPC extends Mobile {
     getCombatMethod(): CombatMethod {
         // By default, NPCs use Melee combat.
         // This can be overridden by creating a class in entity.impl.npc.impl
-        return MELEE_COMBAT;
+        return CombatFactory.MELEE_COMBAT;
     }
 
     clone(): NPC {
-        return create(this.getId(), this.getSpawnPosition());
+        return NPC.create(this.getId(), this.getSpawnPosition());
     }
 
     getFace(): FacingDirection {
@@ -353,9 +372,9 @@ export class NPC extends Mobile {
      *
      * @param implementationClasses
      */
-    static initImplementations(implementationClasses: Class<any>[]): void {
+    static initImplementations(implementationClasses: any[]): void {
         // Add all the implemented NPCs to NPC_IMPLEMENTATION_MAP
-        this.NPC_IMPLEMENTATION_MAP = new Map<number, Class<any>>();
+        this.NPC_IMPLEMENTATION_MAP = new Map<number, any[]>();
         for (const clazz of implementationClasses) {
             for (const id of clazz.getAnnotation(Ids).value()) {
                 this.NPC_IMPLEMENTATION_MAP.set(id, clazz);

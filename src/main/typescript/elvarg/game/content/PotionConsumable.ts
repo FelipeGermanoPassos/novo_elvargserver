@@ -1,4 +1,4 @@
-enum PotionConsumable {
+export class PotionConsumable {
     ANTIFIRE_POTIONS = [2452, 2454, 2456, 2458],
     ANTIPOISON_POTIONS = [2448, 181, 183, 185],
     COMBAT_POTIONS = [9739, 9741, 9743, 9745],
@@ -32,7 +32,7 @@ enum PotionConsumable {
         }
     }
 
-DEFENCE_POTIONS = [2432, 133, 135, 137],
+    DEFENCE_POTIONS = [2432, 133, 135, 137],
     STRENGTH_POTIONS = [113, 115, 117, 119],
     ATTACK_POTIONS = [2428, 121, 123, 125],
     SUPER_DEFENCE_POTIONS = [2442, 163, 165, 167],
@@ -43,38 +43,38 @@ DEFENCE_POTIONS = [2432, 133, 135, 137],
     ZAMORAK_BREW = [2450, 189, 191, 193],
 
     onEffect(player: Player) {
-    switch (this) {
-        case PotionConsumable.DEFENCE_POTIONS:
-            PotionConsumable.onBasicEffect(player, Skill.DEFENCE, BoostType.NORMAL);
-            break;
-        case PotionConsumable.STRENGTH_POTIONS:
-            PotionConsumable.onBasicEffect(player, Skill.STRENGTH, BoostType.NORMAL);
-            break;
-        case PotionConsumable.ATTACK_POTIONS:
-            PotionConsumable.onBasicEffect(player, Skill.ATTACK, BoostType.NORMAL);
-            break;
-        case PotionConsumable.SUPER_DEFENCE_POTIONS:
-            PotionConsumable.onBasicEffect(player, Skill.DEFENCE, BoostType.SUPER);
-            break;
-        case PotionConsumable.SUPER_ATTACK_POTIONS:
-            PotionConsumable.onBasicEffect(player, Skill.ATTACK, BoostType.SUPER);
-            break;
-        case PotionConsumable.SUPER_STRENGTH_POTIONS:
-            PotionConsumable.onBasicEffect(player, Skill.STRENGTH, BoostType.SUPER);
-            break;
-        case PotionConsumable.RANGE_POTIONS:
-            PotionConsumable.onBasicEffect(player, Skill.RANGED, BoostType.NORMAL);
-            break;
-        case PotionConsumable.SUPER_RANGE_POTIONS:
-            PotionConsumable.onBasicEffect(player, Skill.RANGED, BoostType.SUPER);
-            break;
-        case PotionConsumable.ZAMORAK_BREW:
-            PotionConsumable.onZamorakEffect(player);
-            break;
+        switch (this) {
+            case PotionConsumable.DEFENCE_POTIONS:
+                PotionConsumable.onBasicEffect(player, Skill.DEFENCE, BoostType.NORMAL);
+                break;
+            case PotionConsumable.STRENGTH_POTIONS:
+                PotionConsumable.onBasicEffect(player, Skill.STRENGTH, BoostType.NORMAL);
+                break;
+            case PotionConsumable.ATTACK_POTIONS:
+                PotionConsumable.onBasicEffect(player, Skill.ATTACK, BoostType.NORMAL);
+                break;
+            case PotionConsumable.SUPER_DEFENCE_POTIONS:
+                PotionConsumable.onBasicEffect(player, Skill.DEFENCE, BoostType.SUPER);
+                break;
+            case PotionConsumable.SUPER_ATTACK_POTIONS:
+                PotionConsumable.onBasicEffect(player, Skill.ATTACK, BoostType.SUPER);
+                break;
+            case PotionConsumable.SUPER_STRENGTH_POTIONS:
+                PotionConsumable.onBasicEffect(player, Skill.STRENGTH, BoostType.SUPER);
+                break;
+            case PotionConsumable.RANGE_POTIONS:
+                PotionConsumable.onBasicEffect(player, Skill.RANGED, BoostType.NORMAL);
+                break;
+            case PotionConsumable.SUPER_RANGE_POTIONS:
+                PotionConsumable.onBasicEffect(player, Skill.RANGED, BoostType.SUPER);
+                break;
+            case PotionConsumable.ZAMORAK_BREW:
+                PotionConsumable.onZamorakEffect(player);
+                break;
+        }
     }
-}
 
-SARADOMIN_BREW = [6685, 6687, 6689, 6691],
+    SARADOMIN_BREW = [6685, 6687, 6689, 6691],
     GUTHIX_REST = [4417, 4419, 4421, 4423, 1980],
     SUPER_RESTORE_POTIONS = [3024, 3026, 3028, 3030],
     PRAYER_POTIONS = [2434, 139, 141, 143],

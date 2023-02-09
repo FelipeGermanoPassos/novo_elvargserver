@@ -1,3 +1,6 @@
+import { Player } from "../../../entity/impl/player/Player";
+
+
 export class Inventory extends ItemContainer {
 
     Copy code

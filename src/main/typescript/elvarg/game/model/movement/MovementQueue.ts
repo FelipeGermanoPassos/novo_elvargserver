@@ -1,3 +1,5 @@
+import { Mobile } from "../../entity/impl/Mobile";
+
 export class MovementQueue {
 
     private static RANDOM: RandomGen = new RandomGen();

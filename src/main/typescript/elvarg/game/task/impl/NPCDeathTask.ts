@@ -1,4 +1,4 @@
-class NPCDeathTask extends Task {
+export class NPCDeathTask extends Task {
     /**
     * The npc setting off the death task.
     /

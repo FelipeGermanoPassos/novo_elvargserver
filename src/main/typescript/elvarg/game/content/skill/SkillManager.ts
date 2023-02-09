@@ -1,3 +1,6 @@
+import { Skill } from "../../model/Skill";
+import { Player } from "../../entity/impl/player/Player";
+
 export class SkillManager {
     public static readonly AMOUNT_OF_SKILLS: number = Skill.values().length;
     public static readonly MAX_EXPERIENCE: number = 1000000000;
@@ -16,9 +19,9 @@ export class SkillManager {
      * The player associated with this Skills instance.
      */
     private player: Player;
-    private skills: Skills;
+    public skills: Skills;
 
-    public SkillManager(player: Player) {
+    public constructor(player: Player) {
         this.player = player;
         this.skills = new Skills();
         for (let i = 0; i < AMOUNT_OF_SKILLS; i++) {
@@ -396,6 +399,15 @@ export class SkillManager {
         this.setCurrentLevel(skill, curr + amount);
     }
 
+    public decreaseCurrentLevel(skill: Skill, amount: number, minimum: number) {
+        let curr: number = this.getCurrentLevel(skill);
+        if ((curr - amount) < minimum) {
+            this.setCurrentLevel(skill, minimum);
+            return;
+        }
+        this.setCurrentLevel(skill, curr - amount);
+    }
+
     decreaseLevelMax(skill: Skill, amount: number) {
         return this.decreaseCurrentLevel(skill, amount, this.getMaxLevel(skill) - amount);
     }
@@ -461,7 +473,7 @@ export class SkillManager {
     }
 }
 
-class Skills {
+export class Skills {
     private level: number[];
     private maxLevel: number[];
     private experience: number[];

@@ -1,4 +1,4 @@
-class PlayerDeathTask extends Task {
+export class PlayerDeathTask extends Task {
     private player: Player;
     private killer: Player | undefined;
     private loseItems = true;

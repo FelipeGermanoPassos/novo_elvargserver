@@ -1,16 +1,16 @@
-import { RegionManager } from "com.elvarg.game.collision";
-import { PlayerRights } from "com.elvarg.game.model.rights";
-import { Location } from "com.elvarg.game.model";
-import { Area } from "com.elvarg.game.model.areas";
-import { PrivateArea } from "com.elvarg.game.model.areas.impl";
-import { Player } from "com.elvarg.game.entity.impl.player";
-import { GameObject } from "com.elvarg.game.entity.impl.object";
+import { RegionManager } from "../../../collision/RegionManager";
+import { Player } from "../player/Player";
+import { Location } from "../../../model/Location";
+import { Area } from "../../../model/areas/Area";
+import { PrivateArea } from "../../../model/areas/impl/PrivateArea";
+import { PlayerRights } from "../../../model/rights/PlayerRights";
+import { GameObject } from "./GameObject";
 
 export class MapObjects {
 
     public static mapObjects: Map<number, GameObject[]> = new Map<number, GameObject[]>();
 
-    public static get(player: Player, id: number, location: Location): GameObject {
+    public static getPrivateArea(player: Player, id: number, location: Location): GameObject {
         let object = this.get(id, location, player.getPrivateArea());
 
         if (object == null && player.getRights() == PlayerRights.DEVELOPER) {
@@ -57,7 +57,7 @@ export class MapObjects {
         return null;
     }
 
-    public static get(location: Location, type: number, privateArea: PrivateArea): GameObject {
+    public static getType(location: Location, type: number, privateArea: PrivateArea): GameObject {
         // Check instanced objects..
         if (privateArea != null) {
             for (let object of privateArea.getObjects()) {
@@ -74,15 +74,15 @@ export class MapObjects {
         if (location.getZ() >= 4) {
             location = location.clone().setZ(0);
         }
-        let hash = getHash(location.getX(), location.getY(), location.getZ());
+        let hash = MapObjects.getHash(location.getX(), location.getY(), location.getZ());
 
         // Check if the map contains the hash..
-        if (!mapObjects.has(hash)) {
+        if (!this.mapObjects.has(hash)) {
             return null;
         }
 
         // Go through the objects in the list..
-        let list = mapObjects.get(hash);
+        let list = this.mapObjects.get(hash);
         if (list != null) {
             for (let o of list) {
                 if (o.getType() == type && o.getLocation().equals(location)) {
@@ -91,5 +91,68 @@ export class MapObjects {
             }
         }
         return null;
+    }
+
+    static exists(object: GameObject): boolean {
+        return this.get(object.getId(), object.getLocation(), object.getPrivateArea()) === object;
+    }
+
+    static add(object: GameObject) {
+        if (!object.getPrivateArea()) {
+
+            const hash = this.getHash(object.getLocation().getX(), object.getLocation().getY(), object.getLocation().getZ());
+
+            if (this.mapObjects.has(hash)) {
+                let exists = false;
+                const list = this.mapObjects.get(hash);
+                list.forEach((o: GameObject) => {
+                    if (o === object) {
+                        exists = true;
+                        return;
+                    }
+                });
+                if (!exists) {
+                    this.mapObjects.get(hash).push(object);
+                }
+            } else {
+                this.mapObjects.set(hash, [object]);
+            }
+        }
+
+        RegionManager.addObjectClipping(object);
+    }
+
+    static remove(object: GameObject) {
+        const hash = this.getHash(object.getLocation().getX(), object.getLocation().getY(), object.getLocation().getZ());
+
+        if (this.mapObjects.has(hash)) {
+            const list = this.mapObjects.get(hash);
+            for (let i = 0; i < list.length; i++) {
+                if (list[i].getId() === object.getId() && list[i].getLocation().equals(object.getLocation())) {
+                    list.splice(i, 1);
+                }
+            }
+        }
+
+        RegionManager.removeObjectClipping(object);
+    }
+
+    static clear(position: Location, clipShift: number) {
+        const hash = this.getHash(position.getX(), position.getY(), position.getZ());
+
+        if (this.mapObjects.has(hash)) {
+            const list = this.mapObjects.get(hash);
+            for (let i = 0; i < list.length; i++) {
+                if (list[i].getLocation().equals(position)) {
+                    list.splice(i, 1);
+                }
+            }
+        }
+
+        RegionManager.removeClipping(position.getX(), position.getY(), position.getZ(), clipShift);
+    }
+
+    static getHash(x: number, y: number, z: number): number {
+        return z + (x << 24) + (y << 48);
     }
 }

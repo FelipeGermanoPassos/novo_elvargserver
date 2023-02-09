@@ -6,7 +6,6 @@ import {NPCInteraction} from "../NPCInteraction"
 import {NpcIdentifiers} from "../../../../../util/NpcIdentifiers"
 
 
-@Ids(NpcIdentifiers.PERDU)
 export class Perdu implements NPCInteraction {
     
     public firstOptionClick(player: Player, npc: NPC): void {

@@ -11,4 +11,8 @@ export class GodwarsFollower extends NPC {
     public getGod(): God {
         return this.god;
     }
+
+    getSize() {
+
+    }
 }

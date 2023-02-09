@@ -2,13 +2,10 @@ import { CombatMethod } from "../../../../content/combat/method/CombatMethod"
 import { BanditCombatMethod } from "../../../../content/combat/method/impl/npcs/BanditCombtMethod"
 import { NPC } from "../NPC";
 import { Player } from "../../player/Player";
-import { Ids } from "../../../../model/Ids"
 import { Location } from "../../../../model/Location"
 import { Equipment } from "../../../../model/container/impl/Equipment"
-import { NpcIdentifiers } from "../../../../../util/NpcIdentifiers"
 
-@Ids(NpcIdentifiers.BANDIT)
-class Bandit extends NPC {
+export class Bandit extends NPC {
     private static COMBAT_METHOD: CombatMethod = new BanditCombatMethod();
 
     constructor(id: number, position: Location) {
@@ -25,5 +22,9 @@ class Bandit extends NPC {
 
     public getCombatMethod(): CombatMethod {
         return Bandit.COMBAT_METHOD;
+    }
+
+    getSize(): void {
+
     }
 }

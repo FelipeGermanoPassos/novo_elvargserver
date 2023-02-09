@@ -1,15 +1,36 @@
+import { CombatFactory } from "../../../../../content/combat/CombatFactory";
+import { CombatSpecial } from "../../../../../content/combat/CombatSpecial";
+import { CombatType } from "../../../../../content/combat/CombatType";
+import { CombatSpells } from "../../../../../content/combat/magic/CombatSpells";
+import { Presetable } from "../../../../../content/presets/Presetable";
+import { Mobile } from "../../../Mobile";
+import { PlayerBot } from "../../PlayerBot";
+import { AttackStyleSwitch } from "../AttackStyleSwitch";
+import { CombatAction } from "../CombatAction";
+import { CombatSwitch } from "../CombatSwitch";
+import { EnemyDefenseAwareCombatSwitch } from "../EnemyDefenseAwareCombatSwitch";
+import { TribridMaxFighterPreset } from "./TribridMaxFighterPreset";
+import { FighterPreset } from "../FighterPreset";
+import { Item } from "../../../../../model/Item";
+import { ItemIdentifiers } from "../../../../../../util/ItemIdentifiers";
+
+
+
 export class NHPureFighterPreset implements FighterPreset {
+    getItemPreset;
+    getCombatActions;
+    eatAtPercent;
     public static readonly BOT_NH_PURE_83 = new Presetable("BOT NH Pure",
         [
-            new Item(RUNE_CROSSBOW), new Item(BLACK_DHIDE_CHAPS), new Item(RANGING_POTION_4_), new Item(SUPER_STRENGTH_4_),
-            new Item(AVAS_ACCUMULATOR), new Item(GRANITE_MAUL), new Item(MANTA_RAY), new Item(MANTA_RAY),
-            new Item(DRAGON_BOLTS_E_, 75), new Item(MANTA_RAY), new Item(MANTA_RAY), new Item(COOKED_KARAMBWAN),
-            new Item(COOKED_KARAMBWAN), new Item(MANTA_RAY), new Item(MANTA_RAY), new Item(COOKED_KARAMBWAN),
-            new Item(COOKED_KARAMBWAN), new Item(MANTA_RAY), new Item(MANTA_RAY), new Item(MANTA_RAY),
-            new Item(COOKED_KARAMBWAN), new Item(MANTA_RAY), new Item(MANTA_RAY), new Item(MANTA_RAY),
-            new Item(WATER_RUNE, 1000), new Item(BLOOD_RUNE, 1000), new Item(DEATH_RUNE, 1000), new Item(ANGLERFISH)
+            new Item(ItemIdentifiers.RUNE_CROSSBOW), new Item(ItemIdentifiers.BLACK_DHIDE_CHAPS), new Item(ItemIdentifiers.RANGING_POTION_4_), new Item(ItemIdentifiers.SUPER_STRENGTH_4_),
+            new Item(ItemIdentifiers.AVAS_ACCUMULATOR), new Item(ItemIdentifiers.GRANITE_MAUL), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY),
+            new Item(ItemIdentifiers.DRAGON_BOLTS_E_, 75), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.COOKED_KARAMBWAN),
+            new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.COOKED_KARAMBWAN),
+            new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY),
+            new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY),
+            new Item(ItemIdentifiers.WATER_RUNE, 1000), new Item(ItemIdentifiers.BLOOD_RUNE, 1000), new Item(ItemIdentifiers.DEATH_RUNE, 1000), new Item(ItemIdentifiers.ANGLERFISH)
         ],
-        [new Item(GHOSTLY_HOOD), new Item(ZAMORAK_CAPE), new Item(MAGIC_SHORTBOW), new Item(AMULET_OF_GLORY), new Item(GHOSTLY_ROBE), null, new Item(GHOSTLY_ROBE_2), new Item(MITHRIL_GLOVES), new Item(CLIMBING_BOOTS), new Item(RING_OF_RECOIL), new Item(RUNE_ARROW, 175),],
+        [new Item(ItemIdentifiers.GHOSTLY_HOOD), new Item(ItemIdentifiers.ZAMORAK_CAPE), new Item(ItemIdentifiers.MAGIC_SHORTBOW), new Item(ItemIdentifiers.AMULET_OF_GLORY), new Item(ItemIdentifiers.GHOSTLY_ROBE), null, new Item(ItemIdentifiers.GHOSTLY_ROBE_2), new Item(ItemIdentifiers.MITHRIL_GLOVES), new Item(ItemIdentifiers.CLIMBING_BOOTS), new Item(ItemIdentifiers.RING_OF_RECOIL), new Item(ItemIdentifiers.RUNE_ARROW, 175),],
         /* atk, def, str, hp, range, pray, mage */
         [60, 1, 85, 99, 99, 1, 99],
         MagicSpellbook.ANCIENT,

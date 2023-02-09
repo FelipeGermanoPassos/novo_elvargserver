@@ -2,7 +2,7 @@ import { Autocasting } from '../content/combat/magic/Autocasting';
 import { Player } from '../entity/impl/player/Player';
 import { TeleportType } from '../model/teleportation/TeleportType';
 
-const MagicSpellbooks = {
+export const MagicSpellbooks = {
     NORMAL: { id: 1151, type: TeleportType.NORMAL },
     ANCIENT: { id: 12855, type: TeleportType.ANCIENT },
     LUNAR: { id: 29999, type: TeleportType.LUNAR }

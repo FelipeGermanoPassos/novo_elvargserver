@@ -1,10 +1,9 @@
-class Food {
+export class Food {
     /**
      * The {@link Animation} that will be played when consuming food.
      */
     private static readonly ANIMATION = new Animation(829, Priority.HIGH);
 
-    class Food {
     public static consume(player: Player, item: number, slot: number): boolean {
         const food = Edible.types.get(item);
         // Check if {@code item} is a valid food type..
@@ -120,7 +119,6 @@ static getTypes(): number[] {
 getHeal(): number {
     return this.heal;
 }
-
 
 interface Edible {
     item: Item,

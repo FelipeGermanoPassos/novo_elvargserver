@@ -1,4 +1,12 @@
-class NPCDropGenerator {
+import { DropTable, NpcDropDefinition, NPCDrop } from "../../../definition/NpcDropDefinition";
+import { ItemOnGroundManager } from "../grounditem/ItemOnGroundManager";
+import { Player } from "../player/Player";
+import { Item } from "../../../model/Item";
+import { Equipment } from "../../../model/container/impl/Equipment";
+import { RandomGen } from "../../../../util/RandomGen";
+import { NPC } from "./NPC";
+
+export class NPCDropGenerator {
     private player: Player;
     private def: NpcDropDefinition;
 
@@ -56,102 +64,101 @@ class NPCDropGenerator {
                 }
             }
         }
-    }
-    // Handle unique drops..
-// The amount of items the player will receive from the unique drop tables.
-// Note: A player cannot receive multiple drops from the same drop table.
-let rolls = 1 + random.get().nextInt(3);
-for (let i = 0; i < rolls; i++) {
-    let table: DropTable | undefined;
+        // Handle unique drops..
+        // The amount of items the player will receive from the unique drop tables.
+        // Note: A player cannot receive multiple drops from the same drop table.
+        const rolls = 1 + random.get().nextInt(3);
+        for (let i = 0; i < rolls; i++) {
+            let table: DropTable | undefined;
 
-    // Check if we should access the special drop table..
-    if (def.getSpecialDrops() != null && !parsedTables.includes(DropTable.SPECIAL)) {
-        if (def.getSpecialDrops().length > 0) {
-            let drop = def.getSpecialDrops()[random.get().nextInt(def.getSpecialDrops().length)];
-            if (random.get().nextInt(drop.getChance()) == 0) {
-                items.push(drop.toItem(random));
-                parsedTables.push(DropTable.SPECIAL);
-                continue;
+            // Check if we should access the special drop table..
+            if (this.def.getSpecialDrops() != null && !parsedTables.includes(DropTable.SPECIAL)) {
+                if (this.def.getSpecialDrops().length > 0) {
+                    let drop = this.def.getSpecialDrops()[random.get().nextInt(this.def.getSpecialDrops().length)];
+                    if (random.get().nextInt(drop.getChance()) == 0) {
+                        items.push(drop.toItem(random));
+                        parsedTables.push(DropTable.SPECIAL);
+                        continue;
+                    }
+                }
+            }
+
+            // If we didn't get a special drop, attempt to find a different table..
+            if (!table) {
+                let chance = Math.random() * 100;
+                if ((table = this.getDropTable(chance)) != undefined) {
+                    // Make sure we haven't already parsed this table.
+                    if (parsedTables.includes(table)) {
+                        continue;
+                    }
+                    // Get the items related to this drop table..
+                    let dropTableItems: NPCDrop[] | undefined;
+                    switch (table) {
+                        case DropTable.COMMON:
+                            if (this.def.getCommonDrops() != null) {
+                                dropTableItems = this.def.getCommonDrops();
+                            }
+                            break;
+                        case DropTable.UNCOMMON:
+                            if (this.def.getUncommonDrops() != null) {
+                                dropTableItems = this.def.getUncommonDrops();
+                            }
+                            break;
+                        case DropTable.RARE:
+                            if (this.def.getRareDrops() != null) {
+                                dropTableItems = this.def.getRareDrops();
+                            }
+                            break;
+                        case DropTable.VERY_RARE:
+                            if (this.def.getVeryRareDrops() != null) {
+                                dropTableItems = this.def.getVeryRareDrops();
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    if (!dropTableItems) {
+                        continue;
+                    }
+                    // Get a random drop from the table..
+                    let npcDrop = dropTableItems[random.get().nextInt(dropTableItems.length)];
+
+                    // Add the drop to the drop list.
+                    items.push(npcDrop.toItem(random));
+
+                    // Flag this table as visited..
+                    parsedTables.push(table);
+                }
             }
         }
+        return items;
     }
-
-    // If we didn't get a special drop, attempt to find a different table..
-    if (!table) {
-        let chance = Math.random() * 100;
-        if ((table = getDropTable(chance)) != undefined) {
-            // Make sure we haven't already parsed this table.
-            if (parsedTables.includes(table)) {
-                continue;
-            }
-            // Get the items related to this drop table..
-            let dropTableItems: NPCDrop[] | undefined;
-            switch (table) {
-                case DropTable.COMMON:
-                    if (def.getCommonDrops() != null) {
-                        dropTableItems = def.getCommonDrops();
-                    }
-                    break;
-                case DropTable.UNCOMMON:
-                    if (def.getUncommonDrops() != null) {
-                        dropTableItems = def.getUncommonDrops();
-                    }
-                    break;
-                case DropTable.RARE:
-                    if (def.getRareDrops() != null) {
-                        dropTableItems = def.getRareDrops();
-                    }
-                    break;
-                case DropTable.VERY_RARE:
-                    if (def.getVeryRareDrops() != null) {
-                        dropTableItems = def.getVeryRareDrops();
-                    }
-                    break;
-                default:
-                    break;
-            }
-            if (!dropTableItems) {
-                continue;
-            }
-            // Get a random drop from the table..
-            let npcDrop = dropTableItems[random.get().nextInt(dropTableItems.length)];
-
-            // Add the drop to the drop list.
-            items.push(npcDrop.toItem(random));
-
-            // Flag this table as visited..
-            parsedTables.push(table);
-        }
+    /**
+     * Checks if the player is wearing a ring of wealth which will increase the
+     * chances for getting a good drop.
+     *
+     * @return
+     */
+    public wearingRingOfWealth(): boolean {
+        return this.player.getEquipment().getItems()[Equipment.RING_SLOT].getId() == 2572;
     }
-}
-return items;
-
-/**
- * Checks if the player is wearing a ring of wealth which will increase the
- * chances for getting a good drop.
- *
- * @return
- */
-public wearingRingOfWealth(): boolean {
-    return player.getEquipment().getItems()[Equipment.RING_SLOT].getId() == 2572;
-}
-/**
- * Attempts to fetch the drop table for the given chance.
- *
- * @param drop
- * @return
- */
-public getDropTable(chance: number): DropTable | undefined {
-    let table: DropTable | undefined;
-    // Fetch one of the ordinary drop tables
-    // based on our chance.
-    for (let dropTable of Object.values(DropTable)) {
-        if (dropTable.getRandomRequired() >= 0) {
-            if (chance <= dropTable.getRandomRequired()) {
-                table = dropTable;
+    /**
+     * Attempts to fetch the drop table for the given chance.
+     *
+     * @param drop
+     * @return
+     */
+    public getDropTable(chance: number): DropTable | undefined {
+        let table
+        // Fetch one of the ordinary drop tables
+        // based on our chance.
+        for (let dropTable of Object.values(DropTable)) {
+            if (dropTable.getRandomRequired() >= 0) {
+                if (chance <= dropTable.getRandomRequired()) {
+                    table = dropTable;
+                }
             }
         }
+        return table;
     }
-    return table;
-}
 }

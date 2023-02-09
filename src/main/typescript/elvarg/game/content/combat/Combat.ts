@@ -225,10 +225,10 @@ export class Combat {
         this.damageMap.set(player, new HitDamageCache(amount));
     }
 
-    public getKiller(clearMap: boolean): Optional<Player> {
+    public getKiller(clearMap: boolean) {
         // Return null if no players killed this entity.
         if (this.damageMap.size == 0) {
-            return Optional.empty();
+            return null;
         }
 
         // The damage and killer placeholders.

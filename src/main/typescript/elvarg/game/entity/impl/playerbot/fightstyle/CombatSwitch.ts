@@ -1,18 +1,29 @@
+import { PrayerHandler } from "../../../../content/PrayerHandler";
+import { Mobile } from "../../Mobile";
+import { PlayerBot } from "../PlayerBot";
+import { ItemInSlot } from "../../../../model/ItemInSlot";
+import { EquipPacketListener } from "../../../../../net/packet/impl/EquipPacketListener";
+import { TimerKey } from "../../../../../util/timers/TimerKey";
+import { CombatAction } from "./CombatAction";
+import { PrayerData } from "../../../../content/PrayerHandler";
+
+
 export abstract class CombatSwitch implements CombatAction {
 
     switchItemIds: number[];
     prayers: PrayerData[];
     instant: boolean;
+    shouldPerform;
+    stopAfter;
 
-    constructor(switchItemIds: number[]) {
-        this.switchItemIds = switchItemIds;
-        this.prayers = [];
-        this.instant = false;
-    }
 
-    constructor(switchItemIds: number[], prayerData: PrayerData[]) {
+    constructor(switchItemIds: number[], prayerData?: PrayerData[]) {
         this.switchItemIds = switchItemIds;
-        this.prayers = prayerData;
+        if (prayerData != null) {
+            this.prayers = prayerData;
+        } else {
+            this.prayers = [];
+        }
         this.instant = false;
     }
 
@@ -35,5 +46,5 @@ export abstract class CombatSwitch implements CombatAction {
     }
 
 
-    public abstract performAfterSwitch(playerBot: PlayerBot, enemy: Mobile);
+    public abstract performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void;
 }

@@ -1,3 +1,20 @@
+import { Food } from "../../../../content/Food"
+import { PotionConsumable } from "../../../../content/PotionConsumable"
+import { PrayerHandler } from "../../../../content/PrayerHandler";
+import { CombatFactory } from "../../../../content/combat/CombatFactory";
+import { Presetables } from "../../../../content/presets/Presetables";
+import { Mobile } from "../../Mobile";
+import { Player } from "../../player/Player";
+import { PlayerBot } from "../PlayerBot";
+import { ItemInSlot } from "../../../../model/ItemInSlot";
+import { Skill } from "../../../../model/Skill";
+import { TeleportHandler } from "../../../../model/teleportation/TeleportHandler";
+import { TeleportType } from "../../../../model/teleportation/TeleportType";
+import { Task } from "../../../../task/Task";
+import { TaskManager } from "../../../../task/TaskManager";
+import { ItemIdentifiers } from "../../../../../util/ItemIdentifiers";
+import { Misc } from "../../../../../util/Misc";
+
 export class CombatInteraction {
     playerBot: PlayerBot;
     private attackTarget: Mobile;
@@ -69,7 +86,7 @@ export class CombatInteraction {
         }
         // Boost range
         if (!this.playerBot.getSkillManager().isBoosted(Skill.RANGED)) {
-            let pot = RANGE_POTIONS.getIds().map(id => ItemInSlot.getFromInventory(id, this.playerBot.getInventory()))
+            let pot = PotionConsumable.RANGE_POTIONS.getIds().map(id => ItemInSlot.getFromInventory(id, this.playerBot.getInventory()))
                 .filter(Objects.nonNull)
                 .find(p => p);
 
@@ -80,7 +97,7 @@ export class CombatInteraction {
         }
         // Boost all
         if (!this.playerBot.getSkillManager().isBoosted(Skill.STRENGTH)) {
-            let pot = SUPER_COMBAT_POTIONS.getIds().map(id => ItemInSlot.getFromInventory(id, this.playerBot.getInventory()))
+            let pot = PotionConsumable.SUPER_COMBAT_POTIONS.getIds().map(id => ItemInSlot.getFromInventory(id, this.playerBot.getInventory()))
                 .filter(Objects.nonNull)
                 .find(p => p);
 
@@ -91,7 +108,7 @@ export class CombatInteraction {
         }
         // Boost strength
         if (!this.playerBot.getSkillManager().isBoosted(Skill.STRENGTH)) {
-            let pot = SUPER_STRENGTH_POTIONS.getIds().map(id => ItemInSlot.getFromInventory(id, this.playerBot.getInventory()))
+            let pot = PotionConsumable.SUPER_STRENGTH_POTIONS.getIds().map(id => ItemInSlot.getFromInventory(id, this.playerBot.getInventory()))
                 .filter(Objects.nonNull)
                 .find(p => p);
 
@@ -102,7 +119,7 @@ export class CombatInteraction {
         }
         //Boost attack
         if (!this.playerBot.getSkillManager().isBoosted(Skill.ATTACK)) {
-            let pot = SUPER_ATTACK_POTIONS.getIds().map(id => ItemInSlot.getFromInventory(id, this.playerBot.getInventory()))
+            let pot = PotionConsumable.SUPER_ATTACK_POTIONS.getIds().map(id => ItemInSlot.getFromInventory(id, this.playerBot.getInventory()))
                 .filter(Objects.nonNull)
                 .find(p => p);
 
@@ -164,7 +181,7 @@ export class CombatInteraction {
         this.playerBot.setFollowing(null);
         this.playerBot.getCombat().setUnderAttack(null);
 
-        TaskManager.submit(new Task(Misc.randomInclusive(10, 20), playerBot, false) {
+        TaskManager.submit(new Task(Misc.randomInclusive(10, 20), this.playerBot, false) {
             execute(): void {
                 this.reset();
                 this.stop();

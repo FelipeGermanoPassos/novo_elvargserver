@@ -1,4 +1,4 @@
-import { CombatSpells } from "../../../../content/combat/magic/CombatSpell"
+import { CombatSpells } from "../../../../content/combat/magic/CombatSpells"
 import { CombatMethod } from "../../../../content/combat/method/CombatMethod"
 import { RangedData } from "../../../../content/combat/ranged/RangedData"
 import { Ids } from "../../../../model/Ids"
@@ -8,7 +8,6 @@ import { NpcIdentifiers } from "../../../../../util/NpcIdentifiers"
 import { NPC } from "../NPC"
 
 
-@Ids(NpcIdentifiers.ELDER_CHAOS_DRUID)
 export class ElderChaosDruid extends NPC {
 
     constructor(id: number, position: Location) {
@@ -19,5 +18,9 @@ export class ElderChaosDruid extends NPC {
 
     public getCombatMethod(): CombatMethod {
         return CombatFactory.MAGIC_COMBAT;
+    }
+
+    getSize() {
+
     }
 }

@@ -11,9 +11,14 @@ export class Item {
  * @param id     Item id.
  * @param amount Item amount.
  */
-    constructor(id: number, amount: number) {
-        this.id = id;
-        this.amount = amount;
+    constructor(id: number, amount?: number) {
+        if (amount != null) {
+            this.id = id;
+            this.amount = amount;
+        } else {
+            this(id, 1);
+
+        }
     }
 
     /**

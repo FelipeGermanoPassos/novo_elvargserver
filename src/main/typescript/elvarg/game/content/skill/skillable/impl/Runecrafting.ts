@@ -1,4 +1,4 @@
-class Runecrafting {
+export class Runecrafting {
     private static CRAFT_RUNES_GRAPHIC = { id: 186 };
     private static CRAFT_RUNES_ANIMATION = { id: 791 };
 
@@ -223,10 +223,15 @@ class Talisman {
     }
 }
 
-class Pouch {
+export class Pouch {
     private static pouches: Map<number, Pouch> = new Map<number, Pouch>();
 
-    static initialize() {
+    public static SMALL_POUCH = { id: 5509, level: 1, capacity: 3, time: -1 }
+    public static MEDIUM_POUCH = { id: 5510, level: 25, capacity: 6, time: 45 }
+    public static LARGE_POUCH = { id: 5512, level: 50, capacity: 9, time: 29 }
+    public static GIANT_POUCH = { id: 5514, level: 75, capacity: 12, time: 10 }
+
+    public static initialize() {
         for (let p of Object.values(PouchEnum)) {
             pouches.set(p.itemId, p);
         }
@@ -234,36 +239,32 @@ class Pouch {
 
     constructor(public itemId: number, public requiredLevel: number, public capacity: number, public decayChance: number) { }
 
-    static forItemId(itemId: number): Pouch | undefined {
+    public static forItemId(itemId: number): Pouch | undefined {
         return pouches.get(itemId);
     }
 
-    get itemId(): number {
+    public static getitemId(): number {
         return this.itemId;
     }
 
-    get requiredLevel(): number {
+    public static getrequiredLevel(): number {
         return this.requiredLevel;
     }
 
-    get capacity(): number {
+    public static getcapacity(): number {
         return this.capacity;
     }
 
-    get decayChance(): number {
+    public static getdecayChance(): number {
         return this.decayChance;
     }
 }
 
-class PouchContainer {
+export class PouchContainer {
     pouch: Pouch;
     runeEssenceAmt: number;
     pureEssenceAmt: number;
-    constructor(pouch: Pouch) {
-        this.pouch = pouch;
-    }
-
-    constructor(pouch: Pouch, runeEssence: number, pureEssence: number) {
+    constructor(pouch: Pouch, runeEssence?: number, pureEssence?: number) {
         this.pouch = pouch;
         this.runeEssenceAmt = runeEssence;
         this.pureEssenceAmt = pureEssence;
@@ -376,13 +377,6 @@ enum Talisman {
     LAW_TALISMAN = { id: 1458, level: 54, location: { x: 2464, y: 4817 } },
     DEATH_TALISMAN = { id: 1456, level: 65, location: { x: 2208, y: 4829 } },
     BLOOD_TALISMAN = { id: 1450, level: 77, location: { x: 1722, y: 3826 } },
-}
-
-enum Pouch {
-    SMALL_POUCH = { id: 5509, level: 1, capacity: 3, time: -1 },
-    MEDIUM_POUCH = { id: 5510, level: 25, capacity: 6, time: 45 },
-    LARGE_POUCH = { id: 5512, level: 50, capacity: 9, time: 29 },
-    GIANT_POUCH = { id: 5514, level: 75, capacity: 12, time: 10 },
 }
 
 interface Pouch {

@@ -1,3 +1,5 @@
+import { Player } from "../entity/impl/player/Player";
+
 export class Dueling {
     public static readonly MAIN_INTERFACE_CONTAINER = 6669;
     private static readonly DUELING_WITH_FRAME = 6671;
@@ -855,4 +857,5 @@ enum DuelRule {
     NO_RING = 67108864,
     NO_BOOTS = 16777216,
     NO_GLOVES = 8388608,
+}
 }

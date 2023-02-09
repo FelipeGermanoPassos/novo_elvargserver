@@ -1,21 +1,23 @@
+import { Stopwatch } from "../../util/Stopwatch";
+
 export class SecondsTimer {
     private seconds: number;
     private running: boolean;
     private startTime: any;
     private endTime: any;
+    private stopwhatch: Stopwatch
 
     constructor() {
         this.seconds = 0;
         this.running = false;
     }
 
-    start(): SecondsTimer {
-        if (this.seconds <= 0) {
-            return this;
-        }
-        this.running = true;
-        this.startTime = performance.now();
-        return this;
+    start(seconds: number): SecondsTimer {
+        this.seconds = seconds;
+
+        //Reset and then start the stopwatch.
+        this.stopwatch.reset();
+        stopwatch.start();
     }
 
     stop(): void {

@@ -18,7 +18,7 @@ static enum Attack {
     SPECIAL_ATTACK, DEFAULT_RANGED_ATTACK, DEFAULT_MELEE_ATTACK
 }
 
-class CrazyArchaeologistCombatMethod extends CombatMethod {
+export class CrazyArchaeologistCombatMethod extends CombatMethod {
 
     private static readonly QUOTES: string[] = ["I'm Bellock - respect me!", "Get off my site!",
         "No-one messes with Bellock's dig!", "These ruins are mine!", "Taste my knowledge!",

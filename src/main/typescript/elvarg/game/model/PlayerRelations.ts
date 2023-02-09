@@ -1,7 +1,9 @@
+import { Player } from "../entity/impl/player/Player";
+
 export class PlayerRelations {
     private status: PrivateChatStatus = PrivateChatStatus.ON;
-    private friendList: Array<number> = new Array<number>(200);
-    private ignoreList: Array<number> = new Array<number>(100);
+    public friendList: Array<number> = new Array<number>(200);
+    public ignoreList: Array<number> = new Array<number>(100);
     private privateMessageId = 1;
     private player: Player;
 

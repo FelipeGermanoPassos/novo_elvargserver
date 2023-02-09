@@ -1,13 +1,9 @@
 import { CombatMethod } from "../../../../content/combat/method/CombatMethod"
 import { RangedData } from "../../../../content/combat/ranged/RangedData"
 import { NPC } from "../NPC"
-import { Ids } from "../../../../model/Ids"
 import { Location } from "../../../../model/Location"
 import { CombatFactory } from "../../../../content/combat/CombatFactory"
-import { NpcIdentifiers } from "../../../../../util/NpcIdentifiers"
 
-
-@Ids(NpcIdentifiers.KARIL_THE_TAINTED)
 export class KarilTheTainted extends NPC {
 
     constructor(id: number, position: Location) {
@@ -19,5 +15,9 @@ export class KarilTheTainted extends NPC {
 
     public getCombatMethod(): CombatMethod {
         return CombatFactory.RANGED_COMBAT;
+    }
+
+    getSize(){
+
     }
 }

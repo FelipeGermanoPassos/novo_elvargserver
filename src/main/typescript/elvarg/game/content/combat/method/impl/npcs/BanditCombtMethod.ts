@@ -2,7 +2,7 @@ import { MeleeCombatMethod } from "../MeleeCombatMethod";
 import { Mobile } from "../../../../../entity/impl/Mobile";
 import { Equipment } from "../../../../../model/container/impl/Equipment";
 
-class BanditCombtMethod extends MeleeCombatMethod {
+export class BanditCombtMethod extends MeleeCombatMethod {
     onCombatBegan(character: Mobile, target: Mobile) {
         if (!character || !target) {
             return;

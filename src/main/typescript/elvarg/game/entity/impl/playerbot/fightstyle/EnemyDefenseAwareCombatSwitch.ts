@@ -1,18 +1,21 @@
-import { CombatType } from './CombatType';
-import { AttackStyleSwitch } from './AttackStyleSwitch';
-import { Mobile } from '../Mobile';
-import { PlayerBot } from '../PlayerBot';
-import { PrayerHandler } from '../../content/PrayerHandler';
-import { AccuracyFormulasDpsCalc } from '../../content/combat/formula/AccuracyFormulasDpsCalc';
-import { DamageFormulas } from '../../content/combat/formula/DamageFormulas';
-import { BonusManager } from '../../model/equipment/BonusManager';
+import { PrayerHandler } from "../../../../content/PrayerHandler";
+import { CombatType } from "../../../../content/combat/CombatType";
+import { AccuracyFormulasDpsCalc } from "../../../../content/combat/formula/AccuracyFormulasDpsCalc";
+import { DamageFormulas } from "../../../../content/combat/formula/DamageFormulas";
+import { Mobile } from "../../Mobile";
+import { PlayerBot } from "../PlayerBot";
+import { BonusManager } from "../../../../model/equipment/BonusManager";
+import { CombatAction } from "./CombatAction";
+import { AttackStyleSwitch } from "./AttackStyleSwitch";
 
-class EnemyDefenseAwareCombatSwitch implements CombatAction {
+export class EnemyDefenseAwareCombatSwitch implements CombatAction {
     private styleSwitches: AttackStyleSwitch[];
 
     constructor(styleSwitches: AttackStyleSwitch[]) {
         this.styleSwitches = styleSwitches;
     }
+    shouldPerform
+    stopAfter
 
     perform(playerBot: PlayerBot, enemy: Mobile) {
         let bestSwitch: AttackStyleSwitch = null;
@@ -26,7 +29,7 @@ class EnemyDefenseAwareCombatSwitch implements CombatAction {
             let maxHit = styleSwitch.getMaxHit();
 
             if (styleSwitch.getCombatType() == CombatType.MELEE) {
-                defenseRoll = AccuracyFormulasDpsCalc.defenseMeleeRoll(enemy);
+                defenseRoll = AccuracyFormulasDpsCalc.defenseMeleeRoll(enemy, BonusManager.ATTACK_SLASH);
                 if (enemy.getPrayerActive()[PrayerHandler.PROTECT_FROM_MELEE]) {
                     maxHit *= 0.7;
                 }

@@ -1,28 +1,54 @@
+import { PotionConsumable } from "../../../../../content/PotionConsumable";
+import { PrayerData, PrayerHandler } from "../../../../../content/PrayerHandler";
+import { CombatFactory } from "../../../../../content/combat/CombatFactory";
+import { CombatSpecial } from "../../../../../content/combat/CombatSpecial";
+import { CombatType } from "../../../../../content/combat/CombatType";
+import { CombatSpells } from "../../../../../content/combat/magic/CombatSpells";
+import { CombatMethod } from "../../../../../content/combat/method/CombatMethod";
+import { Presetable } from "../../../../../content/presets/Presetable";
+import { Mobile } from "../../../Mobile";
+import { PlayerBot } from "../../PlayerBot";
+import { AttackStyleSwitch } from "../AttackStyleSwitch";
+import { CombatAction } from "../CombatAction";
+import { CombatSwitch } from "../CombatSwitch";
+import { EnemyDefenseAwareCombatSwitch } from "../EnemyDefenseAwareCombatSwitch";
+import { FighterPreset } from "../FighterPreset";
+import { Item } from "../../../../../model/Item";
+import { ItemInSlot } from "../../../../../model/ItemInSlot";
+import { MagicSpellbook } from "../../../../../model/MagicSpellbook";
+import { Skill } from "../../../../../model/Skill";
+import { BonusManager } from "../../../../../model/equipment/BonusManager";
+import { MovementQueue } from "../../../../../model/movement/MovementQueue";
+import { RandomGen } from "../../../../../../util/RandomGen";
+import { TimerKey } from "../../../../../../util/timers/TimerKey";
+import { ItemIdentifiers } from "../../../../../../util/ItemIdentifiers";
+
+
 export class MidTribridMaxFighterPreset implements FighterPreset {
     private static RANDOM = new RandomGen();
     private CombatAction = new CombatAction();
     public static BOT_MID_TRIBRID: Presetable = new Presetable("Mid Tribrid",
         [
-            new Item(AVAS_ACCUMULATOR), new Item(BLACK_DHIDE_BODY), new Item(ABYSSAL_WHIP), new Item(SHARK),
-            new Item(RUNE_CROSSBOW), new Item(RUNE_PLATELEGS), new Item(DRAGON_DEFENDER), new Item(SHARK),
-            new Item(COOKED_KARAMBWAN), new Item(COOKED_KARAMBWAN), new Item(DRAGON_DAGGER_P_PLUS_PLUS_), new Item(SUPER_RESTORE_4_),
-            new Item(SHARK), new Item(SHARK), new Item(SHARK), new Item(SHARK),
-            new Item(SHARK), new Item(SHARK), new Item(SHARK), new Item(SUPER_COMBAT_POTION_4_),
-            new Item(SHARK), new Item(SHARK), new Item(SHARK), new Item(ANGLERFISH),
-            new Item(WATER_RUNE, 6000), new Item(BLOOD_RUNE, 2000), new Item(DEATH_RUNE, 4000), new Item(RANGING_POTION_4_),
+            new Item(ItemIdentifiers.AVAS_ACCUMULATOR), new Item(ItemIdentifiers.BLACK_DHIDE_BODY), new Item(ItemIdentifiers.ABYSSAL_WHIP), new Item(ItemIdentifiers.SHARK),
+            new Item(ItemIdentifiers.RUNE_CROSSBOW), new Item(ItemIdentifiers.RUNE_PLATELEGS), new Item(ItemIdentifiers.DRAGON_DEFENDER), new Item(ItemIdentifiers.SHARK),
+            new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.DRAGON_DAGGER_P_PLUS_PLUS_), new Item(ItemIdentifiers.SUPER_RESTORE_4_),
+            new Item(ItemIdentifiers.SHARK), new Item(ItemIdentifiers.SHARK), new Item(ItemIdentifiers.SHARK), new Item(ItemIdentifiers.SHARK),
+            new Item(ItemIdentifiers.SHARK), new Item(ItemIdentifiers.SHARK), new Item(ItemIdentifiers.SHARK), new Item(ItemIdentifiers.SUPER_COMBAT_POTION_4_),
+            new Item(ItemIdentifiers.SHARK), new Item(ItemIdentifiers.SHARK), new Item(ItemIdentifiers.SHARK), new Item(ItemIdentifiers.ANGLERFISH),
+            new Item(ItemIdentifiers.WATER_RUNE, 6000), new Item(ItemIdentifiers.BLOOD_RUNE, 2000), new Item(ItemIdentifiers.DEATH_RUNE, 4000), new Item(ItemIdentifiers.RANGING_POTION_4_),
         ],
         [
-            new Item(HELM_OF_NEITIZNOT),
-            new Item(SARADOMIN_CAPE),
-            new Item(MASTER_WAND),
-            new Item(AMULET_OF_FURY),
-            new Item(MYSTIC_ROBE_TOP),
-            new Item(SPIRIT_SHIELD),
-            new Item(MYSTIC_ROBE_BOTTOM),
-            new Item(BARROWS_GLOVES),
-            new Item(CLIMBING_BOOTS),
-            new Item(RING_OF_RECOIL),
-            new Item(DRAGON_BOLTS_E_, 500),
+            new Item(ItemIdentifiers.HELM_OF_NEITIZNOT),
+            new Item(ItemIdentifiers.SARADOMIN_CAPE),
+            new Item(ItemIdentifiers.MASTER_WAND),
+            new Item(ItemIdentifiers.AMULET_OF_FURY),
+            new Item(ItemIdentifiers.MYSTIC_ROBE_TOP),
+            new Item(ItemIdentifiers.SPIRIT_SHIELD),
+            new Item(ItemIdentifiers.MYSTIC_ROBE_BOTTOM),
+            new Item(ItemIdentifiers.BARROWS_GLOVES),
+            new Item(ItemIdentifiers.CLIMBING_BOOTS),
+            new Item(ItemIdentifiers.RING_OF_RECOIL),
+            new Item(ItemIdentifiers.DRAGON_BOLTS_E_, 500),
         ],
         [99, 99, 99, 99, 99, 99, 99],
         MagicSpellbook.ANCIENT,
@@ -33,7 +59,7 @@ export class MidTribridMaxFighterPreset implements FighterPreset {
         //Slower
         {
             shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-                return RANDOM.inclusive(0, 4) != 2;
+                return this.RANDOM.inclusive(0, 4) != 2;
             },
             perform(playerBot: PlayerBot, enemy: Mobile): void {
 
@@ -45,7 +71,7 @@ export class MidTribridMaxFighterPreset implements FighterPreset {
         //OverHead prayers
         {
             shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-                return RANDOM.inclusive(0, 4) == 2;
+                return this.RANDOM.inclusive(0, 4) == 2;
             },
             perform(playerBot: PlayerBot, enemy: Mobile) {
                 const combatMethod = CombatFactory.getMethod(enemy);
@@ -54,21 +80,21 @@ export class MidTribridMaxFighterPreset implements FighterPreset {
                 const magicAccuracy = (enemy.isNpc() ? 0 : enemy.getAsPlayer().getBonusManager().getAttackBonus()[BonusManager.ATTACK_MAGIC]);
 
                 if (!CombatFactory.canReach(enemy, combatMethod, playerBot) && magicAccuracy < 35) {
-                    PrayerHandler.activatePrayer(playerBot, PrayerHandler.PrayerData.SMITE);
+                    PrayerHandler.activatePrayer(playerBot, PrayerHandler.prayerData.SMITE);
                     return;
                 }
 
                 if (combatType == CombatType.MELEE && CombatFactory.canReach(enemy, combatMethod, playerBot)) {
-                    PrayerHandler.activatePrayer(playerBot, PrayerHandler.PrayerData.PROTECT_FROM_MELEE);
+                    PrayerHandler.activatePrayer(playerBot, PrayerHandler.prayerData.PROTECT_FROM_MELEE);
                     return;
                 }
 
                 if (combatType == CombatType.RANGED) {
-                    PrayerHandler.activatePrayer(playerBot, PrayerHandler.PrayerData.PROTECT_FROM_MISSILES);
+                    PrayerHandler.activatePrayer(playerBot, PrayerHandler.prayerData.PROTECT_FROM_MISSILES);
                 } else {
-                    PrayerHandler.activatePrayer(playerBot, PrayerHandler.PrayerData.PROTECT_FROM_MAGIC);
+                    PrayerHandler.activatePrayer(playerBot, PrayerHandler.prayerData.PROTECT_FROM_MAGIC);
                 }
-            }
+            },
             stopAfter(): boolean {
                 return false;
             }
@@ -120,7 +146,7 @@ export class MidTribridMaxFighterPreset implements FighterPreset {
             }
         },
         new CombatSwitchAction()([MASTER_WAND, SARADOMIN_CAPE, MYSTIC_ROBE_TOP, MYSTIC_ROBE_BOTTOM, SPIRIT_SHIELD]),
-        new PrayerHandler()([PrayerHandler.PrayerData.PROTECT_ITEM, PrayerHandler.PrayerData.MYSTIC_MIGHT]){
+        new PrayerHandler()([PrayerHandler.prayerData.PROTECT_ITEM, PrayerHandler.prayerData.MYSTIC_MIGHT]){
 
             shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
                 let canAttackNextTick = playerBot.getTimers().willEndIn(TimerKey.COMBAT_ATTACK, 1);
@@ -143,7 +169,7 @@ export class MidTribridMaxFighterPreset implements FighterPreset {
         },
 
         class CombatSwitch {
-            constructor(public equipment: number[], public prayers: PrayerHandler.PrayerData[]) { }
+            constructor(public equipment: number[], public prayers: PrayerData[]) { }
 
             public shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
                 // logic here
@@ -152,70 +178,8 @@ export class MidTribridMaxFighterPreset implements FighterPreset {
             public performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void {
                 // logic here
             }
-        },
-        
-        enum CombatType {
-    MAGIC = "MAGIC",
-    RANGED = "RANGED",
-    MELEE = "MELEE"
-}
-
-const MASTER_WAND = 0;
-const SARADOMIN_CAPE = 1;
-const MYSTIC_ROBE_TOP = 2;
-const MYSTIC_ROBE_BOTTOM = 3;
-const SPIRIT_SHIELD = 4;
-const RUNE_CROSSBOW = 5;
-const AVAS_ACCUMULATOR = 6;
-const RUNE_PLATELEGS = 7;
-const BLACK_DHIDE_BODY = 8;
-const ABYSSAL_WHIP = 9;
-const DRAGON_DEFENDER = 10;
-
-const enemyDefenseAwareCombatSwitch = new EnemyDefenseAwareCombatSwitch([
-    new AttackStyleSwitch(CombatType.MAGIC, new CombatSwitch([MASTER_WAND, SARADOMIN_CAPE, MYSTIC_ROBE_TOP, MYSTIC_ROBE_BOTTOM, SPIRIT_SHIELD],
-        [PrayerHandler.PrayerData.PROTECT_ITEM, PrayerHandler.PrayerData.AUGURY]), {
-        public shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-            return CombatSpells.ICE_BARRAGE.getSpell().canCast(playerBot, false);
-        },
-
-        public performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void {
-            playerBot.getCombat().setCastSpell(CombatSpells.ICE_BARRAGE.getSpell());
-            playerBot.getCombat().attack(enemy);
         }
-    }),
-    new AttackStyleSwitch(CombatType.RANGED, new CombatSwitch([RUNE_CROSSBOW, AVAS_ACCUMULATOR, RUNE_PLATELEGS, BLACK_DHIDE_BODY],
-        [PrayerHandler.PrayerData.PROTECT_ITEM, PrayerHandler.PrayerData.EAGLE_EYE]), {
-        public shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-            return true;
-        },
-
-        public performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void {
-            playerBot.getCombat().setCastSpell(null);
-            playerBot.setSpecialActivated(false);
-            playerBot.getCombat().attack(enemy);
-        },
-        public performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void {
-            playerBot.getCombat().setCastSpell(null);
-            playerBot.getCombat().attack(enemy);
-        },
-    }),
-    shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean, {
-        return playerBot.getTimers().willEndIn(TimerKey.COMBAT_ATTACK, 1),
-    },
-
-    getItemPreset(): Presetable, {
-        return BOT_MID_TRIBRID;
-    },
-
-    getCombatActions(): CombatAction[], {
-        return COMBAT_ACTIONS;
-    },
-
-    eatAtPercent(): number, {
-        return 45;
-    },
-}
+    }
 
 
 

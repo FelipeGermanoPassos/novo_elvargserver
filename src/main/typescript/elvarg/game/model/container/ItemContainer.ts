@@ -1,8 +1,10 @@
+import { Item } from "../Item";
+import { Player } from "../../entity/impl/player/Player";
+
 export class ItemContainer {
     private player: Player;
-    private items: Item[] = new Array(this.capacity());
+    public items: Item[] = new Array(this.capacity());
     
-    Copy code
     constructor() {
         for (let i = 0; i < this.capacity(); i++) {
             this.items[i] = new Item(-1, 0);
@@ -30,6 +32,14 @@ export class ItemContainer {
             this.items[i] = new Item(-1, 0);
         }
     }
+
+    constructor(player: Player, capacity: number)
+    constructor(player: Player)
+    constructor(capacity: number)
+    constructor()
+    constructor(pc?: any, capacity?: any){
+        if ()
+    }
     
     abstract capacity(): number;
     
@@ -48,7 +58,7 @@ export class ItemContainer {
         return this;
     }
     
-    getItems(): Item[] {
+    public getItems(): Item[] {
         return this.items;
     }
     

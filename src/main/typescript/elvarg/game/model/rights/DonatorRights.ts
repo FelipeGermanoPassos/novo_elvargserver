@@ -1,16 +1,16 @@
-enum DonatorRights {
-    NONE = { spriteId: -1, yellDelay: -1, yellTag: "" },
-    REGULAR_DONATOR = { spriteId: 622, yellDelay: 40, yellTag: "[Donator]" },
-    SUPER_DONATOR = { spriteId: 623, yellDelay: 25, yellTag: "[Super Donator]" },
-    UBER_DONATOR = { spriteId: 624, yellDelay: 10, yellTag: "[Uber Donator]" },
+export class DonatorRights {
+    public static NONE = { spriteId: -1, yellDelay: -1, yellTag: "" },
+    public static REGULAR_DONATOR = { spriteId: 622, yellDelay: 40, yellTag: "[Donator]" },
+    public static SUPER_DONATOR = { spriteId: 623, yellDelay: 25, yellTag: "[Super Donator]" },
+    public static UBER_DONATOR = { spriteId: 624, yellDelay: 10, yellTag: "[Uber Donator]" },
 
-    getSpriteId() {
+    public static getSpriteId() {
         return this.spriteId
-    },
-        getYellDelay() {
-    return this.yellDelay
-},
-getYellTag() {
-    return this.yellTag
-}
     }
+    public static getYellDelay() {
+        return this.yellDelay
+    }
+    public static getYellTag() {
+        return this.yellTag
+    }
+}

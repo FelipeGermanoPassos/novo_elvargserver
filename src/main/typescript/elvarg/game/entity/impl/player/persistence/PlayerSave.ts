@@ -1,13 +1,30 @@
+import { PrayerHandler, PrayerData } from "../../../../content/PrayerHandler";
+import { FightType } from "../../../../content/combat/FightType";
+import { Presetable } from "../../../../content/presets/Presetable";
+import { SkillManager, Skills } from "../../../../content/skill/SkillManager";
+import { Runecrafting, PouchContainer } from "../../../../content/skill/skillable/impl/Runecrafting";
+import { Player } from "../Player";
+import { Item } from "../../../../model/Item";
+import { Location } from "../../../../model/Location";
+import { MagicSpellbook } from "../../../../model/MagicSpellbook";
+import { SkullType } from "../../../../model/SkullType";
+import { Bank } from "../../../../model/container/impl/Bank";
+import { DonatorRights } from "../../../../model/rights/DonatorRights";
+import { PlayerRights } from "../../../../model/rights/PlayerRights";
+import { ItemContainer } from "../../../../model/container/ItemContainer";
+
+
 export class PlayerSave {
     private passwordHashWithSalt: string;
+    private ItemContainer = new ItemContainer();
     private isDiscordLogin: boolean;
     private cachedDiscordAccessToken: string;
     private title: string;
-    private rights: PlayerRights;
-    private donatorRights: DonatorRights;
+    private rights;
+    private donatorRights;
     private position: Location;
-    private spellBook: MagicSpellbook;
-    private fightType: FightType;
+    private spellBook;
+    private fightType;
     private autoRetaliate: boolean;
     private xpLocked: boolean;
     private clanChat: string;
@@ -31,7 +48,7 @@ export class PlayerSave {
     private targetSearchTimer: number;
     private specialAttackRestoreTimer: number;
     private skullTimer: number;
-    private skullType: SkullType;
+    private skullType;
     private running: boolean;
     private runEnergy: number;
     private totalKills: number;
@@ -42,12 +59,12 @@ export class PlayerSave {
     private recentKills: string[];
     private deaths: number;
     private points: number;
-    private pouches: Runecrafting.PouchContainer[];
+    private pouches;
     private inventory: Item[];
     private equipment: Item[];
     private appearance: number[];
-    private skills: SkillManager.Skills;
-    private quickPrayers: PrayerHandler.PrayerData[];
+    private skills: Skills;
+    private quickPrayers: PrayerData[];
     private friends: number[];
     private ignores: number[];
     private banks: Map<number, Item[]>;
@@ -376,11 +393,11 @@ export class PlayerSave {
         this.points = points;
     }
 
-    public getPouches(): Runecrafting.PouchContainer[] {
+    public getPouches(): PouchContainer[] {
         return this.pouches;
     }
 
-    public setPouches(pouches: Runecrafting.PouchContainer[]): void {
+    public setPouches(pouches: PouchContainer[]): void {
         this.pouches = pouches;
     }
 
@@ -408,43 +425,43 @@ export class PlayerSave {
         this.appearance = appearance;
     }
 
-    public getSkills(): SkillManager.Skills {
+    public getSkills(): Skills {
         return this.skills;
     }
 
-    public setSkills(skills: SkillManager.Skills): void {
+    public setSkills(skills: Skills): void {
         this.skills = skills;
     }
 
-    public getQuickPrayers(): PrayerHandler.PrayerData[] {
+    public getQuickPrayers(): PrayerData[] {
         return this.quickPrayers;
     }
 
-    setQuickPrayers(quickPrayers: PrayerHandler.PrayerData[]) {
+    public setQuickPrayers(quickPrayers: PrayerData[]) {
         this.quickPrayers = quickPrayers;
     }
 
-    getFriends(): List<Long> {
+    public getFriends(): number[] {
         return this.friends;
     }
 
-    setFriends(friends: List<Long>) {
+    public setFriends(friends: number[]) {
         this.friends = friends;
     }
 
-    getIgnores(): List<Long> {
+    public getIgnores(): number[] {
         return this.ignores;
     }
 
-    setIgnores(ignores: List<Long>) {
+    public setIgnores(ignores: number[]) {
         this.ignores = ignores;
     }
 
-    getBanks(): Map<Integer, List<Item>> {
+    public getBanks(): Map<number, Item[]> {
         return this.banks;
     }
 
-    setBanks(banks: Map<Integer, List<Item>>) {
+    setBanks(banks: Map<number, Item[]>) {
         this.banks = banks;
     }
 
@@ -456,7 +473,7 @@ export class PlayerSave {
         this.presets = presets;
     }
 
-    isDiscordLogin(): boolean {
+    isDiscordLoginReturn(): boolean {
         return this.isDiscordLogin;
     }
 
@@ -538,7 +555,7 @@ export class PlayerSave {
         player.setBarrowsChestsLooted(this.barrowsChests);
         player.setKilledBrothers(this.killedBrothers);
 
-        player.setGodwarsKillcount(this.gwdKills);
+        player.setGodwarsKillcountReturn(this.gwdKills);
 
         // RC pouches
         player.setPouches(this.pouches);
@@ -556,11 +573,11 @@ export class PlayerSave {
         }
 
         for (let l of this.friends) {
-            player.getRelations().getFriendList().add(l);
+            player.getRelations().getFriendList().push(l);
         }
 
         for (let l of this.ignores) {
-            player.getRelations().getIgnoreList().add(l);
+            player.getRelations().getIgnoreList().push(l);
         }
 
         for (let i = 0; i < player.getBanks().length; i++) {
@@ -577,7 +594,7 @@ export class PlayerSave {
         let playerSave = new PlayerSave();
 
         playerSave.passwordHashWithSalt = player.getPasswordHashWithSalt().trim();
-        playerSave.isDiscordLogin = player.isDiscordLogin();
+        playerSave.isDiscordLogin = player.isDiscordLoginReturn();
         playerSave.cachedDiscordAccessToken = player.getCachedDiscordAccessToken();
         playerSave.title = player.getLoyaltyTitle();
         playerSave.rights = player.getRights();
@@ -585,16 +602,16 @@ export class PlayerSave {
         playerSave.position = player.getLocation();
         playerSave.spellBook = player.getSpellbook();
         playerSave.fightType = player.getFightType();
-        playerSave.autoRetaliate = player.autoRetaliate();
-        playerSave.xpLocked = player.experienceLocked();
+        playerSave.autoRetaliate = player.autoRetaliateReturn();
+        playerSave.xpLocked = player.experienceLockedReturn();
         playerSave.clanChat = player.getClanChatName();
         playerSave.targetTeleportUnlocked = player.isTargetTeleportUnlocked();
         playerSave.preserveUnlocked = player.isPreserveUnlocked();
         playerSave.rigourUnlocked = player.isRigourUnlocked();
-        playerSave.auguryUnlocked = player.isAuguryUnlocked();
-        playerSave.hasVengeance = player.hasVengeance();
+        playerSave.auguryUnlocked = player.getAuguryUnlocked();
+        playerSave.hasVengeance = player.hasVengeanceReturn();
         playerSave.lastVengeanceTimer = player.getVengeanceTimer().secondsRemaining();
-        playerSave.running = player.isRunning();
+        playerSave.running = player.isRunningReturn();
         playerSave.runEnergy = player.getRunEnergy();
         playerSave.specPercentage = player.getSpecialPercentage();
         playerSave.recoilDamage = player.getRecoilDamage();
@@ -603,47 +620,47 @@ export class PlayerSave {
         playerSave.poisonImmunityTimer = player.getCombat().getPoisonImmunityTimer().secondsRemaining();
         playerSave.fireImmunityTimer = player.getCombat().getFireImmunityTimer().secondsRemaining();
 
-        playerSave.teleblockTimer = player.getCombat().getTeleBlockTimer().secondsRemaining;
-        playerSave.targetSearchTimer = player.getTargetSearchTimer().secondsRemaining;
-        playerSave.specialAttackRestoreTimer = player.getSpecialAttackRestore().secondsRemaining;
+        playerSave.teleblockTimer = player.getCombat().getTeleBlockTimer().secondsRemaining();
+        playerSave.targetSearchTimer = player.getTargetSearchTimer().secondsRemaining();
+        playerSave.specialAttackRestoreTimer = player.getSpecialAttackRestore().secondsRemaining();
 
-        playerSave.skullTimer = player.skullTimer;
-        playerSave.skullType = player.skullType;
+        playerSave.skullTimer = player.getSkullTimer();
+        playerSave.skullType = player.getSkullTimer();
 
-        playerSave.totalKills = player.totalKills;
-        playerSave.targetKills = player.targetKills;
-        playerSave.normalKills = player.normalKills;
-        playerSave.killstreak = player.killstreak;
-        playerSave.highestKillstreak = player.highestKillstreak;
-        playerSave.recentKills = player.recentKills;
-        playerSave.deaths = player.deaths;
-        playerSave.points = player.points;
-        playerSave.poisonDamage = player.poisonDamage;
-        playerSave.blowpipeScales = player.blowpipeScales;
+        playerSave.totalKills = player.getTotalKills();
+        playerSave.targetKills = player.getTargetKills();
+        playerSave.normalKills = player.getNormalKills();
+        playerSave.killstreak = player.getKillstreak();
+        playerSave.highestKillstreak = player.getHighestKillstreak();
+        playerSave.recentKills = player.getRecentKills();
+        playerSave.deaths = player.getDeaths();
+        playerSave.points = player.getPoints();
+        playerSave.poisonDamage = player.getPoisonDamage();
+        playerSave.blowpipeScales = player.getBlowpipeScales();
 
-        playerSave.barrowsCrypt = player.barrowsCrypt;
-        playerSave.barrowsChests = player.barrowsChestsLooted;
-        playerSave.killedBrothers = player.killedBrothers;
+        playerSave.barrowsCrypt = player.getBarrowsCrypt();
+        playerSave.barrowsChests = player.getBarrowsChestsLooted();
+        playerSave.killedBrothers = player.getKilledBrothers();
 
-        playerSave.gwdKills = player.godwarsKillcount;
+        playerSave.gwdKills = player.getGodwarsKillcount();
 
         // RC pouches
-        playerSave.pouches = player.pouches;
+        playerSave.pouches = player.getPouches();
 
-        playerSave.inventory = player.inventory.items;
-        playerSave.equipment = player.equipment.items;
-        playerSave.appearance = player.appearance.look;
-        playerSave.skills = player.skillManager.skills;
-        playerSave.quickPrayers = player.quickPrayers.prayers;
-        playerSave.questPoints = player.questPoints;
-        playerSave.questProgress = player.questProgress;
+        playerSave.inventory = player.getInventory().getItems();
+        playerSave.equipment = player.getEquipment().getItems();
+        playerSave.appearance = player.getAppearance().getLook();
+        playerSave.skills = player.getSkillManager().getSkills();
+        playerSave.quickPrayers = player.getQuickPrayers().getPrayers();
+        playerSave.questPoints = player.getQuestPoints();
+        playerSave.questProgress = player.getQuestProgress();
 
-        playerSave.friends = player.relations.friendList;
-        playerSave.ignores = player.relations.ignoreList;
+        playerSave.friends = player.getRelations().getFriendList();
+        playerSave.ignores = player.getRelations().getIgnoreList();
 
-        playerSave.presets = player.presets;
+        playerSave.presets = player.getPresets();
 
-        let banks = new Map<number, Array<Item>>();
+        let banks = new Map<number, Item[]>();
 
         /** BANK **/
         for (let i = 0; i < player.banks.length; i++) {
@@ -651,7 +668,7 @@ export class PlayerSave {
                 continue;
             }
             if (player.getBank(i) !== null) {
-                banks.set(i, player.getBank(i).validItems);
+                banks.set(i, player.getBank(i).getValidItems());
             }
         }
         playerSave.banks = banks;

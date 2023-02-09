@@ -24,6 +24,6 @@ export class EmblemTrader implements NPCInteraction {
     }
 
     public useItemOnNpc(player: Player, npc: NPC, itemId: number, slot: number): void {
-
+        
     }
 }

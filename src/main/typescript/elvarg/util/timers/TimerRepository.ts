@@ -1,7 +1,7 @@
 import {TimerKey} from '../timers/TimerKey'
 import {Timer} from '../timers/Timer'
 
-class TimerRepository {
+export class TimerRepository {
     private timers: Map<TimerKey, Timer> = new Map();
 
     public has(key: TimerKey): boolean {

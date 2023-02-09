@@ -75,7 +75,7 @@ export class NpcDropDefinition {
     }
 }
 
-class NPCDrop {
+export class NPCDrop {
     itemId: number;
     minAmount: number;
     maxAmount: number;

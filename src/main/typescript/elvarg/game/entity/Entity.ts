@@ -10,15 +10,15 @@ export abstract class Entity {
     /**
      * Represents the {@link Location} of this {@link Entities}.
      */
-    private location: Location = GameConstants.DEFAULT_LOCATION.clone();
-    private area: Area;
+    public static location: Location = GameConstants.DEFAULT_LOCATION.clone();
+    public static area: Area;
     /**
      * The Entities constructor.
      *
      * @param position The position the entity is currently in.
      */
     constructor(position: Location) {
-        this.location = position;
+        Entity.location = position;
     }
 
 
@@ -45,7 +45,7 @@ export abstract class Entity {
      * @return the entity's world position
      */
     getLocation(): Location {
-        return this.location;
+        return Entity.location;
     }
 
     /**
@@ -54,18 +54,18 @@ export abstract class Entity {
      * @param location the world position
      */
     setLocation(location: Location): Entity {
-        this.location = location;
+        Entity.location = location;
         return this;
     }
     public setArea(area: Area): void {
-        this.area = area;
+        Entity.area = area;
     }
 
     public getArea(): Area {
-        return this.area;
+        return Entity.area;
     }
 
     public getPrivateArea(): PrivateArea | null {
-        return (this.area instanceof PrivateArea ? (this.area as PrivateArea) : null);
+        return (Entity.area instanceof PrivateArea ? (Entity.area as PrivateArea) : null);
     }
 }

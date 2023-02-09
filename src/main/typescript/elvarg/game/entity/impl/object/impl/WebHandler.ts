@@ -1,14 +1,14 @@
-import { Sound } from './Sound';
-import { Sounds } from './Sounds';
-import { Player } from './Player';
-import { GameObject } from './GameObject';
-import { Item } from './Item';
-import { Animation } from './Animation';
-import { TaskManager } from './TaskManager';
-import { TimedObjectReplacementTask } from './TimedObjectReplacementTask';
-import { ItemIdentifiers } from './ItemIdentifiers';
-import { Misc } from './Misc';
-import { ObjectIdentifiers } from './ObjectIdentifiers';
+import { Sound } from "../../../../Sound";
+import { Sounds } from "../../../../Sounds";
+import { Player } from "../../player/Player";
+import { GameObject } from "../GameObject";
+import { Item } from "../../../../model/Item";
+import { Animation } from "../../../../model/Animation";
+import { TaskManager } from "../../../../task/TaskManager";
+import { TimedObjectReplacementTask } from "../../../../task/impl/TimedObjectReplacementTask";
+import { ItemIdentifiers } from "../../../../../util/ItemIdentifiers";
+import { Misc } from "../../../../../util/Misc";
+import { ObjectIdentifiers } from "../../../../../util/ObjectIdentifiers";
 
 const WEB_RESPAWN = 400;
 const SLASH_SOUND: Sound = Sound.SLASH_WEB;
@@ -41,27 +41,27 @@ export class WebHandler {
         return false;
     }
 
-    function handleSlashWeb(player: Player, web: GameObject, itemOnWeb: boolean) {
-    if (web == null) return;
+    public static handleSlashWeb(player: Player, web: GameObject, itemOnWeb: boolean) {
+        if (web == null) return;
 
-    if (web.getDefinition().getName().toLowerCase() !== "web") return;
+        if (web.getDefinition().getName().toLowerCase() !== "web") return;
 
-    const currentTime = Date.now();
-    if (currentTime - lastSlash < 4000) return;
+        const currentTime = Date.now();
+        if (currentTime - lastSlash < 4000) return;
 
-    player.performAnimation(itemOnWeb ? ITEM_ON_WEB_ANIMATION : new Animation(player.getAttackAnim()));
+        player.performAnimation(itemOnWeb ? ITEM_ON_WEB_ANIMATION : new Animation(player.getAttackAnim()));
 
-    const successfulSlashChance = Math.floor(Math.random() * 2);
-    if (successfulSlashChance < 2) {
-        player.sendMessage("You slash the web apart.");
-        Sounds.sendSound(player, SLASH_SOUND);
-        TaskManager.submit(new TimedObjectReplacementTask(web, new GameObject(ObjectIdentifiers.SLASHED_WEB, web.getLocation(), web.getType(), web.getFace(), player.getPrivateArea()), WEB_RESPAWN));
-    } else {
-        Sounds.sendSound(player, FAIL_SLASH_SOUND);
-        player.sendMessage("You fail to slash the web.");
+        const successfulSlashChance = Misc.random(2);
+        if (successfulSlashChance < 2) {
+            player.sendMessage("You slash the web apart.");
+            Sounds.sendSound(player, SLASH_SOUND);
+            TaskManager.submit(new TimedObjectReplacementTask(web, new GameObject(ObjectIdentifiers.SLASHED_WEB, web.getLocation(), web.getType(), web.getFace(), player.getPrivateArea()), WEB_RESPAWN));
+        } else {
+            Sounds.sendSound(player, FAIL_SLASH_SOUND);
+            player.sendMessage("You fail to slash the web.");
+        }
+
+        lastSlash = currentTime;
     }
-
-    lastSlash = currentTime;
-}
 }
 

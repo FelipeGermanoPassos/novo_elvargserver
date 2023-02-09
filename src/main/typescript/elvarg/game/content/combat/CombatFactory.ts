@@ -451,7 +451,7 @@ export class CombatFactory {
             // Randomly apply poison if poisonous weapon is equipped.
             if (damage > 0 && Math.floor(Math.random() * 20) <= 5) { // 1/4
 
-                let poison = Optional.empty();
+                let poison: CombatPoisonData
                 let isRanged = false;
 
                 if (combatType === CombatType.MELEE || p_.getWeapon() === WeaponInterface.DART

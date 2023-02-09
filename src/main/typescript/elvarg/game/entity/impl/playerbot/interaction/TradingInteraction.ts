@@ -1,3 +1,9 @@
+import { Player } from "../../player/Player";
+import { PlayerBot } from "../PlayerBot";
+import { HoldItems } from "../commands/HoldItems";
+import { Item } from "../../../../model/Item";
+import { ItemContainer } from "../../../../model/container/ItemContainer";
+
 export class TradingInteraction {
 
     // The PlayerBot this trading interaction belongs to

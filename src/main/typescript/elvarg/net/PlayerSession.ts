@@ -11,7 +11,7 @@ import { PacketConstants } from './packet/PacketConstants';
 import { Misc } from '../util/Misc';
 import { NetworkConstants } from './NetworkConstants';
 import { SocketIO } from 'socket.io';
-class PlayerSession {
+export class PlayerSession {
     private packetsQueue: Packet[] = [];
     private lastPacketOpcodeQueue: number[] = [];
     private channel: SocketIO.Socket;
@@ -101,5 +101,17 @@ class PlayerSession {
             return;
         }
         this.channel.flush();
+    }
+
+    public getPlayer(): Player {
+        return this.player;
+    }
+
+    public setPlayer(player: Player) {
+        this.player = player;
+    }
+
+    public getChannel(): Channel {
+        return this.channel;
     }
 }

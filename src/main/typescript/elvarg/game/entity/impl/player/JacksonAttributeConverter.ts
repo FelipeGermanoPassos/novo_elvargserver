@@ -1,4 +1,4 @@
-export class JacksonAttributeConverter<T> {
+export class JacksonAttributeConverter<T> implements AttributeConverter<T>  {
     private static gson = new GsonBuilder().create();
     private clazz: new () => T;
 
@@ -10,7 +10,7 @@ export class JacksonAttributeConverter<T> {
         return { s: gson.toJson(input) };
     }
 
-    public transformTo(input: AttributeValue): T {
+    public transformTo(input: AttributeV alue): T {
         return gson.fromJson(input.s, this.clazz);
     }
 

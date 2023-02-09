@@ -79,7 +79,7 @@ export class NPCMovementCoordinator {
             deltaY = this.npc.getLocation().getY() - this.npc.getSpawnPosition().getY();
         }
 
-        if ((deltaX > radius) || (deltaY > radius)) {
+        if ((deltaX > this.radius) || (deltaY > this.radius)) {
             this.coordinateState = CoordinateState.AWAY;
         } else {
             this.coordinateState = CoordinateState.HOME;
@@ -89,13 +89,13 @@ export class NPCMovementCoordinator {
     private generateLocalPosition(): Location | null {
         let dir = -1;
         let x = 0, y = 0;
-        if (!RegionManager.blockedNorth(npc.getLocation(), npc.getPrivateArea())) {
+        if (!RegionManager.blockedNorth(this.npc.getLocation(), this.npc.getPrivateArea())) {
             dir = 0;
-        } else if (!RegionManager.blockedEast(npc.getLocation(), npc.getPrivateArea())) {
+        } else if (!RegionManager.blockedEast(this.npc.getLocation(), this.npc.getPrivateArea())) {
             dir = 4;
-        } else if (!RegionManager.blockedSouth(npc.getLocation(), npc.getPrivateArea())) {
+        } else if (!RegionManager.blockedSouth(this.npc.getLocation(), this.npc.getPrivateArea())) {
             dir = 8;
-        } else if (!RegionManager.blockedWest(npc.getLocation(), npc.getPrivateArea())) {
+        } else if (!RegionManager.blockedWest(this.npc.getLocation(), this.npc.getPrivateArea())) {
             dir = 12;
         }
         let random = Misc.getRandom(3);
@@ -103,22 +103,22 @@ export class NPCMovementCoordinator {
         let found = false;
 
         if (random == 0) {
-            if (!RegionManager.blockedNorth(npc.getLocation(), npc.getPrivateArea())) {
+            if (!RegionManager.blockedNorth(this.npc.getLocation(), this.npc.getPrivateArea())) {
                 y = 1;
                 found = true;
             }
         } else if (random == 1) {
-            if (!RegionManager.blockedEast(npc.getLocation(), npc.getPrivateArea())) {
+            if (!RegionManager.blockedEast(this.npc.getLocation(), this.npc.getPrivateArea())) {
                 x = 1;
                 found = true;
             }
         } else if (random == 2) {
-            if (!RegionManager.blockedSouth(npc.getLocation(), npc.getPrivateArea())) {
+            if (!RegionManager.blockedSouth(this.npc.getLocation(), this.npc.getPrivateArea())) {
                 y = -1;
                 found = true;
             }
         } else if (random == 3) {
-            if (!RegionManager.blockedWest(npc.getLocation(), npc.getPrivateArea())) {
+            if (!RegionManager.blockedWest(this.npc.getLocation(), this.npc.getPrivateArea())) {
                 x = -1;
                 found = true;
             }
@@ -136,22 +136,22 @@ export class NPCMovementCoordinator {
         }
         if (x == 0 && y == 0)
             return null;
-        let spawnX = npc.getSpawnPosition().getX();
-        let spawnY = npc.getSpawnPosition().getY();
+        let spawnX = this.npc.getSpawnPosition().getX();
+        let spawnY = this.npc.getSpawnPosition().getY();
         if (x == 1) {
-            if (npc.getLocation().getX() + x > spawnX + 1)
+            if (this.npc.getLocation().getX() + x > spawnX + 1)
                 return null;
         }
         if (x == -1) {
-            if (npc.getLocation().getX() - x < spawnX - 1)
+            if (this.npc.getLocation().getX() - x < spawnX - 1)
                 return null;
         }
         if (y == 1) {
-            if (npc.getLocation().getY() + y > spawnY + 1)
+            if (this.npc.getLocation().getY() + y > spawnY + 1)
                 return null;
         }
         if (y == -1) {
-            if (npc.getLocation().getY() - y < spawnY - 1)
+            if (this.npc.getLocation().getY() - y < spawnY - 1)
                 return null;
         }
         return new Location(x, y);

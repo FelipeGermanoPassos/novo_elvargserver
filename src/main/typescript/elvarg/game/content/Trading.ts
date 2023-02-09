@@ -138,7 +138,7 @@ export class Trading {
         if (this.state == TradeState.NONE || this.state == TradeState.REQUESTED_TRADE) {
             if (!this.request_delay.finished()) {
                 let seconds = this.request_delay.secondsRemaining();
-                player.getPacketSender()
+                this.player.getPacketSender()
                     .sendMessage("You must wait another " + (seconds == 1 ? "second" : "" + seconds + " seconds")
                         + " before sending more trade requests.");
                 return;
@@ -148,7 +148,7 @@ export class Trading {
             this.setInteract(t_);
             this.setState(TradeState.REQUESTED_TRADE);
             if (t_state == TradeState.REQUESTED_TRADE) {
-                if (t_.getTrading().getInteract() != null && t_.getTrading().getInteract() == player) {
+                if (t_.getTrading().getInteract() != null && t_.getTrading().getInteract() == this.player) {
                     initiateTrade = true;
                 }
             }

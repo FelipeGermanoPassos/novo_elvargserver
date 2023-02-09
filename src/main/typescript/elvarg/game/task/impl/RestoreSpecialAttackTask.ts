@@ -1,4 +1,4 @@
-class RestoreSpecialAttackTask extends Task {
+export class RestoreSpecialAttackTask extends Task {
     constructor(private character: Mobile) {
     super(50, character, false);
     this.character = character;

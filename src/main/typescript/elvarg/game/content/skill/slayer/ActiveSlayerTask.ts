@@ -1,6 +1,6 @@
 import { SlayerMaster } from './SlayerMaster';
 import { SlayerTask } from './SlayerTask';
-class ActiveSlayerTask {
+export class ActiveSlayerTask {
     private master: SlayerMaster;
     private task: SlayerTask;
     private remaining: number;

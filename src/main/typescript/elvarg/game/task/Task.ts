@@ -1,11 +1,6 @@
 import { TaskType } from "./TaskType";
 
-interface TaskContructor {
-    immediate?: boolean;
-    delay?: number;
-    type?: TaskType;
-    key?: Object;
-}
+
 
 export class Task {
     public static DEFAULT_KEY = new Object();
@@ -16,12 +11,13 @@ export class Task {
     private running = false;
     private key: Object;
 
-    constructor(options: TaskContructor = {}) {
-        this.delay = options.delay ?? 1;
-        this.countdown = options.delay ?? 1;
-        this.immediate = options.immediate ?? false;
-        this.bind(options.key ?? Task.DEFAULT_KEY);
-        this.type = options.type ?? TaskType.DEFAULT
+
+    constructor(immediate?: boolean, delay?: number, type?: TaskType, key?: Object) {
+        this.delay = delay ?? 1;
+        this.countdown = delay ?? 1;
+        this.immediate = immediate ?? false;
+        this.bind(key ?? Task.DEFAULT_KEY);
+        this.type = type ?? TaskType.DEFAULT
     }
 
     public getKey(): Object {
@@ -67,5 +63,5 @@ export class Task {
             this.onExecute();
         }
     }
-    protected abstract onExecute(): void;
+    protected onExecute(): void;
 }

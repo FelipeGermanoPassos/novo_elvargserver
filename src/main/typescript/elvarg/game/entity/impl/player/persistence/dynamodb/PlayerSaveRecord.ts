@@ -1,8 +1,5 @@
-import { PlayerSave } from './PlayerSave';
-import { PlayerSaveConverter } from './PlayerSaveConverter';
-import { DynamoDbAttribute, DynamoDbBean, DynamoDbConvertedBy, DynamoDbPartitionKey } from 'aws-sdk-lib'
-
-@DynamoDbBean
+import { PlayerSave } from '../PlayerSave';
+import { PlayerSaveConverter } from '../PlayerSaveConverter';
 export class PlayerSaveRecord {
     private username: string;
     private playerSave: PlayerSave;
@@ -14,7 +11,6 @@ export class PlayerSaveRecord {
         this.updatedAt = updatedAt;
     }
 
-    @DynamoDbPartitionKey()
     public getUsername(): string {
         return this.username;
     }
@@ -23,8 +19,7 @@ export class PlayerSaveRecord {
         this.username = username;
     }
 
-    @DynamoDbAttribute("playerSave")
-    @DynamoDbConvertedBy(PlayerSaveConverter)
+
     public getPlayerSave(): PlayerSave {
         return this.playerSave;
     }

@@ -166,7 +166,6 @@ export class PrayerHandler {
         }
         character.setPrayerActive(prayerId, true);
 
-        Here is the equivalent code in TypeScript:
 
         if (character.isPlayer()) {
             const player = character.getAsPlayer();
@@ -191,7 +190,7 @@ export class PrayerHandler {
         }
     }
 
-    canUse(player: Player, prayer: PrayerData, msg: boolean): boolean {
+    public static canUse(player: Player, prayer: PrayerData, msg: boolean): boolean {
         if (player.getSkillManager().getMaxLevel(Skill.PRAYER) < (prayer.requirement)) {
             if (msg) {
                 player.getPacketSender().sendConfig(prayer.configId, 0);
@@ -296,7 +295,7 @@ export class PrayerHandler {
         }
     }
 
-    deactivatePrayers(character: Mobile): void {
+    public static deactivatePrayers(character: Mobile): void {
         for (let i = 0; i < character.getPrayerActive().length; i++) {
             deactivatePrayer(character, i);
         }
@@ -310,7 +309,7 @@ export class PrayerHandler {
         }
     }
 
-    resetAll(player: Player): void {
+    public static resetAll(player: Player): void {
         for (let i = 0; i < player.getPrayerActive().length; i++) {
             const pd = PrayerData.prayerData.get(i);
             if (!pd) continue;
@@ -472,8 +471,8 @@ export class PrayerHandler {
         }
     }
 }
-
-enum PrayerData {
+}
+export enum PrayerData {
     THICK_SKIN = 1,
     BURST_OF_STRENGTH,
     CLARITY_OF_THOUGHT,

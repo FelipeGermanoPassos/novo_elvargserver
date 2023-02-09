@@ -1,11 +1,14 @@
-import { GameObject } from './GameObject'
-import { RegionManager } from './RegionManager'
-import { Player } from './Player'
+import { World } from "../../../World";
+import { RegionManager } from "../../../collision/RegionManager";
+import { Player } from "../player/Player";
+import { Location } from "../../../model/Location";
+import { GameObject } from "./GameObject";
+import { MapObjects } from "./MapObjects";
 
 export class ObjectManager {
 
     public static onRegionChange(player: Player) {
-        World.getObjects().forEach((o) => perform(o, OperationType.SPAWN));
+        World.getObjects().forEach((o) => ObjectManager.perform(o, OperationType.SPAWN));
         World.getRemovedObjects().forEach((o) => player.getPacketSender().sendObjectRemoval(o));
     }
 
@@ -23,12 +26,12 @@ export class ObjectManager {
 
         World.getObjects().push(object);
         if (playerUpdate) {
-            perform(object, OperationType.SPAWN);
+            ObjectManager.perform(object, OperationType.SPAWN);
         }
     }
     public static deregister(object: GameObject, playerUpdate: boolean) {
         World.getObjects().removeIf(o => o.equals(object));
-        perform(object, OperationType.DESPAWN);
+        ObjectManager.perform(object, OperationType.DESPAWN);
 
         World.getRemovedObjects().add(object);
     }
@@ -89,25 +92,20 @@ export class ObjectManager {
      * @param position
      * @return
      */
-    public static exists(position: Location) {
-        for (let object of World.getObjects()) {
-            if (object.getLocation().equals(position)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     public static exists(id: number, position: Location): boolean {
         for (const object of World.getObjects()) {
             if (object.getLocation().equals(position) && object.getId() == id) {
                 return true;
             }
+            if (object.getLocation().equals(position)) {
+                return true;
+            }
         }
         return false;
     }
-    
-    enum OperationType {
+}
+
+export enum OperationType {
     SPAWN, DESPAWN
 }
-}    

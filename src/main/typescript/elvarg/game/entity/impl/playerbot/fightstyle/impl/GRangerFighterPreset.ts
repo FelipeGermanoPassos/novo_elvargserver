@@ -1,44 +1,39 @@
+import { PrayerHandler } from "../../../../../content/PrayerHandler";
+import { CombatSpecial } from "../../../../../content/combat/CombatSpecial";
+import { Presetable } from "../../../../../content/presets/Presetable";
+import { Mobile } from "../../../Mobile";
+import { PlayerBot } from "../../PlayerBot";
+import { CombatAction } from "../CombatAction";
+import { CombatSwitch } from "../CombatSwitch";
+import { FighterPreset } from "../FighterPreset";
+import { Item } from "../../../../../model/Item";
+import { MagicSpellbook } from "../../../../../model/MagicSpellbook";
+import { ItemIdentifiers } from "../../../../../../util/ItemIdentifiers";
 export class GRangerFighterPreset implements FighterPreset {
+    eatAtPercent
     const BOT_G_MAULER_70 = {
         name: "G Mauler (R)",
         items: [
-            { name: "Rune crossbow" },
-            { name: "Dragon bolts (e)", quantity: 75 },
-            { name: "Ranging potion (4)" },
-            { name: "Super strength (4)" },
-            { name: "Cooked karambwan" },
-            { name: "Granite maul" },
-            { name: "Super restore (4)" },
-            { name: "Super attack (4)" },
-            { name: "Cooked karambwan" },
-            { name: "Manta ray" },
-            { name: "Saradomin brew (4)" },
-            { name: "Monkfish" },
-            { name: "Cooked karambwan" },
-            { name: "Manta ray" },
-            { name: "Manta ray" },
-            { name: "Manta ray" },
-            { name: "Cooked karambwan" },
-            { name: "Manta ray" },
-            { name: "Manta ray" },
-            { name: "Manta ray" },
-            { name: "Cooked karambwan" },
-            { name: "Manta ray" },
-            { name: "Ring of recoil" },
-            { name: "Anglerfish" },
+            new Item(ItemIdentifiers.RUNE_CROSSBOW), new Item(ItemIdentifiers.DRAGON_BOLTS_E_, 75), new Item(ItemIdentifiers.RANGING_POTION_4_), new Item(ItemIdentifiers.SUPER_STRENGTH_4_),
+            new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.GRANITE_MAUL), new Item(ItemIdentifiers.SUPER_RESTORE_4_), new Item(ItemIdentifiers.SUPER_ATTACK_4_),
+            new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.SARADOMIN_BREW_4_), new Item(ItemIdentifiers.MONKFISH),
+            new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY),
+            new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY),
+            new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY),
+            new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.RING_OF_RECOIL), new Item(ItemIdentifiers.ANGLERFISH),
         ],
         equipment: [
-            { name: "Coif" },
-            { name: "Avas accumulator" },
-            { name: "Magic shortbow" },
-            { name: "Amulet of glory" },
-            { name: "Leather body" },
-            { name: "null" },
-            { name: "Black dhide chaps" },
-            { name: "Mithril gloves" },
-            { name: "Climbing boots" },
-            { name: "Ring of recoil" },
-            { name: "Rune arrow", quantity: 75 },
+            new Item(ItemIdentifiers.COIF),
+            new Item(ItemIdentifiers.AVAS_ACCUMULATOR),
+            new Item(ItemIdentifiers.MAGIC_SHORTBOW),
+            new Item(ItemIdentifiers.AMULET_OF_GLORY),
+            new Item(ItemIdentifiers.LEATHER_BODY),
+            null,
+            new Item(ItemIdentifiers.BLACK_DHIDE_CHAPS),
+            new Item(ItemIdentifiers.MITHRIL_GLOVES),
+            new Item(ItemIdentifiers.CLIMBING_BOOTS),
+            new Item(ItemIdentifiers.RING_OF_RECOIL),
+            new Item(ItemIdentifiers.RUNE_ARROW, 75),
         ],
         stats: {
             atk: 50,
@@ -54,7 +49,7 @@ export class GRangerFighterPreset implements FighterPreset {
     };
 
     const COMBAT_ACTIONS: CombatAction[] = [
-        new CombatSwitch([GRANITE_MAUL], {
+        new CombatSwitch([ItemIdentifiers.GRANITE_MAUL], {
             shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
                 return playerBot.getSpecialPercentage() >= 50 &&
                     // Don't switch to Melee if we're frozen
@@ -68,7 +63,7 @@ export class GRangerFighterPreset implements FighterPreset {
                 CombatSpecial.activate(playerBot);
             },
         }),
-        new CombatSwitch([RUNE_CROSSBOW, DRAGON_BOLTS_E_], {
+        new CombatSwitch([ItemIdentifiers.RUNE_CROSSBOW, ItemIdentifiers.DRAGON_BOLTS_E_], {
             shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
                 return enemy.getHitpoints() < 40;
             },
@@ -76,7 +71,7 @@ export class GRangerFighterPreset implements FighterPreset {
                 playerBot.getCombat().attack(enemy);
             },
         }),
-        new CombatSwitch([MAGIC_SHORTBOW, RUNE_ARROW], {
+        new CombatSwitch([ItemIdentifiers.MAGIC_SHORTBOW, ItemIdentifiers.RUNE_ARROW], {
             shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
                 return true;
             },
@@ -88,11 +83,11 @@ export class GRangerFighterPreset implements FighterPreset {
     ];
 
     getItemPreset(): Presetable {
-        return BOT_G_MAULER_70;
+        return this.BOT_G_MAULER_70;
     }
 
     getCombatActions(): CombatAction[] {
-        return COMBAT_ACTIONS;
+        return this.COMBAT_ACTIONS;
     }
 }    
     

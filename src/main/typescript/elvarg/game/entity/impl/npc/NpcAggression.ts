@@ -1,4 +1,12 @@
-class NpcAggression {
+import { CombatFactory } from "../../../content/combat/CombatFactory";
+import { CombatMethod } from "../../../content/combat/method/CombatMethod";
+import { NpcDefinition } from "../../../definition/NpcDefinition"
+import { Player } from "../player/Player";
+import { AreaManager } from "../../../model/areas/AreaManager";
+import { PrivateArea } from "../../../model/areas/impl/PrivateArea";
+import { Misc } from "../../../../util/Misc";
+
+export class NpcAggression {
     public static NPC_TOLERANCE_SECONDS = 600; // 10 mins (Accurate to OSRS)
 
     public static process(player: Player) {
@@ -21,7 +29,7 @@ class NpcAggression {
             }
 
             // Get the NPC's current definition (taking into account possible transformation)
-            let npcDefinition = npc.getCurrentDefinition();
+            let npcDefinition: NpcDefinition = npc.getCurrentDefinition();
             if (npcDefinition == null || npc.getHitpoints() <= 0
                 || !npcDefinition.isAggressive()
                 || npc.getPrivateArea() != player.getPrivateArea()) {
@@ -63,7 +71,7 @@ class NpcAggression {
             let distanceToPlayer = npc.getSpawnPosition().getDistance(player.getLocation());
 
             // Get the npc's combat method
-            let method = CombatFactory.getMethod(npc);
+            let method: CombatMethod = CombatFactory.getMethod(npc);
 
             // Get the max distance this npc can attack from.
             // We should always attack if we're at least 3 tiles from the player.

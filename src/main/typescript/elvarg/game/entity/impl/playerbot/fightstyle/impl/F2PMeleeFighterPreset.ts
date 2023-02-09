@@ -1,29 +1,41 @@
+import { Presetable } from "../../../../../content/presets/Presetable";
+import { Mobile } from "../../../Mobile";
+import { PlayerBot } from "../../PlayerBot";
+import { CombatAction } from "../CombatAction";
+import { CombatSwitch } from "../CombatSwitch";
+import { FighterPreset } from "../FighterPreset";
+import { Item } from "../../../../../model/Item";
+import { MagicSpellbook } from "../../../../../model/MagicSpellbook";
+import { TimerKey } from "../../../../../../util/timers/TimerKey";
+import { ItemIdentifiers } from "../../../../../../util/ItemIdentifiers";
+
+
 export class F2PMeleeFighterPreset implements FighterPreset {
 
+    eatAtPercent
 
-
-    static PRESETABLE: Presetable = new Presetable("F2P Pure",
+    public static PRESETABLE: Presetable = new Presetable("F2P Pure",
         [
-            new Item(RUNE_2H_SWORD), new Item(STRENGTH_POTION_4_), new Item(SWORDFISH), new Item(SWORDFISH),
-            new Item(SWORDFISH), new Item(SWORDFISH), new Item(SWORDFISH), new Item(SWORDFISH),
-            new Item(SWORDFISH), new Item(SWORDFISH), new Item(SWORDFISH), new Item(SWORDFISH),
-            new Item(SWORDFISH), new Item(SWORDFISH), new Item(SWORDFISH), new Item(SWORDFISH),
-            new Item(SWORDFISH), new Item(SWORDFISH), new Item(SWORDFISH), new Item(SWORDFISH),
-            new Item(SWORDFISH), new Item(SWORDFISH), new Item(SWORDFISH), new Item(SWORDFISH),
-            new Item(SWORDFISH), new Item(SWORDFISH), new Item(SWORDFISH), new Item(SWORDFISH),
+            new Item(ItemIdentifiers.RUNE_2H_SWORD), new Item(ItemIdentifiers.STRENGTH_POTION_4_), new Item(ItemIdentifiers.SWORDFISH), new Item(ItemIdentifiers.SWORDFISH),
+            new Item(ItemIdentifiers.SWORDFISH), new Item(ItemIdentifiers.SWORDFISH), new Item(ItemIdentifiers.SWORDFISH), new Item(ItemIdentifiers.SWORDFISH),
+            new Item(ItemIdentifiers.SWORDFISH), new Item(ItemIdentifiers.SWORDFISH), new Item(ItemIdentifiers.SWORDFISH), new Item(ItemIdentifiers.SWORDFISH),
+            new Item(ItemIdentifiers.SWORDFISH), new Item(ItemIdentifiers.SWORDFISH), new Item(ItemIdentifiers.SWORDFISH), new Item(ItemIdentifiers.SWORDFISH),
+            new Item(ItemIdentifiers.SWORDFISH), new Item(ItemIdentifiers.SWORDFISH), new Item(ItemIdentifiers.SWORDFISH), new Item(ItemIdentifiers.SWORDFISH),
+            new Item(ItemIdentifiers.SWORDFISH), new Item(ItemIdentifiers.SWORDFISH), new Item(ItemIdentifiers.SWORDFISH), new Item(ItemIdentifiers.SWORDFISH),
+            new Item(ItemIdentifiers.SWORDFISH), new Item(ItemIdentifiers.SWORDFISH), new Item(ItemIdentifiers.SWORDFISH), new Item(ItemIdentifiers.SWORDFISH),
         ],
         [
-            new Item(IRON_FULL_HELM),
-            new Item(CAPE_OF_LEGENDS),
-            new Item(MAPLE_SHORTBOW),
-            new Item(AMULET_OF_POWER),
-            new Item(LEATHER_BODY),
-            new Item(GREEN_DHIDE_VAMB),
-            new Item(GREEN_DHIDE_CHAPS),
+            new Item(ItemIdentifiers.IRON_FULL_HELM),
+            new Item(ItemIdentifiers.CAPE_OF_LEGENDS),
+            new Item(ItemIdentifiers.MAPLE_SHORTBOW),
+            new Item(ItemIdentifiers.AMULET_OF_POWER),
+            new Item(ItemIdentifiers.LEATHER_BODY),
+            new Item(ItemIdentifiers.GREEN_DHIDE_VAMB),
+            new Item(ItemIdentifiers.GREEN_DHIDE_CHAPS),
             null,
-            new Item(LEATHER_BOOTS),
+            new Item(ItemIdentifiers.LEATHER_BOOTS),
             null,
-            new Item(ADAMANT_ARROW, 100),
+            new Item(ItemIdentifiers.ADAMANT_ARROW, 100),
         ],
         /* atk, def, str, hp, range, pray, mage */
         [40, 1, 90, 58, 84, 1, 1],
@@ -31,8 +43,8 @@ export class F2PMeleeFighterPreset implements FighterPreset {
         true
     );
 
-    static COMBAT_ACTIONS: CombatAction[] = [
-        new CombatSwitch(new int[]{ RUNE_2H_SWORD }) {
+    public static COMBAT_ACTIONS: CombatAction[] = [
+        new CombatSwitch([ItemIdentifiers.RUNE_2H_SWORD]), {
 
             /**
              * KO Weapon - Rune 2H sword
@@ -42,14 +54,14 @@ export class F2PMeleeFighterPreset implements FighterPreset {
                 let canAttackNextTick = playerBot.getTimers().getTicks(TimerKey.COMBAT_ATTACK) <= 1;
                 return canAttackNextTick &&
                     enemy.getHitpoints() < 25;
-            }
+            },
 
-            performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void {
+            performAfterSwitch(playerBot: PlayerBot, enemy: Mobile) {
                 playerBot.getCombat().attack(enemy);
             }
         },
 
-        new CombatSwitch(new int[]{ MAPLE_SHORTBOW }) {
+        new CombatSwitch([ItemIdentifiers.MAPLE_SHORTBOW]), {
 
             /**
              * Default Weapon - Maple Shortbow (Max DPS)
@@ -57,7 +69,7 @@ export class F2PMeleeFighterPreset implements FighterPreset {
 
             shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
                 return enemy.getHitpoints() >= 25;
-            }
+            },
 
             performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void {
                 playerBot.getCombat().attack(enemy);
@@ -66,10 +78,10 @@ export class F2PMeleeFighterPreset implements FighterPreset {
     ];
 
     getItemPreset(): Presetable {
-        return this.PRESETABLE;
+        return F2PMeleeFighterPreset.PRESETABLE;
     }
 
     getCombatActions(): CombatAction[] {
-        return this.COMBAT_ACTIONS;
+        return F2PMeleeFighterPreset.COMBAT_ACTIONS;
     }
 }

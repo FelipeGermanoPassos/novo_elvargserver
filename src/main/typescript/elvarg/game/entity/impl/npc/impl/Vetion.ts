@@ -8,7 +8,7 @@ import { Ids } from "../../../../model/Ids"
 import { Location } from "../../../../model/Location"
 import { Mobile } from "../../Mobile"
 import { VetionHellhound } from "./VetionHellhound"
-import { NPCIdentifiers } from "../../../../../util/NpcIdentifiers"
+import { NpcIdentifiers } from "../../../../../util/NpcIdentifiers"
 
 export class Vetion extends NPC {
     private static readonly COMBAT_METHOD = new VetionCombatMethod();
@@ -19,10 +19,10 @@ export class Vetion extends NPC {
     constructor(id: number, position: Location) {
         super(id, position);
         this.hellhounds = [];
-        this.setNpcTransformationId(NPCIdentifiers.VETION);
+        this.setNpcTransformationId(NpcIdentifiers.VETION);
     }
 
-    public getCombatMethod(): VetionCombatMethod {
+    public static getCombatMethod(): VetionCombatMethod {
         return Vetion.COMBAT_METHOD;
     }
 
@@ -37,10 +37,10 @@ export class Vetion extends NPC {
             }
         }
 
-        if (this.getNpcTransformationId() == NPCIdentifiers.VETION_REBORN) {
+        if (this.getNpcTransformationId() == NpcIdentifiers.VETION_REBORN) {
             if (this.rebornTimer == 500) {
                 this.spawnedHellhounds = true;
-                this.setNpcTransformationId(NPCIdentifiers.VETION);
+                this.setNpcTransformationId(NpcIdentifiers.VETION);
                 this.rebornTimer = 0;
             }
             this.rebornTimer++;
@@ -49,9 +49,9 @@ export class Vetion extends NPC {
 
     private spawnHellhounds(target: Mobile) {
         for (let i = 0; i < 2; i++) {
-            let hellhoundId = NPCIdentifiers.VETION_HELLHOUND;
-            if (this.getNpcTransformationId() == NPCIdentifiers.VETION_REBORN) {
-                hellhoundId = NPCIdentifiers.GREATER_VETION_HELLHOUND;
+            let hellhoundId = NpcIdentifiers.VETION_HELLHOUND;
+            if (this.getNpcTransformationId() == NpcIdentifiers.VETION_REBORN) {
+                hellhoundId = NpcIdentifiers.GREATER_VETION_HELLHOUND;
             }
             const hellhound = NPC.create(hellhoundId, this.getLocation()) as VetionHellhound;
             hellhound.setVetion(this);
@@ -70,9 +70,9 @@ export class Vetion extends NPC {
         this.hellhounds = [];
         this.spawnedHellhounds = false;
 
-        if (this.getNpcTransformationId() != NPCIdentifiers.VETION_REBORN) {
+        if (this.getNpcTransformationId() != NpcIdentifiers.VETION_REBORN) {
             this.setHitpoints(this.getDefinition().getHitpoints());
-            this.setNpcTransformationId(NPCIdentifiers.VETION_REBORN);
+            this.setNpcTransformationId(NpcIdentifiers.VETION_REBORN);
             this.forceChat("Do it again!");
             return;
         }

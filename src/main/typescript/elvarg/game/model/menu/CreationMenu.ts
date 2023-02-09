@@ -1,4 +1,4 @@
-class CreationMenu {
+export class CreationMenu {
     /**
     * The title of this {@link CreationMenu}.
     */

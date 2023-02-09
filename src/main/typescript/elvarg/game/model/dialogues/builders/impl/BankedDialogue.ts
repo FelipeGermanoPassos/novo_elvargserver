@@ -1,4 +1,4 @@
-class BankerDialogue extends DynamicDialogueBuilder {
+export class BankerDialogue extends DynamicDialogueBuilder {
 
     build(player: Player) {
         this.add(new NpcDialogue(0, NpcIdentifiers.BANKER, "Hello would you like to open the bank?"));

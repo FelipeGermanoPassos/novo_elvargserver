@@ -1,4 +1,7 @@
-class QuickPrayers extends PrayerHandler {
+import { Player } from "../entity/impl/player/Player";
+import { PrayerHandler } from "./PrayerHandler";
+
+export class QuickPrayers extends PrayerHandler {
     private static readonly TOGGLE_QUICK_PRAYERS = 1500;
     private static readonly SETUP_BUTTON = 1506;
     private static readonly CONFIRM_BUTTON = 17232;
@@ -6,11 +9,12 @@ class QuickPrayers extends PrayerHandler {
     private static readonly CONFIG_START = 620;
 
     private player: Player;
-    private prayers: PrayerData[] = new Array(PrayerData.values().length);
+    public prayers: PrayerData[] = new Array(PrayerData.values().length);
     private selectingPrayers: boolean;
     private enabled: boolean;
 
     constructor(player: Player) {
+        super();
         this.player = player;
     }
 

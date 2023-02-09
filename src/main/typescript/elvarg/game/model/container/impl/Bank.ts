@@ -1,3 +1,5 @@
+import { Player } from "../../../entity/impl/player/Player";
+
 export class Bank extends ItemContainer {
     public static readonly TOTAL_BANK_TABS = 11;
     public static readonly CONTAINER_START = 50300;

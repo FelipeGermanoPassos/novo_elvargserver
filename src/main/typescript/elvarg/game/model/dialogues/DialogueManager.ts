@@ -1,4 +1,6 @@
-class DialogueManager {
+import { Player } from "../../entity/impl/player/Player";
+
+export class DialogueManager {
     public static STATIC_DIALOGUES: Map<number, DialogueBuilder> = new Map<number, DialogueBuilder>();
 
     static {

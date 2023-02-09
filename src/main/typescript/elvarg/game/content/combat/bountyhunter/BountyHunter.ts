@@ -10,7 +10,7 @@ import { Item } from "../../../model/Item";
 import { WildernessArea } from "../../../model/areas/impl/WildernessArea";
 import { ItemIdentifiers } from "../../../../util/ItemIdentifiers";
 import { Misc } from "../../../../util/Misc";
-class BountyHunter {
+export class BountyHunter {
     public static PLAYERS_IN_WILD: Player[] = [];
     public static TARGET_PAIRS: TargetPair[] = [];
     private static TARGET_WEALTH_STRING = 23305;

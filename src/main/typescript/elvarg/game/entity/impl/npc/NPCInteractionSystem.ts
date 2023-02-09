@@ -1,10 +1,15 @@
-class NPCInteractionSystem {
+import { Player } from "../player/Player";
+import { Ids } from "../../../model/Ids";
+import { NPCInteraction } from "./NPCInteraction";
+import { NPC } from "./NPC";
+
+export class NPCInteractionSystem {
     private static NPC_INTERACT_MAP: Map<number, NPCInteraction>;
 
-    public static init(interactClasses: Array<typeof NPCInteraction>) {
-        NPC_INTERACT_MAP = interactClasses.flatMap(clazz => {
+    public static init(interactClasses: NPCInteraction[]) {
+        NPCInteractionSystem.NPC_INTERACT_MAP = interactClasses.flatMap(clazz => {
             try {
-                var instance = new clazz();
+                let instance = new NPCInteraction(clazz.getDeclaredConstructor().newInstance());
                 return clazz.ids.map(id => [id, instance] as [number, NPCInteraction]);
             } catch (e) {
                 throw new Error(e);
@@ -16,7 +21,7 @@ class NPCInteractionSystem {
     }
 
     public static handleFirstOption(player: Player, npc: NPC) {
-        var npcInteraction = NPC_INTERACT_MAP.get(npc.getId());
+        var npcInteraction = NPCInteractionSystem.NPC_INTERACT_MAP.get(npc.getId());
         if (!npcInteraction) {
             return false;
         }
@@ -26,7 +31,7 @@ class NPCInteractionSystem {
     }
 
     public static handleSecondOption(player: Player, npc: NPC) {
-        var npcInteraction = NPC_INTERACT_MAP.get(npc.getId());
+        var npcInteraction = NPCInteractionSystem.NPC_INTERACT_MAP.get(npc.getId());
         if (!npcInteraction) {
             return false;
         }
@@ -36,7 +41,7 @@ class NPCInteractionSystem {
     }
 
     public static handleThirdOption(player: Player, npc: NPC) {
-        var npcInteraction = NPC_INTERACT_MAP.get(npc.getId());
+        var npcInteraction = NPCInteractionSystem.NPC_INTERACT_MAP.get(npc.getId());
         if (!npcInteraction) {
             return false;
         }
@@ -46,7 +51,7 @@ class NPCInteractionSystem {
     }
 
     public static handleForthOption(player: Player, npc: NPC) {
-        var npcInteraction = NPC_INTERACT_MAP.get(npc.getId());
+        var npcInteraction = NPCInteractionSystem.NPC_INTERACT_MAP.get(npc.getId());
         if (!npcInteraction) {
             return false;
         }
@@ -56,7 +61,7 @@ class NPCInteractionSystem {
     }
 
     public static handleUseItem(player: Player, npc: NPC, itemId: number, slot: number) {
-        var npcInteraction = NPC_INTERACT_MAP.get(npc.getId());
+        var npcInteraction = NPCInteractionSystem.NPC_INTERACT_MAP.get(npc.getId());
         if (!npcInteraction) {
             return false;
         }
