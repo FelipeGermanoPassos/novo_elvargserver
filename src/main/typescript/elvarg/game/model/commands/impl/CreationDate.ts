@@ -1,7 +1,7 @@
 import {Player} from '../../../entity/impl/player/Player';
 import {Command} from '../../../model/commands/Command';
 
-class CreationDate implements Command {
+export class CreationDate implements Command {
     execute(player: Player, command: string, parts: string[]) {
         let calendar = Calendar.getInstance();
         calendar.setTimeInMillis(player.getCreationDate().getTime());

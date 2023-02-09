@@ -1,4 +1,20 @@
+<<<<<<< Updated upstream
 class BountyHunter {
+=======
+import { Emblem } from "./Emblem";
+import { TargetPair } from "./TargetPair";
+import { WealthType } from "./WealthType";
+import { CombatFactory } from "../CombatFactory";
+import { ItemOnGroundManager } from "../../../entity/impl/grounditem/ItemOnGroundManager";
+import { Player } from "../../../entity/impl/player/Player";
+import { PlayerBot } from "../../../entity/impl/playerbot/PlayerBot";
+import { BrokenItem } from "../../../model/BrokenItem";
+import { Item } from "../../../model/Item";
+import { WildernessArea } from "../../../model/areas/impl/WildernessArea";
+import { ItemIdentifiers } from "../../../../util/ItemIdentifiers";
+import { Misc } from "../../../../util/Misc";
+export class BountyHunter {
+>>>>>>> Stashed changes
     public static PLAYERS_IN_WILD: Player[] = [];
     public static TARGET_PAIRS: TargetPair[] = [];
     private static TARGET_WEALTH_STRING = 23305;

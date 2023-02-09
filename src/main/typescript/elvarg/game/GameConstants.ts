@@ -1,7 +1,24 @@
+<<<<<<< Updated upstream
 import { PlayerBotDefinition, PlayerPersistence, PlayerRights, Location } from './game.definition';
 import { DynamoDBPlayerPersistence, JSONFilePlayerPersistence } from './entity/player/persistence';
 import { FightStyleImpl } from './entity/playerbot/fightstyle/fightstyle.impl';
 import { Set } from 'collections-es6';
+=======
+import { PlayerBotDefinition } from "./definition/PlayerBotDefinition";
+import { DynamoDBPlayerPersistence } from "./entity/impl/player/persistence/dynamodb/DynamoDBPlayerPersistence";
+import { JSONFilePlayerPersistence } from "./entity/impl/player/persistence/jsonfile/JSONFilePlayerPersistence";
+import { TribridMaxFighterPreset } from "./entity/impl/playerbot/fightstyle/impl/TribridMaxFighterPreset"
+import { DDSPureMFighterPreset } from "./entity/impl/playerbot/fightstyle/impl/DDSPureMFighterPreset"
+import { DDSPureRFighterPreset } from "./entity/impl/playerbot/fightstyle/impl/DDSPureRFighterPreset"
+import { F2PMeleeFighterPreset } from "./entity/impl/playerbot/fightstyle/impl/F2PMeleeFighterPreset"
+import { GRangerFighterPreset } from "./entity/impl/playerbot/fightstyle/impl/GRangerFighterPreset"
+import { MidTribridMaxFighterPreset } from "./entity/impl/playerbot/fightstyle/impl/MidTribridMaxFighterPreset"
+import { NHPureFighterPreset } from "./entity/impl/playerbot/fightstyle/impl/NHPureFighterPreset"
+import { ObbyMaulerFighterPreset } from "./entity/impl/playerbot/fightstyle/impl/ObbyMaulerFighterPreset"
+import { PlayerPersistence } from "./entity/impl/player/persistence/PlayerPersistence";
+import { Location } from "./model/Location"
+import { PlayerRights } from "./model/rights/PlayerRights"
+>>>>>>> Stashed changes
 
 export class GameConstants {
 <<<<<<< HEAD
@@ -10,10 +27,10 @@ export class GameConstants {
     public static readonly DEFINITIONS_DIRECTORY: string = "./data/definitions/";
     public static readonly CLIPPING_DIRECTORY: string = "./data/clipping/";
     public static readonly PLAYER_PERSISTENCE: PlayerPersistence = new JSONFilePlayerPersistence();
-    public static readonly CONCURRENCY: boolean = (Runtime.getRuntime().availableProcessors() > 1);
+    public static readonly CONCURRENCY: boolean = false;
     public static readonly GAME_ENGINE_PROCESSING_CYCLE_RATE: number = 600;
     public static readonly QUEUED_LOOP_THRESHOLD: number = 45;
-    public static readonly DEFAULT_LOCATION: Location = new Location(3089, 3524);
+    public static readonly DEFAULT_LOCATION: Location = new Location(3089, 3524, 0);
     public static readonly QUEUE_SWITCHING_REFRESH: boolean = true;
     public static readonly DROP_THRESHOLD: number = 2;
     public static readonly COMBAT_SKILLS_EXP_MULTIPLIER: number = 6;
@@ -22,6 +39,7 @@ export class GameConstants {
     public static readonly TAB_INTERFACES: number[] = [2423, 3917, 31000, 3213, 1644, 5608, -1, 37128, 5065, 5715, 2449,
     42500, 147, 32000];
 
+<<<<<<< Updated upstream
     public static readonly ALLOWED_SPAWNS: Set<number> = new Set([
 =======
     public static NAME = "RspsApp";
@@ -42,6 +60,9 @@ export class GameConstants {
         42500, 147, 32000];
     public static ALLOWED_SPAWNS = new Set<number>(Arrays.asList(
 >>>>>>> 03ef12a5e231898cd5dce5dce3b92cc40bac36ba
+=======
+    public static ALLOWED_SPAWNS = new Set([
+>>>>>>> Stashed changes
         13441, 3144, 391, 397, 385, 7946, 2436, 145, 147, 149, 2440, 157, 159, 161,
         2442, 163, 165, 167, 9739, 2444, 169, 171, 173, // potions and food
         3040, 3042, 3044, 3046, 2452, 2454, 2456, 2458, 2448, 181, 183, 185, 6685, 6687, 6689, 6691, 2450, 189, 191, 193, 3024, 3026, 3028, 3030, 2434, // potions and food
@@ -78,6 +99,7 @@ export class GameConstants {
         544, 542, 1035, 1033, 579, 577, 1011, 554, 555, 556, 557, 558, 559, 561, 563, 562, 560, 565, 566, 9075,
         1704, 1731, 1725, 1727, 1729]);
 
+<<<<<<< Updated upstream
         public static readonly PLAYER_BOTS: PlayerBotDefinition[] = [
             new PlayerBotDefinition("Bot Hello123", new Location(3085, 3528), new ObbyMaulerFighterPreset()),
             new PlayerBotDefinition("Elvemage", new Location(3093, 3529), new NHPureFighterPreset()),
@@ -91,6 +113,21 @@ export class GameConstants {
             
         public static readonly PLAYER_BOT_PASSWORD: string = "wirfunerpro4n!1";
         public static readonly PLAYER_BOT_OVERRIDE: PlayerRights[] = [PlayerRights.MODERATOR, PlayerRights.ADMINISTRATOR, PlayerRights.DEVELOPER, PlayerRights.OWNER];
+=======
+    public static readonly PLAYER_BOTS: PlayerBotDefinition[] = [
+        new PlayerBotDefinition("Bot Hello123", new Location(3085, 3528,0), new ObbyMaulerFighterPreset()),
+        new PlayerBotDefinition("Elvemage", new Location(3093, 3529,0), new NHPureFighterPreset()),
+        new PlayerBotDefinition("Bot 1337Pk", new Location(3087, 3530,0), new DDSPureRFighterPreset()),
+        new PlayerBotDefinition("Bot Kids Ranqe", new Location(3089, 3530,0), new GRangerFighterPreset()),
+        new PlayerBotDefinition("Bot Josh", new Location(3091, 3533,0), new DDSPureMFighterPreset()),
+        new PlayerBotDefinition("Bot Odablock", new Location(3091, 3536,0), new TribridMaxFighterPreset()),
+        new PlayerBotDefinition("Bot SKillSpecs", new Location(3095, 3535,0), new MidTribridMaxFighterPreset()),
+        new PlayerBotDefinition("Bot F2P Pure", new Location(3096, 3530,0), new F2PMeleeFighterPreset()),
+    ];
+
+    public static readonly PLAYER_BOT_PASSWORD: string = "wirfunerpro4n!1";
+    public static readonly PLAYER_BOT_OVERRIDE: PlayerRights[] = [PlayerRights.MODERATOR, PlayerRights.ADMINISTRATOR, PlayerRights.DEVELOPER, PlayerRights.OWNER];
+>>>>>>> Stashed changes
 }
 
     

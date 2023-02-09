@@ -1,4 +1,19 @@
+<<<<<<< Updated upstream
 class CastleWars implements Minigame {
+=======
+export enum Team {
+    ZAMORAK = "ZAMORAK",
+    SARADOMIN = "SARADOMIN",
+    GUTHIX = "GUTHIX",
+    area = Area,
+    waitingRoom = Location,
+    score = number,
+    players = Player[],
+    respawn_area_bounds = Boundary;
+}
+
+export class CastleWars implements Minigame {
+>>>>>>> Stashed changes
     public static readonly CastleWarsSaradominWaitingArea SARADOMIN_WAITING_AREA = new CastleWarsSaradominWaitingArea();
     public static readonly CastleWarsZamorakWaitingArea ZAMORAK_WAITING_AREA = new CastleWarsZamorakWaitingArea();
     public static readonly CastleWarsGameArea GAME_AREA = new CastleWarsGameArea();

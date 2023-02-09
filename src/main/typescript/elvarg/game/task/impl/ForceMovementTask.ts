@@ -1,29 +1,36 @@
+<<<<<<< Updated upstream
 class ForceMovementTask extends Task {
+=======
+import { Task } from "../Task";
+import { Location } from "../../model/Location";
+import { ForceMovement } from "../../model/ForceMovement";
+import { Player } from "../../entity/impl/player/Player";
+import { TaskType } from "../TaskType";
+
+export class ForceMovementTask extends Task {
+>>>>>>> Stashed changes
     private player: Player;
     private end: Location;
     private start: Location;
-    
+
     constructor(player: Player, delay: number, forceM: ForceMovement) {
-        super(delay, player, (delay == 0 ? true : false));
+        super(delay, player as any);
         this.player = player;
-        this.start = forceM.getStart().clone();
-        this.end = forceM.getEnd().clone();
+        this.start = (forceM.getStart() as any).clone();
+        this.end = (forceM.getEnd() as any).clone();
     
-        //Reset combat
         player.getCombat().reset();
-    
-        //Reset movement queue
         player.getMovementQueue().reset();
-    
-        //Playerupdating
         player.setForceMovement(forceM);
     }
-    
-    protected execute() {
-        let x = start.getX() + end.getX();
-        let y = start.getY() + end.getY();
-        player.moveTo(new Location(x, y, player.getLocation().getZ()));
-        player.setForceMovement(null);
+
+    public execute() {
+        let x = this.start.getX() + this.end.getX();
+        let y = this.start.getY() + this.end.getY();
+        (this.player as any).moveTo(new (Location as any)(x, y, (this.player.getLocation() as any).getZ()));
+        this.player.setForceMovement(null);
         this.stop();
     }
 }
+
+

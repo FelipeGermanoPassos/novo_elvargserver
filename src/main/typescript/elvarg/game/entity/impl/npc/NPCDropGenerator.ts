@@ -1,4 +1,4 @@
-class NPCDropGenerator {
+export class NPCDropGenerator {
     private player: Player;
     private def: NpcDropDefinition;
 

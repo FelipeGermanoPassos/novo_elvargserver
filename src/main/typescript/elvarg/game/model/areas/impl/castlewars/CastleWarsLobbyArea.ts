@@ -1,10 +1,10 @@
-import CastleWars from '../../../../content/minigames/impl/CastleWars';
-import Lanthus from '../../../../entity/impl/npc/impl/Lanthus';
+import {CastleWars} from '../../../../content/minigames/impl/CastleWars';
+import {Lanthus} from '../../../../entity/impl/npc/impl/Lanthus';
 import * as from '../../../../'
 import {Player} from '../../../../entity/impl/player/Player'
 import {PlayerBot} from '../../../../entity/impl/playerbot/PlayerBot'
 import {Arrays} from 'collections'
-import Boundary from '../../../../model/Boundary';
+import {Boundary} from '../../../../model/Boundary';
 import {Area} from '../../../../model/areas/Area';
 import {obj} from  '../../../../../util/ObjectIdentifiers';
 
@@ -14,7 +14,7 @@ class CastleWarsLobbyArea extends Area {
     private lanthus: Lanthus;
 
     constructor() {
-        super(Arrays.asList(new Boundary(2435, 2446, 3081, 3098)));
+        super(Arrays.asList(new Boundary(2435, 2446, 3081, 3098,0)));
     }
 
     public getName(): string {

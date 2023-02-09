@@ -40,6 +40,7 @@ enum Sound {
     // Special attack
     DRAGON_DAGGER_SPECIAL = { id: 385, volume: 1, delay: 25 },
     // Spell sounds
+<<<<<<< Updated upstream
     SPELL_FAIL_SPLASH = { id: 193 },
     TELEPORT = { id: 202 },
     ICA_BARRAGE_IMPACT = { id: 1125, volume: 1, delay: 0 },
@@ -72,6 +73,54 @@ enum Sound {
         return this.loopType;
     }
     
+=======
+
+    SPELL_FAIL_SPLASH = { id: 193, volume: 1, delay: 0, loopType: 0 }
+    TELEPORT = { id: 202, volume: 1, delay: 0, loopType: 0 }
+
+    ICA_BARRAGE_IMPACT = { id: 1125, volume: 1, delay: 0, loopType: 0 }
+
+    DROP_ITEM = { id: 376, volume: 1, delay: 0, loopType: 0 }
+    PICK_UP_ITEM = { id: 358, volume: 1, delay: 0, loopType: 0 }
+
+    SET_UP_BARRICADE = { id: 358, volume: 1, delay: 0, loopType: 0 }
+
+    FIRE_LIGHT = { id: 375, volume: 1, delay: 0, loopType: 0 }
+    FIRE_SUCCESSFUL = { id: 608, volume: 1, delay: 0, loopType: 0 }
+    FIRE_FIRST_ATTEMPT = { id: 2584, volume: 1, delay: 0, loopType: 0 }
+    SLASH_WEB = { id: 237, volume: 1, delay: 0, loopType: 0 }
+    FAIL_SLASH_WEB = { id: 2548, volume: 1, delay: 0, loopType: 0 }
+    FOOD_EAT = { id: 317, volume: 1, delay: 0, loopType: 0 }
+    DRINK = { id: 334, volume: 1, delay: 0, loopType: 0 }
+
+    private static id: number;
+    private static volume: number;
+    private static delay: number;
+
+    private static loopType: number;
+
+    public static Sound(id:number, volume:number, delay:number, loopType:number ) {
+        this.id = id;
+        this.volume = volume;
+        this.delay = delay;
+        this.loopType = loopType;
+    }
+
+    public getId(): number {
+        return Sound.id;
+    }
+
+    public getVolume():number {
+        return Sound.volume;
+    }
+
+    public getDelay():number {
+        return Sound.delay;
+    }
+
+    public getLoopType():number { return Sound.loopType; }
+
+>>>>>>> Stashed changes
 }
 
 

@@ -3,6 +3,15 @@ import { Mobile } from "../Mobile";
 
 
 export class Player extends Mobile {
+    requestLogout() {
+        throw new Error('Method not implemented.');
+    }
+    setCachedUpdateBlock(arg0: null) {
+        throw new Error('Method not implemented.');
+    }
+    getSession() {
+        throw new Error('Method not implemented.');
+    }
     public increaseStats = new SecondsTimer();
     public decreaseStats = new SecondsTimer();
     private localPlayers: Player[] = [];

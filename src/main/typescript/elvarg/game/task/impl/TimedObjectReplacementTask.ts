@@ -2,7 +2,7 @@ class TimedObjectReplacementTask extends Task {
     private original: GameObject;
     private temp: GameObject;
     private ticks: number;
-    private tick = 0;
+    public static tick = 0;
     private sameTile = false;
     
     constructor(original: GameObject, temp: GameObject, ticks: number) {
@@ -14,14 +14,14 @@ class TimedObjectReplacementTask extends Task {
     }
     
     execute() {
-        if (this.tick === 0) {
+        if (TimedObjectReplacementTask.tick === 0) {
             ObjectManager.deregister(this.original, !this.sameTile);
             ObjectManager.register(this.temp, true);
-        } else if (this.tick >= this.ticks) {
+        } else if (TimedObjectReplacementTask.tick >= this.ticks) {
             ObjectManager.deregister(this.temp, !this.sameTile);
             ObjectManager.register(this.original, true);
             this.stop();
         }
-        this.tick++;
+        TimedObjectReplacementTask.tick++;
     }
 }

@@ -1,11 +1,9 @@
 
 
-//import com.elvarg.net.security.IsaacRandom;
-import * as IsaacRandom from '../../net/security/IsaacRandom';
+import {IsaacRandom} from '../../net/security/IsaacRandom';
+const BigInteger = require('big-integer');
 
-//import java.math.BigNumbereger;
-import * as BigInteger from 'big-integer';
-public class Buffer {
+export class Buffer {
     private static readonly BIT_MASKS: number[] = [0, 1, 3, 7, 15, 31, 63, 127, 255,
     511, 1023, 2047, 4095, 8191, 16383, 32767, 65535, 0x1ffff, 0x3ffff,
     0x7ffff, 0xfffff, 0x1fffff, 0x3fffff, 0x7fffff, 0xffffff,
@@ -22,7 +20,7 @@ public class Buffer {
     }
 
     public static create(): Buffer {
-        let buffer = new Buffer();
+        let buffer = new Buffer([0]);
         buffer.currentPosition = 0;
         buffer.payload = new Array(5000);
         return buffer;
@@ -42,18 +40,22 @@ public class Buffer {
                 + (this.payload[this.currentPosition - 1] & 0xff);
     }
 
-    function readUShortA(): number {
+    public readUShortA(): number {
         this.currentPosition += 2;
         return ((this.payload[this.currentPosition - 2] & 0xff) << 8)
                 + (this.payload[this.currentPosition - 1] - 128 & 0xff);
     }
 
-    function readUSmart(): number {
+    public readSignedByte(): number {
+        return this.payload[this.currentPosition++];
+    }
+
+    public readUSmart(): number {
         let value = this.payload[this.currentPosition] & 0xff;
         if (value < 128)
-            return readUnsignedByte();
+            return this.readSignedByte();
         else
-            return readUShort() - 32768;
+            return this.readUShort() - 32768;
     }
 
     public readUSmart2(): number {
@@ -69,7 +71,7 @@ public class Buffer {
     let i = this.currentPosition;
     while (this.payload[this.currentPosition++] != 0)
         ;
-    return new String(this.payload, i, this.currentPosition - i - 1);
+        return String.fromCharCode(...this.payload.slice(i, this.currentPosition - 1));
     }
 
     public writeOpcode(opcode: number):void {
@@ -124,8 +126,8 @@ public class Buffer {
     }
     
     public writeString(text: string):void {
-        this.payload.slice(text.length()).forEach((e,i) => this.payload[this.currentPosition + i] = e);
-        this.currentPosition += text.length();
+        this.payload.slice(text.length).forEach((e,i) => this.payload[this.currentPosition + i] = e);
+        this.currentPosition += text.length;
         this.payload[this.currentPosition++] = 10;
     }
 
@@ -135,11 +137,6 @@ public class Buffer {
         if (i > 32767)
         i -= 65537;
         return i;
-    }
-                    
-
-    public readSignedByte(): number {
-        return this.payload[this.currentPosition++];
     }
     
     public readShort(): number {
@@ -168,91 +165,90 @@ public class Buffer {
                 + (this.payload[this.currentPosition - 1] & 0xff);
     }
 
-    function readLong(): number {
-        let msi = (readInt() & 0xffffffff) as number;
-        let lsi = (readInt() & 0xffffffff) as number;
+    public readLong(): number {
+        let msi = (this.readInt() & 0xffffffff) as number;
+        let lsi = (this.readInt() & 0xffffffff) as number;
         return (msi << 32) + lsi;
     }
 
-    function readString(): string {
-        let index = currentPosition;
-        while (payload[currentPosition++] != 10)
-            ;
-        return new String(payload, index, currentPosition - index - 1);
+    public readString(): string {
+        let index = this.currentPosition;
+        while (this.payload[this.currentPosition++] != 10);
+        return String.fromCharCode(...this.payload.slice(index, this.currentPosition - 1));
     }
 
-    function readBytes(): Uint8Array {
-        let index = currentPosition;
-        while (payload[currentPosition++] != 10)
+    public readBytes(): Uint8Array {
+        let index = this.currentPosition;
+        while (this.payload[this.currentPosition++] != 10)
             ;
-        let data = new Uint8Array(currentPosition - index - 1);
-        data.set(payload.slice(index, currentPosition - 1));
+        let data = new Uint8Array(this.currentPosition - index - 1);
+        data.set(this.payload.slice(index, this.currentPosition - 1));
         return data;
     }
 
-    function readBytes(offset: number, length: number, data: Uint8Array) {
+    public readByte(offset: number, length: number, data: Uint8Array) {
         for (let index = length; index < length + offset; index++)
-            data[index] = payload[currentPosition++];
+            data[index] = this.payload[this.currentPosition++];
     }
 
-    function initBitAccess() {
-        bitPosition = currentPosition * 8;
+    public initBitAccess() {
+        this.bitPosition = this.currentPosition * 8;
     }
 
-    function readBits(amount: number): number {
-        let byteOffset = bitPosition >> 3;
-        let bitOffset = 8 - (bitPosition & 7);
+    public readBits(amount: number): number {
+        let byteOffset = this.bitPosition >> 3;
+        let bitOffset = 8 - (this.bitPosition & 7);
         let value = 0;
-        bitPosition += amount;
+        this.bitPosition += amount;
         for (; amount > bitOffset; bitOffset = 8) {
-            value += (payload[byteOffset++] & BIT_MASKS[bitOffset]) << amount
+            value += (this.payload[byteOffset++] & Buffer.BIT_MASKS[bitOffset]) << amount
                     - bitOffset;
             amount -= bitOffset;
         }
         if (amount == bitOffset)
-            value += payload[byteOffset] & BIT_MASKS[bitOffset];
+            value += this.payload[byteOffset] & Buffer.BIT_MASKS[bitOffset];
         else
-            value += payload[byteOffset] >> bitOffset - amount
-                    & BIT_MASKS[amount];
+            value += this.payload[byteOffset] >> bitOffset - amount
+                    & Buffer.BIT_MASKS[amount];
         return value;
     }
 
-    function disableBitAccess() {
-        currentPosition = (bitPosition + 7) / 8;
+    public disableBitAccess() {
+        this.currentPosition = (this.bitPosition + 7) / 8;
     }
 
-    function readSmart(): number {
-        let value = payload[currentPosition] & 0xff;
+    public readSmart(): number {
+        let value = this.payload[this.currentPosition] & 0xff;
         if (value < 128)
-            return readUnsignedByte() - 64;
+            return this.readSignedByte() - 64;
         else
-            return readUShort() - 49152;
+            return this.readUShort() - 49152;
     }
 
-    function getSmart(): number {
+    public getSmart(): number {
         try {
             // checks current without modifying position
-            if (currentPosition >= payload.length) {
-                return payload[payload.length - 1] & 0xFF;
+            if (this.currentPosition >= this.payload.length) {
+                return this.payload[this.payload.length - 1] & 0xFF;
             }
-            let value = payload[currentPosition] & 0xFF;
+            let value = this.payload[this.currentPosition] & 0xFF;
 
             if (value < 128) {
-                return readUnsignedByte();
+                return this.readSignedByte();
             } else {
-                return readUShort() - 32768;
+                return this.readUShort() - 32768;
             }
         } catch (e) {
             console.log(e);
-            return readUShort() - 32768;
+            return this.readUShort() - 32768;
         }
     }
 
-    function encodeRSA(exponent: bigint, modulus: bigint) {
-        let length = currentPosition;
-        currentPosition = 0;
+    public encodeRSA(exponent: bigint, modulus: bigint) {
+        let length = this.currentPosition;
+        this.currentPosition = 0;
         let buffer = new Uint8Array(length);
-        readBytes(length, 0, buffer);
+        this.readBytes();
 
         let rsa = buffer;
 
@@ -261,71 +257,71 @@ public class Buffer {
                 .toByteArray();
         //}
 
-        currentPosition = 0;
-        writeByte(rsa.length);
-        writeBytes(rsa, rsa.length, 0);
+        this.currentPosition = 0;
+        this.writeByte(rsa.length);
+        this.writeByteS(rsa.length);
     }
 
-    function writeNegatedByte(value: number) {
-        payload[currentPosition++] = (value * -1);
+    public writeNegatedByte(value: number) {
+        this.payload[this.currentPosition++] = (value * -1);
     }
 
-    function writeByteS(value: number) {
-        payload[currentPosition++] = (128 - value);
+    public writeByteS(value: number) {
+        this.payload[this.currentPosition++] = (128 - value);
     }
 
-    function readUByteA(): number {
-        return payload[currentPosition++] - 128 & 0xff;
+    public readUByteA(): number {
+        return this.payload[this.currentPosition++] - 128 & 0xff;
     }
 
-    function readNegUByte(): number {
-        return -payload[currentPosition++] & 0xff;
+    public readNegUByte(): number {
+        return -this.payload[this.currentPosition++] & 0xff;
     }
 
-    function readUByteS(): number {
-        return 128 - payload[currentPosition++] & 0xff;
+    public readUByteS(): number {
+        return 128 - this.payload[this.currentPosition++] & 0xff;
     }
 
-    function readNegByte(): number {
-        return -payload[currentPosition++];
+    public readNegByte(): number {
+        return -this.payload[this.currentPosition++];
     }
 
-    function readByteS(): number {
-        return 128 - payload[currentPosition++];
+    public readByteS(): number {
+        return 128 - this.payload[this.currentPosition++];
     }
 
-    function writeLEShort(value: number) {
-        payload[currentPosition++] = value;
-        payload[currentPosition++] = (value >> 8);
+    public writeLEShort(value: number) {
+        this.payload[this.currentPosition++] = value;
+        this.payload[this.currentPosition++] = (value >> 8);
     }
 
-    function writeShortA(value: number) {
-        payload[currentPosition++] = (value >> 8);
-        payload[currentPosition++] = (value + 128);
+    public writeShortA(value: number) {
+        this.payload[this.currentPosition++] = (value >> 8);
+        this.payload[this.currentPosition++] = (value + 128);
     }
 
-    function writeLEShortA(value: number) {
-        payload[currentPosition++] = (value + 128);
-        payload[currentPosition++] = (value >> 8);
+    public writeLEShortA(value: number) {
+        this.payload[this.currentPosition++] = (value + 128);
+        this.payload[this.currentPosition++] = (value >> 8);
     }
 
-    function readLEUShort(): number {
-        currentPosition += 2;
-        return ((payload[currentPosition - 1] & 0xff) << 8)
-                + (payload[currentPosition - 2] & 0xff);
+    public readLEUShort(): number {
+        this.currentPosition += 2;
+        return ((this.payload[this.currentPosition - 1] & 0xff) << 8)
+                + (this.payload[this.currentPosition - 2] & 0xff);
     }
 
     
-    function readLEUShortA(): number {
-        currentPosition += 2;
-        return ((payload[currentPosition - 1] & 0xff) << 8)
-                + (payload[currentPosition - 2] - 128 & 0xff);
+    public readLEUShortA(): number {
+        this.currentPosition += 2;
+        return ((this.payload[this.currentPosition - 1] & 0xff) << 8)
+                + (this.payload[this.currentPosition - 2] - 128 & 0xff);
     }
 
-    function readLEShort(): number {
-        currentPosition += 2;
-        let value = ((payload[currentPosition - 1] & 0xff) << 8)
-                + (payload[currentPosition - 2] & 0xff);
+    public readLEShort(): number {
+        this.currentPosition += 2;
+        let value = ((this.payload[this.currentPosition - 1] & 0xff) << 8)
+                + (this.payload[this.currentPosition - 2] & 0xff);
 
         if (value > 32767) {
             value -= 0x10000;
@@ -333,45 +329,45 @@ public class Buffer {
         return value;
     }
 
-    function readLEShortA(): number {
-        currentPosition += 2;
-        let value = ((payload[currentPosition - 1] & 0xff) << 8)
-                + (payload[currentPosition - 2] - 128 & 0xff);
+    public readLEShortA(): number {
+        this.currentPosition += 2;
+        let value = ((this.payload[this.currentPosition - 1] & 0xff) << 8)
+                + (this.payload[this.currentPosition - 2] - 128 & 0xff);
         if (value > 32767)
             value -= 0x10000;
         return value;
     }
 
-    function getIntLittleEndian(): number {
-        currentPosition += 4;
-        return ((payload[currentPosition - 4] & 0xFF) << 24) + ((payload[currentPosition - 3] & 0xFF) << 16) + ((payload[currentPosition - 2] & 0xFF) << 8) + (payload[currentPosition - 1] & 0xFF);
+    public getIntLittleEndian(): number {
+        this.currentPosition += 4;
+        return ((this.payload[this.currentPosition - 4] & 0xFF) << 24) + ((this.payload[this.currentPosition - 3] & 0xFF) << 16) + ((this.payload[this.currentPosition - 2] & 0xFF) << 8) + (this.payload[this.currentPosition - 1] & 0xFF);
     }
 
-    function readMEInt(): number { // V1
-        currentPosition += 4;
-        return ((payload[currentPosition - 2] & 0xff) << 24)
-                + ((payload[currentPosition - 1] & 0xff) << 16)
-                + ((payload[currentPosition - 4] & 0xff) << 8)
-                + (payload[currentPosition - 3] & 0xff);
+    public readMEInt(): number { // V1
+        this.currentPosition += 4;
+        return ((this.payload[this.currentPosition - 2] & 0xff) << 24)
+                + ((this.payload[this.currentPosition - 1] & 0xff) << 16)
+                + ((this.payload[this.currentPosition - 4] & 0xff) << 8)
+                + (this.payload[this.currentPosition - 3] & 0xff);
     }
 
-    function readIMEInt(): number { // V2
-        currentPosition += 4;
-        return ((payload[currentPosition - 3] & 0xff) << 24)
-                + ((payload[currentPosition - 4] & 0xff) << 16)
-                + ((payload[currentPosition - 1] & 0xff) << 8)
-                + (payload[currentPosition - 2] & 0xff);
+    public readIMEInt(): number { // V2
+        this.currentPosition += 4;
+        return ((this.payload[this.currentPosition - 3] & 0xff) << 24)
+                + ((this.payload[this.currentPosition - 4] & 0xff) << 16)
+                + ((this.payload[this.currentPosition - 1] & 0xff) << 8)
+                + (this.payload[this.currentPosition - 2] & 0xff);
     }
 
-    function writeReverseDataA(data: Uint8Array, length: number, offset: number) {
+    public writeReverseDataA(data: Uint8Array, length: number, offset: number) {
         for (let index = (length + offset) - 1; index >= length; index--) {
-            payload[currentPosition++] = (data[index] + 128);
+            this.payload[this.currentPosition++] = (data[index] + 128);
         }
     }
 
-    function readReverseData(data: Uint8Array, offset: number, length: number) {
+    public readReverseData(data: Uint8Array, offset: number, length: number) {
         for (let index = (length + offset) - 1; index >= length; index--) {
-            data[index] = payload[currentPosition++];
+            data[index] = this.payload[this.currentPosition++];
         }
     }
 }

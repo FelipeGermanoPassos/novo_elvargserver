@@ -1,16 +1,16 @@
-eimport { ThreadFactoryBuilder } from 'com.google.common.util.concurrent';
+import { ThreadFactoryBuilder } from 'com.google.common.util.concurrent';
 import { ScheduledExecutorService, Executors } from 'java.util.concurrent';
 import { ClanChatManager } from 'com.elvarg.game.content.clan';
 import { GameConstants } from './GameConstants';
-import [TimeUnit] from 'TimeUnit';
-import { World } from './Worlds';
+import { TimeUnit } from 'timeunit';
+import { World } from '../game/World';
 
 /**
  * The engine which processes the game.
  *
  * @author Professor Oak
  */
-export class GameEngine implements Runnable {
+export class GameEngine  {
     private executorService = new ScheduledExecutorService();
     
     constructor() {

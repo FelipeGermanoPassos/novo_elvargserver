@@ -1,15 +1,20 @@
-class NPCDeathTask extends Task {
-    /**
-    * The npc setting off the death task.
-    /
-    private npc: NPC;
-    /*
-    * The amount of ticks on the task.
-    /
+import { Task } from "../Task";
+import { Optional } from "../../../../../../../node_modules/optional-typescript/dist/index";
+import { World } from "../../World";
+import { Slayer } from '../../../game/content/skill/slayer/Slayer'
+import { NPC } from "../../entity/impl/npc/NPC";
+import { NPCDropGenerator } from '../../../game/entity/impl/npc/NPCDropGenerator'
+import { Barricades } from "../../entity/impl/npc/impl/Barricades";
+import { Player } from "../../entity/impl/player/Player";
+import { Animation } from "../../model/Animation";
+import { Priority } from "../../model/Priority";
+import { TaskManager } from "../TaskManager";
+import { NPCRespawnTask } from '../impl/NPCRespawnTask'
+
+
+export class NPCDeathTask extends Task {
+    private npc: NPC
     private ticks: number;
-    /*
-    * The player who killed the NPC
-    */
     private killer: Optional<Player> = Optional.empty();
     
     /**

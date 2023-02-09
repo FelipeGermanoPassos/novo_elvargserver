@@ -1,4 +1,4 @@
-class Barrows {
+export class Barrows {
     public static ENTRANCE = new Location(3565, 3306);
     public static KILLCOUNTER_INTERFACE_ID = 4535;
     public static KILLCOUNTER_FRAME_ID = 4536;

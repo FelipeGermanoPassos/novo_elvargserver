@@ -12,9 +12,9 @@ export enum TimerKey {
     CASTLEWARS_TAKE_ITEM,
     STEPPING_OUT,
     BOT_WAIT_FOR_PLAYERS
-    }
-    
-    export let ticks: { [key in TimerKey]: number } = {
+}
+
+export let ticks: { [key in TimerKey]: number } = {
     [TimerKey.FOOD]: 0,
     [TimerKey.KARAMBWAN]: 0,
     [TimerKey.POTION]: 0,
@@ -26,8 +26,9 @@ export enum TimerKey {
     [TimerKey.CASTLEWARS_TAKE_ITEM]: 0,
     [TimerKey.STEPPING_OUT]: 0,
     [TimerKey.BOT_WAIT_FOR_PLAYERS]: Misc.getTicks(180)
-    }
-    
+}
+export namespace TimerKey {
     export function getTicks(key: TimerKey) {
-    return ticks[key];
+        return ticks[key];
     }
+}

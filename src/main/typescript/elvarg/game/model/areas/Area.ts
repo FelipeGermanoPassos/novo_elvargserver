@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import {Boundary} from '../../../game/model/Boundary';
 import {Player} from '../../entity/impl/player/Player'
 import {PlayerBot} from '../../entity/impl/playerbot/PlayerBot'
@@ -5,6 +6,15 @@ import {PlayerBot} from '../../entity/impl/playerbot/PlayerBot'
 import {Mobile} from '../../entity/impl/Mobile'
 import {Item} from '../../../game/model/Item'
 import {CombatFactory} from '../../content/combat/CombatFactory'
+=======
+import { Boundary } from '../../../game/model/Boundary';
+import { Player } from '../../entity/impl/player/Player'
+import { PlayerBot } from '../../entity/impl/playerbot/PlayerBot'
+import { NPC } from '../../entity/impl/npc/NPC';
+import { Mobile } from '../../entity/impl/Mobile'
+import { Item } from '../../../game/model/Item'
+import { CanAttackResponse } from '../../content/combat/CombatFactory'
+>>>>>>> Stashed changes
 
 
 export abstract class Area {
@@ -23,7 +33,7 @@ export abstract class Area {
         }
     
         if (character.isPlayer()) {
-            this.players[character.getIndex()] = character.getAsPlayer();
+            this.players[character.getIndex()] = (character.getAsPlayer() as unknown) as Player;
         } else if (character.isNpc()) {
             this.npcs[character.getIndex()] = character.getAsNpc();
         }
@@ -56,12 +66,12 @@ export abstract class Area {
         return true;
     }
 
-    public canAttack(attacker: Mobile, target: Mobile): CombatFactory.CanAttackResponse {
+    public canAttack(attacker: Mobile, target: Mobile): CanAttackResponse {
         if (attacker.isPlayer() && target.isPlayer()) {
-            return CombatFactory.CanAttackResponse.CANT_ATTACK_IN_AREA;
+            return CanAttackResponse.CANT_ATTACK_IN_AREA;
         }
 
-        return CombatFactory.CanAttackResponse.CAN_ATTACK;
+        return CanAttackResponse.CAN_ATTACK;
     }
 
     public canPlayerBotIdle(playerBot: PlayerBot): boolean {

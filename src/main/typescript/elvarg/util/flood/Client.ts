@@ -1,4 +1,14 @@
-export public class Client {
+import { Buffer } from '../flood/Buffer';
+import { ByteBuffer } from '../flood/ByteBuffer'
+import { BufferedConnection } from '../flood/BufferedConnection'
+import { IsaacRandom } from '../../net/security/IsaacRandom';
+import { NetworkConstants } from '../../net/NetworkConstants'
+import * as net from 'net';
+import { GameConstants } from '../../game/GameConstants';
+import { LoginResponses } from '../../net/login/LoginResponses';
+import { Server } from '../../Server';
+
+export class Client {
     private readonly username: string;
     private readonly password: string;
     public loggedIn: boolean;
@@ -14,12 +24,19 @@ export public class Client {
         this.username = username;
         this.password = password;
     }
+
+    private openSocket(port: number): net.Socket {
+        return net.createConnection({
+          host: 'localhost',
+          port: port
+        });
+      }
     
     public attemptLogin(): void {
         this.login = Buffer.create();
         this.incoming = Buffer.create();
         this.outgoing = ByteBuffer.create(5000, false, null);
-        this.socketStream = new BufferedConnection(openSocket(NetworkConstants.GAME_PORT));
+        this.socketStream = new BufferedConnection(this.openSocket(NetworkConstants.GAME_PORT));
     
         this.outgoing.putByte(14); //REQUEST
         this.socketStream.queueBytes(1, this.outgoing.getBuffer());
@@ -27,12 +44,7 @@ export public class Client {
         let response = this.socketStream.read();
     }
 
-    constructor(username: string, password: string) {
-        this.username = username;
-        this.password = password;
-    }
-    
-    public attemptLogin2() {
+    public attemptLogins() {
         this.login = Buffer.create();
         this.incoming = Buffer.create();
         this.outgoing = ByteBuffer.create(5000, false, null);
@@ -47,74 +59,56 @@ export public class Client {
         let cipher = null;
     
         if (response === 0) {
-            socketStream.flushInputStream(incoming.payload, 8);
-            incoming.currentPosition = 0;
-            serverSeed = incoming.readLong();
+            this.socketStream.flushInputStream(new Uint8Array(this.incoming.payload), 8);
+            this.incoming.currentPosition = 0;
+            this.serverSeed = this.incoming.readLong();
             let seed: number[] = [
             Math.floor(Math.random() * 99999999),
             Math.floor(Math.random() * 99999999),
-            serverSeed >> 32,
-            serverSeed
+            this.serverSeed >> 32,
+            this.serverSeed
             ];
-            outgoing.resetPosition();
-            outgoing.putByte(10);
-            outgoing.putInt(seed[0]);
-            outgoing.putInt(seed[1]);
-            outgoing.putInt(seed[2]);
-            outgoing.putInt(seed[3]);
-            outgoing.putInt(GameConstants.CLIENT_UID);
-            outgoing.putString(username);
-            outgoing.putString(password);
-            outgoing.encryptRSAContent();
+            this.outgoing.resetPosition();
+            this.outgoing.putByte(10);
+            this.outgoing.putInt(seed[0]);
+            this.outgoing.putInt(seed[1]);
+            this.outgoing.putInt(seed[2]);
+            this.outgoing.putInt(seed[3]);
+            this.outgoing.putInt(GameConstants.CLIENT_UID);
+            this.outgoing.putString(this.username);
+            this.outgoing.putString(this.password);
+            this.outgoing.encryptRSAContent();
             
-            Copy code
-            login.currentPosition = 0;
-            login.writeByte(16);
-            login.writeByte(outgoing.getPosition() + 2);
-            login.writeByte(255);
-            login.writeByte(0);
-            login.writeBytes(outgoing.getBuffer(), outgoing.getPosition(), 0);
-            cipher = new IsaacRandom(seed);
+            this.login.currentPosition = 0;
+            this.login.writeByte(16);
+            this.login.writeByte(this.outgoing.getPosition() + 2);
+            this.login.writeByte(255);
+            this.login.writeByte(0);
+            this.login.writeByteS(this.outgoing.getPosition());
+            cipher = new IsaacRandom();
             for (let index = 0; index < 4; index++) {
                 seed[index] += 50;
             }
-            encryption = new IsaacRandom(seed);
-            socketStream.queueBytes(login.currentPosition, login.payload);
-            response = socketStream.read();
+            this.encryption = new IsaacRandom();
+            this.socketStream.queueBytes(this.login.currentPosition, new Uint8Array(this.login.payload));
+            response = this.socketStream.read();
         }
         if (response === LoginResponses.LOGIN_SUCCESSFUL) {
-            Server.getFlooder().clients.set(username, this);
-            let rights = socketStream.read();
-            loggedIn = true;
-            outgoing = ByteBuffer.create(5000, false, cipher);
-            incoming.currentPosition = 0;
+            Server.getFlooder().clients.set(this.username, this);
+            let rights = this.socketStream.read();
+            this.loggedIn = true;
+            this.outgoing = ByteBuffer.create(5000, false, cipher);
+            this.incoming.currentPosition = 0;
         }
+    }
             
-            process() {
-            if (loggedIn) {
-                /for (let i = 0; i < 5; i++) {
-                    if (!this.readPacket()) {
-                    break;
-                    }
-                }
-                if (pingCounter++ >= 25) {
-                    outgoing.resetPosition();
-                    outgoing.putOpcode(0);
-                    if (socketStream != null) {
-                        socketStream.queueBytes(outgoing.bufferLength(), outgoing.getBuffer());
-                    }
-                    pingCounter = 0;
-                }
-            }
-            }
             
-            private readPacket(): boolean {
-                if (socketStream == null) {
-                    return false;
-                }
-            }
+    private readPacket(): boolean {
+        if (this.socketStream == null) {
+                return false;
+        }
 
-            let available: number = socketStream.available();
+        let available: number = this.socketStream.available();
 
         if (available < 2) {
         return false;
@@ -124,22 +118,22 @@ export public class Client {
         let packetSize: number = -1;
 
         if (opcode === -1) {
-        socketStream.flushInputStream(incoming.payload, 1);
-        opcode = incoming.payload[0] & 0xff;
-        if (encryption != null) {
-        opcode = (opcode - encryption.nextInt()) & 0xff;
-        }
-        socketStream.flushInputStream(incoming.payload, 2);
-        packetSize = ((incoming.payload[0] & 0xff) << 8) + (incoming.payload[1] & 0xff);
+            this.socketStream.flushInputStream(new Uint8Array(this.incoming.payload), 1);
+            opcode = this.incoming.payload[0] & 0xff;
+            if (this.encryption != null) {
+            opcode = (opcode - this.encryption.nextInt()) & 0xff;
+            }
+            this.socketStream.flushInputStream(new Uint8Array(this.incoming.payload), 2);
+            packetSize = ((this.incoming.payload[0] & 0xff) << 8) + (this.incoming.payload[1] & 0xff);
         }
 
         if (!(opcode >= 0 && opcode < 256)) {
-        opcode = -1;
-        return false;
+            opcode = -1;
+            return false;
         }
 
-        incoming.currentPosition = 0;
-        socketStream.flushInputStream(incoming.payload, packetSize);
+        this.incoming.currentPosition = 0;
+this.socketStream.flushInputStream(new Uint8Array(this.incoming.payload), packetSize);
 
         switch (opcode) {
 
@@ -147,7 +141,22 @@ export public class Client {
         return false;
     }
 
-    private Socket openSocket(int port) throws IOException {
-        return new Socket(InetAddress.getByName("localhost"), port);
+    public process() {
+        if (this.loggedIn) {
+            for (let i = 0; i < 5; i++) {
+            if (!this.readPacket()) {
+            break;
+            }
+            }
+            if (this.pingCounter++ >= 25) {
+            this.outgoing.resetPosition();
+            this.outgoing.putOpcode(0);
+            if (this.socketStream != null) {
+                this.socketStream.queueBytes(this.outgoing.bufferLength(), this.outgoing.getBuffer());
+            }
+            this.pingCounter = 0;
+            }
+        }
     }
+
 }

@@ -50,5 +50,9 @@ class BrokenItem {
         }
         return cost;
     }
+
+    public static get(originalId: number): BrokenItem | undefined {
+        return BrokenItem.brokenItems.get(originalId);
+    }
 }
 BrokenItem.init();

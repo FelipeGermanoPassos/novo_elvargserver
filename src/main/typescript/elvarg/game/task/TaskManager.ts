@@ -1,3 +1,10 @@
+
+import { Queue } from 'queue';
+import { List } from 'List'
+import { LinkedList } from 'linked-list'
+import { iterator } from 'iterator'
+import { Task } from './Task';
+ 
 export class TaskManager {
     private static pendingTasks: Queue<Task> = new LinkedList<Task>();
     private static activeTasks: List<Task> = new LinkedList<Task>();
@@ -9,13 +16,13 @@ export class TaskManager {
     public static process(): void {
         try {
             let t: Task;
-            while ((t = pendingTasks.poll()) != null) {
+            while ((t = TaskManager.pendingTasks.poll()) != null) {
                 if (t.isRunning()) {
-                    activeTasks.add(t);
+                    TaskManager.activeTasks.add(t);
                 }
             }
     
-            const it = activeTasks.iterator();
+            const it = TaskManager.activeTasks.iterator();
     
             while (it.hasNext()) {
                 t = it.next();
@@ -38,26 +45,26 @@ export class TaskManager {
             task.execute();
         }
     
-        pendingTasks.add(task);
+        TaskManager.pendingTasks.add(task);
     }
 
-    public static cancelTasks(keys: Object[]): void {
+    public static cancelTask(keys: any[]): void {
         for (const key of keys) {
-        cancelTasks(key);
+        TaskManager.cancelTask(key);
         }
-        }
+    }
         
     
-        public static cancelTasks(key: Object): void {
+    public static cancelTasks(key: Object): void {
             try {
-                pendingTasks.filter(t => t.getKey() === key).forEach(t => t.stop());
-                activeTasks.filter(t => t.getKey() === key).forEach(t => t.stop());
+                TaskManager.pendingTasks.filter(t => t.getKey() === key).forEach(t => t.stop());
+                TaskManager.activeTasks.filter(t => t.getKey() === key).forEach(t => t.stop());
             } catch (e) {
                 console.error(e);
             }
-        }
+    }
         
-        public static getTaskAmount(): number {
-            return (pendingTasks.size + activeTasks.size);
-        }
+    public static getTaskAmount(): number {
+            return (TaskManager.pendingTasks.size + TaskManager.activeTasks.size);
+    }
 }

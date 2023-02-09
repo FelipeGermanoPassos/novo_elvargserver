@@ -1,6 +1,38 @@
+
+import { Server } from '../Server';
+import { MinigameHandler } from './content/minigames/MinigameHandler';
+import { MobileList } from '../game/entity/impl/MobileList'
+import { ItemOnGround } from './entity/impl/grounditem/ItemOnGround';
+import { ItemOnGroundManager } from './entity/impl/grounditem/ItemOnGroundManager';
+import { NPC } from './entity/impl/npc/NPC';
+import { GameObject } from './entity/impl/object/GameObject';
+import { MapObjects } from './entity/impl/object/MapObjects';
+import { Player } from './entity/impl/player/Player';
+import { PlayerBot } from './entity/impl/playerbot/PlayerBot';
+import { NPCUpdating } from '../game/entity/updating/NPCUpdating'
+import { PlayerUpdating } from './entity/updating/PlayerUpdating';
+import { GameSyncExecutor } from './entity/updating/sync/GameSyncExecutor';
+import { Graphic } from './model/Graphic';
+import { Location } from './model/Location';
+import { Players } from './model/commands/impl/Players';
+import { TaskManager } from './task/TaskManager';
+import { GameConstants } from '../game/GameConstants'
+import { Queue} from 'queue'
+import { Misc } from '../util/Misc';
+import { produce } from 'immer';
+import { List } from 'list'
+import { TreeMap } from 'treemap'
+import { LinkedHashSet} from 'langx-js'
+
+interface GameSyncTaskInterface {
+    isParallel: boolean;
+    isPlayerTask: boolean;
+    execute(index: number): void;
+}
+
 export class World {
     private static readonly MAX_PLAYERS = 500;
-    private static players: MobileList<Player> = new MobileList<Player>(MAX_PLAYERS);
+    private static players: MobileList<Player> = new MobileList<Player>(World.MAX_PLAYERS);
     private static playerBots: Map<string, PlayerBot> = new Map<string, PlayerBot>();
     private static npcs: MobileList<NPC> = new MobileList<NPC>(5000);
     private static items: ItemOnGround[] = [];
@@ -40,71 +72,21 @@ export class World {
      */
     private static executor = new GameSyncExecutor();
 
-    executor.sync(new GameSyncTask(false, false) {
-    execute(index: number) {
-        let npc = npcs.get(index);
-        try {
-            npc.process();
-        } catch (e) {
-            console.log(e);
-        }
-    }
-});
+    public players = new MobileList<Player>(0);
+    public npcs = new MobileList<NPC>(0);
+    public playerBots = new Map<string, PlayerBot>();
+    public items = new Array<ItemOnGround>();
+    public objects = new Array<GameObject>();
+    public removedObjects = new Set<GameObject>();
+    public addPlayerQueue = new Array<Player>();
+    public removePlayerQueue = new Array<Player>();
+    public addNPCQueue = new Array<NPC>();
+    public removeNPCQueue = new Array<NPC>();
 
-executor.sync(new GameSyncTask(true) {
-    execute(index: number) {
-        let player = players.get(index);
-        synchronized(player) {
-            try {
-                PlayerUpdating.update(player);
-                NPCUpdating.update(player);
-            } catch (e) {
-                console.log(e);
-                player.requestLogout();
-            }
-        }
-    }
-});
-
-executor.sync(new GameSyncTask(true) {
-    execute(index: number) {
-        let player = players.get(index);
-        synchronized(player) {
-            try {
-                player.resetUpdating();
-                player.setCachedUpdateBlock(null);
-                player.getSession().flush();
-            } catch (e) {
-                console.log(e);
-                player.requestLogout();
-            }
-        }
-    });
-
-executor.sync(new GameSyncTask(false) {
-    execute(index: number) {
-        let npc = npcs.get(index);
-        synchronized(npc) {
-            try {
-                npc.resetUpdating();
-            } catch (e) {
-                console.log(e);
-            }
-        }
-    }
-});
-
-
-    /**
-    * Gets a player by their username.
-    *
-    * @param username
-    *            The username of the player.
-    * @return The player with the matching username.
-    */
-    public static getPlayerByName(username: string): Player {
-    return players.search(p => p != null && p.getUsername().equals(Misc.formatText(username)));
-}
+    
+    public static getPlayerByName(username: string): Player | undefined {
+        return this.players.find(p => p !== null && p.getUsername().equals(Misc.formatText(username)));
+      }
 
     /**
     * Broadcasts a message to all players in the game.
@@ -113,8 +95,8 @@ executor.sync(new GameSyncTask(false) {
     *            The message to broadcast.
     */
     public static sendMessage(message: string) {
-    players.forEach(p => p.getPacketSender().sendMessage(message));
-}
+        World.players.forEach(p => p.getPacketSender().sendMessage(message));
+    }
 
     /**
     * Broadcasts a message to all staff-members in the game.
@@ -123,212 +105,249 @@ executor.sync(new GameSyncTask(false) {
     *            The message to broadcast.
     */
     public static sendStaffMessage(message: string) {
-    players.filter(p => !Objects.isNull(p) && p.isStaff())
-        .forEach(p => p.getPacketSender().sendMessage(message));
-}
+        const players = [];
+        World.players.forEach(p => {
+            if (p && p.isStaff()) {
+                players.push(p);
+            }
+        });
+        players.forEach(p => p.getPacketSender().sendMessage(message));
+    }
 
     /**
     * Saves all players in the game.
     */
     public static savePlayers() {
-    players.forEach(PLAYER_PERSISTENCE:: save);
-}
+        this.players.forEach(player => GameConstants.PLAYER_PERSISTENCE.save(player));
+    }
+    
+    public static getPlayers(): MobileList<Player> {
+        return this.players;
+    }
+    
+    public static getNpcs(): MobileList<NPC> {
+        return this.npcs;
+    }
+    
+    public static getPlayerBots(): TreeMap<string, PlayerBot> { 
+        return this.playerBots; 
+    }
+    
+    public static getItems(): List<ItemOnGround> {
+        return this.items;
+    }
+    
+    public static getObjects(): List<GameObject> {
+        return this.objects;
+    }
+    
+    public static getRemovedObjects(): LinkedHashSet<GameObject> {
+        return this.removedObjects;
+    }
+    
+    public static getAddPlayerQueue(): Queue<Player> {
+        return this.addPlayerQueue
+    Queue;
+    }   
+    public static getRemovePlayerQueue(): Queue<Player> {
+        return this.removePlayerQueue;
+    }
+    
+    public static getAddNPCQueue(): Queue<NPC> {
+        return this.addNPCQueue;
+    }
+    
+    public static getRemoveNPCQueue(): Queue<NPC> {
+        return this.removeNPCQueue;
+    }
 
-    public static getPlayers(): MobileList < Player > {
-    return players;
-}
+    public findSpawnedObject(id: number, loc: Location): GameObject | undefined {
+        return World.objects.find(i => i.getId() === id && i.getLocation().equals(loc));
+    }
 
-    public static getNpcs(): MobileList < NPC > {
-    return npcs;
-}
+    public static findCacheObject(player: Player, id: number, loc: Location): GameObject {
+        return MapObjects.get(player, id, loc);
+    }
 
-    public static getPlayerBots(): TreeMap < string, PlayerBot > { return playerBots; }
+    public static sendLocalGraphics(id: number, position: Location) {
+        const nearbyPlayers = players.filter(p => p !== null && p.getLocation().isWithinDistance(position, 32)) as Player[];
+        if (nearbyPlayers.length > 0) {
+            nearbyPlayers.forEach(p => p.getPacketSender().sendGraphic(new Graphic(id, 0), position));
+        }
+    }
 
-    public static getItems(): List < ItemOnGround > {
-    return items;
-}
+    public getPlayerByName(username: string): Player | undefined {
+        return World.players.find(p => p != null && p.getUsername().toLowerCase() === username.toLowerCase());
+    }
 
-    public static getObjects(): List < GameObject > {
-    return objects;
-}
+    public sendMessage(message: string) {
+        World.players.forEach(p => p.getPacketSender().sendMessage(message));
+    }
 
-    public static getRemovedObjects(): LinkedHashSet < GameObject > {
-    return removedObjects;
-}
+    public sendStaffMessage(message: string): void {
+        World.players.forEach(p => {
+            if (p && p !== null && p.isStaff()) {
+                p.getPacketSender().sendMessage(message);
+            }
+        });
+    }
 
-    public static getAddPlayerQueue(): Queue < Player > {
-    return addPlayerQueue;
-}
-
-    public static getRemovePlayerQueue(): Queue < Player > {
-    return removePlayerQueue;
-}
-
-    public static getAddNPCQueue(): Queue < NPC > {
-    return addNPCQueue;
-}
-
-    public static getRemoveNPCQueue(): Queue < NPC > {
-    return removeNPCQueue;
-}
+    public savePlayers() {
+        World.players.forEach(GameConstants.PLAYER_PERSISTENCE.save);
+    }
 
     public static process() {
     // Process all active {@link Task}s..
-    TaskManager.process();
-        
-        Copy code
-    // Process all minigames
-    MinigameHandler.process();
+        TaskManager.process();
+            
+        // Process all minigames
+        MinigameHandler.process();
 
-    // Process all ground items..
-    ItemOnGroundManager.process();
+        // Process all ground items..
+        ItemOnGroundManager.process();
 
-    // Add pending players..
-    for (let i = 0; i < GameConstants.QUEUED_LOOP_THRESHOLD; i++) {
-        let player = World.addPlayerQueue.shift();
-        if (!player)
-            break;
-        // Kick any copies before adding the new player
-        let existingPlayer = World.getPlayerByName(player.username);
-        if (existingPlayer) {
-            existingPlayer.requestLogout();
+        // Add pending players..
+        for (let i = 0; i < GameConstants.QUEUED_LOOP_THRESHOLD; i++) {
+            let player = World.addPlayerQueue.shift();
+            if (!player)
+                break;
+            // Kick any copies before adding the new player
+            let existingPlayer = World.getPlayerByName(player.username);
+            if (existingPlayer) {
+                existingPlayer.requestLogout();
+            }
+            World.players.add(player);
         }
-        World.players.add(player);
-    }
 
-    // Deregister queued players.
-    let amount = 0;
-    let $it = World.removePlayerQueue.iterator();
-    while ($it.hasNext()) {
-        let player = $it.next();
+        // Deregister queued players.
+        let amount = 0;
+        World.removePlayerQueue.forEach((player, index) => {
         if (!player || amount >= GameConstants.QUEUED_LOOP_THRESHOLD) {
-            break;
+            return;
         }
         if (player.canLogout() || player.forcedLogoutTimer.finished() || Server.isUpdating()) {
             World.players.remove(player);
-            $it.remove();
+            World.removePlayerQueue.splice(index, 1);
         }
-        amount++;
-    }
-
-    // Add pending Npcs..
-    for (let i = 0; i < GameConstants.QUEUED_LOOP_THRESHOLD; i++) {
-        let npc = World.addNPCQueue.shift();
-        if (!npc)
-            break;
-        World.npcs.add(npc);
-    }
-
-    // Removing pending npcs..
-    for (let i = 0; i < GameConstants.QUEUED_LOOP_THRESHOLD; i++) {
-        let npc = World.removeNPCQueue.shift();
-        if (!npc)
-            break;
-        World.npcs.remove(npc);
-    }
-
-    // Handle synchronization tasks.
-    World.executor.sync((index: number) => {
-        let player = World.players.get(index);
-        try {
-            player.process();
-        } catch (e) {
-            console.error(e);
-            player.requestLogout();
+    amount++;
+});
+        // Add pending Npcs..
+        for (let i = 0; i < GameConstants.QUEUED_LOOP_THRESHOLD; i++) {
+            let npc = World.addNPCQueue.shift();
+            if (!npc)
+                break;
+            World.npcs.add(npc);
         }
-    }, true, false);
 
-    World.executor.sync((index: number) => {
-        let npc = World.npcs.get(index);
+        // Removing pending npcs..
+        for (let i = 0; i < GameConstants.QUEUED_LOOP_THRESHOLD; i++) {
+            let npc = World.removeNPCQueue.shift();
+            if (!npc)
+                break;
+            World.npcs.remove(npc);
+        }
+
+        // Handle synchronization tasks.
+        World.executor.sync((index: number) => {
+            let player = World.players.get(index);
+            try {
+                player.process();
+            } catch (e) {
+                console.error(e);
+                player.requestLogout();
+            }
+        });
+
+        World.executor.sync((index: number) => {
+            let npc = World.npcs.get(index);
+            try {
+                npc.process();
+            } catch (e) {
+                console.error(e);
+            }
+        });
+
+        World.executor.sync((index: number) => {
+            let player = World.players.get(index);
+            try {
+                PlayerUpdating.update(player);
+                NPCUpdating.update(player);
+            } catch (e) {
+                console.error(e);
+                player.requestLogout();
+            }
+        });
+
+        World.executor.sync(new GameSyncTask(true, (index: number) => {
+            let player = World.players.get(index);
+            produce(player, draft => {
+                try {
+                    draft.resetUpdating();
+                    draft.setCachedUpdateBlock(null);
+                    draft.getSession().flush();
+                } catch (e) {
+                    console.log(e);
+                    draft.requestLogout();
+                }
+            });
+        }));
+
+        World.executor.sync(new GameSyncTask(false, (index: number) => {
+            let npc = World.npcs.get(index);
+            produce(npc, draft => {
+                try {
+                    draft.resetUpdating();
+                } catch (e) {
+                    console.log(e);
+                }
+            });
+        }));
+    }
+}
+
+class NPCSyncTask implements GameSyncTaskInterface {
+    isParallel: boolean;
+    isPlayerTask: boolean;
+
+    constructor(isParallel: boolean, isPlayerTask: boolean) {
+        this.isParallel = isParallel;
+        this.isPlayerTask = isPlayerTask;
+    }
+
+    execute(index: number) {
+        let npc = World.getNpcs().get(index);
         try {
             npc.process();
         } catch (e) {
-            console.error(e);
+            console.error("Erro ao processar NPC: ", e);
+            throw new Error("Erro ao processar NPC");
         }
-    }, false, false);
+    }
+}
 
-    World.executor.sync((index: number) => {
-        let player = World.players.get(index);
+class PlayerSyncTask implements GameSyncTaskInterface {
+    isParallel: boolean;
+    isPlayerTask: boolean;
+
+    constructor(isPlayerTask: boolean) {
+        this.isParallel = true;
+        this.isPlayerTask = isPlayerTask;
+    }
+
+    execute(index: number) {
+        let player = World.getPlayers().get(index);
         try {
             PlayerUpdating.update(player);
             NPCUpdating.update(player);
         } catch (e) {
-            console.error(e);
-            player.requestLogout();
+            console.error("Erro ao atualizar jogador: ", e);
+            player.logout();
+            throw new Error("Erro ao atualizar jogador");
         }
-    }, true);
-
-    executor.sync(new GameSyncTask(true, (index: number) => {
-        let player = players.get(index);
-        synchronized(player) {
-            try {
-                player.resetUpdating();
-                player.setCachedUpdateBlock(null);
-                player.getSession().flush();
-            } catch (e) {
-                console.log(e);
-                player.requestLogout();
-            }
-        }
-    });
-
-    executor.sync(new GameSyncTask(false, (index: number) => {
-        let npc = npcs.get(index);
-        synchronized(npc) {
-            try {
-                npc.resetUpdating();
-            } catch (e) {
-                console.log(e);
-            }
-        }
-    });
-
-    class GameSyncTask {
-        constructor(private isPlayer: boolean, private execute: (index: number) => void) { }
-    }
-
-    export function getPlayerByName(username: string): Player | undefined {
-        return players.find(p => p != null && p.getUsername().toLowerCase() === username.toLowerCase());
-    }
-
-    export function sendMessage(message: string) {
-        players.forEach(p => p.getPacketSender().sendMessage(message));
-    }
-
-    export function sendStaffMessage(message: string) {
-        players.filter(p => !Objects.isNull(p) && p.isStaff()).forEach(p => p.getPacketSender().sendMessage(message));
-    }
-
-    export function savePlayers() {
-        players.forEach(PLAYER_PERSISTENCE.save);
-    }
-
-    export const players = new MobileList<Player>();
-    export const npcs = new MobileList<NPC>();
-    export const playerBots = new Map<string, PlayerBot>();
-    export const items = new Array<ItemOnGround>();
-    export const objects = new Array<GameObject>();
-    export const removedObjects = new Set<GameObject>();
-    export const addPlayerQueue = new Array<Player>();
-    export const removePlayerQueue = new Array<Player>();
-    export const addNPCQueue = new Array<NPC>();
-    export const removeNPCQueue = new Array<NPC>();
-
-    export function findSpawnedObject(id: number, loc: Location): GameObject | undefined {
-        return objects.find(i => i.getId() === id && i.getLocation().equals(loc));
-    }
-
-    export function findCacheObject(player: Player, id: number, loc: Location): GameObject {
-        return MapObjects.get(player, id, loc);
-    }
-
-    export function sendLocalGraphics(id: number, position: Location) {
-        players.filter(p => p != null && p.getLocation().isWithinDistance(position, 32))
-            .forEach(p => p.getPacketSender().sendGraphic(new Graphic(id), position));
     }
 }
 
-
-
-
+class GameSyncTask {
+    constructor(private isPlayer: boolean, private execute: (index: number) => void) { }
+}
 

@@ -1,6 +1,12 @@
+import {ShopManager} from '../../model/container/shop/ShopManager'
+import {Shop} from '../../model/container/shop/Shop'
+import {Misc} from '../../../util/Misc'
+import { Task } from '../Task';
+
 class ShopRestockTask extends Task {
+
     constructor(private shop: Shop) {
-    super(10);
+    super();
     this.shop = shop;
     }
     
@@ -24,7 +30,6 @@ class ShopRestockTask extends Task {
         }
         }
         
-        Copy code
         let performedUpdate = false;
         
         for (let itemId of items) {
@@ -54,7 +59,7 @@ class ShopRestockTask extends Task {
     }
         
     stop() {
-        super.stop();
+        this.stop();
         this.shop.setRestocking(false);
     }
 }
