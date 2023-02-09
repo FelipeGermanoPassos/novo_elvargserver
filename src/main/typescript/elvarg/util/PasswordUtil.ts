@@ -1,26 +1,30 @@
+import bcrypt from "bcrypt";
+
 export class PasswordUtil {
-    private static pbkdf2 = PBKDF2Function.getInstance(Hmac.SHA512, 5000, 512);
+    private static pbkdf2 = 10;
 
-    public static generatePasswordHashWithSalt(password: string): string {
-        const hash = Password.hash(password).addRandomSalt().with(this.pbkdf2);
+    public static async generatePasswordHashWithSalt(password: string): Promise<string> {
+        const saltRounds = this.pbkdf2;
+        const salt = await bcrypt.genSalt(saltRounds);
+        const hash = await bcrypt.hash(password, salt);
 
-        return this.toBase64(hash.getSalt()) + ":" + this.toBase64(hash.getResult());
+        return salt + ":" + hash;
     }
 
-    public static passwordsMatch(plainTextPassword: string, passwordHashWithSalt: string): boolean {
+    public static async passwordsMatch(plainTextPassword: string, passwordHashWithSalt: string): Promise<boolean> {
         const parts = passwordHashWithSalt.split(":");
+        const salt = parts[0];
+        const hash = parts[1];
 
-        const salt = this.fromBase64(parts[0]);
-        const passwordHash = this.fromBase64(parts[1]);
-
-        return Password.check(plainTextPassword, passwordHash).addSalt(salt).with(this.pbkdf2);
+        return await bcrypt.compare(plainTextPassword, hash);
     }
 
     private static toBase64(s: string): string {
-        return btoa(s);
+        return Buffer.from(s).toString('base64');
     }
 
     private static fromBase64(s: string): string {
-        return atob(s);
+        return Buffer.from(s, 'base64').toString();
+
     }
 }

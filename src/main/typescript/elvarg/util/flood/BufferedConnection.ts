@@ -1,3 +1,8 @@
+import { Socket } from 'socket.io'
+import * as fsfrom 'fs'
+import { OutputStream } from 'node-js'
+import { Mutex } from "stoppable-lock";
+
 export class BufferedConnection implements Runnable {
     private socket: Socket;
     private inputStream: InputStream;
@@ -11,46 +16,53 @@ export class BufferedConnection implements Runnable {
 
     constructor(socket1: Socket) {
         closed = false;
-        isWriter = false;
-        hasIOError = false;
-        socket = socket1;
-        socket.setTimeout(30000);
-        socket.setNoDelay(true);
-        inputStream = socket.getInputStream();
-        outputStream = socket.getOutputStream();
+        this.isWriter = false;
+        this.hasIOError = false;
+        this.socket = socket1;
+        this.socket.setTimeout(30000);
+        this.socket.setNoDelay(true);
+        this.inputStream = this.socket.getInputStream();
+        this.outputStream = this.socket.getOutputStream();
     }
 
     public close(): void {
         closed = true;
         try {
-            if (inputStream != null)
-                inputStream.close();
-            if (outputStream != null)
-                outputStream.close();
-            if (socket != null)
-                socket.close();
+            if (this.inputStream != null)
+                this.inputStream.close();
+            if (this.outputStream != null)
+                this.outputStream.close();
+            if (this.socket != null)
+                this.socket.close();
         } catch (error) {
             //console.log("Error closing stream");
         }
-        isWriter = false;
-        synchronized (this) {
-            notify();
+        this.isWriter = false;
+        const lock = new Mutex();
+
+        async function doSomething() {
+            await lock.acquire();
+            try {
+                // Your code here
+            } finally {
+                lock.release();
+            }
         }
-        buffer = null;
+        this.buffer = null;
     }
 
     public read(): number {
         if (closed)
             return 0;
         else
-            return inputStream.read();
+            return this.inputStream.read();
     }
 
     public available(): number {
         if (closed)
             return 0;
         else
-            return inputStream.available();
+            return this.inputStream.available();
     }
 
     public flushInputStream(abyte0: Uint8Array, j: number): void {
@@ -59,7 +71,7 @@ export class BufferedConnection implements Runnable {
             return;
         let k;
         for (; j > 0; j -= k) {
-            k = inputStream.read(abyte0, i, j);
+            k = this.inputStream.read(abyte0, i, j);
             if (k <= 0)
                 throw new Error("EOF");
             i += k;
@@ -71,61 +83,65 @@ export class BufferedConnection implements Runnable {
             console.log("Closed");
             return;
         }
-        if (hasIOError) {
-            hasIOError = false;
+        if (this.hasIOError) {
+            this.hasIOError = false;
             //throw new IOError("Error in writer thread");
         }
-        if (buffer == null)
-            buffer = new Uint8Array(5000);
-        synchronized (this) {
-            for (let l = 0; l < i; l++) {
-                buffer[buffIndex] = abyte0[l];
-                buffIndex = (buffIndex + 1) % 5000;
-                if (buffIndex == (writeIndex + 4900) % 5000)
-                    throw new Error("buffer overflow");
-            }
+        if (this.buffer == null)
+            this.buffer = new Uint8Array(5000);
+        let lock = new Mutex();
 
-            if (!isWriter) {
-                isWriter = true;
-                let t = new Thread(this);
-                t.setPriority(3);
-                t.start();
+        async function doSomething() {
+            await lock.acquire();
+            try {
+                // Your code here
+            } finally {
+                lock.release();
             }
-
-            notify();
         }
     }
 
     public run(): void {
-        while (isWriter) {
+        while (this.isWriter) {
             let i;
             let j;
-            synchronized (this) {
-                if (buffIndex == writeIndex)
-                    try {
-                        wait();
-                    } catch (InterruptedException _ex) {
+            let lock = new Mutex();
+            async function readData() {
+                await lock.acquire();
+                try {
+                    if (this.buffIndex === this.writeIndex) {
+                        await lock.release();
+                        await lock.acquire();
                     }
-                if (!isWriter)
-                    return;
-                j = writeIndex;
-                if (buffIndex >= writeIndex)
-                    i = buffIndex - writeIndex;
-                else
-                    i = 5000 - writeIndex;
+            
+                    if (!this.isWriter) {
+                        lock.release();
+                        return;
+                    }
+                    j = this.writeIndex;
+                    if (this.buffIndex >= this.writeIndex) {
+                        i = this.buffIndex - this.writeIndex;
+                    } else {
+                        i = 5000 - this.writeIndex;
+                    }
+                } finally {
+                    lock.release();
+                }
             }
             if (i > 0) {
                 try {
-                    outputStream.write(buffer, j, i);
-                } catch (IOError _ex) {
-                    hasIOError = true;
+                    this.outputStream.write(this.buffer, j, i);
+                } catch (Error) {
+                    var ioError = Error;
+                    this.hasIOError = true;
                 }
-                writeIndex = (writeIndex + i) % 5000;
+                this.writeIndex = (this.writeIndex + i) % 5000;
                 try {
-                    if (buffIndex == writeIndex)
-                        outputStream.flush();
-                } catch (IOError _ex) {
-                    hasIOError = true;
+                    if (this.buffIndex == this.writeIndex)
+                        this.outputStream.flush();
+                } catch (Error) {
+                    var error = Error;
+                    this.hasIOError = true;
                 }
             }
         }
@@ -133,13 +149,14 @@ export class BufferedConnection implements Runnable {
 
     public printDebug(): void {
         console.log("dummy:" + closed);
-        console.log("tcycl:" + writeIndex);
-        console.log("tnum:" + buffIndex);
-        console.log("writer:" + isWriter);
-        console.log("ioerror:" + hasIOError);
+        console.log("tcycl:" + this.writeIndex);
+        console.log("tnum:" + this.buffIndex);
+        console.log("writer:" + this.isWriter);
+        console.log("ioerror:" + this.hasIOError);
         try {
-            console.log("available:" + available());
-        } catch (IOError _ex) {
+            console.log("available:" + this.available());
+        } catch (IOError) {
+            var _ex = IOError;
         }
     }
 }

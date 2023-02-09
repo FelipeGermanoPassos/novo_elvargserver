@@ -1,4 +1,4 @@
- export class Sound {
+export class Sound {
 
     // crafting sounds
 
@@ -32,56 +32,82 @@
 
     public static WOODCUTTING_CHOP = { id: 472, volume: 1, delay: 10, loopType: 0 }
 
-    WOODCUTTING_TREE_DOWN = { id: 473, volume: 1, delay: 0, loopType: 0 }
+    public static WOODCUTTING_TREE_DOWN = { id: 473, volume: 1, delay: 0, loopType: 0 }
 
     // Getting hit
-    FEMALE_GETTING_HIT = { id: 818, volume: 1, delay: 25, loopType: 0 }
+    public static FEMALE_GETTING_HIT = { id: 818, volume: 1, delay: 25, loopType: 0 }
 
     // weapon sounds
 
-    IMP_ATTACKING = { id: 10, volume: 1, delay: 25, loopType: 0 }
+    public static IMP_ATTACKING = { id: 10, volume: 1, delay: 25, loopType: 0 }
 
-    SHOOT_ARROW = { id: 370, volume: 1, delay: 0, loopType: 0 }
+    public static SHOOT_ARROW = { id: 370, volume: 1, delay: 0, loopType: 0 }
 
-    WEAPON = { id: 398, volume: 1, delay: 25, loopType: 0 } // default/other
+    public static WEAPON = { id: 398, volume: 1, delay: 25, loopType: 0 } // default/other
 
-    WEAPON_GODSWORD = { id: 390, volume: 1, delay: 25, loopType: 0 }
+    public static WEAPON_GODSWORD = { id: 390, volume: 1, delay: 25, loopType: 0 }
 
-    WEAPON_STAFF = { id: 394, volume: 1, delay: 25, loopType: 0 }
+    public static WEAPON_STAFF = { id: 394, volume: 1, delay: 25, loopType: 0 }
 
-    WEAPON_BOW = { id: 370, volume: 1, delay: 25, loopType: 0 }
+    public static WEAPON_BOW = { id: 370, volume: 1, delay: 25, loopType: 0 }
 
-    WEAPON_BATTLE_AXE = { id: 399, volume: 1, delay: 25, loopType: 0 }
+    public static WEAPON_BATTLE_AXE = { id: 399, volume: 1, delay: 25, loopType: 0 }
 
-    WEAPON_TWO_HANDER = { id: 400, volume: 1, delay: 25, loopType: 0 }
+    public static WEAPON_TWO_HANDER = { id: 400, volume: 1, delay: 25, loopType: 0 }
 
-    WEAPON_SCIMITAR = { id: 396, volume: 1, delay: 25, loopType: 0 }
+    public static WEAPON_SCIMITAR = { id: 396, volume: 1, delay: 25, loopType: 0 }
 
     public static WEAPON_WHIP = { id: 1080, volume: 1, delay: 25, loopType: 0 }
 
     // Special attack
-    DRAGON_DAGGER_SPECIAL = { id: 385, volume: 1, delay: 25, loopType: 0 }
+    public static DRAGON_DAGGER_SPECIAL = { id: 385, volume: 1, delay: 25, loopType: 0 }
 
     // Spell sounds
 
-    SPELL_FAIL_SPLASH = { id: 193, volume: 1, delay: 0, loopType: 0 }
-    TELEPORT = { id: 202, volume: 1, delay: 0, loopType: 0 }
+    public static SPELL_FAIL_SPLASH = { id: 193, volume: 1, delay: 0, loopType: 0 }
+    public static TELEPORT = { id: 202, volume: 1, delay: 0, loopType: 0 }
 
-    ICA_BARRAGE_IMPACT = { id: 1125, volume: 1, delay: 0, loopType: 0 }
+    public static ICA_BARRAGE_IMPACT = { id: 1125, volume: 1, delay: 0, loopType: 0 }
 
-    DROP_ITEM = { id: 376, volume: 1, delay: 0, loopType: 0 }
-    PICK_UP_ITEM = { id: 358, volume: 1, delay: 0, loopType: 0 }
+    public static DROP_ITEM = { id: 376, volume: 1, delay: 0, loopType: 0 }
+    public static PICK_UP_ITEM = { id: 358, volume: 1, delay: 0, loopType: 0 }
 
-    SET_UP_BARRICADE = { id: 358, volume: 1, delay: 0, loopType: 0 }
+    public static SET_UP_BARRICADE = { id: 358, volume: 1, delay: 0, loopType: 0 }
 
-    FIRE_LIGHT = { id: 375, volume: 1, delay: 0, loopType: 0 }
-    FIRE_SUCCESSFUL = { id: 608, volume: 1, delay: 0, loopType: 0 }
-    FIRE_FIRST_ATTEMPT = { id: 2584, volume: 1, delay: 0, loopType: 0 }
-    SLASH_WEB = { id: 237, volume: 1, delay: 0, loopType: 0 }
-    FAIL_SLASH_WEB = { id: 2548, volume: 1, delay: 0, loopType: 0 }
-    FOOD_EAT = { id: 317, volume: 1, delay: 0, loopType: 0 }
-    DRINK = { id: 334, volume: 1, delay: 0, loopType: 0 }
+    public static FIRE_LIGHT = { id: 375, volume: 1, delay: 0, loopType: 0 }
+    public static FIRE_SUCCESSFUL = { id: 608, volume: 1, delay: 0, loopType: 0 }
+    public static FIRE_FIRST_ATTEMPT = { id: 2584, volume: 1, delay: 0, loopType: 0 }
+    public static SLASH_WEB = { id: 237, volume: 1, delay: 0, loopType: 0 }
+    public static FAIL_SLASH_WEB = { id: 2548, volume: 1, delay: 0, loopType: 0 }
+    public static FOOD_EAT = { id: 317, volume: 1, delay: 0, loopType: 0 }
+    public static DRINK = { id: 334, volume: 1, delay: 0, loopType: 0 }
 
+    private static id: number;
+    private static volume: number;
+    private static delay: number;
+
+    private static loopType: number;
+
+    public static Sound(id: number, volume: number, delay: number, loopType: number) {
+        this.id = id;
+        this.volume = volume;
+        this.delay = delay;
+        this.loopType = loopType;
+    }
+
+    public getId(): number {
+        return Sound.id;
+    }
+
+    public getVolume(): number {
+        return Sound.volume;
+    }
+
+    public getDelay(): number {
+        return Sound.delay;
+    }
+
+    public getLoopType(): number { return Sound.loopType; }
 
 }
 

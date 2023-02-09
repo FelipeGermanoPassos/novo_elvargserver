@@ -1,3 +1,7 @@
+import { ItemOnGround } from "../../entity/impl/grounditem/ItemOnGround";
+import { ItemOnGroundManager } from "../../entity/impl/grounditem/ItemOnGroundManager";
+import { Task } from "../Task";
+
 class GroundItemRespawnTask extends Task {
     /**
     * The {@link ItemOnGround} which is going to respawn.
@@ -11,7 +15,7 @@ class GroundItemRespawnTask extends Task {
     
     execute() {
         // Register the new entity..
-        ItemOnGroundManager.register(item.clone());
+        ItemOnGroundManager.register(this.item.clone());
     
         // Stop the task
         this.stop();

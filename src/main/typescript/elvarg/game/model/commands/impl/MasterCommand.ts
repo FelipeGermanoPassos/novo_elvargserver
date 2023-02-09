@@ -1,3 +1,4 @@
+
 import { Command } from '../../../model/commands/Command';
 import { Player } from '../../../entity/impl/player/Player';
 import { PlayerRights } from '../../../model/rights/PlayerRights';
@@ -7,7 +8,8 @@ import { Flag } from '../../Flag';
 import { Skill } from '../../Skill';
 
 
-class MasterCommand implements Command {
+export class MasterCommand implements Command {
+
     execute(player: Player, command: string, parts: string[]) {
         for (let skill in Skill) {
             let level = SkillManager.getMaxAchievingLevel(skill);

@@ -38,7 +38,11 @@ export class Server {
             return;
         }
 
+<<<<<<< HEAD
         console.log(logMessage);
+=======
+        getLogger().info(logMessage);
+>>>>>>> 592c60a3dab911781579638e2c4e3af73e902af2
     }
 
     // public static getLogger() {

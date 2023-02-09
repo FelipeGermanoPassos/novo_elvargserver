@@ -1,15 +1,13 @@
-package com.elvarg.util.flood;
+import { BigInt } from 'big-int'
+import { IsaacRandom } from '../../net/security/IsaacRandom';
 
-import com.elvarg.net.security.IsaacRandom;
-
-import java.math.BigInteger;
-class ByteBuffer {
+export class ByteBuffers {
     public static RSA_MODULUS = new BigInt("131409501542646890473421187351592645202876910715283031445708554322032707707649791604685616593680318619733794036379235220188001221437267862925531863675607742394687835827374685954437825783807190283337943749605737918856262761566146702087468587898515768996741636870321689974105378482179138088453912399137944888201");
     public static RSA_EXPONENT = new BigInt("65537");
     private static pkt_opcode_slot = 0;
     private static pkt_size_slot = 1;
     private static pkt_content_start = 2;
-    private static BIT_CONSTANTS = [0, 1, 3, 7, 15, 31, 63, 127,
+    public static BIT_CONSTANTS = [0, 1, 3, 7, 15, 31, 63, 127,
     255, 511, 1023, 2047, 4095, 8191, 16383, 32767, 65535, 0x1ffff,
     0x3ffff, 0x7ffff, 0xFFfff, 0x1fffff, 0x3fffff, 0x7fffff, 0xFFffff,
     0x1ffffff, 0x3ffffff, 0x7ffffff, 0xFFfffff, 0x1fffffff, 0x3fffffff,
@@ -24,45 +22,44 @@ class ByteBuffer {
     constructor() {
     
     }
+}
 
-    class ByteBuffer {
-        buffer: number[];
-        reserve_packet_slots: boolean;
-        size: number;
-        position: number;
-        cipher: IsaacRandom;
-        static pkt_opcode_slot = 0;
-        static pkt_size_slot = 1;
-        static pkt_content_start = 2;
-        
-        Copy code
-        constructor(buffer: number[]) {
-            this.buffer = buffer;
-        }
-        
-        static create(size: number, reserve_packet_slots: boolean, cipher: IsaacRandom): ByteBuffer {
-            let stream_1 = new ByteBuffer();
-            stream_1.buffer = new Array(size);
-            stream_1.reserve_packet_slots = reserve_packet_slots;
-            stream_1.size = size;
-            stream_1.position = reserve_packet_slots ? ByteBuffer.pkt_content_start : ByteBuffer.pkt_opcode_slot;
-            stream_1.cipher = cipher;
-            return stream_1;
-        }
-        
-        reset(reserve_packet_slots: boolean) {
-            this.buffer = new Array(this.size);
-            this.reserve_packet_slots = reserve_packet_slots;
-            this.position = reserve_packet_slots ? ByteBuffer.pkt_content_start : ByteBuffer.pkt_opcode_slot;
-        }
+export class ByteBuffer {
+    buffer: number[];
+    reserve_packet_slots: boolean;
+    size: number;
+    position: number;
+    cipher: IsaacRandom;
+    static pkt_opcode_slot = 0;
+    static pkt_size_slot = 1;
+    static pkt_content_start = 2;
+    
+    constructor(buffer: number[]) {
+        this.buffer = buffer;
+    }
+    
+    static create(size: number, reserve_packet_slots: boolean, cipher: IsaacRandom): ByteBuffer {
+        let stream_1 = new ByteBuffer([0]);
+        stream_1.buffer = new Array(size);
+        stream_1.reserve_packet_slots = reserve_packet_slots;
+        stream_1.size = size;
+        stream_1.position = reserve_packet_slots ? ByteBuffer.pkt_content_start : ByteBuffer.pkt_opcode_slot;
+        stream_1.cipher = cipher;
+        return stream_1;
+    }
+    
+    reset(reserve_packet_slots: boolean) {
+        this.buffer = new Array(this.size);
+        this.reserve_packet_slots = reserve_packet_slots;
+        this.position = reserve_packet_slots ? ByteBuffer.pkt_content_start : ByteBuffer.pkt_opcode_slot;
     }
 
-    encryptRSAContent() {
+    public  encryptRSAContent() {
         /* Cache the current position for future use */
         let currentPosition = this.position;
 
         /* Reset the position */
-        this.position = this.reserve_packet_slots ? this.pkt_content_start : this.pkt_opcode_slot;
+        this.position = this.reserve_packet_slots ? ByteBuffer.pkt_content_start : ByteBuffer.pkt_opcode_slot;
 
         /* An empty byte array with a capacity of {@code #currentPosition} bytes */
         let decodeBuffer = new Uint8Array(currentPosition);
@@ -89,7 +86,7 @@ class ByteBuffer {
          * integer n, two integers a and b are said to be congruent modulo n)
          * {@link #RSA_MODULES}
          */
-        let encodedBigInteger = decodedBigInteger.modPow(this.RSA_EXPONENT, this.RSA_MODULUS);
+        let encodedBigInteger = decodedBigInteger.modPow(ByteBuffers.RSA_EXPONENT, ByteBuffers.RSA_MODULUS);
 
         /*
          * Returns the value of the {@code #encodedBigInteger} translated to a
@@ -98,7 +95,7 @@ class ByteBuffer {
         let encodedBuffer = encodedBigInteger.toArray();
 
         /* Reset the position so we can write fresh to the buffer */
-        this.position = this.reserve_packet_slots ? this.pkt_content_start : this.pkt_opcode_slot;
+        this.position = this.reserve_packet_slots ? ByteBuffer.pkt_content_start : ByteBuffer.pkt_opcode_slot;
 
         /*
          * We put the length of the {@code #encodedBuffer} to the buffer as a
@@ -111,39 +108,35 @@ class ByteBuffer {
 
     }
 
-    finishBitAccess() {
-        this.position = Math.floor((this.bitPosition + 7) / 8);
+    public finishBitAccess() :void {
+        this.position = Math.floor((this.position + 7) / 8);
     }
 
     getBits(bitLength: number): number {
-        let k = this.bitPosition >> 3;
-        let l = 8 - (this.bitPosition & 7);
+        let k = this.position >> 3;
+        let l = 8 - (this.position & 7);
         let i1 = 0;
-        this.bitPosition += bitLength;
+        this.position += bitLength;
 
         for (; bitLength > l; l = 8) {
-            i1 += (this.buffer[k++] & this.BIT_CONSTANTS[l]) << bitLength - l;
+            i1 += (this.buffer[k++] & ByteBuffers.BIT_CONSTANTS[l]) << bitLength - l;
             bitLength -= l;
         }
 
         if (bitLength == l) {
-            i1 += this.buffer[k] & this.BIT_CONSTANTS[l];
+            i1 += this.buffer[k] & ByteBuffers.BIT_CONSTANTS[l];
         } else {
-            i1 += (this.buffer[k] >> l - bitLength) & this.BIT_CONSTANTS[bitLength];
+            i1 += (this.buffer[k] >> l - bitLength) & ByteBuffers.BIT_CONSTANTS[bitLength];
         }
 
         return i1;
-    }
-
-    getByte(): number {
-        return this.buffer[this.position++];
     }
 
     getByte(value: number) {
         this.buffer[this.position++] = value;
     }
 
-    getBytes(): Uint8Array {
+    getsBytes(): Uint8Array {
         let pos = this.position;
         while (this.buffer[this.position++] !== 10) { }
         let buf = new Uint8Array(this.position - pos - 1);
@@ -168,8 +161,9 @@ class ByteBuffer {
     }
 
     getLong(): number {
-        let msw = this.getIntLittleEndian() & 0xFFFFFFFFL;
-        let lsw = this.getIntLittleEndian() & 0xFFFFFFFFL;
+        const LONG_MASK: number = 0xFFFFFFFF;
+        let msw = this.getIntLittleEndian() & LONG_MASK;
+        let lsw = this.getIntLittleEndian() & LONG_MASK;
         return msw << 32 | lsw;
     }
 
@@ -233,10 +227,10 @@ class ByteBuffer {
         while (this.buffer[this.position++] != 10) {
         }
     
-        return new String(this.buffer, i, this.position - i - 1);
+        return new TextDecoder().decode(new Uint8Array(this.buffer.slice(i, this.position - 1)));
     }
     
-    public getTribyte(): number {
+    public getTribytes(): number {
         this.position += 3;
         return ((this.buffer[this.position - 3] & 0xFF) << 16) + ((this.buffer[this.position - 2] & 0xFF) << 8) + (this.buffer[this.position - 1] & 0xFF);
     }
@@ -273,7 +267,7 @@ class ByteBuffer {
     }
         
     public initBitAccess(): void {
-        this.bitPosition = this.position << 3;
+        this.position = this.position << 3;
     }
     
     public method400(value: number): void {
@@ -432,7 +426,7 @@ class ByteBuffer {
     }
     
     public putOpcode(i: number): void {
-        this.buffer[this.reserve_packet_slots ? this.pkt_opcode_slot : this.position++] = (i + this.cipher.nextInt()) as number & 0xff;
+        this.buffer[this.reserve_packet_slots ? ByteBuffer.pkt_opcode_slot : this.position++] = (i + this.cipher.nextInt()) as number & 0xff;
     }
     
     public putShort(value: number): void {
@@ -462,7 +456,7 @@ class ByteBuffer {
     }
     
     public getBitPosition(): number {
-        return this.bitPosition;
+        return this.position;
     }
     
     public getCipher(): IsaacRandom {
@@ -474,19 +468,19 @@ class ByteBuffer {
     }
     
     public getBuffer(): Uint8Array {
-        return this.buffer;
+        return new Uint8Array(this.buffer);
     }
                                 
     public bufferLength(): number {
         let size = this.position;
         if (this.reserve_packet_slots) {
-            this.buffer[this.pkt_size_slot] = (size + this.cipher.nextInt()) as number & 0xff;
+            this.buffer[ByteBuffer.pkt_size_slot] = (size + this.cipher.nextInt()) as number & 0xff;
         }
         return size;
     }
 
     public resetPosition(): void {
-        this.position = this.reserve_packet_slots ? this.pkt_content_start : this.pkt_opcode_slot;
+        this.position = this.reserve_packet_slots ? ByteBuffer.pkt_content_start : ByteBuffer.pkt_opcode_slot;
     }
 
     public getPosition(): number {

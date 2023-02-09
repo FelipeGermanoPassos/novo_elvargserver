@@ -1,7 +1,8 @@
 
 import { NPC } from '../game/entity/impl/npc/NPC';
 import requireAll from 'require-all';
-import reflect from 'reflect-metadata';
+import { getOwnMetadata } from '@angular/core';
+
 export class Systems {
     public static init() {
         const npcOverrideClasses = requireAll({
@@ -11,7 +12,7 @@ export class Systems {
             map: (name, path) => require(path).default
         });
 
-        const npcClasses = npcOverrideClasses.filter(clazz => Reflect.hasOwnMetadata('Ids', clazz.prototype));
+        const npcClasses = npcOverrideClasses.filter(clazz => getOwnMetadata('Ids', clazz.prototype));
         const implementationClasses = npcClasses.filter(clazz => clazz.prototype instanceof NPC);
         NPC.initImplementations(implementationClasses);
     }

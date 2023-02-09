@@ -1,22 +1,33 @@
+import { TimerKey } from '../../../../util/timers/TimerKey'
+import { Area } from '../Area'; 
+import { Boundary } from '../../Boundary';
+import { Mobile } from '../../../entity/impl/Mobile';
+import { Player } from '../../../entity/impl/player/Player';
+import { PlayerBot } from '../../../entity/impl/playerbot/PlayerBot';
+import { CanAttackResponse } from '../../../content/combat/CombatFactory';
+import { DuelState } from '../../../content/Duelling'
+import { DuelRule } from '../../../content/Duelling'
+import { Optional } from '../../../../../../../../node_modules/optional-typescript/dist/index';
+
 export class DuelArenaArea extends Area {
     constructor() {
-        super(Arrays.asList(new Boundary(3326, 3383, 3197, 3295)));
-    }
+        super(Array.of(new Boundary(3326, 3383, 3197, 3295,0)));
+        }
 
-    postEnter(character: Mobile) {
+    public postEnter(character: Mobile) {
         if (character.isPlayer()) {
             let player = character.getAsPlayer();
             player.getPacketSender().sendInteractionOption("Challenge", 1, false);
             player.getPacketSender().sendInteractionOption("null", 2, true);
         }
 
-        if (character.isPlayerBot() && this.getPlayers().size() == 0) {
+        if (character.isPlayerBot() && this.getPlayers().length == 0) {
             // Allow this PlayerBot to wait for players for 5 minutes
             character.getAsPlayerBot().getTimers().register(TimerKey.BOT_WAIT_FOR_PLAYERS);
-        }
+            }
     }
 
-    postLeave(character: Mobile, logout: boolean) {
+    public postLeave(character: Mobile, logout: boolean) {
         if (character.isPlayer()) {
             let player = character.getAsPlayer();
             if (player.getDueling().inDuel()) {
@@ -25,24 +36,24 @@ export class DuelArenaArea extends Area {
             player.getPacketSender().sendInteractionOption("null", 2, true);
             player.getPacketSender().sendInteractionOption("null", 1, false);
 
-            if (this.getPlayers().size() == 0 && this.getPlayerBots().size() > 0) {
+            if (this.getPlayers().length == 0 && this.getPlayerBots().length > 0) {
                 // Last player has left duel arena and there are bots
                 this.getPlayerBots().forEach(pb => pb.getTimers().register(TimerKey.BOT_WAIT_FOR_PLAYERS));
             }
         }
     }
 
-    process(character: Mobile) {
+    public process(character: Mobile) {
     }
 
-    canTeleport(player: Player): boolean {
+    public canTeleport(player: Player): boolean {
         if (player.getDueling().inDuel()) {
             return false;
         }
         return true;
     }
 
-    canAttack(character: Mobile, target: Mobile): CanAttackResponse {
+    public canAttack(character: Mobile, target: Mobile): CanAttackResponse {
         if (character.isPlayer() && target.isPlayer()) {
             let a = character.getAsPlayer();
             let t = target.getAsPlayer();
@@ -59,39 +70,39 @@ export class DuelArenaArea extends Area {
         return CanAttackResponse.CAN_ATTACK;
     }
 
-    canTrade(player: Player, target: Player): boolean {
+    public canTrade(player: Player, target: Player): boolean {
         if (player.getDueling().inDuel()) {
             return false;
         }
         return true;
     }
 
-    isMulti(character: Mobile): boolean {
+    public isMulti(character: Mobile): boolean {
         return true;
     }
 
-    canEat(player: Player, itemId: number): boolean {
+    public canEat(player: Player, itemId: number): boolean {
         if (player.getDueling().inDuel() && player.getDueling().getRules()[DuelRule.NO_FOOD.ordinal()]) {
             return false;
         }
         return true;
     }
 
-    canDrink(player: Player, itemId: number): boolean {
+    public canDrink(player: Player, itemId: number): boolean {
         if (player.getDueling().inDuel() && player.getDueling().getRules()[DuelRule.NO_POTIONS.ordinal()]) {
             return false;
         }
         return true;
     }
 
-    dropItemsOnDeath(player: Player, killer: Optional<Player>): boolean {
+    public staticdropItemsOnDeath(player: Player, killer: Optional<Player>): boolean {
         if (player.getDueling().inDuel()) {
             return false;
         }
         return true;
     }
 
-    handleDeath(player: Player, killer: Optional<Player>): boolean {
+    public handleDeath(player: Player, killer?: Player): boolean {
         if (player.getDueling().inDuel()) {
             player.getDueling().duelLost();
             return true;
@@ -99,9 +110,9 @@ export class DuelArenaArea extends Area {
         return false;
     }
 
-    onPlayerRightClick(player: Player, rightClicked: Player, option: number) {
+    public onPlayerRightClick(player: Player, rightClicked: Player, option: number) {
         if (option == 1) {
-            if (player.busy()) {
+            if (player.isBusy()) {
                 player.getPacketSender().sendMessage("You cannot do that right now.");
                 return;
             }
@@ -121,7 +132,7 @@ export class DuelArenaArea extends Area {
     }
 
     canPlayerBotIdle(playerBot: PlayerBot): boolean {
-        if (this.getPlayers().size > 0) {
+        if (this.getPlayers().length > 0) {
             // Player bots can idle here if there are any real players here
             return true;
         }

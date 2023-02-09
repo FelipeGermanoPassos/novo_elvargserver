@@ -1,4 +1,4 @@
-class Slayer {
+export class Slayer {
     public static assign(player: Player): boolean {
         let master: SlayerMaster = SlayerMaster.TURAEL;
         for (SlayerMaster m : SlayerMaster.MASTERS) {

@@ -1,54 +1,66 @@
-import {TimerKey} from '../timers/TimerKey'
-import {Timer} from '../timers/Timer'
+import { TimerKey } from '../timers/TimerKey'
+import { Timer } from '../timers/Timer'
 
-export class TimerRepository {
-    private timers: Map<TimerKey, Timer> = new Map();
+
+
+class TimerRepository {
+    private timer = new Map<TimerKey, Timer>();
 
     public has(key: TimerKey): boolean {
-        const timer = this.timers.get(key);
-        return timer !== null && timer.getTicks() > 0;
+        let timer = this.timer.get(key);
+        return timer !== null && timer.ticks() > 0;
     }
 
-    public register(timer: Timer): void;
-    public register(key: TimerKey, ticks: number): void;
-    public register(key: TimerKey): void;
-    public register(key: TimerKey | Timer, ticks?: number): void {
-        if (key instanceof Timer) {
-            this.timers.set(key.getKey(), key);
-        } else {
-            if (ticks) {
-                this.timers.set(key, new Timer(key, ticks));
-            } else {
-                this.timers.set(key, new Timer(key, key.getTicks()));
-            }
+    public register(timer: Timer) {
+        this.timer.set(timer.key(), timer);
+    }
+
+    public left(key: TimerKey): number {
+        let timer = this.timer.get(key);
+        return timer.ticks();
+    }
+
+    public willEndIn(key: TimerKey, ticks: number): boolean {
+        let timer = this.timer.get(key);
+        if (timer === null) {
+            return true;
+        }
+        return timer.ticks() <= ticks;
+    }
+
+
+    public getTicks(key: TimerKey): number {
+        let timer = this.timer.get(key);
+        if (timer === null) {
+            return 0;
+        }
+        return timer.ticks();
+    }
+
+    public registers(key: TimerKey, ticks: number) {
+        this.timer.set(key, new Timer(key, ticks));
+    }
+
+    public extendOrRegister(key: TimerKey, ticks: number) {
+        this.timer.set(key, this.timer.get(key) === null || this.timer.get(key).ticks() < ticks ? new Timer(key, ticks) : this.timer.get(key));
+    }
+    public addOrSet(key: TimerKey, ticks: number) {
+        this.timer.set(key, this.timer.get(key) ? new Timer(key, this.timer.get(key).ticks() + ticks) : new Timer(key, ticks));
+    }
+
+    public cancel(name: TimerKey) {
+        this.timer.delete(name);
+    }
+
+    public process() {
+        if (this.timer.size > 0) {
+            this.timer.forEach((timer: Timer) => {
+                timer.tick();
+            });
         }
     }
 
-    extendOrRegister(key: TimerKey, ticks: number) {
-        const timer = this.timers.get(key);
-        if (timer && timer.ticks() >= ticks) {
-            this.timers.set(key, new Timer(key, ticks));
-        }
-    }
-
-    addOrSet(key: TimerKey, ticks: number) {
-        this.timers.compute(key, (k, t) => t == null ? new Timer(key, ticks) : new Timer(key, t.ticks() + ticks));
-    }
-
-    cancel(name: TimerKey) {
-        this.timers.delete(name);
-    }
-
-    process() {
-        if (this.timers.size) {
-            const entries = Array.from(this.timers.entries());
-            for (const [key, value] of entries) {
-                value.tick();
-            }
-        }
-    }
-
-    getTimers(): Map<TimerKey, Timer> {
-        return this.timers;
+    public timers(): Map<TimerKey, Timer> {
+        return this.timer;
     }
 }

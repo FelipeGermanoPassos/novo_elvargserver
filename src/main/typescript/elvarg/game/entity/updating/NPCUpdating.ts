@@ -19,12 +19,7 @@ import com.elvarg.game.model.areas.AreaManager;
 import * as AreaManager from '../../model/areas/AreaManager';
 import com.elvarg.net.packet.ByteOrder;
 
-import com.elvarg.net.packet.PacketBuilder;
-import com.elvarg.net.packet.PacketType;
-import com.elvarg.net.packet.PacketBuilder.AccessType;
-import com.elvarg.net.packet.ValueType;
 
-import java.util.Iterator;
 
 /**
  * Represents a player's npc updating task, which loops through all local
@@ -33,7 +28,7 @@ import java.util.Iterator;
  * @author Relex lawl
  */
 
-public class NPCUpdating {
+export public class NPCUpdating {
 
     /**
      * Handles the actual npc updating for the associated player.

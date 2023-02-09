@@ -1,4 +1,20 @@
-export class PlayerDeathTask extends Task {
+import { GameConstants } from "../../GameConstants";
+import { ItemsKeptOnDeath } from "../../content/ItemsKeptOnDeath";
+import { CombatFactory } from "../../content/combat/CombatFactory";
+import { Emblem } from "../../content/combat/bountyhunter/Emblem";
+import { Presetables } from "../../content/presets/Presetables";
+import { ItemDefinition } from "../../definition/ItemDefinition";
+import { ItemOnGroundManager } from "../../entity/impl/grounditem/ItemOnGroundManager";
+import { Player } from "../../entity/impl/player/Player";
+import { PlayerBot } from "../../entity/impl/playerbot/PlayerBot";
+import { PlayerRights } from "../../model/rights/PlayerRights";
+import { Task } from "../Task";
+import { Item } from "../../model/Item";
+import { PrayerHandler } from "../../content/PrayerHandler";
+import { Location } from "../../model/Location";
+import { BrokenItem } from "../../model/BrokenItem";
+
+class PlayerDeathTask extends Task {
     private player: Player;
     private killer: Player | undefined;
     private loseItems = true;
@@ -7,7 +23,7 @@ export class PlayerDeathTask extends Task {
     
 
     constructor(player: Player) {
-        super(1, player, false);
+        super(1, false);
         this.player = player;
         this.killer = player.getCombat().getKiller(true);
     }
@@ -35,90 +51,92 @@ export class PlayerDeathTask extends Task {
 
                 for (let item of playerItems) {
                 // Keep tradeable items
-                if (!item.getDefinition().isTradeable() || itemsToKeep.get().includes(item)) {
-                    if (!itemsToKeep.get().includes(item)) {
-                        itemsToKeep.get().add(item);
+                if (!item.getDefinition().isTradeable() || this.itemsToKeep.includes(item)) {
+                    if (!this.itemsToKeep.includes(item)) {
+                      this.itemsToKeep.push(item);
                     }
                     continue;
                 }
-
                 // Don't drop items if we're owner or dev
-                if (player.getRights() === PlayerRights.OWNER || player.getRights() === PlayerRights.DEVELOPER) {
+                if (this.player.getRights() === PlayerRights.OWNER || this.player.getRights() === PlayerRights.DEVELOPER) {
                     break;
                 }
 
                 // Drop emblems but downgrade them a tier.
-                if (item.getId() === Emblem.MYSTERIOUS_EMBLEM_1.id || item.getId() === Emblem.MYSTERIOUS_EMBLEM_2.id
-                        || item.getId() === Emblem.MYSTERIOUS_EMBLEM_3.id || item.getId() === Emblem.MYSTERIOUS_EMBLEM_4.id
-                        || item.getId() === Emblem.MYSTERIOUS_EMBLEM_5.id || item.getId() === Emblem.MYSTERIOUS_EMBLEM_6.id
-                        || item.getId() === Emblem.MYSTERIOUS_EMBLEM_7.id || item.getId() === Emblem.MYSTERIOUS_EMBLEM_8.id
-                        || item.getId() === Emblem.MYSTERIOUS_EMBLEM_9.id || item.getId() === Emblem.MYSTERIOUS_EMBLEM_10.id) {
+                if (Emblem.some(emblem => emblem.id === item.getId())) {
 
                     // Tier 1 shouldnt be dropped cause it cant be downgraded
-                    if (item.getId() === Emblem.MYSTERIOUS_EMBLEM_1.id) {
+                    if (item.getId() === Emblem.find(emblem => emblem.name === 'MYSTERIOUS_EMBLEM_1').id) {
                         continue;
                     }
 
-                    if (killer.isPresent) {
-                        const lowerEmblem = item.getId() === Emblem.MYSTERIOUS_EMBLEM_2.id ? item.getId() - 2 : item.getId() - 1;
-                        ItemOnGroundManager.registerNonGlobal(killer.get, new Item(lowerEmblem), position);
-                        killer.get.getPacketSender().sendMessage(@red@${player.getUsername()} dropped a ${ItemDefinition.forId(lowerEmblem).getName()}!);
-                        dropped = true;
-                        continue;
+                    if (this.killer) {
+                        const emblem = Emblem.find(emblem => emblem.id === item.getId());
+                        if (emblem) {
+                            const lowerEmblemId = emblem.id === 12748 ? 12746 : emblem.id - 1;
+                            ItemOnGroundManager.registerNonGlobal(this.killer, new Item(lowerEmblemId, 0));
+                            this.killer.getPacketSender().sendMessage(`${this.player.getUsername()} dropped a ${ItemDefinition.forId(lowerEmblemId).getName()}!`);
+                            dropped = true;
+                            continue;
                         }
-                        droppedItems.add(item);
-                        
-                        // Drop item
-                        ItemOnGroundManager.register(killer.isPresent ? killer.get : player, item, position);
-                        dropped = true;
+                    }
+                    droppedItems.add(item);
+                    
+                    // Drop item
+                    if (this.killer) {
+                        ItemOnGroundManager.register(this.killer, item);
+                    } else {
+                        ItemOnGroundManager.register(this.player, item);
+                    }
+                    dropped = true;
                 }
                         
                 // Handle defeat..
-                if (killer.isPresent) {   
-                    if (k.getArea() != null) {
-                        k.getArea().defeated(k, player);
+                if (this.killer) {   
+                    if (this.killer.getArea() != null) {
+                        this.killer.getArea().defeated(this.killer, this.player);
                     }
                     if (!dropped) {
-                        killer.get.getPacketSender().sendMessage(${player.getUsername()} had no valuable items to be dropped.);
+                        this.killer.getPacketSender().sendMessage(`${this.player.getUsername()} had no valuable items to be dropped.`);
                     }
                 }
                 
                 // Reset items
-                player.getInventory().resetItems().refreshItems();
-                player.getEquipment().resetItems().refreshItems();
+                this.player.getInventory().resetItems().refreshItems();
+                this.player.getEquipment().resetItems().refreshItems();
                 }
                 
                 // Restore the player's default attributes (such as stats)..
-                player.resetAttributes();
+                this.player.resetAttributes();
                 
                 // If the player lost items..
-                if (loseItems) {
+                if (this.loseItems) {
                 // Handle items kept on death..
-                    if (itemsToKeep.isPresent()) {
-                        for (const it of itemsToKeep.get()) {
-                            let id = it.getId();
-                            const brokenItem = BrokenItem.get(id);
-                            if (brokenItem != null) {
-                                id = brokenItem.getBrokenItem();
-                                player.getPacketSender().sendMessage(`Your ${ItemDefinition.forId(it.getId()).getName()} has been broken. You can fix it by talking to Perdu.`);
-                            }
-                        player.getInventory().add(new Item(id, it.getAmount()));
+                if (this.itemsToKeep.length > 0) {
+                    for (const it of this.itemsToKeep) {
+                        let id = it.getId();
+                        const brokenItem = BrokenItem.get(id);
+                        if (brokenItem != null) {
+                            id = brokenItem.getBrokenItem();
+                            this.player.getPacketSender().sendMessage(`Your ${ItemDefinition.forId(it.getId()).getName()} has been broken. You can fix it by talking to Perdu.`);
                         }
-                        itemsToKeep.get().clear();
+                        this.player.getInventory().add(new Item(id, it.getAmount()));
                     }
+                    this.itemsToKeep.length = 0;
+                }
                 }
 
                 let handledDeath: boolean = false;
 
-                if (player.getArea() != null) {
-                    handledDeath = player.getArea().handleDeath(player, killer);
+                if (this.player.getArea() != null) {
+                    handledDeath = this.player.getArea().handleDeath(this.player, this.killer);
                 }
 
                 if (!handledDeath) {
-                    player.moveTo(GameConstants.DEFAULT_LOCATION);
-                    if (loseItems) {
-                        if (player.isOpenPresetsOnDeath()) {
-                            Presetables.open(player);
+                    this.player.moveTo(GameConstants.DEFAULT_LOCATION);
+                    if (this.loseItems) {
+                        if (this.player.isOpenPresetsOnDeath()) {
+                            Presetables.open(this.player);
                         }
                     }
                 }
@@ -128,33 +146,33 @@ export class PlayerDeathTask extends Task {
                 break;
 
                 case 2:
-                if (player instanceof PlayerBot) {
-                    (<PlayerBot>player).getCombatInteraction().handleDying(this.killer);
+                if (this.player instanceof PlayerBot) {
+                    (<PlayerBot>this.player).getCombatInteraction().handleDying(this.killer);
                 }
 
                 // Reset combat..
-                player.getCombat().reset();
+                this.player.getCombat().reset();
 
                 // Reset movement queue and disable it..
-                player.getMovementQueue().setBlockMovement(true).reset();
+                this.player.getMovementQueue().setBlockMovement(true).reset();
 
                 // Mark us as untargetable..
-                player.setUntargetable(true);
+                this.player.setUntargetable(true);
 
                 // Close all open interfaces..
-                player.getPacketSender().sendInterfaceRemoval();
+                this.player.getPacketSender().sendInterfaceRemoval();
 
                 // Send death message..
-                player.getPacketSender().sendMessage("Oh dear, you are dead!");
+                this.layer.getPacketSender().sendMessage("Oh dear, you are dead!");
 
                 // Perform death animation..
-                player.performAnimation(new Animation(836, Priority.HIGH));
+                this.player.performAnimation(new Animation(836, Priority.HIGH));
 
                 // Handle retribution prayer effect on our killer, if present..
-                if (PrayerHandler.isActivated(player, PrayerHandler.RETRIBUTION)) {
-                    if (killer.isPresent()) {
-                        CombatFactory.handleRetribution(player, killer.get());
-                    }
+                if (PrayerHandler.isActivated(this.player, PrayerHandler.RETRIBUTION)) {
+                    if (typeof this.killer !== 'undefined' && this.killer !== null) {
+                        CombatFactory.handleRetribution(this.player, this.killer);
+                      }
                 }
                         break;
                         ticks--;
@@ -163,8 +181,8 @@ export class PlayerDeathTask extends Task {
         } catch (e) {
             super.stop();
             console.error(e);
-            player.resetAttributes();
-            player.moveTo(GameConstants.DEFAULT_LOCATION);
+            this.player.resetAttributes();
+            this.player.moveTo(GameConstants.DEFAULT_LOCATION);
         }
     }
 }

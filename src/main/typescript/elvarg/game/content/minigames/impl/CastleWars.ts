@@ -1,4 +1,4 @@
-enum Team {
+export enum Team {
     ZAMORAK = "ZAMORAK",
     SARADOMIN = "SARADOMIN",
     GUTHIX = "GUTHIX",

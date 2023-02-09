@@ -1,3 +1,8 @@
+import { DecimalFormat} from 'decimal-format'
+import { Location } from '../game/model/Location';
+import { Player } from '../game/entity/impl/player/Player';
+import {RandomGen} from '../util/RandomGen'
+
 export class Misc {
     static getTicks(seconds: number): number {
         return (seconds / 0.6);
@@ -21,12 +26,12 @@ export class Misc {
     private static readonly RANDOM = new RandomGen();
     private static readonly SECURE_RANDOM = new SecureRandom();
     private static readonly BLOCKED_WORDS = [
-        ".com", ".net", ".org", "<img", "@cr", "<img=", ":tradereq:", ":duelreq:",
-        "<col=", "<shad="];
-    static readonly DIRECTIONS = [[-1, 1], [0, 1], [1, 1],
-    [-1, 0], [1, 0], [-1, -1], [0, -1], [1, -1]];
-    static xlateDirectionToClient = new byte[]{ 1, 2, 4, 7, 6, 5, 3, 0 };
-    const xlateTable = [' ', 'e', 't', 'a', 'o', 'i', 'h', 'n',
+    ".com", ".net", ".org", "<img", "@cr", "<img=", ":tradereq:", ":duelreq:",
+    "<col=", "<shad="];
+    static readonly DIRECTIONS = [ [ -1, 1 ], [ 0, 1 ], [ 1, 1 ],
+    [ -1, 0 ], [ 1, 0 ], [ -1, -1 ], [ 0, -1 ], [ 1, -1 ] ];
+    static xlateDirectionToClient = {1, 2, 4, 7, 6, 5, 3, 0};
+    static xlateTable = [' ', 'e', 't', 'a', 'o', 'i', 'h', 'n',
     's', 'r', 'd', 'l', 'u', 'm', 'w', 'c', 'y', 'f', 'g', 'p', 'b',
     'v', 'k', 'x', 'j', 'q', 'z', '0', '1', '2', '3', '4', '5', '6',
     '7', '8', '9', ' ', '!', '?', '.', ',', ':', ';', '(', ')', '-',
@@ -41,8 +46,13 @@ export class Misc {
 }
 
     public static getRandomDouble(length: number): number {
-    return Math.random() * length;
-}
+        return Math.random() * length;
+    }
+   
+
+
+
+
     public static getRandomDouble(): number {
     return Math.random();
 }
@@ -51,7 +61,6 @@ export class Misc {
     return RANDOM.nextInt();
 }
 
-    public static inclusive(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
@@ -64,72 +73,73 @@ export class Misc {
     return "" + hourPrefix + ":" + minutePrefix + "";
 }
 
-function getTimePlayed(totalPlayTime: number): string {
-    const sec = Math.floor(totalPlayTime / 1000);
-    const h = Math.floor(sec / 3600);
-    const m = Math.floor(sec / 60 % 60);
-    const s = sec % 60;
-    return (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
-}
-
-function getHoursPlayed(totalPlayTime: number): string {
-    const sec = Math.floor(totalPlayTime / 1000);
-    const h = Math.floor(sec / 3600);
-    return (h < 10 ? "0" + h : h) + "h";
-}
-
-function getMinutesPassed(t: number): number {
-    const seconds = Math.floor((t / 1000) % 60);
-    const minutes = Math.floor(((t - seconds) / 1000) / 60);
-    return minutes;
-}
-
-function concat(a: any[], b: any[]): any[] {
-    const aLen = a.length;
-    const bLen = b.length;
-    const c = new Array(aLen + bLen);
-    c.push(...a, ...b);
-    return c;
-}
-
-function getCloseRandomPlayer(plrs: any[]): any {
-    const index = getRandom(plrs.length - 1);
-    if (index > 0) {
-        return plrs[index];
-    }
-    return null;
-}
-
-function getDirection(x: number, y: number): number {
-    for (let i = 0; i < 8; i++) {
-        if (DIRECTIONS[i][0] == x && DIRECTIONS[i][1] == y)
-            return i;
-    }
-    return -1;
-}
-
-function ucFirst(str: string): string {
-    str = str.toLowerCase();
-    if (str.length > 1) {
-        str = str.substring(0, 1).toUpperCase() + str.substring(1);
-    } else {
-        return str.toUpperCase();
-    }
-    return str;
-}
-
-function format(num: number): string {
-    return num.toLocaleString();
-}
-
-function formatText(s: string): string {
-    for (let i = 0; i < s.length; i++) {
-        if (i == 0) {
-            s = `${s.charAt(0).toUpperCase()}${s.substring(1)}`;
+    public static getTimePlayed(totalPlayTime: number): string {
+        const sec = Math.floor(totalPlayTime / 1000);
+        const h = Math.floor(sec / 3600);
+        const m = Math.floor(sec / 60 % 60);
+        const s = sec % 60;
+        return (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+      }
+      
+      public static getHoursPlayed(totalPlayTime: number): string {
+        const sec = Math.floor(totalPlayTime / 1000);
+        const h = Math.floor(sec / 3600);
+        return (h < 10 ? "0" + h : h) + "h";
+      }
+      
+      public static getMinutesPassed(t: number): number {
+        const seconds = Math.floor((t / 1000) % 60);
+        const minutes = Math.floor(((t - seconds) / 1000) / 60);
+        return minutes;
+      }
+      
+      public static concat(a: any[], b: any[]): any[] {
+        const aLen = a.length;
+        const bLen = b.length;
+        const c = new Array(aLen + bLen);
+        c.push(...a, ...b);
+        return c;
+      }
+      
+      public static getCloseRandomPlayer(plrs: any[]): any {
+        const index = getRandom(plrs.length - 1);
+        if (index > 0) {
+          return plrs[index];
         }
-        if (!/[a-zA-Z0-9]/.test(s.charAt(i))) {
-            if (i + 1 < s.length) {
-                s = `${s.substring(0, i + 1)}${s.charAt(i + 1).toUpperCase()}${s.substring(i + 2)}`;
+        return null;
+      }
+
+      public static getDirection(x: number, y: number): number {
+        for (let i = 0; i < 8; i++) {
+            if (DIRECTIONS[i][0] == x && DIRECTIONS[i][1] == y)
+                return i;
+        }        
+        return -1;
+    }
+    
+    public static ucFirst(str: string): string {
+        str = str.toLowerCase();
+        if (str.length > 1) {
+            str = str.substring(0, 1).toUpperCase() + str.substring(1);
+        } else {
+            return str.toUpperCase();
+        }
+        return str;
+    }
+    
+    public static format(num: number): string {
+        return num.toLocaleString();
+    }
+    
+    public static formatText(s: string): string {
+        for (let i = 0; i < s.length; i++) {
+            if (i == 0) {
+                s = `${s.charAt(0).toUpperCase()}${s.substring(1)}`;
+            }
+            if (!/[a-zA-Z0-9]/.test(s.charAt(i))) {
+                if (i + 1 < s.length) {
+                    s = `${s.substring(0, i + 1)}${s.charAt(i + 1).toUpperCase()}${s.substring(i + 2)}`;
+                }
             }
         }
     }
@@ -188,14 +198,30 @@ function textPack(text: string): number[] {
         text = text.substring(0, 80);
     }
 
-    let packedData: number[] = [];
-    text = text.toLowerCase();
-    let carryOverNibble = -1;
-    let ofs = 0;
-    for (let idx = 0; idx < text.length; idx++) {
-        let c = text.charAt(idx);
-        let tableIdx = 0;
-        for (let i = 0; i < xlateTable.length; i++) {
+    public static anOrA(s: string): string {
+        s = s.toLowerCase();
+        if (s === "anchovies" || s === "soft clay" || s === "cheese" || s === "ball of wool" || s === "spice" || s === "steel nails" || s === "snape grass" || s === "coal") {
+          return "some";
+        }
+        if (s.startsWith("a") || s.startsWith("e") || s.startsWith("i") || s.startsWith("o") || s.startsWith("u")) {
+          return "an";
+        }
+        return "a";
+      }
+      
+    public static textPack(text: string): number[] {
+        if (text.length > 80) {
+          text = text.substring(0, 80);
+        }
+      
+        let packedData: number[] = [];
+        text = text.toLowerCase();
+        let carryOverNibble = -1;
+        let ofs = 0;
+        for (let idx = 0; idx < text.length; idx++) {
+          let c = text.charAt(idx);
+          let tableIdx = 0;
+          for (let i = 0; i < xlateTable.length; i++) {
             if (c === xlateTable[i]) {
                 tableIdx = i;
                 break;
@@ -224,20 +250,20 @@ function textPack(text: string): number[] {
     return packedData;
 }
 
-function anOrA(s: string): string {
-    s = s.toLowerCase();
-    if (s.toLowerCase() === "anchovies" || s.toLowerCase() === "soft clay" || s.toLowerCase() === "cheese" || s.toLowerCase() === "ball of wool" || s.toLowerCase() === "spice" || s.toLowerCase() === "steel nails" || s.toLowerCase() === "snape grass" || s.toLowerCase() === "coal")
-        return "some";
-    if (s.startsWith("a") || s.startsWith("e") || s.startsWith("i") || s.startsWith("o") || s.startsWith("u"))
-        return "an";
-    return "a";
-}
-
-function getClasses(packageName: string): Array<any> {
-    let classList: Array<any> = [];
-    // Add logic to get classes from package name
-    return classList;
-}
+    public static anOrA(s: string): string {
+            s = s.toLowerCase();
+            if (s.toLowerCase() === "anchovies" || s.toLowerCase() === "soft clay" || s.toLowerCase() === "cheese" || s.toLowerCase() === "ball of wool" || s.toLowerCase() === "spice" || s.toLowerCase() === "steel nails" || s.toLowerCase() === "snape grass" || s.toLowerCase() === "coal")
+                return "some";
+            if (s.startsWith("a") || s.startsWith("e") || s.startsWith("i") || s.startsWith("o") || s.startsWith("u"))
+                return "an";
+            return "a";
+    }
+        
+    public static getClasses(packageName: string): Array<any> {
+            let classList: Array<any> = [];
+            // Add logic to get classes from package name
+            return classList;
+    }
 
     private static findClasses(directory: string, packageName: string): any[] {
     let classes = [];
@@ -345,16 +371,37 @@ function readFile(s: File): Uint8Array {
     }
 }
 
-function randomTypeOfList<T>(list: T[]): T {
-    return list[Math.floor(Math.random() * list.length)];
-}
+    public static isWeekend(): boolean {
+        let day = new Date().getDay();
+        return (day === 0) || (day === 6) || (day === 7);
+    }
+
+    public static readFile(s: File): Uint8Array {
+        try {
+            let fis = new FileReader();
+            let fc = new Uint8Array(s.size);
+            fis.readAsArrayBuffer(s);
+            fis.onloadend = public static() {
+                fc = new Uint8Array(fis.result);
+            }
+            fis.close();
+            return fc;
+        } catch (e) {
+            console.log("FILE : " + s.name + " missing.");
+            return null;
+        }
+    }
+
+    public static randomTypeOfList<T>(list: T[]): T {
+        return list[Math.floor(Math.random() * list.length)];
+    }
 
     public static randomInclusive(min: number, max: number): number {
-    return Math.min(min, max) + Math.floor(Math.random() * (Math.max(min, max) - Math.min(min, max) + 1));
-}
+        return Math.min(min, max) + Math.floor(Math.random() * (Math.max(min, max) - Math.min(min, max) + 1));
+    }
 
-import { GZIPInputStream, ByteArrayInputStream, DataInputStream } from 'java.io';
-import { TimeUnit } from 'java.util.concurrent';
+    import { GZIPInputStream, ByteArrayInputStream, DataInputStream } from 'java.io';
+    import { TimeUnit } from 'java.util.concurrent';
 
     public static getBuffer(f: File): Uint8Array | null {
     if (!f.exists()) {
@@ -396,83 +443,69 @@ const getTimeLeft = (start: number, timeAmount: number, timeUnit: number): numbe
     return timeAmount - toReturn;
 }
 
-const getFormattedPlayTime = (player: Player) => {
-    const different = Date.now() - player.getCreationDate().getTime();
-
-    const secondsInMilli = 1000;
-    const minutesInMilli = secondsInMilli * 60;
-    const hoursInMilli = minutesInMilli * 60;
-    const daysInMilli = hoursInMilli * 24;
-
-    const elapsedDays = different / daysInMilli;
-    let different = different % daysInMilli;
-
-    const elapsedHours = different / hoursInMilli;
-    different = different % hoursInMilli;
-
-    const elapsedMinutes = different / minutesInMilli;
-    different = different % minutesInMilli;
-
-    const elapsedSeconds = different / secondsInMilli;
-
-    return `${elapsedDays} day(s) : ${elapsedHours} hour(s) : ${elapsedMinutes} minute(s) : ${elapsedSeconds} second(s)`;
-}
-
-// Converts an array of bytes to an integer
-function hexToInt(data: number[]) {
-    let value = 0;
-    let n = 1000;
-    for (let i = 0; i < data.length; i++) {
-        let num = (data[i] & 0xFF) * n;
-        value += num;
-        if (n > 1) {
-            n = n / 1000;
+    // Converts an array of bytes to an integer
+    public static hexToInt(data: number[]) {
+        let value = 0;
+        let n = 1000;
+        for (let i = 0; i < data.length; i++) {
+            let num = (data[i] & 0xFF) * n;
+            value += num;
+            if (n > 1) {
+                n = n / 1000;
+            }
         }
     }
     return value;
 }
 
-// Returns the delta between two locations
-public function delta(a: Location, b: Location) {
-    return { x: b.x - a.x, y: b.y - a.y };
-}
+    // Returns the delta between two locations
+    public public static delta(a: Location, b: Location) {
+        return {x: b.x - a.x, y: b.y - a.y};
+    }
 
-// Picks a random element out of any array type
-function randomElement<T>(array: T[]) {
-    return array[Math.floor(Math.random() * array.length)];
-}
+    // Picks a random element out of any array type
+    public static randomElement<T>(array: T[]) {
+        return array[Math.floor(Math.random() * array.length)];
+    }
 
-// Picks a random element out of any list type
-function randomElement<T>(list: T[]) {
-    return list[Math.floor(Math.random() * list.length)];
-}
+    // Picks a random element out of any list type
+    public static randomElement<T>(list: T[]) {
+        return list[Math.floor(Math.random() * list.length)];
+    }
 
 const BLOCKED_WORDS: string[] = [];
 
-function blockedWord(string: string): boolean {
-    for (const s of BLOCKED_WORDS) {
-        if (string.includes(s)) {
-            return true;
+    public static blockedWord(string: string): boolean {
+        for (const s of BLOCKED_WORDS) {
+            if (string.includes(s)) {
+                return true;
+            }
         }
     }
     return false;
 }
 
-function capitalizeWords(name: string): string {
-    let builder = "";
-    const words = name.split(" ");
-    for (let i = 0, l = words.length; i < l; ++i) {
-        if (i > 0) {
-            builder += " ";
+    public static capitalizeWords(name: string): string {
+        let builder = "";
+        const words = name.split(" ");
+        for (let i = 0, l = words.length; i < l; ++i) {
+            if (i > 0) {
+                builder += " ";
+            }
+            builder += words[i][0].toUpperCase() + words[i].substring(1);
         }
         builder += words[i][0].toUpperCase() + words[i].substring(1);
     }
     return builder;
 }
 
-function capitalize(name: string): string {
-    if (name.length < 1) {
-        return "";
+    public static capitalize(name: string): string {
+        if (name.length < 1) {
+            return "";
+        }
+        let builder = "";
+        builder += name[0].toUpperCase() + name.substring(1).toLowerCase();
+        return builder;
     }
     let builder = "";
     builder += name[0].toUpperCase() + name.substring(1).toLowerCase();
@@ -509,51 +542,53 @@ function capitalize(name: string): string {
     return l;
 }
 
-function getBuffer(file: string): Uint8Array | null {
-    try {
-        let f = new File(file);
-        if (!f.exists())
-            return null;
-        let buffer = new Uint8Array(f.length);
-        let dis = new DataInputStream(new FileInputStream(f));
-        dis.readFully(buffer);
-        dis.close();
-        return buffer;
-    } catch (e) {
-        console.error(e);
+    public static getBuffer(file: string): Uint8Array | null {
+        try {
+            let f = new File(file);
+            if (!f.exists())
+                return null;
+            let buffer = new Uint8Array(f.length);
+            let dis = new DataInputStream(new FileInputStream(f));
+            dis.readFully(buffer);
+            dis.close();
+            return buffer;
+        } catch (e) {
+            console.error(e);
+        }
+        return null;
+    }
+    
+    public static formatNameForProtocol(name: string) : string {
+        return name.toLowerCase().replace(" ", "_");
+    }
+    
+    public static formatName(name: string) : string {
+        return fixName(name.replace(" ", "_"));
+    }
+    
+    public static longToString(l: number) : string {
+        let i = 0;
+        let ac: string[] = new Array(12);
+        while (l != 0) {
+            let l1 = l;
+            l /= 37;
+            ac[11 - i++] = VALID_CHARACTERS[(l1 - l * 37)];
+        }
+        return ac.slice(12 - i, i).join("");
     }
     return null;
 }
 
-function formatNameForProtocol(name: string): string {
-    return name.toLowerCase().replace(" ", "_");
-}
-
-function formatName(name: string): string {
-    return fixName(name.replace(" ", "_"));
-}
-
-function longToString(l: number): string {
-    let i = 0;
-    let ac: string[] = new Array(12);
-    while (l != 0) {
-        let l1 = l;
-        l /= 37;
-        ac[11 - i++] = VALID_CHARACTERS[(l1 - l * 37)];
-    }
-    return ac.slice(12 - i, i).join("");
-}
-
-const EFFECTS: string[] = [
-    "@gre@", "@cya@", "@red@", "chalreq", "tradereq", "@bro@", "@yel@", "@blu@", "@gr1@", "@gr2@", "@gr3@", "@str@", "@mag@", "@dre@", "@dbl@", "@or1@", "@or2@", "@or3@", "@whi@", "@bla@", "@cr", "<col", "<shad", "<str", "<u", "<br", "<trans", "duelreq", "<img", "@lre@", ":clan:", "]cr", "::summ", "<str"
-];
-
-function fixName(name: string): string {
-    if (name.length > 0) {
-        const ac = name.split('');
-        for (let j = 0; j < ac.length; j++) {
-            if (ac[j] === '_') {
-                ac[j] = ' ';
+    const EFFECTS: string[] = [
+        "@gre@", "@cya@", "@red@", "chalreq", "tradereq", "@bro@", "@yel@", "@blu@", "@gr1@", "@gr2@", "@gr3@", "@str@", "@mag@", "@dre@", "@dbl@", "@or1@", "@or2@", "@or3@", "@whi@", "@bla@", "@cr", "<col", "<shad", "<str", "<u", "<br", "<trans", "duelreq", "<img", "@lre@", ":clan:", "]cr", "::summ", "<str"
+        ];
+        
+    public static fixName(name: string): string {
+        if (name.length > 0) {
+            const ac = name.split('');
+            for (let j = 0; j < ac.length; j++) {
+                if (ac[j] === '_') {
+                    ac[j] = ' ';
                 if ((j + 1 < ac.length) && (ac[j + 1] >= 'a') && (ac[j + 1] <= 'z')) {
                     ac[j + 1] = String.fromCharCode((ac[j + 1].charCodeAt(0) + 65) - 97);
                 }
@@ -566,26 +601,25 @@ function fixName(name: string): string {
     } else {
         return name;
     }
-}
-export function wrapText(text: string, len: number) {
-    // return empty array for null text
-    if (!text) return [];
-
-    // return text if len is zero or less
-    if (len <= 0) return [text];
-
-    // return text if less than length
-    if (text.length <= len) return [text];
-
-    const chars = text.split("");
-    const lines: string[] = [];
-    let line = "";
-    let word = "";
-
-    // Text effects
-    let effects: string | null = null;
-    for (const effectCode of EFFECTS) {
-        if (text.includes(effectCode)) {
+    export public static wrapText(text: string, len: number) {
+        // return empty array for null text
+        if (!text) return [];
+      
+        // return text if len is zero or less
+        if (len <= 0) return [text];
+      
+        // return text if less than length
+        if (text.length <= len) return [text];
+      
+        const chars = text.split("");
+        const lines: string[] = [];
+        let line = "";
+        let word = "";
+      
+        // Text effects
+        let effects: string | null = null;
+        for (const effectCode of EFFECTS) {
+          if (text.includes(effectCode)) {
             if (!effects) {
                 effects = "";
             }
@@ -666,30 +700,54 @@ export function wrapText(text: string, len: number) {
             line_ = effects + line_;
         }
 
-        lines.push(line_);
+    public static _hash(string: string): number {
+        return Array.from({length: string.length}, (_, index) => string.charCodeAt(index)).reduce((hash, charCode) => hash * 61 + charCode - 32, 0);
     }
-
-    let ret = new Array<string>(lines.length);
-    let c = 0; // counter
-    for (let e of lines) {
-        ret[c] = e;
-        c++;
+    
+    public static getUsersProjectRootDirectory(): string {
+        const envRootDir = process.cwd();
+        const rootDir = path.resolve(".");
+        if (rootDir.startsWith(envRootDir)) {
+            return rootDir;
+        } else {
+            throw new Error("Root dir not found in user directory.");
+        }
     }
-
-    return ret;
-}
-
-function _hash(string: string): number {
-    return Array.from({ length: string.length }, (_, index) => string.charCodeAt(index)).reduce((hash, charCode) => hash * 61 + charCode - 32, 0);
-}
-
-function getUsersProjectRootDirectory(): string {
-    const envRootDir = process.cwd();
-    const rootDir = path.resolve(".");
-    if (rootDir.startsWith(envRootDir)) {
-        return rootDir;
-    } else {
-        throw new Error("Root dir not found in user directory.");
+    
+    public static random(range: number): number {
+        return Math.floor(Math.random() * (range + 1));
+    }
+    
+    public static random(minRange: number, maxRange: number): number {
+        return minRange + random(maxRange - minRange);
+    }
+    
+    /**
+     * Get a random number between a range and exclude some numbers.
+     * The excludes list MUST BE MODIFIABLE.
+     *
+     * @param start start number
+     * @param end end number
+     * @param excludes list of numbers to be excluded
+     * @return value between {@code start} (inclusive) and {@code end} (inclusive)
+     */
+    public static getRandomExcluding(start: number, end: number, excludes: number[]): number {
+        // Using Array as the list needs to be modifiable for Array.sort:
+        excludes.sort();
+    
+        let random = start + Math.floor(Math.random() * (end - start + 1 - excludes.length));
+        for (const exclude of excludes) {
+            if (random < exclude) {
+                break;
+            }
+            random++;
+        }
+        return random;
+    }
+    
+    public static concatWithCollection<T>(array1: T[], array2: T[]): T[] {
+        const resultList = [...array1, ...array2];
+        return resultList as T[];
     }
 }
 

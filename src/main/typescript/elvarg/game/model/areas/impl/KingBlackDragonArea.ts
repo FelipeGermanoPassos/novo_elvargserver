@@ -4,7 +4,7 @@ import { Player } from '../../../entity/impl/player/Player'
 import { Optional } from 'optional'
 import { Mobile } from '../../../entity/impl/Mobile';
 
-class KingBlackDragonArea extends Area {
+export class KingBlackDragonArea extends Area {
     public static BOUNDARY = new Boundary(2249, 2292, 4672, 4720, 0);
 
     process(character: Mobile) { }

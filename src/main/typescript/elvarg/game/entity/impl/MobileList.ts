@@ -1,6 +1,12 @@
 import { Mobile } from './Mobile';
 
 export class MobileList<E extends Mobile> implements Iterable<E> {
+    find(arg0: (p: any) => boolean): import("./player/Player").Player {
+        throw new Error('Method not implemented.');
+    }
+    filter(arg0: (p: any) => any) {
+        throw new Error('Method not implemented.');
+    }
     private slotQueue: Queue<number> = new ArrayDeque<number>();
     private capacity: number;
     private characters: E[];

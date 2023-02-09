@@ -830,7 +830,7 @@ class DuelRule {
 }
 
 
-public enum DuelState {
+export public enum DuelState {
     NONE, REQUESTED_DUEL, DUEL_SCREEN, ACCEPTED_DUEL_SCREEN, CONFIRM_SCREEN, ACCEPTED_CONFIRM_SCREEN, STARTING_DUEL, IN_DUEL;
 }
 

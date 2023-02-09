@@ -1,23 +1,24 @@
 import {PlayerBot} from '../../../../entity/impl/playerbot/PlayerBot';
 import {Player} from '../../../../entity/impl/player/Player'
-import * as Mobile from '../../../../entity/impl/Mobile'
+import {Mobile} from '../../../../entity/impl/Mobile'
 import {Arrays} from 'collections'
-import Boundary from '../../../../model/Boundary';
+import {Boundary} from '../../../../model/Boundary';
 import {CastleWars} from '../../../../content/minigames/impl/CastleWars';
-import com.elvarg.game.model.Item;
-import {Item} from '../../../../model/Item';
-import static com.elvarg.util.ObjectIdentifiers.PORTAL_9;
 import {obj} from '../../../../../util/ObjectIdentifiers';
 import Misc from 'misc'
 import {Area} from '../../../../model/areas/Area';
 import * as from 'random';
 import {Item} from '../../../../model/Item';
+import { TaskManager } from '../../../../task/TaskManager';
+import { Equipment } from '../../../container/impl/Equipment';
+import { Flag } from '../../../Flag';
+
 
 
 
 class CastleWarsSaradominWaitingArea extends Area {
     constructor() {
-        super(Arrays.asList(new Boundary(2368, 2392, 9481, 9497)));
+        super(Arrays.asList(new Boundary(2368, 2392, 9481, 9497,0)));
     }
 
     public getName(): string {
@@ -63,7 +64,7 @@ class CastleWarsSaradominWaitingArea extends Area {
 
         if (logout) {
             // Player has logged out, teleport them to the lobby
-            player.moveTo(new Location(2439 + Misc.random(4), 3085 + Misc.random(5), 0));
+            player.moveTo(new Location());
         }
 
         if (player.getArea() != CastleWars.GAME_AREA) {
@@ -81,8 +82,7 @@ class CastleWarsSaradominWaitingArea extends Area {
     public handleObjectClick(player: Player, objectId: number, type: number): boolean {
         switch (objectId) {
             case obj.PORTAL_8:
-                player.Mobile.moveTo(new Location(2439 + Misc.random(4),
-                        3085 + Misc.random(5), 0));
+                player.moveTo(new Location());
                 return true;
         }
 
@@ -127,4 +127,5 @@ class CastleWarsSaradominWaitingArea extends Area {
     return CastleWars.ZAMORAK_WAITING_AREA.getPlayers().size > 0;
     }
 }
+
     

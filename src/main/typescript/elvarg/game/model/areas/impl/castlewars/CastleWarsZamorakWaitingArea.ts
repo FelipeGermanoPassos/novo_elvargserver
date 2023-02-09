@@ -1,19 +1,19 @@
-import {PlayerBot} from '../../../../entity/impl/playerbot/PlayerBot';
-import {Player} from '../../../../entity/impl/player/Player'
-import * as Mobile from '../../../../entity/impl/Mobile'
-import {Arrays} from 'collections'
-import Boundary from '../../../../model/Boundary';
-import {CastleWars} from '../../../../content/minigames/impl/CastleWars';
-import com.elvarg.game.model.Item;
-import {Item} from '../../../../model/Item';
-import static com.elvarg.util.ObjectIdentifiers.PORTAL_9;
-import {obj} from '../../../../../util/ObjectIdentifiers';
+import { PlayerBot } from '../../../../entity/impl/playerbot/PlayerBot';
+import { Player } from '../../../../entity/impl/player/Player'
+import { Mobile } from '../../../../entity/impl/Mobile'
+import { Arrays } from 'collections'
+import { Boundary } from '../../../../model/Boundary';
+import { CastleWars } from '../../../../content/minigames/impl/CastleWars';
+import { Item } from '../../../../model/Item';
+import { obj } from '../../../../../util/ObjectIdentifiers';
 import Misc from 'misc'
-import {Area} from '../../../../model/areas/Area'
+import { Area } from '../../../../model/areas/Area'
+import { TaskManager } from '../../../../task/TaskManager';
+import { Equipment } from '../../../container/impl/Equipment';
 
 class CastleWarsZamorakWaitingArea extends Area {
     constructor() {
-        super(Arrays.asList(new Boundary(2408, 2432, 9512, 9535)));
+        super(Arrays.asList(new Boundary(2408, 2432, 9512, 9535,0)));
     }
 
     public getName(): string {
@@ -50,14 +50,14 @@ class CastleWarsZamorakWaitingArea extends Area {
         }
 
         if (CastleWars.START_GAME_TASK.isRunning() && Area.getPlayers().size === 0
-                && CastleWars.SARADOMIN_WAITING_AREA.getPlayers().size === 0) {
+            && CastleWars.SARADOMIN_WAITING_AREA.getPlayers().size === 0) {
             // Ensure the game start timer is cancelled
             TaskManager.cancelTasks(CastleWars.START_GAME_TASK);
         }
 
         if (logout) {
             // Player has logged out, teleport them to the lobby
-            player.moveTo(new Location(2439 + Misc.random(4), 3085 + Misc.random(5), 0));
+            player.moveTo(new Location());
         }
 
         if (player.getArea() !== CastleWars.GAME_AREA) {
@@ -75,47 +75,46 @@ class CastleWarsZamorakWaitingArea extends Area {
     handleObjectClick(player: Player, objectId: number, type: number): boolean {
         switch (objectId) {
             case obj.PORTAL_9:
-                player.Mobile.moveTo(new Location(2439 + Misc.random(4),
-                    3085 + Misc.random(5), 0));
+                player.moveTo(new Location());
                 return true;
         }
-    
+
         return false;
     }
-        
+
     process(character: Mobile) {
         let player = character.getAsPlayer();
         if (player == null) {
             return;
         }
-    
+
         // Update the interface
         player.getPacketSender().sendString(CastleWars.START_GAME_TASK.isRunning() ?
             "Time until next game starts: " + Math.floor(CastleWars.START_GAME_TASK.getRemainingTicks())
             : "Waiting for players to join the other team.", 11480);
-    
+
         // Send the interface
         player.getPacketSender().sendWalkableInterface(11479);
     }
-    
+
     canEquipItem(player: Player, slot: number, item: Item): boolean {
         if (slot == Equipment.CAPE_SLOT || slot == Equipment.HEAD_SLOT) {
             player.getPacketSender().sendMessage("You can't remove your team's colours.");
             return false;
         }
-    
+
         return true;
     }
-    
+
     canUnequipItem(player: Player, slot: number, item: Item): boolean {
         if (slot == Equipment.CAPE_SLOT || slot == Equipment.HEAD_SLOT) {
             player.getPacketSender().sendMessage("You can't remove your team's colours.");
             return false;
         }
-    
+
         return true;
     }
-        
+
     canPlayerBotIdle(playerBot: PlayerBot): boolean {
         // Allow the player bot to wait here if there are players in the other team
         return CastleWars.SARADOMIN_WAITING_AREA.getPlayers().size() > 0;

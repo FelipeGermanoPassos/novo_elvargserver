@@ -1,28 +1,29 @@
+
 interface TimerKey {
     id: string;
     name: string;
 }
 
 export class Timer {
-    private key: TimerKey;
-    private ticks: number;
+    private Key: TimerKey;
+    private Ticks: number;
     
-    constructor(key: TimerKey, ticks: number) {
-        this.key = key;
-        this.ticks = ticks;
+    constructor(Key: TimerKey, Ticks: number) {
+        this.Key = Key;
+        this.Ticks = Ticks;
     }
     
-    public getTicks(): number {
-        return this.ticks;
+    public ticks(): number {
+        return this.Ticks;
     }
     
-    public getKey(): TimerKey {
-        return this.key;
+    public key(): TimerKey {
+        return this.Key;
     }
     
     public tick(): void {
-        if (this.ticks > 0) {
-            this.ticks--;
+        if (this.Ticks > 0) {
+            this.Ticks--;
         }
     }
 }
