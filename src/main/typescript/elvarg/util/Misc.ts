@@ -1,3 +1,8 @@
+import { DecimalFormat} from 'decimal-format'
+import { Location } from '../game/model/Location';
+import { Player } from '../game/entity/impl/player/Player';
+import {RandomGen} from '../util/RandomGen'
+
 export class Misc {
     static getTicks(seconds: number): number {
     return (seconds / 0.6);
@@ -25,7 +30,7 @@ export class Misc {
     "<col=", "<shad="];
     static readonly DIRECTIONS = [ [ -1, 1 ], [ 0, 1 ], [ 1, 1 ],
     [ -1, 0 ], [ 1, 0 ], [ -1, -1 ], [ 0, -1 ], [ 1, -1 ] ];
-    static xlateDirectionToClient = new byte[]{1, 2, 4, 7, 6, 5, 3, 0};
+    static xlateDirectionToClient = {1, 2, 4, 7, 6, 5, 3, 0};
     static xlateTable = [' ', 'e', 't', 'a', 'o', 'i', 'h', 'n',
     's', 'r', 'd', 'l', 'u', 'm', 'w', 'c', 'y', 'f', 'g', 'p', 'b',
     'v', 'k', 'x', 'j', 'q', 'z', '0', '1', '2', '3', '4', '5', '6',
@@ -36,7 +41,6 @@ export class Misc {
     private static ZonedDateTime zonedDateTime;
     private static RANDOM = new Random();
 
-    Copy code
     public static getRandom(length: number): number {
         return RANDOM.nextInt(length + 1);
     }
@@ -44,13 +48,13 @@ export class Misc {
     public static getRandomDouble(length: number): number {
         return Math.random() * length;
     }
-    return random;
-}
+   
 
-function concatWithCollection<T>(array1: T[], array2: T[]): T[] {
-    const resultList = [...array1, ...array2];
-    return resultList as T[];
-}
+
+    public static concatWithCollection<T>(array1: T[], array2: T[]): T[] {
+        const resultList = [...array1, ...array2];
+        return resultList as T[];
+    }   
 
 
     public static getRandomDouble(): number {
@@ -74,7 +78,7 @@ function concatWithCollection<T>(array1: T[], array2: T[]): T[] {
         return "" + hourPrefix + ":" + minutePrefix + "";
     }
 
-    function getTimePlayed(totalPlayTime: number): string {
+    public static getTimePlayed(totalPlayTime: number): string {
         const sec = Math.floor(totalPlayTime / 1000);
         const h = Math.floor(sec / 3600);
         const m = Math.floor(sec / 60 % 60);
@@ -82,19 +86,19 @@ function concatWithCollection<T>(array1: T[], array2: T[]): T[] {
         return (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
       }
       
-      function getHoursPlayed(totalPlayTime: number): string {
+      public static getHoursPlayed(totalPlayTime: number): string {
         const sec = Math.floor(totalPlayTime / 1000);
         const h = Math.floor(sec / 3600);
         return (h < 10 ? "0" + h : h) + "h";
       }
       
-      function getMinutesPassed(t: number): number {
+      public static getMinutesPassed(t: number): number {
         const seconds = Math.floor((t / 1000) % 60);
         const minutes = Math.floor(((t - seconds) / 1000) / 60);
         return minutes;
       }
       
-      function concat(a: any[], b: any[]): any[] {
+      public static concat(a: any[], b: any[]): any[] {
         const aLen = a.length;
         const bLen = b.length;
         const c = new Array(aLen + bLen);
@@ -102,7 +106,7 @@ function concatWithCollection<T>(array1: T[], array2: T[]): T[] {
         return c;
       }
       
-      function getCloseRandomPlayer(plrs: any[]): any {
+      public static getCloseRandomPlayer(plrs: any[]): any {
         const index = getRandom(plrs.length - 1);
         if (index > 0) {
           return plrs[index];
@@ -110,7 +114,7 @@ function concatWithCollection<T>(array1: T[], array2: T[]): T[] {
         return null;
       }
 
-      function getDirection(x: number, y: number): number {
+      public static getDirection(x: number, y: number): number {
         for (let i = 0; i < 8; i++) {
             if (DIRECTIONS[i][0] == x && DIRECTIONS[i][1] == y)
                 return i;
@@ -118,7 +122,7 @@ function concatWithCollection<T>(array1: T[], array2: T[]): T[] {
         return -1;
     }
     
-    function ucFirst(str: string): string {
+    public static ucFirst(str: string): string {
         str = str.toLowerCase();
         if (str.length > 1) {
             str = str.substring(0, 1).toUpperCase() + str.substring(1);
@@ -128,11 +132,11 @@ function concatWithCollection<T>(array1: T[], array2: T[]): T[] {
         return str;
     }
     
-    function format(num: number): string {
+    public static format(num: number): string {
         return num.toLocaleString();
     }
     
-    function formatText(s: string): string {
+    public static formatText(s: string): string {
         for (let i = 0; i < s.length; i++) {
             if (i == 0) {
                 s = `${s.charAt(0).toUpperCase()}${s.substring(1)}`;
@@ -182,7 +186,7 @@ function concatWithCollection<T>(array1: T[], array2: T[]): T[] {
         return new TextDecoder().decode(decodeBuf.slice(0, idx));
     }
 
-    function anOrA(s: string): string {
+    public static anOrA(s: string): string {
         s = s.toLowerCase();
         if (s === "anchovies" || s === "soft clay" || s === "cheese" || s === "ball of wool" || s === "spice" || s === "steel nails" || s === "snape grass" || s === "coal") {
           return "some";
@@ -193,7 +197,7 @@ function concatWithCollection<T>(array1: T[], array2: T[]): T[] {
         return "a";
       }
       
-    function textPack(text: string): number[] {
+    public static textPack(text: string): number[] {
         if (text.length > 80) {
           text = text.substring(0, 80);
         }
@@ -234,7 +238,7 @@ function concatWithCollection<T>(array1: T[], array2: T[]): T[] {
         return packedData;
     }
 
-    function anOrA(s: string): string {
+    public static anOrA(s: string): string {
             s = s.toLowerCase();
             if (s.toLowerCase() === "anchovies" || s.toLowerCase() === "soft clay" || s.toLowerCase() === "cheese" || s.toLowerCase() === "ball of wool" || s.toLowerCase() === "spice" || s.toLowerCase() === "steel nails" || s.toLowerCase() === "snape grass" || s.toLowerCase() === "coal")
                 return "some";
@@ -243,7 +247,7 @@ function concatWithCollection<T>(array1: T[], array2: T[]): T[] {
             return "a";
     }
         
-    function getClasses(packageName: string): Array<any> {
+    public static getClasses(packageName: string): Array<any> {
             let classList: Array<any> = [];
             // Add logic to get classes from package name
             return classList;
@@ -334,17 +338,17 @@ function concatWithCollection<T>(array1: T[], array2: T[]): T[] {
         return elapsed;
     }
 
-    function isWeekend(): boolean {
+    public static isWeekend(): boolean {
         let day = new Date().getDay();
         return (day === 0) || (day === 6) || (day === 7);
     }
 
-    function readFile(s: File): Uint8Array {
+    public static readFile(s: File): Uint8Array {
         try {
             let fis = new FileReader();
             let fc = new Uint8Array(s.size);
             fis.readAsArrayBuffer(s);
-            fis.onloadend = function() {
+            fis.onloadend = public static() {
                 fc = new Uint8Array(fis.result);
             }
             fis.close();
@@ -355,11 +359,11 @@ function concatWithCollection<T>(array1: T[], array2: T[]): T[] {
         }
     }
 
-    function randomTypeOfList<T>(list: T[]): T {
+    public static randomTypeOfList<T>(list: T[]): T {
         return list[Math.floor(Math.random() * list.length)];
     }
 
-    function randomInclusive(min: number, max: number): number {
+    public static randomInclusive(min: number, max: number): number {
         return Math.min(min, max) + Math.floor(Math.random() * (Math.max(min, max) - Math.min(min, max) + 1));
     }
 
@@ -429,7 +433,7 @@ function concatWithCollection<T>(array1: T[], array2: T[]): T[] {
     }
 
     // Converts an array of bytes to an integer
-    function hexToInt(data: number[]) {
+    public static hexToInt(data: number[]) {
         let value = 0;
         let n = 1000;
         for (let i = 0; i < data.length; i++) {
@@ -443,23 +447,23 @@ function concatWithCollection<T>(array1: T[], array2: T[]): T[] {
     }
 
     // Returns the delta between two locations
-    public function delta(a: Location, b: Location) {
+    public public static delta(a: Location, b: Location) {
         return {x: b.x - a.x, y: b.y - a.y};
     }
 
     // Picks a random element out of any array type
-    function randomElement<T>(array: T[]) {
+    public static randomElement<T>(array: T[]) {
         return array[Math.floor(Math.random() * array.length)];
     }
 
     // Picks a random element out of any list type
-    function randomElement<T>(list: T[]) {
+    public static randomElement<T>(list: T[]) {
         return list[Math.floor(Math.random() * list.length)];
     }
 
     const BLOCKED_WORDS: string[] = [];
 
-    function blockedWord(string: string): boolean {
+    public static blockedWord(string: string): boolean {
         for (const s of BLOCKED_WORDS) {
             if (string.includes(s)) {
                 return true;
@@ -468,7 +472,7 @@ function concatWithCollection<T>(array1: T[], array2: T[]): T[] {
         return false;
     }
 
-    function capitalizeWords(name: string): string {
+    public static capitalizeWords(name: string): string {
         let builder = "";
         const words = name.split(" ");
         for (let i = 0, l = words.length; i < l; ++i) {
@@ -480,7 +484,7 @@ function concatWithCollection<T>(array1: T[], array2: T[]): T[] {
         return builder;
     }
 
-    function capitalize(name: string): string {
+    public static capitalize(name: string): string {
         if (name.length < 1) {
             return "";
         }
@@ -519,7 +523,7 @@ function concatWithCollection<T>(array1: T[], array2: T[]): T[] {
         return l;
     }
 
-    function getBuffer(file: string): Uint8Array | null {
+    public static getBuffer(file: string): Uint8Array | null {
         try {
             let f = new File(file);
             if (!f.exists())
@@ -535,15 +539,15 @@ function concatWithCollection<T>(array1: T[], array2: T[]): T[] {
         return null;
     }
     
-    function formatNameForProtocol(name: string) : string {
+    public static formatNameForProtocol(name: string) : string {
         return name.toLowerCase().replace(" ", "_");
     }
     
-    function formatName(name: string) : string {
+    public static formatName(name: string) : string {
         return fixName(name.replace(" ", "_"));
     }
     
-    function longToString(l: number) : string {
+    public static longToString(l: number) : string {
         let i = 0;
         let ac: string[] = new Array(12);
         while (l != 0) {
@@ -558,7 +562,7 @@ function concatWithCollection<T>(array1: T[], array2: T[]): T[] {
         "@gre@", "@cya@", "@red@", "chalreq", "tradereq", "@bro@", "@yel@", "@blu@", "@gr1@", "@gr2@", "@gr3@", "@str@", "@mag@", "@dre@", "@dbl@", "@or1@", "@or2@", "@or3@", "@whi@", "@bla@", "@cr", "<col", "<shad", "<str", "<u", "<br", "<trans", "duelreq", "<img", "@lre@", ":clan:", "]cr", "::summ", "<str"
         ];
         
-    function fixName(name: string): string {
+    public static fixName(name: string): string {
         if (name.length > 0) {
             const ac = name.split('');
             for (let j = 0; j < ac.length; j++) {
@@ -577,7 +581,7 @@ function concatWithCollection<T>(array1: T[], array2: T[]): T[] {
             return name;
         }
     }
-    export function wrapText(text: string, len: number) {
+    export public static wrapText(text: string, len: number) {
         // return empty array for null text
         if (!text) return [];
       
@@ -689,11 +693,11 @@ function concatWithCollection<T>(array1: T[], array2: T[]): T[] {
             return ret;
         }
 
-    function _hash(string: string): number {
+    public static _hash(string: string): number {
         return Array.from({length: string.length}, (_, index) => string.charCodeAt(index)).reduce((hash, charCode) => hash * 61 + charCode - 32, 0);
     }
     
-    function getUsersProjectRootDirectory(): string {
+    public static getUsersProjectRootDirectory(): string {
         const envRootDir = process.cwd();
         const rootDir = path.resolve(".");
         if (rootDir.startsWith(envRootDir)) {
@@ -703,11 +707,11 @@ function concatWithCollection<T>(array1: T[], array2: T[]): T[] {
         }
     }
     
-    function random(range: number): number {
+    public static random(range: number): number {
         return Math.floor(Math.random() * (range + 1));
     }
     
-    function random(minRange: number, maxRange: number): number {
+    public static random(minRange: number, maxRange: number): number {
         return minRange + random(maxRange - minRange);
     }
     
@@ -720,7 +724,7 @@ function concatWithCollection<T>(array1: T[], array2: T[]): T[] {
      * @param excludes list of numbers to be excluded
      * @return value between {@code start} (inclusive) and {@code end} (inclusive)
      */
-    function getRandomExcluding(start: number, end: number, excludes: number[]): number {
+    public static getRandomExcluding(start: number, end: number, excludes: number[]): number {
         // Using Array as the list needs to be modifiable for Array.sort:
         excludes.sort();
     
@@ -734,7 +738,7 @@ function concatWithCollection<T>(array1: T[], array2: T[]): T[] {
         return random;
     }
     
-    function concatWithCollection<T>(array1: T[], array2: T[]): T[] {
+    public static concatWithCollection<T>(array1: T[], array2: T[]): T[] {
         const resultList = [...array1, ...array2];
         return resultList as T[];
     }

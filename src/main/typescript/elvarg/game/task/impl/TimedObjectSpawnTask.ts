@@ -2,13 +2,8 @@ class TimedObjectSpawnTask extends Task {
     private temp: GameObject;
     private ticks: number;
     private action: Optional<Action>;
-<<<<<<< Updated upstream
-    private tick = 0;
-    
-=======
     public static tick = 0;
 
->>>>>>> Stashed changes
     constructor(temp: GameObject, ticks: number, action: Optional<Action>) {
         super(1, true);
         this.temp = temp;
@@ -28,10 +23,6 @@ class TimedObjectSpawnTask extends Task {
     
             this.stop();
         }
-<<<<<<< Updated upstream
-        this.tick++;
-=======
         TimedObjectSpawnTask.tick++;
->>>>>>> Stashed changes
     }
 }

@@ -1,12 +1,3 @@
-<<<<<<< Updated upstream
-import {Player} from '../../../../entity/impl/player/Player'
-import * as Mobile from '../../../../entity/impl/Mobile'
-import {Arrays} from 'collections'
-import Boundary from '../../../../model/Boundary';
-import {Barrows} from '../../../content/minigames/impl/Barrows';
-import {Area} from '../../../../model/areas/Area';
-import {Optional} from 'optional'
-=======
 import { Player } from '../../../entity/impl/player/Player'
 import { Mobile } from '../../../entity/impl/Mobile'
 import { Arrays } from 'collections'
@@ -14,7 +5,6 @@ import { Boundary } from '../../../model/Boundary';
 import { Barrows } from '../../../content/minigames/impl/Barrows'
 import { Area } from '../../../model/areas/Area';
 import { Optional } from 'optional'
->>>>>>> Stashed changes
 
 export class BarrowsArea extends Area {
     constructor() {

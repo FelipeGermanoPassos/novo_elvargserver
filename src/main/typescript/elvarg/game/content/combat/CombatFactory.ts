@@ -911,7 +911,7 @@ export class CombatFactory {
 }
 
 
-enum CanAttackResponse {
+export enum CanAttackResponse {
     INVALID_TARGET,
     ALREADY_UNDER_ATTACK,
     CANT_ATTACK_IN_AREA,

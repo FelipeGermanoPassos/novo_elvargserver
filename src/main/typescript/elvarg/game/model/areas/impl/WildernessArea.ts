@@ -1,6 +1,3 @@
-<<<<<<< Updated upstream
-class WildernessArea extends Area {
-=======
 import { Boundary } from "../../Boundary";
 import { Area } from "../Area";
 import { Mobile } from "../../../entity/impl/Mobile";
@@ -14,7 +11,6 @@ import { PlayerRights } from "../../rights/PlayerRights";
 import { Optional } from "../../../../../../../../node_modules/optional-typescript/dist/index";
 
 export class WildernessArea extends Area {
->>>>>>> Stashed changes
     getName(): string {
         return "the Wilderness";
     }

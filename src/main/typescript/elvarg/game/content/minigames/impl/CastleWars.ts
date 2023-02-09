@@ -1,6 +1,3 @@
-<<<<<<< Updated upstream
-class CastleWars implements Minigame {
-=======
 export enum Team {
     ZAMORAK = "ZAMORAK",
     SARADOMIN = "SARADOMIN",
@@ -13,7 +10,6 @@ export enum Team {
 }
 
 export class CastleWars implements Minigame {
->>>>>>> Stashed changes
     public static readonly CastleWarsSaradominWaitingArea SARADOMIN_WAITING_AREA = new CastleWarsSaradominWaitingArea();
     public static readonly CastleWarsZamorakWaitingArea ZAMORAK_WAITING_AREA = new CastleWarsZamorakWaitingArea();
     public static readonly CastleWarsGameArea GAME_AREA = new CastleWarsGameArea();

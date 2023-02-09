@@ -41,14 +41,9 @@ class TimerRepository {
         this.timer.set(key, new Timer(key, ticks));
     }
     
-    public register1(key: TimerKey) {
-        this.timer.set(key, new Timer(key, key.getTicks()));
-    }
-    
     public extendOrRegister(key: TimerKey, ticks: number) {
-        this.timer.set(key, this.timer.get(key) === null || this.timer.get(key).ticks() < ticks ? new Timer(key, ticks) : this.timers.get(key));
-    }
-
+        this.timer.set(key, this.timer.get(key) === null || this.timer.get(key).ticks() < ticks ? new Timer(key, ticks) : this.timer.get(key));
+      }
     public addOrSet(key: TimerKey, ticks: number) {
         this.timer.set(key, this.timer.get(key) ? new Timer(key, this.timer.get(key).ticks() + ticks) : new Timer(key, ticks));
     }
@@ -58,7 +53,7 @@ class TimerRepository {
     }
       
     public process() {
-        if (this.timers.size > 0) {
+        if (this.timer.size > 0) {
           this.timer.forEach((timer: Timer) => {
             timer.tick();
           });

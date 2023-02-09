@@ -1,14 +1,4 @@
-<<<<<<< HEAD
-import { Misc } from 'misc';
-import  {GameLogic } from '../game/GameLogic';
-import * as fs from 'fs-extra';
-
-import {array} from 'collections'
-
-class PlayerPunishment {
-=======
 export class PlayerPunishment {
->>>>>>> 03ef12a5e231898cd5dce5dce3b92cc40bac36ba
     private static readonly BAN_DIRECTORY = "./data/saves/";
     private static readonly MUTE_DIRECTORY = "./data/saves/";
 

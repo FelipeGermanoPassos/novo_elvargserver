@@ -1,8 +1,23 @@
+
+import { CastleWars } from "../../../../content/minigames/impl/CastleWars";
+import { Misc } from "../../../../../util/Misc";
+import { Mobile } from "../../../../entity/impl/Mobile";
+import { Player } from "../../../../entity/impl/player/Player";
+import { PlayerBot } from "../../../../entity/impl/playerbot/PlayerBot";
+import { Area } from "../../Area";
+import { Boundary } from "../../../Boundary";
+import { PolygonalBoundary } from "../../../PolygonalBoundary";
+import { Equipment } from "../../../container/impl/Equipment";
+import { Team } from "../../../../content/minigames/impl/CastleWars";
+import { Task } from "../../../../task/Task";
+
+
+
 class CastleWarsGameArea extends Area {
     private static DUNGEON_BOUNDARIES: Boundary[] = [
-        new Boundary(2365, 2404, 9500, 9530),
-        new Boundary(2394, 2431, 9474, 9499),
-        new Boundary(2405, 2424, 9500, 9509)
+        new Boundary(2365, 2404, 9500, 9530,0),
+        new Boundary(2394, 2431, 9474, 9499,0),
+        new Boundary(2405, 2424, 9500, 9509,0)
     ];
 
     private static GAME_SURFACE_BOUNDARY = new PolygonalBoundary(
@@ -20,7 +35,7 @@ class CastleWarsGameArea extends Area {
 
     constructor() {
         // Merge the Dungeon boundaries and the game surface area polygonal boundary
-        super(DUNGEON_BOUNDARIES.concat(GAME_SURFACE_BOUNDARY));
+        super(CastleWarsGameArea.DUNGEON_BOUNDARIES.concat(CastleWarsGameArea.GAME_SURFACE_BOUNDARY));
     }
 
     public getName(): string {
@@ -35,8 +50,8 @@ class CastleWarsGameArea extends Area {
 
         let config;
         player.getPacketSender().sendWalkableInterface(11146);
-        player.getPacketSender().sendString("Zamorak = " + CastleWars.Team.ZAMORAK.getScore(), 11147);
-        player.getPacketSender().sendString(CastleWars.Team.SARADOMIN.getScore() + " = Saradomin", 11148);
+        player.getPacketSender().sendString("Zamorak = " + Team.ZAMORAK.getScore(), 11147);
+        player.getPacketSender().sendString(Team.SARADOMIN.getScore() + " = Saradomin", 11148);
         player.getPacketSender().sendString(CastleWars.START_GAME_TASK.getRemainingTicks() + " ticks", 11155);
         config = 2097152 * CastleWars.saraFlag;
         player.getPacketSender().sendToggle(378, config);
@@ -44,7 +59,6 @@ class CastleWarsGameArea extends Area {
         player.getPacketSender().sendToggle(377, config);
     }
 
-    @Override
     public postLeave(character: Mobile, logout: boolean): void {
         const player = character.getAsPlayer();
         if (!player) {
@@ -53,7 +67,7 @@ class CastleWarsGameArea extends Area {
 
         CastleWars.Team.removePlayer(player);
 
-        if (getPlayers().size < 2 || (CastleWars.Team.ZAMORAK.getPlayers().size === 0 ||
+        if (this.player.size < 2 || (CastleWars.Team.ZAMORAK.getPlayers().size === 0 ||
             CastleWars.Team.SARADOMIN.getPlayers().size === 0)) {
         // If either team has no players left, the game must end
             CastleWars.endGame();
@@ -61,7 +75,7 @@ class CastleWarsGameArea extends Area {
 
         if (logout) {
         // Player has logged out, teleport them to the lobby
-            player.moveTo(new Location(2439 + Misc.random(4), 3085 + Misc.random(5), 0));
+            player.moveTo(new Location());
         }
 
         // Remove items

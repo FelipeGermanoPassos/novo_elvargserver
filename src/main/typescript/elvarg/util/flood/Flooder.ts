@@ -41,7 +41,7 @@ export class Flooder {
                     let keysToRemove = [];
                     for (const [key, client] of this.clients) {
                         try {
-                            client.attemptLogin2.process();
+                            client.process();
                         } catch (e) {
                             console.error(e);
                             keysToRemove.push(key);

@@ -1,6 +1,3 @@
-<<<<<<< Updated upstream
-class BountyHunter {
-=======
 import { Emblem } from "./Emblem";
 import { TargetPair } from "./TargetPair";
 import { WealthType } from "./WealthType";
@@ -14,7 +11,6 @@ import { WildernessArea } from "../../../model/areas/impl/WildernessArea";
 import { ItemIdentifiers } from "../../../../util/ItemIdentifiers";
 import { Misc } from "../../../../util/Misc";
 export class BountyHunter {
->>>>>>> Stashed changes
     public static PLAYERS_IN_WILD: Player[] = [];
     public static TARGET_PAIRS: TargetPair[] = [];
     private static TARGET_WEALTH_STRING = 23305;

@@ -1,6 +1,3 @@
-<<<<<<< Updated upstream
-class ForceMovementTask extends Task {
-=======
 import { Task } from "../Task";
 import { Location } from "../../model/Location";
 import { ForceMovement } from "../../model/ForceMovement";
@@ -8,7 +5,6 @@ import { Player } from "../../entity/impl/player/Player";
 import { TaskType } from "../TaskType";
 
 export class ForceMovementTask extends Task {
->>>>>>> Stashed changes
     private player: Player;
     private end: Location;
     private start: Location;

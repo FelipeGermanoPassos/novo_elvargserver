@@ -1,14 +1,4 @@
 
-<<<<<<< Updated upstream
-import {Area} from '../../../../model/areas/Area';
-import {Boundary} from '../../../../model/Boundary';
-import {Entity} from '../../../entity/Entity';
-import {World} from '../../../Worlds'
-import {ObjectManager} from '../../../entity/impl/object/ObjectManager';
-import {ItemOnGroundManager} from '../../../entity/impl/grounditem/ItemOnGroundManager'
-import {GameObject} from '../../../entity/impl/object/GameObject';
-import {Mobile} from '../../../../entity/impl/Mobile'
-=======
 import { Area } from '../../../../model/areas/Area';
 import { Boundary } from '../../../../model/Boundary';
 import { Entity } from '../../../entity/Entity';
@@ -17,7 +7,6 @@ import { ObjectManager } from '../../../entity/impl/object/ObjectManager';
 import { ItemOnGroundManager } from '../../../entity/impl/grounditem/ItemOnGroundManager'
 import { GameObject } from '../../../entity/impl/object/GameObject';
 import { Mobile } from '../../../../entity/impl/Mobile'
->>>>>>> Stashed changes
 
 export abstract class PrivateArea extends Area {
     public entities: Entity[];

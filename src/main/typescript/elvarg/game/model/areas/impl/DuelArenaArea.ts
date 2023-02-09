@@ -1,6 +1,3 @@
-<<<<<<< Updated upstream
-class DuelArenaArea extends Area {
-=======
 import { TimerKey } from '../../../../util/timers/TimerKey'
 import { Area } from '../Area'; 
 import { Boundary } from '../../Boundary';
@@ -13,7 +10,6 @@ import { DuelRule } from '../../../content/Duelling'
 import { Optional } from '../../../../../../../../node_modules/optional-typescript/dist/index';
 
 export class DuelArenaArea extends Area {
->>>>>>> Stashed changes
     constructor() {
         super(Array.of(new Boundary(3326, 3383, 3197, 3295,0)));
         }

@@ -1,3 +1,21 @@
+
+
+import { Location } from "../Location";
+import {CastleWars} from '../../content/minigames/impl/CastleWars'
+import { Mobile } from "../../entity/impl/Mobile";
+import { BarrowsArea } from '../../model/areas/impl/BarrowsArea'
+import { DuelArenaArea } from '../../model/areas/impl/DuelArenaArea'
+import {GodwarsDungeonArea} from '../../model/areas/impl/GodwarsDugeonArea'
+import {KingBlackDragonArea} from '../../model/areas/impl/KingBlackDragonArea'
+import {WildernessArea} from '../../model/areas/impl/WildernessArea'
+import { Area } from "./Area";
+import {CastleWarsLobbyArea} from '../../model/areas/impl/castlewars/CastleWarsLobbyArea'
+import {CastleWarsZamorakWaitingArea} from '../../model/areas/impl/castlewars/CastleWarsZamorakWaitingArea'
+import {CastleWarsGameArea} from '../../model/areas/impl/castlewars/CastleWarsGameArea';
+import {CastleWarsSaradominWaitingArea} from '../../model/areas/impl/castlewars/CastleWarsSaradominWaitingArea'
+import { CanAttackResponse } from "../../content/combat/CombatFactory";
+import { Boundary } from "../Boundary";
+
 class AreaManager {
 
     public static areas: Area[] = [];
@@ -6,12 +24,12 @@ class AreaManager {
         AreaManager.areas.push(new BarrowsArea());
         AreaManager.areas.push(new DuelArenaArea());
         AreaManager.areas.push(new WildernessArea());
-        AreaManager.areas.push(new KingBlackDragonArea());
+        AreaManager.areas.push(new KingBlackDragonArea();
         AreaManager.areas.push(new GodwarsDungeonArea());
-        AreaManager.areas.push(CastleWars.LOBBY_AREA);
-        AreaManager.areas.push(CastleWars.ZAMORAK_WAITING_AREA);
-        AreaManager.areas.push(CastleWars.SARADOMIN_WAITING_AREA);
-        AreaManager.areas.push(CastleWars.GAME_AREA);
+        AreaManager.areas.push(CastleWars.CastleWarsLobbyArea.LOBBY_AREA);
+        AreaManager.areas.push(CastleWars.CastleWarsZamorakWaitingArea.ZAMORAK_WAITING_AREA);
+        AreaManager.areas.push(CastleWars.CastleWarsSaradominWaitingArea.SARADOMIN_WAITING_AREA);
+        AreaManager.areas.push(CastleWars.CastleWarsGameArea.GAME_AREA);
     }
 
     /**
@@ -68,12 +86,6 @@ class AreaManager {
             previousArea.postLeave(c, false);
         }
     }
-    static inside(position: Location, area: Area) {
-        return true;
-    }
-    static get(position: Location) {
-        return;
-    }
 
     public static inMulti(c: Mobile): boolean {
         if (c.getArea() != null) {
@@ -89,7 +101,7 @@ class AreaManager {
      * @param target
      * @return {CanAttackResponse}
      */
-    public static canAttack(attacker: Mobile, target: Mobile): CanAttackResponse {
+    public static canAttack(attacker: Mobile, target: Mobile):CanAttackResponse {
         if (attacker.getPrivateArea() != target.getPrivateArea()) {
             return CanAttackResponse.CANT_ATTACK_IN_AREA;
         }

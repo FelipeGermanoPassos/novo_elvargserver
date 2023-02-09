@@ -1,14 +1,3 @@
-<<<<<<< Updated upstream
-class CombatPoisonEffect extends Task {
-    private entity: Mobile;
-    private tick: number;
-    
-    Copy code
-    constructor(entity: Mobile) {
-        super(30, entity, false);
-        this.entity = entity;
-        this.tick = 0;
-=======
 
 import { ItemIdentifiers } from "../../../util/ItemIdentifiers";
 import { Task } from "../Task";
@@ -33,7 +22,6 @@ class CombatPoisonEffect extends Task {
     if (!this.entity.isRegistered()) {
       this.stop();
       return;
->>>>>>> Stashed changes
     }
 
     if (!this.entity.isPoisoned()) {
@@ -45,26 +33,6 @@ class CombatPoisonEffect extends Task {
       this.stop();
       return;
     }
-<<<<<<< Updated upstream
-        
-        enum PoisonType {
-        VERY_WEAK = 2,
-        WEAK = 3,
-        MILD = 4,
-        EXTRA = 5,
-        SUPER = 6,
-        VENOM = 12
-        }
-        
-    class CombatPoisonData {
-        private static CombatPoisonData.types = new Map<number, PoisonType>();
-        
-        private constructor() {}
-        
-        public getDamage(id: number): number {
-            return this.CombatPoisonData.types.get(id).damage;
-        }
-=======
 
     let poisonDamage =
       this.tick % 5 === 0 ? this.entity.getPoisonDamage() - 1 : this.entity.getPoisonDamage();
@@ -74,7 +42,6 @@ class CombatPoisonEffect extends Task {
     if (poisonDamage <= 1) {
       this.stop();
       return;
->>>>>>> Stashed changes
     }
   }
 
