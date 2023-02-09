@@ -35,3 +35,4 @@ export enum CombatSpells {
         return 1;
     }
 }
+}

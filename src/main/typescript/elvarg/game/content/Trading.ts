@@ -38,7 +38,7 @@ export class Trading {
 
     constructor(player: Player) {
         this.player = player;
-        this.container = new ItemContainer(player) {
+        this.container = new ItemContainer(player); {
             public function stackType(): StackType {
                 return StackType.DEFAULT;
             }
@@ -143,6 +143,9 @@ export class Trading {
                         + " before sending more trade requests.");
                 return;
             }
+
+            // Cache the interact...
+            let interact_: Player = this.interact;
             let t_state = t_.getTrading().getState();
             let initiateTrade = false;
             this.setInteract(t_);
@@ -156,7 +159,7 @@ export class Trading {
                 this.player.getTrading().initiateTrade();
                 t_.getTrading().initiateTrade();
             } else {
-                player.getPacketSender().sendMessage("You've sent a trade request to " + t_.getUsername() + ".");
+                this.player.getPacketSender().sendMessage("You've sent a trade request to " + t_.getUsername() + ".");
                 t_.getPacketSender().sendMessage(this.player.getUsername() + ":tradereq:");
                 if (t_ instanceof PlayerBot) {
                     // Player Bots: Automatically accept any trade request
@@ -195,7 +198,7 @@ export class Trading {
             this.player.getPacketSender().sendInterfaceRemoval();
             if (interact_ != null) {
                 if (interact_.getStatus() == PlayerStatus.TRADING) {
-                    if (interact_.getTrading().getInteract() != null && interact_.getTrading().getInteract() == player) {
+                    if (interact_.getTrading().getInteract() != null && interact_.getTrading().getInteract() == this.player) {
                         interact_.getPacketSender().sendInterfaceRemoval();
                     }
                 }
@@ -204,14 +207,15 @@ export class Trading {
     }
 
     public acceptTrade() {
-        if (!Trading.validate(this.player, this.interact, PlayerStatus.TRADING, [TradeState.TRADE_SCREEN,
-        TradeState.ACCEPTED_TRADE_SCREEN, TradeState.CONFIRM_SCREEN, TradeState.ACCEPTED_CONFIRM_SCREEN])) {
+        if (!Trading.validate(this.player, this.interact, PlayerStatus.TRADING, TradeState.TRADE_SCREEN,
+            TradeState.ACCEPTED_TRADE_SCREEN, TradeState.CONFIRM_SCREEN, TradeState.ACCEPTED_CONFIRM_SCREEN
+        )) {
             return;
         }
         if (!this.button_delay.finished()) {
             return;
         }
-        let interact_ = this.interact;
+        let interact_: Player = this.interact;
         let t_state = interact_.getTrading().getState();
         if (this.state == TradeState.TRADE_SCREEN) {
             let slotsNeeded = 0;
@@ -220,7 +224,7 @@ export class Trading {
             }
             let freeSlots = this.interact.getInventory().getFreeSlots();
             if (slotsNeeded > freeSlots) {
-                player.getPacketSender().sendMessage("")
+                this.player.getPacketSender().sendMessage("")
                     .sendMessage("@or3@" + this.interact.getUsername() + " will not be able to hold that item.")
                     .sendMessage(
                         "@or3@They have " + freeSlots + " free inventory slot" + (freeSlots == 1 ? "." : "s."));
@@ -229,7 +233,8 @@ export class Trading {
                     .sendMessage("Trade cannot be accepted, you don't have enough free inventory space.");
                 return;
             }
-            this.setState(TradeState.ACCEPTED_TRADE_SCREEN);
+            this.state = (TradeState.ACCEPTED_TRADE_SCREEN);
+
             this.player.getPacketSender().sendString(Trading.STATUS_FRAME_1, "Waiting for other player..");
             this.interact.getPacketSender().sendString(Trading.STATUS_FRAME_1, "" + player.getUsername() + " has accepted.");
             if (this.state == TradeState.ACCEPTED_TRADE_SCREEN && t_state == TradeState.ACCEPTED_TRADE_SCREEN) {
@@ -239,44 +244,44 @@ export class Trading {
                 if (interact_ instanceof PlayerBot) {
                     ((PlayerBot) interact_).getTradingInteraction().acceptTrade();
                 }
-            } else if (this.state === TradeState.CONFIRM_SCREEN) {
-                // Both are in the same state. Do the second-stage accept.
-                this.setState(TradeState.ACCEPTED_CONFIRM_SCREEN);
-                // Update status...
-                this.player.getPacketSender().sendString(Trading.STATUS_FRAME_2,
-                    onwaiting for ${ interact_.getUsername() }'s confirmation..);
-                interact_.getPacketSender().sendString(Trading.STATUS_FRAME_2,
-                        ${ this.player.getUsername() } has accepted.Do you wish to do the same ?);
-                if (this.state === TradeState.ACCEPTED_CONFIRM_SCREEN && t_state === TradeState.ACCEPTED_CONFIRM_SCREEN) {
-                    // Give items to both players...
-                    const receivingItems = interact_.getTrading().getContainer().getValidItems();
-                    for (const item of receivingItems) {
-                        this.player.getInventory().add(item);
-                    }
-                    const givingItems = this.player.getTrading().getContainer().getValidItems();
-                    for (const item of givingItems) {
-                        interact_.getInventory().add(item);
-                    }
-                    if (this.player instanceof PlayerBot && receivingItems.length > 0) {
-                        ((this.player as PlayerBot).getTradingInteraction().receivedItems(receivingItems, interact_);
-                    }
-                    // Reset attributes for both players...
-                    this.resetAttributes();
-                    interact_.getTrading().resetAttributes();
-                    // Send interface removal for both players...
-                    this.player.getPacketSender().sendInterfaceRemoval();
-                    interact_.getPacketSender().sendInterfaceRemoval();
-                    // Send successful trade message!
-                    this.player.getPacketSender().sendMessage("Trade accepted!");
-                    interact_.getPacketSender().sendMessage("Trade accepted!");
-                }
-            } else {
-                if (interact_ instanceof PlayerBot) {
-                    (interact_ as PlayerBot).getTradingInteraction().acceptTrade();
-                }
             }
-            button_delay.start(1);
+        } else if (this.state === TradeState.CONFIRM_SCREEN) {
+            // Both are in the same state. Do the second-stage accept.
+            this.state = (TradeState.ACCEPTED_CONFIRM_SCREEN);
+            // Update status...
+            this.player.getPacketSender().sendString(Trading.STATUS_FRAME_2,
+                "Waiting for " + interact_.getUsername() + 's confirmation..');
+            interact_.getPacketSender().sendString(Trading.STATUS_FRAME_2,
+                "" + this.player.getUsername() + " has accepted.Do you wish to do the same ?");
+            if (this.state === TradeState.ACCEPTED_CONFIRM_SCREEN && t_state === TradeState.ACCEPTED_CONFIRM_SCREEN) {
+                // Give items to both players...
+                const receivingItems = interact_.getTrading().getContainer().getValidItems();
+                for (const item of receivingItems) {
+                    this.player.getInventory().add(item);
+                }
+                const givingItems = this.player.getTrading().getContainer().getValidItems();
+                for (const item of givingItems) {
+                    interact_.getInventory().add(item);
+                }
+                if (this.player instanceof PlayerBot && receivingItems.length > 0) {
+                    ((this.player as PlayerBot).getTradingInteraction().receivedItems(receivingItems, interact_);
+                }
+                // Reset attributes for both players...
+                this.resetAttributes();
+                interact_.getTrading().resetAttributes();
+                // Send interface removal for both players...
+                this.player.getPacketSender().sendInterfaceRemoval();
+                interact_.getPacketSender().sendInterfaceRemoval();
+                // Send successful trade message!
+                this.player.getPacketSender().sendMessage("Trade accepted!");
+                interact_.getPacketSender().sendMessage("Trade accepted!");
+            }
+        } else {
+            if (interact_ instanceof PlayerBot) {
+                (interact_ as PlayerBot).getTradingInteraction().acceptTrade();
+            }
         }
+        this.button_delay.start(1);
     }
 
     private confirmScreen() {
@@ -299,7 +304,7 @@ export class Trading {
 
             // Validate this trade action..
             if (!Trading.validate(this.player, this.interact, PlayerStatus.TRADING,
-                [TradeState.TRADE_SCREEN, TradeState.ACCEPTED_TRADE_SCREEN])) {
+                TradeState.TRADE_SCREEN, TradeState.ACCEPTED_TRADE_SCREEN)) {
                 return;
             }
 
@@ -408,7 +413,6 @@ export class Trading {
     getContainer(): ItemContainer {
         return this.container;
     }
-
 }
 
 private enum TradeState {

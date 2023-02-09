@@ -337,7 +337,7 @@ export class RegionManager {
 
         if (type === 22) {
             if (def.hasActions() && def.solid) {
-                addClipping(x, y, height, 0x200000, object.getPrivateArea());
+                RegionManager.addClipping(x, y, height, 0x200000, object.getPrivateArea());
             }
         } else if (type >= 9) {
             if (def.solid) {

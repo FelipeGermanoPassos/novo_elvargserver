@@ -74,15 +74,6 @@ import { QuickPrayers } from "../../../content/QuickPrayers";
 
 
 export class Player extends Mobile {
-    requestLogout() {
-        throw new Error('Method not implemented.');
-    }
-    setCachedUpdateBlock(arg0: null) {
-        throw new Error('Method not implemented.');
-    }
-    getSession() {
-        throw new Error('Method not implemented.');
-    }
     public increaseStats = new SecondsTimer();
     public decreaseStats = new SecondsTimer();
     private localPlayers: Player[] = [];
@@ -254,7 +245,7 @@ export class Player extends Mobile {
         this.setHasVengeance(false);
         this.getCombat().getFireImmunityTimer().stop();
         this.getCombat().getPoisonImmunityTimer().stop();
-        this.getCombat().getTeleBlockTimer().stop();
+        this.getCombat().getTeleblockTimer().stop();
         this.getTimers().cancel(TimerKey.FREEZE);
         this.getCombat().getPrayerBlockTimer().stop();
         this.setPoisonDamage(0);

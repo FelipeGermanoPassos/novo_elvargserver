@@ -1,5 +1,7 @@
 import { Player } from "../entity/impl/player/Player";
+import { Skill } from "../model/Skill";
 import { PrayerHandler } from "./PrayerHandler";
+import { PrayerData } from "./PrayerHandler";
 
 export class QuickPrayers extends PrayerHandler {
     private static readonly TOGGLE_QUICK_PRAYERS = 1500;
@@ -25,10 +27,10 @@ export class QuickPrayers extends PrayerHandler {
     }
 
     private sendCheck(prayer: PrayerData): void {
-        this.player.getPacketSender().sendConfig(CONFIG_START + prayer.ordinal(), this.prayers[prayer.ordinal()] !== null ? 0 : 1);
+        this.player.getPacketSender().sendConfig(QuickPrayers.CONFIG_START + prayer.ordinal(), this.prayers[prayer.ordinal()] !== null ? 0 : 1);
     }
 
-    private uncheck(toDeselect: number[], exception: number): void {
+    private uncheckSelect(toDeselect: number[], exception: number): void {
         for (const i of toDeselect) {
             if (i === exception) {
                 continue;
@@ -45,7 +47,8 @@ export class QuickPrayers extends PrayerHandler {
     }
 
     private toggle(index: number): void {
-        const prayer = PrayerData.values()[index];
+        const prayer: PrayerData = PrayerData.values()[index];
+
         if (this.prayers[prayer.ordinal()] !== null) {
             this.uncheck(prayer);
             return;
@@ -60,55 +63,55 @@ export class QuickPrayers extends PrayerHandler {
         this.sendCheck(prayer);
 
         switch (index) {
-            case THICK_SKIN:
-            case ROCK_SKIN:
-            case STEEL_SKIN:
-                this.uncheck(DEFENCE_PRAYERS, index);
+            case QuickPrayers.THICK_SKIN:
+            case QuickPrayers.ROCK_SKIN:
+            case QuickPrayers.STEEL_SKIN:
+                this.uncheck(QuickPrayers.DEFENCE_PRAYERS, index);
                 break;
-            case BURST_OF_STRENGTH:
-            case SUPERHUMAN_STRENGTH:
-            case ULTIMATE_STRENGTH:
-                this.uncheck(STRENGTH_PRAYERS, index);
-                this.uncheck(RANGED_PRAYERS, index);
-                this.uncheck(MAGIC_PRAYERS, index);
+            case QuickPrayers.BURST_OF_STRENGTH:
+            case QuickPrayers.SUPERHUMAN_STRENGTH:
+            case QuickPrayers.ULTIMATE_STRENGTH:
+                this.uncheck(QuickPrayers.STRENGTH_PRAYERS, index);
+                this.uncheck(QuickPrayers.RANGED_PRAYERS, index);
+                this.uncheck(QuickPrayers.MAGIC_PRAYERS, index);
                 break;
-            case CLARITY_OF_THOUGHT:
-            case IMPROVED_REFLEXES:
-            case INCREDIBLE_REFLEXES:
-                this.uncheck(ATTACK_PRAYERS, index);
-                this.uncheck(RANGED_PRAYERS, index);
-                this.uncheck(MAGIC_PRAYERS, index);
+            case QuickPrayers.CLARITY_OF_THOUGHT:
+            case QuickPrayers.IMPROVED_REFLEXES:
+            case QuickPrayers.INCREDIBLE_REFLEXES:
+                this.uncheck(QuickPrayers.ATTACK_PRAYERS, index);
+                this.uncheck(QuickPrayers.RANGED_PRAYERS, index);
+                this.uncheck(QuickPrayers.MAGIC_PRAYERS, index);
                 break;
-            case SHARP_EYE:
-            case HAWK_EYE:
-            case EAGLE_EYE:
-            case MYSTIC_WILL:
-            case MYSTIC_LORE:
-            case MYSTIC_MIGHT:
-                this.uncheck(STRENGTH_PRAYERS, index);
-                this.uncheck(ATTACK_PRAYERS, index);
-                this.uncheck(RANGED_PRAYERS, index);
-                this.uncheck(MAGIC_PRAYERS, index);
+            case QuickPrayers.SHARP_EYE:
+            case QuickPrayers.HAWK_EYE:
+            case QuickPrayers.EAGLE_EYE:
+            case QuickPrayers.MYSTIC_WILL:
+            case QuickPrayers.MYSTIC_LORE:
+            case QuickPrayers.MYSTIC_MIGHT:
+                this.uncheck(QuickPrayers.STRENGTH_PRAYERS, index);
+                this.uncheck(QuickPrayers.ATTACK_PRAYERS, index);
+                this.uncheck(QuickPrayers.RANGED_PRAYERS, index);
+                this.uncheck(QuickPrayers.MAGIC_PRAYERS, index);
                 break;
-            case CHIVALRY:
-            case PIETY:
-            case RIGOUR:
-            case AUGURY:
-                this.uncheck(DEFENCE_PRAYERS, index);
-                this.uncheck(STRENGTH_PRAYERS, index);
-                this.uncheck(ATTACK_PRAYERS, index);
-                this.uncheck(RANGED_PRAYERS, index);
-                this.uncheck(MAGIC_PRAYERS, index);
+            case QuickPrayers.CHIVALRY:
+            case QuickPrayers.PIETY:
+            case QuickPrayers.RIGOUR:
+            case QuickPrayers.AUGURY:
+                this.uncheck(QuickPrayers.DEFENCE_PRAYERS, index);
+                this.uncheck(QuickPrayers.STRENGTH_PRAYERS, index);
+                this.uncheck(QuickPrayers.ATTACK_PRAYERS, index);
+                this.uncheck(QuickPrayers.RANGED_PRAYERS, index);
+                this.uncheck(QuickPrayers.MAGIC_PRAYERS, index);
                 break;
-            case PROTECT_FROM_MAGIC:
-            case PROTECT_FROM_MISSILES:
-            case PROTECT_FROM_MELEE:
-                this.uncheck(OVERHEAD_PRAYERS, index);
+            case QuickPrayers.PROTECT_FROM_MAGIC:
+            case QuickPrayers.PROTECT_FROM_MISSILES:
+            case QuickPrayers.PROTECT_FROM_MELEE:
+                this.uncheck(QuickPrayers.OVERHEAD_PRAYERS, index);
                 break;
-            case RETRIBUTION:
-            case REDEMPTION:
-            case SMITE:
-                this.uncheck(OVERHEAD_PRAYERS, index);
+            case QuickPrayers.RETRIBUTION:
+            case QuickPrayers.REDEMPTION:
+            case QuickPrayers.SMITE:
+                this.uncheck(QuickPrayers.OVERHEAD_PRAYERS, index);
                 break;
         }
     }
@@ -117,7 +120,7 @@ export class QuickPrayers extends PrayerHandler {
         if (this.enabled) {
             for (const prayer of this.prayers) {
                 if (prayer === null) continue;
-                if (isActivated(this.player, prayer.ordinal())) {
+                if (QuickPrayers.isActivated(this.player, prayer.ordinal())) {
                     return;
                 }
             }
@@ -129,7 +132,7 @@ export class QuickPrayers extends PrayerHandler {
 
     public handleButton(button: number): boolean {
         switch (button) {
-            case TOGGLE_QUICK_PRAYERS:
+            case QuickPrayers.TOGGLE_QUICK_PRAYERS:
                 if (this.player.getSkillManager().getCurrentLevel(Skill.PRAYER) <= 0) {
                     this.player.getPacketSender().sendMessage("You don't have enough Prayer points.");
                     return true;
@@ -137,14 +140,14 @@ export class QuickPrayers extends PrayerHandler {
                 if (this.enabled) {
                     for (const prayer of this.prayers) {
                         if (prayer === null) continue;
-                        deactivatePrayer(this.player, prayer.ordinal());
+                        this.deactivatePrayer(this.player, prayer.ordinal());
                     }
                     this.enabled = false;
                 } else {
                     let found = false;
                     for (const prayer of this.prayers) {
                         if (prayer === null) continue;
-                        activatePrayer(this.player, prayer.ordinal());
+                        QuickPrayers.activatePrayer(this.player, prayer.ordinal());
                         found = true;
                     }
                     if (!found) {
@@ -154,17 +157,17 @@ export class QuickPrayers extends PrayerHandler {
                 }
                 this.player.getPacketSender().sendQuickPrayersState(this.enabled);
                 break;
-            case SETUP_BUTTON:
+            case QuickPrayers.SETUP_BUTTON:
                 if (this.selectingPrayers) {
                     this.player.getPacketSender().sendTabInterface(5, 5608).sendTab(5);
                     this.selectingPrayers = false;
                 } else {
                     this.sendChecks();
-                    this.player.getPacketSender().sendTabInterface(5, QUICK_PRAYERS_TAB_INTERFACE_ID).sendTab(5);
+                    this.player.getPacketSender().sendTabInterface(5, QuickPrayers.QUICK_PRAYERS_TAB_INTERFACE_ID).sendTab(5);
                     this.selectingPrayers = true;
                 }
                 break;
-            case CONFIRM_BUTTON:
+            case QuickPrayers.CONFIRM_BUTTON:
                 if (this.selectingPrayers) {
                     this.player.getPacketSender().sendTabInterface(5, 5608);
                     this.selectingPrayers = false;
