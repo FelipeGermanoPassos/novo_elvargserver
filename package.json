@@ -24,6 +24,7 @@
     "map": "^1.0.1",
     "misc": "^1.0.2",
     "moment": "^2.29.4",
+    "queue": "^6.0.2",
     "random": "^4.1.0",
     "reflect-metadata": "^0.1.13",
     "require-all": "^3.0.0",
