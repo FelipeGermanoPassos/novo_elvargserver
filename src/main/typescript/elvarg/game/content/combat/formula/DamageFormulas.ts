@@ -49,7 +49,7 @@ export class DamageFormulas {
         return str;
     }
 
-    private static calculateMaxMeleeHit(entity: Mobile): number {
+    public static calculateMaxMeleeHit(entity: Mobile): number {
         let maxHit: number;
         if (entity.isPlayer()) {
             let player = entity.getAsPlayer();

@@ -50,6 +50,39 @@ export class PrayerHandler {
     public static OVERHEAD_PRAYERS: number[] = [PrayerHandler.PROTECT_FROM_MAGIC, PrayerHandler.PROTECT_FROM_MISSILES, PrayerHandler.PROTECT_FROM_MELEE, PrayerHandler.RETRIBUTION, PrayerHandler.REDEMPTION, PrayerHandler.SMITE];
     public static PROTECTION_PRAYERS: number[] = [PrayerHandler.PROTECT_FROM_MAGIC, PrayerHandler.PROTECT_FROM_MISSILES, PrayerHandler.PROTECT_FROM_MELEE];
 
+    public static PrayerDataList = {
+
+        THICK_SKIN: [1, 5, 5609, 83],
+        BURST_OF_STRENGTH: [4, 5, 5610, 84],
+        CLARITY_OF_THOUGHT: [7, 5, 5611, 85],
+        SHARP_EYE: [8, 5, 19812, 700],
+        MYSTIC_WILL: [9, 5, 19814, 701],
+        ROCK_SKIN: [10, 10, 5612, 86],
+        SUPERHUMAN_STRENGTH: [13, 10, 5613, 87],
+        IMPROVED_REFLEXES: [16, 10, 5614, 88],
+        RAPID_RESTORE: [19, 2.3, 5615, 89],
+        RAPID_HEAL: [22, 3, 5616, 90],
+        PROTECT_ITEM: [25, 3, 5617, 91],
+        HAWK_EYE: [26, 10, 19816, 702],
+        MYSTIC_LORE: [27, 10, 19818, 703],
+        STEEL_SKIN: [28, 20, 5618, 92],
+        ULTIMATE_STRENGTH: [31, 20, 5619, 93],
+        INCREDIBLE_REFLEXES: [34, 20, 5620, 94],
+        PROTECT_FROM_MAGIC: [37, 20, 5621, 95, 2],
+        PROTECT_FROM_MISSILES: [40, 20, 5622, 96, 1],
+        PROTECT_FROM_MELEE: [43, 20, 5623, 97, 0],
+        EAGLE_EYE: [44, 20, 19821, 704],
+        MYSTIC_MIGHT: [45, 20, 19823, 705],
+        RETRIBUTION: [46, 5, 683, 98, 4],
+        REDEMPTION: [49, 10, 684, 99, 5],
+        SMITE: [52, 32.0, 685, 100, 100, 6],
+        PRESERVE: [55, 3, 28001, 708],
+        CHIVALRY: [60, 38.5, 19825, 706],
+        PIETY: [70, 38.5, 19827, 707],
+        RIGOUR: [74, 38.5, 28004, 710],
+        AUGURY: [77, 38.5, 28007, 712]
+    }
+
     public static getProtectingPrayer(type: CombatType): number {
         switch (type) {
             case CombatType.MELEE:
@@ -62,6 +95,7 @@ export class PrayerHandler {
                 throw new Error("Invalid combat type: " + type);
         }
     }
+
     public static isActivated(c: Mobile, prayer: number): boolean {
         return c.getPrayerActive()[prayer];
     }
@@ -78,7 +112,7 @@ export class PrayerHandler {
             if (!player.getPrayerActive()[prayerData.ordinal()])
                 PrayerHandler.activatePrayer(player, prayerData.ordinal());
             else
-                deactivatePrayer(player, prayerData.ordinal());
+                PrayerHandler.deactivatePrayer(player, prayerData.ordinal());
             return true;
         }
         return false;
@@ -130,21 +164,21 @@ export class PrayerHandler {
             case PrayerHandler.THICK_SKIN:
             case PrayerHandler.ROCK_SKIN:
             case PrayerHandler.STEEL_SKIN:
-                resetPrayers(character, PrayerHandler.DEFENCE_PRAYERS, prayerId);
+                PrayerHandler.resetPrayers(character, PrayerHandler.DEFENCE_PRAYERS, prayerId);
                 break;
             case PrayerHandler.BURST_OF_STRENGTH:
             case PrayerHandler.SUPERHUMAN_STRENGTH:
             case PrayerHandler.ULTIMATE_STRENGTH:
-                resetPrayers(character, PrayerHandler.STRENGTH_PRAYERS, prayerId);
-                resetPrayers(character, PrayerHandler.RANGED_PRAYERS, prayerId);
-                resetPrayers(character, PrayerHandler.MAGIC_PRAYERS, prayerId);
+                PrayerHandler.resetPrayers(character, PrayerHandler.STRENGTH_PRAYERS, prayerId);
+                PrayerHandler.resetPrayers(character, PrayerHandler.RANGED_PRAYERS, prayerId);
+                PrayerHandler.resetPrayers(character, PrayerHandler.MAGIC_PRAYERS, prayerId);
                 break;
             case PrayerHandler.CLARITY_OF_THOUGHT:
             case PrayerHandler.IMPROVED_REFLEXES:
             case PrayerHandler.INCREDIBLE_REFLEXES:
-                resetPrayers(character, PrayerHandler.ATTACK_PRAYERS, prayerId);
-                resetPrayers(character, PrayerHandler.RANGED_PRAYERS, prayerId);
-                resetPrayers(character, PrayerHandler.MAGIC_PRAYERS, prayerId);
+                PrayerHandler.resetPrayers(character, PrayerHandler.ATTACK_PRAYERS, prayerId);
+                PrayerHandler.resetPrayers(character, PrayerHandler.RANGED_PRAYERS, prayerId);
+                PrayerHandler.resetPrayers(character, PrayerHandler.MAGIC_PRAYERS, prayerId);
                 break;
             case PrayerHandler.SHARP_EYE:
             case PrayerHandler.HAWK_EYE:
@@ -152,30 +186,30 @@ export class PrayerHandler {
             case PrayerHandler.MYSTIC_WILL:
             case PrayerHandler.MYSTIC_LORE:
             case PrayerHandler.MYSTIC_MIGHT:
-                resetPrayers(character, PrayerHandler.STRENGTH_PRAYERS, prayerId);
-                resetPrayers(character, PrayerHandler.ATTACK_PRAYERS, prayerId);
-                resetPrayers(character, PrayerHandler.RANGED_PRAYERS, prayerId);
-                resetPrayers(character, PrayerHandler.MAGIC_PRAYERS, prayerId);
+                PrayerHandler.resetPrayers(character, PrayerHandler.STRENGTH_PRAYERS, prayerId);
+                PrayerHandler.resetPrayers(character, PrayerHandler.ATTACK_PRAYERS, prayerId);
+                PrayerHandler.resetPrayers(character, PrayerHandler.RANGED_PRAYERS, prayerId);
+                PrayerHandler.resetPrayers(character, PrayerHandler.MAGIC_PRAYERS, prayerId);
                 break;
             case PrayerHandler.CHIVALRY:
             case PrayerHandler.PIETY:
             case PrayerHandler.RIGOUR:
             case PrayerHandler.AUGURY:
-                resetPrayers(character, PrayerHandler.DEFENCE_PRAYERS, prayerId);
-                resetPrayers(character, PrayerHandler.STRENGTH_PRAYERS, prayerId);
-                resetPrayers(character, PrayerHandler.ATTACK_PRAYERS, prayerId);
-                resetPrayers(character, PrayerHandler.RANGED_PRAYERS, prayerId);
-                resetPrayers(character, PrayerHandler.MAGIC_PRAYERS, prayerId);
+                PrayerHandler.resetPrayers(character, PrayerHandler.DEFENCE_PRAYERS, prayerId);
+                PrayerHandler.resetPrayers(character, PrayerHandler.STRENGTH_PRAYERS, prayerId);
+                PrayerHandler.resetPrayers(character, PrayerHandler.ATTACK_PRAYERS, prayerId);
+                PrayerHandler.resetPrayers(character, PrayerHandler.RANGED_PRAYERS, prayerId);
+                PrayerHandler.resetPrayers(character, PrayerHandler.MAGIC_PRAYERS, prayerId);
                 break;
             case PrayerHandler.PROTECT_FROM_MAGIC:
             case PrayerHandler.PROTECT_FROM_MISSILES:
             case PrayerHandler.PROTECT_FROM_MELEE:
-                resetPrayers(character, PrayerHandler.OVERHEAD_PRAYERS, prayerId);
+                PrayerHandler.resetPrayers(character, PrayerHandler.OVERHEAD_PRAYERS, prayerId);
                 break;
             case PrayerHandler.RETRIBUTION:
             case PrayerHandler.REDEMPTION:
             case PrayerHandler.SMITE:
-                resetPrayers(character, PrayerHandler.OVERHEAD_PRAYERS, prayerId);
+                PrayerHandler.resetPrayers(character, PrayerHandler.OVERHEAD_PRAYERS, prayerId);
                 break;
         }
         character.setPrayerActive(prayerId, true);
@@ -204,7 +238,7 @@ export class PrayerHandler {
         }
     }
 
-    public static canUse(player: Player, prayer: PrayerData, msg: boolean): boolean {
+    public static canUse(player: Player, prayer: number[], msg: boolean): boolean {
         if (player.getSkillManager().getMaxLevel(Skill.PRAYER) < (prayer.requirement)) {
             if (msg) {
                 player.getPacketSender().sendConfig(prayer.configId, 0);
@@ -212,28 +246,28 @@ export class PrayerHandler {
             }
             return false;
         }
-        if (prayer === PrayerData.CHIVALRY && player.getSkillManager().getMaxLevel(Skill.DEFENCE) < 60) {
+        if (prayer === this.PrayerDataList.CHIVALRY && player.getSkillManager().getMaxLevel(Skill.DEFENCE) < 60) {
             if (msg) {
                 player.getPacketSender().sendConfig(prayer.configId, 0);
                 player.getPacketSender().sendMessage("You need a Defence level of at least 60 to use Chivalry.");
             }
             return false;
         }
-        if (prayer === PrayerData.PIETY && player.getSkillManager().getMaxLevel(Skill.DEFENCE) < 70) {
+        if (prayer === this.PrayerDataList.PIETY && player.getSkillManager().getMaxLevel(Skill.DEFENCE) < 70) {
             if (msg) {
                 player.getPacketSender().sendConfig(prayer.configId, 0);
                 player.getPacketSender().sendMessage("You need a Defence level of at least 70 to use Piety.");
             }
             return false;
         }
-        if ((prayer === PrayerData.RIGOUR || prayer === PrayerData.AUGURY) && player.getSkillManager().getMaxLevel(Skill.DEFENCE) < 70) {
+        if ((prayer === this.PrayerDataList.RIGOUR || prayer === this.PrayerDataList.AUGURY) && player.getSkillManager().getMaxLevel(Skill.DEFENCE) < 70) {
             if (msg) {
                 player.getPacketSender().sendConfig(prayer.configId, 0);
                 player.getPacketSender().sendMessage("You need a Defence level of at least 70 to use that prayer.");
             }
             return false;
         }
-        if (prayer === PrayerData.PROTECT_ITEM) {
+        if (prayer === this.PrayerDataList.PROTECT_ITEM) {
             if (player.isSkulled() && player.getSkullType() === SkullTypes.RED_SKULL) {
                 if (msg) {
                     player.getPacketSender().sendConfig(prayer.configId, 0);
@@ -243,8 +277,8 @@ export class PrayerHandler {
             }
         }
         if (!player.getCombat().getPrayerBlockTimer().finished()) {
-            if (prayer == PrayerData.PROTECT_FROM_MELEE || prayer == PrayerData.PROTECT_FROM_MISSILES
-                || prayer == PrayerData.PROTECT_FROM_MAGIC) {
+            if (prayer == this.PrayerDataList.PROTECT_FROM_MELEE || prayer == this.PrayerDataList.PROTECT_FROM_MISSILES
+                || prayer == this.PrayerDataList.PROTECT_FROM_MAGIC) {
                 if (msg) {
                     player.getPacketSender().sendConfig(prayer.configId, 0);
                     player.getPacketSender()
@@ -257,9 +291,9 @@ export class PrayerHandler {
         // Prayer locks
         let locked = false;
 
-        if (prayer == PrayerData.PRESERVE && !player.isPreserveUnlocked()
-            || prayer == PrayerData.RIGOUR && !player.isRigourUnlocked()
-            || prayer == PrayerData.AUGURY && !player.isAuguryUnlocked()) {
+        if (prayer == this.PrayerDataList.PRESERVE && !player.isPreserveUnlocked()
+            || prayer == this.PrayerDataList.RIGOUR && !player.isRigourUnlocked()
+            || prayer == this.PrayerDataList.AUGURY && !player.isAuguryUnlocked()) {
             if (player.getRights() != PlayerRights.OWNER && player.getRights() != PlayerRights.DEVELOPER) {
                 locked = true;
             }
@@ -283,7 +317,7 @@ export class PrayerHandler {
         return true;
     }
 
-    deactivatePrayer(c: Mobile, prayerId: number): void {
+    public static deactivatePrayer(c: Mobile, prayerId: number): void {
         if (!c.getPrayerActive()[prayerId]) {
             return;
         }
@@ -361,7 +395,7 @@ export class PrayerHandler {
         return -1;
     }
 
-    startDrain(player: Player) {
+    public static startDrain(player: Player) {
         if (player.isDrainingPrayer()) {
             return;
         }
@@ -430,7 +464,7 @@ export class PrayerHandler {
      */
     public static resetPrayers(player: Player, prayers: number[]): void {
         for (let i = 0; i < prayers.length; i++) {
-            deactivatePrayer(player, prayers[i]);
+            PrayerHandler.deactivatePrayer(player, prayers[i]);
         }
     }
 
@@ -444,38 +478,7 @@ export class PrayerHandler {
     }
 }
 
-export const PrayerDataType = {
 
-    THICK_SKIN = { requirement: 1, drainRate: 5, buttonId: 5609, configId: 83 },
-    BURST_OF_STRENGTH = { requirement: 4, drainRate: 5, buttonId: 5610, configId: 84 },
-    CLARITY_OF_THOUGHT = { requirement: 7, drainRate: 5, buttonId: 5611, configId: 85 },
-    SHARP_EYE = { requirement: 8, drainRate: 5, buttonId: 19812, configId: 700 },
-    MYSTIC_WILL = { requirement: 9, drainRate: 5, buttonId: 19814, configId: 701 },
-    ROCK_SKIN = { requirement: 10, drainRate: 10, buttonId: 5612, configId: 86 },
-    SUPERHUMAN_STRENGTH = { requirement: 13, drainRate: 10, buttonId: 5613, configId: 87 },
-    IMPROVED_REFLEXES = { requirement: 16, drainRate: 10, buttonId: 5614, configId: 88 },
-    RAPID_RESTORE = { requirement: 19, drainRate: 2.3, buttonId: 5615, configId: 89 },
-    RAPID_HEAL = { requirement: 22, drainRate: 3, buttonId: 5616, configId: 90 },
-    PROTECT_ITEM = { requirement: 25, drainRate: 3, buttonId: 5617, configId: 91 },
-    HAWK_EYE = { requirement: 26, drainRate: 10, buttonId: 19816, configId: 702 },
-    MYSTIC_LORE = { requirement: 27, drainRate: 10, buttonId: 19818, configId: 703 },
-    STEEL_SKIN = { requirement: 28, drainRate: 20, buttonId: 5618, configId: 92 },
-    ULTIMATE_STRENGTH = { requirement: 31, drainRate: 20, buttonId: 5619, configId: 93 },
-    INCREDIBLE_REFLEXES = { requirement: 34, drainRate: 20, buttonId: 5620, configId: 94 },
-    PROTECT_FROM_MAGIC = { requirement: 37, drainRate: 20, buttonId: 5621, configId: 95, 2},
-    PROTECT_FROM_MISSILES = { requirement: 40, drainRate: 20, buttonId: 5622, configId: 96, 1},
-    PROTECT_FROM_MELEE = { requirement: 43, drainRate: 20, buttonId: 5623, configId: 97, 0},
-    EAGLE_EYE = { requirement: 44, drainRate: 20, buttonId: 19821, configId: 704 },
-    MYSTIC_MIGHT = { requirement: 45, drainRate: 20, buttonId: 19823, configId: 705 },
-    RETRIBUTION = { requirement: 46, drainRate: 5, buttonId: 683, configId: 98, 4},
-    REDEMPTION = { requirement: 49, drainRate: 10, buttonId: 684, configId: 99, 5},
-    SMITE = { requirement: 52, drainRate: 32.0, buttonId: 685, configId: 100, 100, 6},
-    PRESERVE = { requirement: 55, drainRate: 3, buttonId: 28001, configId: 708 },
-    CHIVALRY = { requirement: 60, drainRate: 38.5, buttonId: 19825, configId: 706 },
-    PIETY = { requirement: 70, drainRate: 38.5, buttonId: 19827, configId: 707 },
-    RIGOUR = { requirement: 74, drainRate: 38.5, buttonId: 28004, configId: 710 },
-    AUGURY = { requirement: 77, drainRate: 38.5, buttonId: 28007, configId: 712 }
-}
 
 export class PrayerData {
     /**

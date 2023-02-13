@@ -1,10 +1,21 @@
+import { Sound } from "../Sound"
+import { Sounds } from "../Sounds"
+import { Player } from "../entity/impl/player/Player"
+import { Animation } from "../model/Animation"
+import { EffectTimer } from "../model/EffectTimer"
+import { Item } from "../model/Item"
+import { Skill } from "../model/Skill"
+import { TimerKey } from "../../util/timers/TimerKey"
+
 export class PotionConsumable {
-    ANTIFIRE_POTIONS = [2452, 2454, 2456, 2458],
-    ANTIPOISON_POTIONS = [2448, 181, 183, 185],
-    COMBAT_POTIONS = [9739, 9741, 9743, 9745],
-    SUPER_COMBAT_POTIONS = [12695, 12697, 12699, 12701],
-    MAGIC_POTIONS = [3040, 3042, 3044, 3046],
-    SUPER_MAGIC_POTIONS = [11726, 11727, 11728, 11729],
+    public static ANTIFIRE_POTIONS = [2452, 2454, 2456, 2458]
+    public static ANTIPOISON_POTIONS = [2448, 181, 183, 185]
+    public static COMBAT_POTIONS = [9739, 9741, 9743, 9745]
+    public static SUPER_COMBAT_POTIONS = [12695, 12697, 12699, 12701]
+    public static MAGIC_POTIONS = [3040, 3042, 3044, 3046]
+    public static SUPER_MAGIC_POTIONS = [11726, 11727, 11728, 11729]
+    private static VIAL: number = 229;
+
 
     onEffect(player: Player) {
         switch (this) {
@@ -32,17 +43,17 @@ export class PotionConsumable {
         }
     }
 
-    DEFENCE_POTIONS = [2432, 133, 135, 137],
-    STRENGTH_POTIONS = [113, 115, 117, 119],
-    ATTACK_POTIONS = [2428, 121, 123, 125],
-    SUPER_DEFENCE_POTIONS = [2442, 163, 165, 167],
-    SUPER_ATTACK_POTIONS = [2436, 145, 147, 149],
-    SUPER_STRENGTH_POTIONS = [2440, 157, 159, 161],
-    RANGE_POTIONS = [2444, 169, 171, 173],
-    SUPER_RANGE_POTIONS = [11722, 11723, 11724, 11725],
-    ZAMORAK_BREW = [2450, 189, 191, 193],
+    public static DEFENCE_POTIONS = [2432, 133, 135, 137]
+    public static STRENGTH_POTIONS = [113, 115, 117, 119]
+    public static ATTACK_POTIONS = [2428, 121, 123, 125]
+    public static SUPER_DEFENCE_POTIONS = [2442, 163, 165, 167]
+    public static SUPER_ATTACK_POTIONS = [2436, 145, 147, 149]
+    public static SUPER_STRENGTH_POTIONS = [2440, 157, 159, 161]
+    public static RANGE_POTIONS = [2444, 169, 171, 173]
+    public static SUPER_RANGE_POTIONS = [11722, 11723, 11724, 11725]
+    public static ZAMORAK_BREW = [2450, 189, 191, 193]
 
-    onEffect(player: Player) {
+    onEffectAttack(player: Player) {
         switch (this) {
             case PotionConsumable.DEFENCE_POTIONS:
                 PotionConsumable.onBasicEffect(player, Skill.DEFENCE, BoostType.NORMAL);
@@ -74,60 +85,11 @@ export class PotionConsumable {
         }
     }
 
-    SARADOMIN_BREW = [6685, 6687, 6689, 6691],
-    GUTHIX_REST = [4417, 4419, 4421, 4423, 1980],
-    SUPER_RESTORE_POTIONS = [3024, 3026, 3028, 3030],
-    PRAYER_POTIONS = [2434, 139, 141, 143],
-}
+    public static SARADOMIN_BREW = [6685, 6687, 6689, 6691]
+    public static GUTHIX_REST = [4417, 4419, 4421, 4423, 1980]
+    public static SUPER_RESTORE_POTIONS = [3024, 3026, 3028, 3030]
+    public static PRAYER_POTIONS = [2434, 139, 141, 143]
 
-type PotionConsumableTypes = keyof typeof PotionConsumable;
-
-interface PotionConsumableInterface {
-    onEffect(player: Player): void;
-}
-
-class SARADOMIN_BREW implements PotionConsumableInterface {
-    onEffect(player: Player) {
-        PotionConsumable.onSaradominEffect(player);
-    }
-}
-
-class GUTHIX_REST implements PotionConsumableInterface {
-    onEffect(player: Player) {
-        player.getSkillManager().increaseCurrentLevelMax(Skill.HITPOINTS, 5);
-    }
-}
-
-class SUPER_RESTORE_POTIONS implements PotionConsumableInterface {
-    onEffect(player: Player) {
-        PotionConsumable.onPrayerEffect(player, true);
-        PotionConsumable.onRestoreEffect(player);
-    }
-}
-
-class PRAYER_POTIONS implements PotionConsumableInterface {
-    onEffect(player: Player) {
-        PotionConsumable.onPrayerEffect(player, false);
-    }
-}
-
-const potionConsumableMap = new Map<PotionConsumableTypes, PotionConsumableInterface>([
-    [PotionConsumable.SARADOMIN_BREW, new SARADOMIN_BREW()],
-    [PotionConsumable.GUTHIX_REST, new GUTHIX_REST()],
-    [PotionConsumable.SUPER_RESTORE_POTIONS, new SUPER_RESTORE_POTIONS()],
-    [PotionConsumable.PRAYER_POTIONS, new PRAYER_POTIONS()],
-]);
-
-function consumePotion(type: PotionConsumableTypes, player: Player) {
-    const potion = potionConsumableMap.get(type);
-    if (potion) {
-        potion.onEffect(player);
-    }
-}
-
-const VIAL: number = 229;
-
-class PotionConsumable {
     private ids: number[];
 
     constructor(...ids: number[]) {
@@ -144,7 +106,7 @@ class PotionConsumable {
                 player.getPacketSender().sendMessage("You cannot use potions here.");
                 return true;
             }
-            if (potion === GUTHIX_REST || potion === SARADOMIN_BREW) {
+            if (potion === PotionConsumable.GUTHIX_REST || potion === PotionConsumable.SARADOMIN_BREW) {
                 if (!player.getArea().canEat(player, item)) {
                     player.getPacketSender().sendMessage("You cannot eat here.");
                     return true;
@@ -185,7 +147,7 @@ class PotionConsumable {
                 }
             }
         }
-        return new Item(VIAL);
+        return new Item(PotionConsumable.VIAL);
     }
 
     private static forId(id: number): PotionConsumable | undefined {
@@ -316,29 +278,31 @@ class PotionConsumable {
     public getIds(): number[] {
         return this.ids;
     }
-    private enum BoostType {
-    LOW(0.10), NORMAL(0.13), SUPER(0.19);
-/**
- * The amount this type will boost by.
- */
- private amount: number;
+}
 
- /**
-  * Creates a new {@link BoostType}.
-  *
-  * @param boostAmount
-  *            the amount this type will boost by.
-  */
- private constructor(boostAmount: number) {
+private class BoostType {
+    LOW(0.10), NORMAL(0.13), SUPER(0.19);
+    /**
+     * The amount this type will boost by.
+     */
+    private amount: number;
+
+    /**
+     * Creates a new {@link BoostType}.
+     *
+     * @param boostAmount
+     *            the amount this type will boost by.
+     */
+    private constructor(boostAmount: number) {
         this.amount = boostAmount;
     }
 
- /**
-  * Gets the amount this type will boost by.
-  *
-  * @return the boost amount.
-  */
- public getAmount(): number {
+    /**
+     * Gets the amount this type will boost by.
+     *
+     * @return the boost amount.
+     */
+    public getAmount(): number {
         return this.amount;
     }
 

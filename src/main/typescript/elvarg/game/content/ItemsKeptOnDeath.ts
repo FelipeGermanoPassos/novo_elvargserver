@@ -1,3 +1,10 @@
+import { Emblem } from "./combat/bountyhunter/Emblem";
+import { Player } from "../entity/impl/player/Player";
+import { Item } from "../model/Item";
+import { SkullType } from "../model/SkullType";
+import { Misc } from "../../util/Misc";
+import { PrayerHandler } from "./PrayerHandler";
+
 export class ItemsKeptOnDeath {
     public static open(player: Player) {
         ItemsKeptOnDeath.clearInterfaceData(player); //To prevent sending multiple layers of items.
@@ -53,7 +60,7 @@ export class ItemsKeptOnDeath {
             items.push(item);
         }
         items.sort((items, new Comparator<Item>() {
-            public compare(Item item, Item item2) {
+            public compare(item: Item, item2: Item) {
                 const value1 = item.getDefinition().getValue();
                 const value2 = item2.getDefinition().getValue();
                 if (value1 == value2) {
@@ -65,15 +72,15 @@ export class ItemsKeptOnDeath {
                 }
             }
         });
-        ArrayList < Item > toKeep = new ArrayList<Item>();
-        const amountToKeep = getAmountToKeep(player);
-        for (let i = 0; i < amountToKeep && i < items.size(); i++) {
-            toKeep.add(items.get(i));
+        let toKeep: Item[];
+        const amountToKeep = ItemsKeptOnDeath.getAmountToKeep(player);
+        for (let i = 0; i < amountToKeep && i < items.length(); i++) {
+            toKeep.unshift(items[i]);
         }
         return toKeep;
     }
 
-    public static getAmountToKeep(Player player) {
+    public static getAmountToKeep(player: Player) {
         if (player.getSkullTimer() > 0) {
             if (player.getSkullType() == SkullType.RED_SKULL) {
                 return 0;
