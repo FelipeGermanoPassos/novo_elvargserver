@@ -9,10 +9,6 @@ import {GodwarsDungeonArea} from '../../model/areas/impl/GodwarsDugeonArea'
 import {KingBlackDragonArea} from '../../model/areas/impl/KingBlackDragonArea'
 import {WildernessArea} from '../../model/areas/impl/WildernessArea'
 import { Area } from "./Area";
-import {CastleWarsLobbyArea} from '../../model/areas/impl/castlewars/CastleWarsLobbyArea'
-import {CastleWarsZamorakWaitingArea} from '../../model/areas/impl/castlewars/CastleWarsZamorakWaitingArea'
-import {CastleWarsGameArea} from '../../model/areas/impl/castlewars/CastleWarsGameArea';
-import {CastleWarsSaradominWaitingArea} from '../../model/areas/impl/castlewars/CastleWarsSaradominWaitingArea'
 import { CanAttackResponse } from "../../content/combat/CombatFactory";
 import { Boundary } from "../Boundary";
 
@@ -24,7 +20,7 @@ class AreaManager {
         AreaManager.areas.push(new BarrowsArea());
         AreaManager.areas.push(new DuelArenaArea());
         AreaManager.areas.push(new WildernessArea());
-        AreaManager.areas.push(new KingBlackDragonArea();
+        AreaManager.areas.push(new KingBlackDragonArea(new Boundary()));
         AreaManager.areas.push(new GodwarsDungeonArea());
         AreaManager.areas.push(CastleWars.CastleWarsLobbyArea.LOBBY_AREA);
         AreaManager.areas.push(CastleWars.CastleWarsZamorakWaitingArea.ZAMORAK_WAITING_AREA);

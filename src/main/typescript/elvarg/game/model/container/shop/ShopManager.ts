@@ -1,8 +1,19 @@
+
+import { ShopIdentifiers } from '../../../../util/ShopIdentifiers';
+import { Shop } from './Shop';
+import { Player } from '../../../entity/impl/player/Player';
+import { PlayerStatus } from '../../PlayerStatus';
+import { World } from '../../../World';
+import { ItemDefinition } from '../../../definition/ItemDefinition';
+import { TaskManager } from '../../../task/TaskManager';
+import { ShopRestockTask } from '../../../task/impl/ShopRestockTask'
+import { ItemIdentifiers } from '../../../../util/ItemIdentifiers';
+import { Misc } from '../../../../util/Misc';
+
 export class ShopManager extends ShopIdentifiers {
     public static shops: Map<number, Shop> = new Map<number, Shop>();
     
-    Copy code
-    public static open(player: Player, id: number) {
+    public static opens(player: Player, id: number) {
         const shop = this.shops.get(id);
         if (shop) {
             this.open(player, shop, true);
@@ -36,14 +47,14 @@ export class ShopManager extends ShopIdentifiers {
     }
 
     public static refresh(shop: Shop) {
-        for (const player of World.getPlayers()) {
+        World.getPlayers().forEach(player => {
             if (!player) {
-                continue;
+              return;
             }
             if (this.viewingShop(player, shop.id)) {
-                this.open(player, shop, false);
+              this.open(player, shop, false);
             }
-        }
+          });
     }
     
     public static priceCheck(player: Player, itemId: number, slot: number, shopItem: boolean) {
@@ -55,7 +66,7 @@ export class ShopManager extends ShopIdentifiers {
             flag = true;
         } else if (shopItem && (slot >= player.shop.currentStock.length || !player.shop.currentStock[slot] || player.shop.currentStock[slot].id !== itemId)) {
             flag = true;
-        } else if (!shopItem && (slot >= player.inventory.capacity || player.inventory.items[slot].id !== itemId)) {
+        } else if (!shopItem && (slot >= player.inventory.capacity() || player.inventory.getItems()[slot].getId() !== itemId)) {
             flag = true;
         }
 
@@ -83,7 +94,6 @@ export class ShopManager extends ShopIdentifiers {
         return;
         }
         
-        Copy code
         if (itemValue > 1) {
             itemValue = itemValue * Shop.SALES_TAX_MODIFIER;
         }
@@ -107,7 +117,6 @@ export class ShopManager extends ShopIdentifiers {
         flag = true;
         }
         
-        Copy code
         if (flag) {
             return;
         }
@@ -124,6 +133,7 @@ export class ShopManager extends ShopIdentifiers {
         }
         
         let bought = false;
+        const item = player.getInventory().get(itemId);
 
         for (let i = amount; i > 0; i--) {
             let currencyAmount = shop.currency.getAmountForPlayer(player);
@@ -132,7 +142,6 @@ export class ShopManager extends ShopIdentifiers {
             }
             let shopItemAmount = shop.currentStock[slot].amount;
             
-            Copy code
             if (shopItemAmount <= 1 && !this.deletesItems(shop.id)) {
                 player.packetSender.sendMessage("This item is currently out of stock. Come back later.");
                 break;
@@ -153,7 +162,9 @@ export class ShopManager extends ShopIdentifiers {
             if (!itemDef.isStackable()) {
                 shop.currency.decrementForPlayer(player, itemValue);
                 shop.removeItem(itemId, 1);
-                player.inventory.add(itemId, 1);
+                if (item) {
+                    player.getInventory().add(item);
+                }
                 bought = true;
             } else {
                 let canBeBought = (currencyAmount / itemValue);
@@ -168,7 +179,9 @@ export class ShopManager extends ShopIdentifiers {
             
                 shop.currency.decrementForPlayer(player, itemValue * canBeBought);
                 shop.removeItem(itemId, canBeBought);
-                player.inventory.add(itemId, canBeBought);
+                if (item) {
+                    player.getInventory().add(item);
+                }
                 bought = true;
                 break;
             }
@@ -183,16 +196,17 @@ export class ShopManager extends ShopIdentifiers {
         }
     }
 
+    
+
     public static sellItem(player: Player, slot: number, itemId: number, amount: number) {
         let shop = player.shop;
         let flag = false;
         if (shop == null || player.status != PlayerStatus.SHOPPING || player.interfaceId != Shop.INTERFACE_ID) {
         flag = true;
-        } else if (slot >= player.inventory.capacity || player.inventory.items[slot].id != itemId) {
+        } else if (slot >= player.inventory.capacity() || player.inventory.getItems()[slot].getId() != itemId) {
         flag = true;
         }
-        
-        Copy code
+
         if (flag) {
             return;
         }
@@ -233,6 +247,8 @@ export class ShopManager extends ShopIdentifiers {
     
         // A flag which indicates if an item was sold.
         let sold = false;
+
+        const item = player.getInventory().get(itemId);
     
         // Perform sale..
         for (let amountRemaining = amount; amountRemaining > 0; amountRemaining--) {
@@ -271,9 +287,12 @@ export class ShopManager extends ShopIdentifiers {
                 }
             }
 
-            if (!itemDef.isStackable()) {
-            // Remove item from player's inventory..
-                player.getInventory().delete(itemId, 1);
+                if (!itemDef.isStackable()) {
+                // Remove item from player's inventory..
+                
+                if (item) {
+                    player.getInventory().delete(item);
+                }
                 // Add player currency..
                 shop.getCurrency().incrementForPlayer(player, itemValue);
     
@@ -284,7 +303,9 @@ export class ShopManager extends ShopIdentifiers {
             } else {
                 
                     // Remove item from player's inventory..
-                    player.getInventory().delete(itemId, amountRemaining);
+                    if (item) {
+                        player.getInventory().delete(item);
+                    }
         
                     // Add player currency..
                     shop.getCurrency().incrementForPlayer(player, itemValue * amountRemaining);
@@ -308,7 +329,7 @@ export class ShopManager extends ShopIdentifiers {
     }
 
     private static getItemValue(player: Player, itemDef: ItemDefinition, shopId: number): number {
-        if (shopId == PVP_SHOP) {
+        if (shopId == ShopManager.PVP_SHOP) {
         return itemDef.getBloodMoneyValue();
         }
         return itemDef.getValue();
@@ -342,7 +363,7 @@ export class ShopManager extends ShopIdentifiers {
             return false;
         }*/
     
-        if (shop.getId() == GENERAL_STORE) {
+        if (shop.getId() == ShopManager.GENERAL_STORE) {
             return true;
         }
     
@@ -362,7 +383,7 @@ export class ShopManager extends ShopIdentifiers {
      * @return
      */
     public static deletesItems(shopId: number): boolean {
-        if (shopId == GENERAL_STORE) {
+        if (shopId == ShopManager.GENERAL_STORE) {
             return true;
         }
         return false;
@@ -375,7 +396,7 @@ export class ShopManager extends ShopIdentifiers {
      * @return
      */
     public static restocksItem(shopId: number): boolean {
-        if (shopId == GENERAL_STORE) {
+        if (shopId == ShopManager.GENERAL_STORE) {
             return false;
         }
         return true;

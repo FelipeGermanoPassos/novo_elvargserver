@@ -1,6 +1,12 @@
+import { Command } from '../../../model/commands/Command';
+import { Player } from '../../../entity/impl/player/Player';
+import { PlayerRights } from '../../rights/PlayerRights';
+import { NPC } from '../../../entity/impl/npc/NPC';
+import { World } from '../../../World';
+import { NpcDefinition } from '../../../definition/NpcDefinition';
+
 class SpawnPermanentNPCCommand implements Command {
 
-    Copy code
     execute(player: Player, command: string, parts: string[]) {
         try {
             let npcId = parseInt(parts[1]);

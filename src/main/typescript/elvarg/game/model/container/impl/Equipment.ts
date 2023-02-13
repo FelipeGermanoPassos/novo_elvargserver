@@ -1,5 +1,10 @@
 import { ItemContainer } from "../ItemContainer";
+import { Item } from "../../Item";
 import { Player } from "../../../entity/impl/player/Player";
+import { StackType } from "../StackType";
+import { WeaponInterfaces } from "../../../content/combat/WeaponInterfaces";
+import { ItemDefinition } from "../../../definition/ItemDefinition";
+import { Inventory } from "./Inventory";
 
 export class Equipment extends ItemContainer {
     public static INVENTORY_INTERFACE_ID = 1688;
@@ -16,12 +21,13 @@ export class Equipment extends ItemContainer {
     public static RING_SLOT = 12;
     public static AMMUNITION_SLOT = 13;
     public static NO_ITEM = new Item(-1);
+    static ITEM_COUNT = 10;
     
     constructor(public player: Player) {
         super(player);
     }
 
-    public static getItemCount(p: Player, s: string, inventory: boolean): number {
+    public getItemCount(p: Player, s: string, inventory: boolean): number {
         let count = 0;
         for (let t of p.getEquipment().getItems()) {
             if (t == null || t.getId() < 1 || t.getAmount() < 1)
@@ -30,7 +36,7 @@ export class Equipment extends ItemContainer {
                 count++;
         }
         if (inventory) {
-            for (let t of p.getInventory().getItems()) {
+            for (let t of p.getInventory().) {
                 if (t == null || t.getId() < 1 || t.getAmount() < 1)
                     continue;
                 if (t.getDefinition().getName().toLowerCase().includes(s.toLowerCase()))
@@ -50,17 +56,18 @@ export class Equipment extends ItemContainer {
     
     public refreshItems(): ItemContainer {
         this.getPlayer().getPacketSender().sendItemContainer(this, Equipment.INVENTORY_INTERFACE_ID);
-        return this;
-    }
-    
-    public full(): Equipment {
-        return this;
+        return new ItemContainer(this.getPlayer());
     }
 
+    public isFull(): boolean {
+        let inventory = new Inventory(this.player);
+        return this.getItemCount(this.getPlayer(), "s", inventory.full) === Equipment.ITEM_COUNT;
+    }
+    
     public wearingNexAmours(): boolean {
-        const head = this.player.getEquipment().getItems()[HEAD_SLOT].getId();
-        const body = this.player.getEquipment().getItems()[BODY_SLOT].getId();
-        const legs = this.player.getEquipment().getItems()[LEG_SLOT].getId();
+        const head = this.player.getEquipment().getItems()[Equipment.HEAD_SLOT].getId();
+        const body = this.player.getEquipment().getItems()[Equipment.BODY_SLOT].getId();
+        const legs = this.player.getEquipment().getItems()[Equipment.LEG_SLOT].getId();
         const torva = head === 14008 && body === 14009 && legs === 14010;
         const pernix = head === 14011 && body === 14012 && legs === 14013;
         const virtus = head === 14014 && body === 14015 && legs === 14016;
@@ -68,8 +75,9 @@ export class Equipment extends ItemContainer {
     }
     
     public wearingHalberd(): boolean {
-        const def = ItemDefinition.forId(this.player.getEquipment().getItems()[Equipment.WEAPON_SLOT].getId());
-        return def != null && def.getName().toLowerCase().endsWith("halberd");
+        const itemId = this.getPlayer().getEquipment().getItems()[Equipment.WEAPON_SLOT].getId();
+        const itemDef = ItemDefinition.forId(itemId);
+        return itemDef != null && itemDef.getName().toLowerCase().endsWith("halberd");
     }
     
     public properEquipmentForWilderness(): boolean {
@@ -92,12 +100,12 @@ export class Equipment extends ItemContainer {
     }
     
     public hasCastleWarsBracelet(): boolean {
-        const hands = this.get(HANDS_SLOT);
+        const hands = this.get(Equipment.HANDS_SLOT);
         return hands != null && hands.getId() >= 11079 && hands.getId() <= 11083;
     }
     
     public hasGodsword(): boolean {
-        return this.get(WEAPON_SLOT) != null && this.get(WEAPON_SLOT).getDefinition().getName().toLowerCase().contains("godsword");
+        return this.get(Equipment.WEAPON_SLOT) != null && this.get(Equipment.WEAPON_SLOT).getDefinition().getName().toLowerCase().includes("godsword");
     }
 }
     

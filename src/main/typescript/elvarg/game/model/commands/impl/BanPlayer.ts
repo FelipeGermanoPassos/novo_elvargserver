@@ -1,10 +1,7 @@
 import {Player} from '../../../entity/impl/player/Player';
 import {PlayerRights} from '../../../model/rights/PlayerRights';
 import {Command} from '../../../model/commands/Command';
-
-import static com.elvarg.game.GameConstants.PLAYER_PERSISTENCE;
 import { GameConstants } from '../../../GameConstants';
-
 import {World} from '../../../World';
 import {PlayerPunishment} from '../../../../util/PlayerPunishment';
 

@@ -14,7 +14,7 @@ export class UnlockPrayers implements Command {
         }
         player.getPacketSender().sendConfig(709, player.isPreserveUnlocked() ? 1 : 0);
         player.getPacketSender().sendConfig(711, player.isRigourUnlocked() ? 1 : 0);
-        player.getPacketSender().sendConfig(713, player.isAuguryUnlocked() ? 1 : 0);
+        player.getPacketSender().sendConfig(713, player.getAuguryUnlocked() ? 1 : 0);
     }
 
     canUse(player: Player) {

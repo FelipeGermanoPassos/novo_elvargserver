@@ -1,4 +1,4 @@
-class NpcDialogue extends Dialogue {
+export class NpcDialogue extends Dialogue {
     private static readonly CHATBOX_INTERFACES = [4885, 4890, 4896, 4903];
     private npcId: number;
     private text: string;

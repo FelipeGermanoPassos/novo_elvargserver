@@ -1,3 +1,9 @@
+import { Command } from "../Command";
+import { CombatFactory } from "../../../content/combat/CombatFactory";
+import { PlayerRights } from "../../rights/PlayerRights";
+import { World } from "../../../World";
+import { Player } from "../../../entity/impl/player/Player";
+
 class ExitClient implements Command {
     execute(player: Player, command: string, parts: string[]) {
         let player2 = command.substring(parts[0].length + 1);

@@ -1,5 +1,4 @@
 import { PlayerBotDefinition } from "./definition/PlayerBotDefinition";
-import { DynamoDBPlayerPersistence } from "./entity/impl/player/persistence/dynamodb/DynamoDBPlayerPersistence";
 import { JSONFilePlayerPersistence } from "./entity/impl/player/persistence/jsonfile/JSONFilePlayerPersistence";
 import { TribridMaxFighterPreset } from "./entity/impl/playerbot/fightstyle/impl/TribridMaxFighterPreset"
 import { DDSPureMFighterPreset } from "./entity/impl/playerbot/fightstyle/impl/DDSPureMFighterPreset"

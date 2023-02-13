@@ -2,6 +2,8 @@ import { Socket } from 'socket.io'
 import * as fsfrom 'fs'
 import { OutputStream } from 'node-js'
 import { Mutex } from "stoppable-lock";
+import {InputStream } from 'node-js'
+import { Runnable } from 'runnable'
 
 export class BufferedConnection implements Runnable {
     private socket: Socket;

@@ -1,3 +1,15 @@
+import { NpcIdentifiers } from "../../../../../util/NpcIdentifiers";
+import { OptionDialogue } from '../../../../model/dialogues/entries/impl/OptionDialogue'
+import { Player } from "../../../../entity/impl/player/Player";
+import { DynamicDialogueBuilder } from '../../../../model/dialogues/builders/DynamicDialogueBuilder'
+import { NpcDialogue } from '../../../../model/dialogues/entries/impl/NpcDialogue'
+import { DialogueOption } from "../../DialogueOption";
+
+
+import com.elvarg.game.model.dialogues.entries.impl.OptionDialogue;
+
+
+
 export class BankerDialogue extends DynamicDialogueBuilder {
 
     build(player: Player) {
@@ -5,7 +17,7 @@ export class BankerDialogue extends DynamicDialogueBuilder {
 
         this.add(new OptionDialogue(1, (option) => {
             switch (option) {
-                case FIRST_OPTION:
+                case DialogueOption.FIRST_OPTION:
                     player.getBank(player.getCurrentBankTab()).open();
                     break;
                 default:

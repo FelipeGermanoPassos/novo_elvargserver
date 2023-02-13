@@ -1,7 +1,7 @@
 import { BackgroundLoader } from "../util/BackgroundLoader";
 import { ClanChatManager } from "./content/clan/ClanChatManager";
-import { CombatPoisonData } from "./task/impl/CombatPoisonEffect/CombatPoisonData";
-import { PlayerPunishment } from "./util/PlayerPunishment";
+import { CombatPoisonData } from '../game/task/impl/CombatPoisonEffect'
+import { PlayerPunishment } from "../util/PlayerPunishment";
 import { Systems } from "./Systems";
 import { RegionManager } from "./collision/RegionManager";
 import { GameEngine } from "./GameEngine";

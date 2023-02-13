@@ -1,5 +1,9 @@
+import { PlayerRights } from "../../rights/PlayerRights";
+import { Command } from "../Command";
+import { Player } from "../../../entity/impl/player/Player";
+
 class AreaDebug implements Command {
-    execute(player: Player, command: string, parts: string[]): void {
+    execute(player:Player, command: string, parts: string[]): void {
         if (player.getArea() != null) {
             player.getPacketSender().sendMessage("");
             player.getPacketSender().sendMessage("Area: " + player.getArea().constructor.name);

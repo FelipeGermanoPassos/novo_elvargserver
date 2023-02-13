@@ -33,7 +33,7 @@ export class NPCDeathTask extends Task {
             case 1:
                 this.npc.getMovementQueue().setBlockMovement(true).reset();
                 this.killer = this.npc.getCombat().getKiller(true);
-                this.npc.performAnimation(new newAnimation(this.npc.getCurrentDefinition().getDeathAnim(), Priority.HIGH));
+                this.npc.performAnimation(new Animation(this.npc.getCurrentDefinition().getDeathAnim(), Priority.HIGH));
                 this.npc.getCombat().reset();
                 this.npc.setMobileInteraction(null);
                 break;
