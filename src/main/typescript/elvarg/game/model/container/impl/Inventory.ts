@@ -1,9 +1,10 @@
 import { Player } from "../../../entity/impl/player/Player";
+import { ItemContainer } from "../ItemContainer";
+import { StackType } from "../StackType";
 
 
 export class Inventory extends ItemContainer {
 
-    Copy code
     public static readonly INTERFACE_ID: number = 3214;
     
     constructor(player: Player) {
@@ -18,13 +19,17 @@ export class Inventory extends ItemContainer {
         return StackType.DEFAULT;
     }
     
-    public refreshItems(): Inventory {
-        this.player.getPacketSender().sendItemContainer(this, INTERFACE_ID);
-        return this;
+    public refreshItems(): ItemContainer {
+        this.getPlayer().getPacketSender().sendItemContainer(this, Inventory.INTERFACE_ID);
+        return super.refreshItems();
     }
     
-    public full(): Inventory {
-        this.player.getPacketSender().sendMessage("Not enough space in your inventory.");
-        return this;
+    public full(itemId?: number): ItemContainer {
+        if (itemId !== undefined) {
+            return false;
+        } else {
+            this.getPlayer().getPacketSender().sendMessage("Not enough space in your inventory.");
+            return this;
+        }
     }
 }

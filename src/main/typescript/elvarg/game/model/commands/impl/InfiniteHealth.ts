@@ -1,4 +1,3 @@
-
 import { PlayerRights } from '../../../model/rights/PlayerRights';
 import { Command } from '../../../model/commands/Command';
 import { Player } from '../../../entity/impl/player/Player';

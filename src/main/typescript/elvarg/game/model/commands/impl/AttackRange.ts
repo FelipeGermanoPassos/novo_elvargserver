@@ -1,5 +1,12 @@
+import { Command } from "../Command";
+import { Player } from "../../../entity/impl/player/Player";
+import { Graphic } from "../../Graphic";
+import { CombatFactory } from "../../../content/combat/CombatFactory";
+import { Location } from "../../Location";
+import { PlayerRights } from "../../rights/PlayerRights";
+
 class AttackRange implements Command {
-    public static readonly PURPLE_GLOW = new Graphic(332);
+    public static readonly PURPLE_GLOW = new Graphic(332,0);
 
     execute(player: Player, command: string, parts: string[]): void {
         // Player can type a fixed distance or use their current weapon's distance.
@@ -7,15 +14,15 @@ class AttackRange implements Command {
 
         let playerLocation = player.getLocation().clone();
 
-        let startingLocation = player.getLocation().clone().translate(-(distance + 5), -(distance + 5));
+        let startingLocation = player.getLocation().clone().translate(-(distance + 5), -(distance + 5),0);
 
-        let endingLocation = player.getLocation().clone().translate((distance + 5), (distance + 5));
+        let endingLocation = player.getLocation().clone().translate((distance + 5), (distance + 5),0);
 
         let deltas = new Set<Location>();
 
         for (let x = startingLocation.getX(); x <= endingLocation.getX(); x++) {
             for (let y = startingLocation.getY(); y <= endingLocation.getY(); y++) {
-                let currentTile = new Location(x, y);
+                let currentTile: Location = new Location(x, y);
                 if (currentTile.getDistance(playerLocation) != distance) {
                     continue;
                 }
@@ -33,8 +40,10 @@ class AttackRange implements Command {
             console.log(deltas);
         }
 
-        canUse(player: Player): boolean {
-            let rights = player.getRights();
-            return (rights == PlayerRights.OWNER || rights == PlayerRights.DEVELOPER);
-        }
     }
+
+    canUse(player: Player): boolean {
+        let rights = player.getRights();
+        return (rights == PlayerRights.OWNER || rights == PlayerRights.DEVELOPER);
+    }
+}

@@ -112,7 +112,7 @@ export class DuelArenaArea extends Area {
 
     public onPlayerRightClick(player: Player, rightClicked: Player, option: number) {
         if (option == 1) {
-            if (player.isBusy()) {
+            if (player.busy()) {
                 player.getPacketSender().sendMessage("You cannot do that right now.");
                 return;
             }

@@ -1,3 +1,8 @@
+import { Player } from "../../../entity/impl/player/Player";
+import { Command } from "../Command";
+import { World } from "../../../World";
+import { PlayerRights } from "../../rights/PlayerRights";
+
 class SaveAll implements Command {
     execute(player: Player, command: string, parts: string[]) {
         World.savePlayers();

@@ -11,11 +11,22 @@ export class ChangePassword implements Command {
 
         let pass = command.substring(parts[0].length + 1);
         if (pass.length > 3 && pass.length < 20) {
-            player.setPasswordHashWithSalt(PasswordUtil.generatePasswordHashWithSalt(pass));
-            player.getPacketSender().sendMessage("Your password is now: " + pass);
+            this.changePassword(player, pass)
+                .then(() => {
+                    player.getPacketSender().sendMessage("Your password is now: " + pass);
+                })
+                .catch((err) => {
+                    console.error(err);
+                    player.getPacketSender().sendMessage("An error occurred while changing your password.");
+                });
         } else {
             player.getPacketSender().sendMessage("Invalid password input.");
         }
+    }
+
+    private async changePassword(player: Player, pass: string): Promise<void> {
+        const passwordHash = await PasswordUtil.generatePasswordHashWithSalt(pass);
+        player.setPasswordHashWithSalt(passwordHash);
     }
 
     canUse(player: Player): boolean {

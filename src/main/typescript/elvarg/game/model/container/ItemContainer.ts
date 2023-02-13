@@ -2,7 +2,7 @@ import { Item } from "../Item";
 import { Player } from "../../entity/impl/player/Player";
 
 export class ItemContainer {
-    private player: Player;
+    public player: Player;
     public items: Item[] = new Array(this.capacity());
     
     constructor() {
@@ -70,7 +70,7 @@ export class ItemContainer {
         return array;
     }
 
-    setItems(items: Item[]): ItemContainer {
+    public setItems(items: Item[]): ItemContainer {
         this.items = items;
         return this;
     }
@@ -259,7 +259,7 @@ export class ItemContainer {
         return this.items[slot];
     }
 
-    public switchItem(to: ItemContainer, item: Item, slot: number, sort: boolean, refresh: boolean): ItemContainer {
+    public switchItem(to: ItemContainer, item: Item sort: boolean, refresh: boolean): ItemContainer {
         if (this.getItems()[slot].getId() !== item.getId()) {
         return this;
         }

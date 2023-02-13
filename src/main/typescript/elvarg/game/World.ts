@@ -341,7 +341,7 @@ class PlayerSyncTask implements GameSyncTaskInterface {
             NPCUpdating.update(player);
         } catch (e) {
             console.error("Erro ao atualizar jogador: ", e);
-            player.logout();
+            player.onLogout();
             throw new Error("Erro ao atualizar jogador");
         }
     }

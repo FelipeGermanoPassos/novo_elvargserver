@@ -6,7 +6,7 @@ import { Item } from "../../model/Item";
 import { HitDamage } from "../../content/combat/hit/HitDamage";
 import { HitMask } from "../../content/combat/hit/HitMask";
 
-class CombatPoisonEffect extends Task {
+export class CombatPoisonEffect extends Task {
   private entity: Mobile;
   public tick;
 
@@ -65,7 +65,7 @@ enum PoisonType {
   VENOM = 12,
 }
 
-class CombatPoisonData {
+export class CombatPoisonData {
   private static damage: number
   public static types: number[]
   private static tipos = new Map<number, PoisonType>();

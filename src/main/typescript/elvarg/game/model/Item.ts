@@ -2,8 +2,8 @@ import { ItemDefinition } from '../definition/ItemDefinition';
 
 export class Item {
 
-    private id: number;
-    private amount: number;
+    public id: number;
+    public amount: number;
 
     /**
  * An Item object constructor.

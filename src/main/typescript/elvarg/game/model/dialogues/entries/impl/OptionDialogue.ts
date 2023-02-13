@@ -1,4 +1,4 @@
-class OptionDialogue extends Dialogue {
+export class OptionDialogue extends Dialogue {
     private static readonly CHATBOX_INTERFACES = [13760, 2461, 2471, 2482, 2494];
     private action: DialogueOptionAction;
     private title: string;

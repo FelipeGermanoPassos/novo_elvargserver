@@ -1,3 +1,8 @@
+import { ShopCurrencies } from '../shop/currency/ShopCurrencies'
+import { Item } from '../../Item';
+import { ShopCurrency } from './currency/ShopCurrency';
+import { ShopManager } from './ShopManager';
+
 export class Shop {
     public static SALES_TAX_MODIFIER = 0.85;
     public static MAX_SHOP_ITEMS = 1000;
@@ -8,27 +13,16 @@ export class Shop {
     public static INVENTORY_INTERFACE_ID = 3823;
     public static SCROLL_BAR_INTERFACE_ID = 29995;
     public static INFINITY = 2000000000;
-    public static CURRENCY_COINS = ShopCurrencies.COINS.get();
+    public static CURRENCY_COINS = ShopCurrencies.COINS;
     
-    Copy code
-    private id: number;
+    public id: number;
     private name: string;
     private originalStock: Item[];
-    private currentStock: Item[] = new Array(Shop.MAX_SHOP_ITEMS);
+    public currentStock: Item[] = new Array(Shop.MAX_SHOP_ITEMS);
     private restocking: boolean;
-    private currency: ShopCurrency;
+    public currency: ShopCurrency;
 
-    onstructor(id: number, name: string, originalStock: Item[]) {
-        this.id = id;
-        this.name = name;
-        this.originalStock = originalStock;
-        for (let i = 0; i < originalStock.length; i++) {
-            this.currentStock[i] = originalStock[i].clone();
-        }
-        this.currency = CURRENCY_COINS;
-    }
-    
-    constructor(id: number, name: string, originalStock: Item[], currency: ShopCurrency) {
+    constructor(name: string, originalStock: Item[], currency: ShopCurrency = Shop.CURRENCY_COINS, id: number = ShopManager.generateUnusedId()) {
         this.id = id;
         this.name = name;
         this.originalStock = originalStock;
@@ -36,10 +30,6 @@ export class Shop {
             this.currentStock[i] = originalStock[i].clone();
         }
         this.currency = currency;
-    }
-    
-    constructor(name: string, originalStock: Item[], currency: ShopCurrency) {
-        this(ShopManager.generateUnusedId(), name, originalStock, currency);
     }
     
     removeItem(itemId: number, amount: number) {
@@ -89,7 +79,7 @@ export class Shop {
             if (!item) continue;
             amount++;
         }
-        return (amount >= this.MAX_SHOP_ITEMS);
+        return (amount >= Shop.MAX_SHOP_ITEMS);
     }
     
     getAmount(itemId: number, fromOriginalStock: boolean): number {

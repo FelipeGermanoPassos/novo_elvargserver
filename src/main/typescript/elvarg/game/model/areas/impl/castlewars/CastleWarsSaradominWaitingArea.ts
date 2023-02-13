@@ -96,9 +96,7 @@ class CastleWarsSaradominWaitingArea extends Area {
         }
 
          // Update the interface
-         player.getPacketSender().sendString(CastleWars.START_GAME_TASK.isRunning() ?
-         "Time until next game starts: " + Math.floor(CastleWars.START_GAME_TASK.getRemainingTicks())
-         : "Waiting for players to join the other team.", 11480);
+        player.getPacketSender().sendString(11480, "Waiting for players to join the other team.");
 
         // Send the interface
         player.getPacketSender().sendWalkableInterface(11479);

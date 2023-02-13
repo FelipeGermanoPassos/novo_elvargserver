@@ -1,3 +1,9 @@
+import { World } from "../../../World";
+import { Command } from "../Command";
+import { Player } from "../../../entity/impl/player/Player";
+import { PlayerRights } from "../../rights/PlayerRights";
+import { NpcSpawnDefinitionLoader } from "../../../definition/loader/impl/NpcSpawnDefinitionLoader";
+
 class ReloadNPCSpawns implements Command {
     execute(player: Player, command: string, parts: string[]): void {
         try {

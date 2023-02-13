@@ -1,4 +1,4 @@
-import {World} from '../game/Worlds'
+import {World} from '../game/World'
 
 
 
