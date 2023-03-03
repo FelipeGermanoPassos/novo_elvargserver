@@ -1,3 +1,20 @@
+import { PacketExecutor } from "../PacketExecutor";
+import { WeaponInterfaces } from "../../../game/content/combat/WeaponInterfaces";
+import { Player } from "../../../game/entity/impl/player/Player";
+import { Packet } from "../Packet";
+import { ItemInSlot } from "../../../game/model/ItemInSlot";
+import { Inventory } from "../../../game/model/container/impl/Inventory";
+import { Item } from "../../../game/model/Item";
+import { Equipment } from "../../../game/model/container/impl/Equipment";
+import { Skill } from "../../../game/model/Skill";
+import { Misc } from "../../../util/Misc";
+import { Server } from "../../../Server";
+import { DuelRule } from "../../../game/content/Duelling";
+import { GameConstants } from "../../../game/GameConstants";
+import { Flag } from "../../../game/model/Flag";
+import { BonusManager } from "../../../game/model/equipment/BonusManager";
+
+
 export class EquipPacketListener implements PacketExecutor {
 
 	public static resetWeapon(player: Player, deactivateSpecialAttack: boolean) {
@@ -20,7 +37,7 @@ export class EquipPacketListener implements PacketExecutor {
 		EquipPacketListener.equip(player, itemInSlot.getId(), itemInSlot.getSlot(), Inventory.INTERFACE_ID);
 	}
 
-	public static void equip(Player player, int id, int slot, int interfaceId) {
+	public static equip(player: Player, id, slot: number, interfaceId: number): void{
 
 		// Validate player..
 		if (player == null || player.getHitpoints() <= 0) {
@@ -33,7 +50,7 @@ export class EquipPacketListener implements PacketExecutor {
 		}
 
 		// Check if the item in the slot matches the one requested to be wielded..
-		Item item = player.getInventory().getItems()[slot].clone();
+		let item: Item = player.getInventory().getItems()[slot].clone();
 		if (item.getId() != id) {
 			return;
 		}
@@ -72,7 +89,7 @@ export class EquipPacketListener implements PacketExecutor {
 				}
 
 				// Check if the item has a proper equipment slot..
-				int equipmentSlot = item.getDefinition().getEquipmentType().getSlot();
+				let equipmentSlot: number = item.getDefinition().getEquipmentType().getSlot();
 				if (equipmentSlot == -1) {
 					Server.getLogger()
 						.info("Attempting to equip item " + item.getId() + " which has no defined equipment slot.");
@@ -86,7 +103,7 @@ export class EquipPacketListener implements PacketExecutor {
 
 				// Handle duel arena settings..
 				if (player.getDueling().inDuel()) {
-					for (int i = 11; i < player.getDueling().getRules().length; i++) {
+					for (let i: number = 11; i < player.getDueling().getRules().length; i++) {
 						if (player.getDueling().getRules()[i]) {
 							DuelRule duelRule = DuelRule.forId(i);
 							if (equipmentSlot == duelRule.getEquipmentSlot()
@@ -104,26 +121,26 @@ export class EquipPacketListener implements PacketExecutor {
 					}
 				}
 
-				Item equipItem = player.getEquipment().forSlot(equipmentSlot).clone();
+				let equipItem: Item = player.getEquipment().forSlot(equipmentSlot).clone();
 				if (equipItem.getDefinition().isStackable() && equipItem.getId() == item.getId()) {
-					int amount = equipItem.getAmount() + item.getAmount() <= Integer.MAX_VALUE
+					let amount: number = equipItem.getAmount() + item.getAmount() <= Number.MAX_VALUE
 						? equipItem.getAmount() + item.getAmount()
-						: Integer.MAX_VALUE;
-					player.getInventory().delete(item, false);
+						: Number.MAX_VALUE;
+					player.getInventory().delete(amount);
 					player.getEquipment().getItems()[equipmentSlot].setAmount(amount);
 					equipItem.setAmount(amount);
 				} else {
 					if (item.getDefinition().isDoubleHanded() && equipmentSlot == Equipment.WEAPON_SLOT) {
 
-						int slotsRequired = player.getEquipment().isSlotOccupied(Equipment.SHIELD_SLOT)
+						let slotsRequired: Number= player.getEquipment().isSlotOccupied(Equipment.SHIELD_SLOT)
 							&& player.getEquipment().isSlotOccupied(Equipment.WEAPON_SLOT) ? 1 : 0;
 						if (player.getInventory().getFreeSlots() < slotsRequired) {
 							player.getInventory().full();
 							return;
 						}
 
-						Item shield = player.getEquipment().getItems()[Equipment.SHIELD_SLOT];
-						Item weapon = player.getEquipment().getItems()[Equipment.WEAPON_SLOT];
+						let shield: Item = player.getEquipment().getItems()[Equipment.SHIELD_SLOT];
+						let weapon: Item = player.getEquipment().getItems()[Equipment.WEAPON_SLOT];
 						player.getEquipment().set(Equipment.SHIELD_SLOT, new Item(-1, 0));
 						// player.getInventory().delete(item);
 						player.getEquipment().set(equipmentSlot, item);
@@ -131,10 +148,10 @@ export class EquipPacketListener implements PacketExecutor {
 						if (weapon.getId() != -1) {
 							player.getInventory().setItem(slot, weapon);
 						} else
-							player.getInventory().delete(item);
+							player.getInventory().delete(item.amount);
 
 						if (shield.getId() != -1) {
-							player.getInventory().add(shield);
+							player.getInventory().add(shield.amount);
 						}
 
 					} else if (equipmentSlot == Equipment.SHIELD_SLOT
@@ -142,13 +159,13 @@ export class EquipPacketListener implements PacketExecutor {
 						player.getInventory().setItem(slot, player.getEquipment().getItems()[Equipment.WEAPON_SLOT]);
 						player.getEquipment().setItem(Equipment.WEAPON_SLOT, new Item(-1));
 						player.getEquipment().setItem(Equipment.SHIELD_SLOT, item);
-						resetWeapon(player, true);
+						EquipPacketListener.resetWeapon(player, true);
 					} else {
 						if (equipmentSlot == equipItem.getDefinition().getEquipmentType().getSlot()
 							&& equipItem.getId() != -1) {
 							if (player.getInventory().contains(equipItem.getId())) {
-								player.getInventory().delete(item, false);
-								player.getInventory().add(equipItem, false);
+								player.getInventory().delete(item.amount);
+								player.getInventory().add(equipItem.amount);
 							} else {
 								player.getInventory().setItem(slot, equipItem);
 							}
@@ -161,7 +178,7 @@ export class EquipPacketListener implements PacketExecutor {
 				}
 
 				if (equipmentSlot == Equipment.WEAPON_SLOT) {
-					resetWeapon(player, true);
+					EquipPacketListener.resetWeapon(player, true);
 				}
 
 				if (player.getEquipment().get(Equipment.WEAPON_SLOT).getId() != 4153) {

@@ -7,9 +7,9 @@ import { Mobile } from "../../../../../entity/impl/Mobile";
 import { CombatSpecial } from "../../../CombatSpecial";
 import { GraphicHeight } from "../../../../../model/GraphicHeight";
 import { Player } from '../../../../../entity/impl/player/Player';
-class AbyssalWhipCombatMethod extends MeleeCombatMethod {
-    private static readonly ANIMATION = new Animation(1658, Priority.HIGH);
-    private static readonly GRAPHIC = new Graphic(341, GraphicHeight.HIGH, Priority.HIGH);
+export class AbyssalWhipCombatMethod extends MeleeCombatMethod {
+    private static readonly ANIMATION = new Animation(1658);
+    private static readonly GRAPHIC = new Graphic(341, GraphicHeight.HIGH);
 
     start(character: Mobile, target: Mobile) {
         CombatSpecial.drain(character, CombatSpecial.ABYSSAL_WHIP.getDrainAmount());

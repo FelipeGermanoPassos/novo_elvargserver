@@ -10,9 +10,9 @@ import { CombatFactory } from "../../../CombatFactory";
 import { Misc } from "../../../../../../util/Misc";
 import { PoisonType } from "../../../../../task/impl/CombatPoisonEffect";
 
-class AbyssalTentacleCombatMethod extends MeleeCombatMethod {
-    private static readonly ANIMATION = new Animation(1658, Priority.HIGH);
-    private static readonly GRAPHIC = new Graphic(181, GraphicHeight.HIGH, Priority.HIGH);
+export class AbyssalTentacleCombatMethod extends MeleeCombatMethod {
+    private static readonly ANIMATION = new Animation(1658);
+    private static readonly GRAPHIC = new Graphic(181, GraphicHeight.HIGH);
 
     start(character: Mobile, target: Mobile) {
         CombatSpecial.drain(character, CombatSpecial.ABYSSAL_TENTACLE.getDrainAmount());

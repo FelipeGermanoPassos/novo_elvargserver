@@ -30,7 +30,7 @@ export class Sound {
 
     // woodcutting sounds
 
-    public static WOODCUTTING_CHOP = { id: 472, volume: 1, delay: 10, loopType: 0 }
+    public static readonly WOODCUTTING_CHOP = { id: 472, volume: 1, delay: 10, loopType: 0 };
 
     public static WOODCUTTING_TREE_DOWN = { id: 473, volume: 1, delay: 0, loopType: 0 }
 
@@ -60,7 +60,7 @@ export class Sound {
     public static WEAPON_WHIP = { id: 1080, volume: 1, delay: 25, loopType: 0 }
 
     // Special attack
-    public static DRAGON_DAGGER_SPECIAL = { id: 385, volume: 1, delay: 25, loopType: 0 }
+    public static readonly DRAGON_DAGGER_SPECIAL = { id: 385, volume: 1, delay: 25, loopType: 0 }
 
     // Spell sounds
 

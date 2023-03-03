@@ -1,4 +1,5 @@
 import {IsaacRandom} from '../security/IsaacRandom';
+import { ChannelHandlerContext } from 'netty'
 
 export class LoginDetailsMessage {
     private readonly context: ChannelHandlerContext;

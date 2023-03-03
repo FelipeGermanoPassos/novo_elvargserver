@@ -7,7 +7,7 @@ import { CombatSpecial } from "../../../CombatSpecial";
 
 export class ArmadylGodswordCombatMethod extends MeleeCombatMethod {
 
-    private static readonly ANIMATION = new Animation(7644, Priority.HIGH);
+    private static readonly ANIMATION = new Animation(7644);
     private static readonly GRAPHIC = new Graphic(1211, Priority.HIGH);
 
     start(character: Mobile, target: Mobile): void {

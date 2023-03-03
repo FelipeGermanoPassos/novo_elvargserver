@@ -20,6 +20,11 @@ export class MobileList<E extends Mobile> implements Iterable<E> {
             this.slotQueue.add(i);
         }
     }
+    [Symbol.iterator](): Iterator<E, any, undefined> {
+        throw new Error('Method not implemented.');
+    }
+
+    
 
     public add(e: E): boolean {
         if (e === null) {

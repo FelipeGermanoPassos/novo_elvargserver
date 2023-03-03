@@ -1,4 +1,10 @@
-class MagicOnPlayerPacketListener implements PacketExecutor {
+import { World } from "../../../game/World";
+import { Player } from "../../../game/entity/impl/player/Player";
+import { Packet } from "../Packet";
+import { PacketExecutor } from "../PacketExecutor";
+import { CombatSpells } from "../../../game/content/combat/magic/CombatSpells";
+
+export class MagicOnPlayerPacketListener implements PacketExecutor {
     execute(player: Player, packet: Packet) {
         let playerIndex = packet.readShortA();
 

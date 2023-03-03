@@ -1,6 +1,13 @@
+import { ItemIdentifiers } from "../../../../../util/ItemIdentifiers";
+import { Skill, Skills} from "../../../../model/Skill";
+import { Player } from "../../../../entity/impl/player/Player";
+import { PetHandler } from "../../../PetHandler";
+import { Graphic } from "../../../../model/Graphic";
+import { Animation } from "../../../../model/Animation";
+
 export class Runecrafting {
-    private static CRAFT_RUNES_GRAPHIC = { id: 186 };
-    private static CRAFT_RUNES_ANIMATION = { id: 791 };
+    private static CRAFT_RUNES_GRAPHIC = new Graphic(186);
+    private static CRAFT_RUNES_ANIMATION = new Animation(791);
 
     static initialize(player: Player, objectId: number): boolean {
         let rune = Rune.forId(objectId);
@@ -27,16 +34,16 @@ export class Runecrafting {
                     return true;
                 }
             }
-            player.performGraphic(CRAFT_RUNES_GRAPHIC);
-            player.performAnimation(CRAFT_RUNES_ANIMATION);
-			int craftAmount = craftAmount(rune.get(), player);
-			int xpGain = 0;
-            for (int i = 0; i < 28; i++) {
+            player.performGraphic(Runecrafting.CRAFT_RUNES_GRAPHIC);
+            player.performAnimation(Runecrafting.CRAFT_RUNES_ANIMATION);
+			let craftAmount: number = this.craftAmount(rune.get(), player);
+            let xpGain: number = 0;
+            for (let i = 0; i < 28; i++) {
                 if (!player.getInventory().contains(essence)) {
-                    break;
+                break;
                 }
-                player.getInventory().delete(essence, 1);
-                player.getInventory().add(rune.get().getRuneID(), craftAmount);
+                player.getInventory().deleteNumber(essence, 1);
+                player.getInventory().adds(rune.get().getRuneID(), craftAmount);
                 xpGain += rune.get().getXP();
             }
 
@@ -52,7 +59,7 @@ export class Runecrafting {
     private static craftAmount(rune: Rune, player: Player) {
         let amount = 1;
         switch (rune) {
-            case Rune.AIR_RUNE:
+            case AIR_RUNE:
                 if (player.getSkillManager().getMaxLevel(Skill.RUNECRAFTING) >= 11)
                     amount = 2;
                 if (player.getSkillManager().getMaxLevel(Skill.RUNECRAFTING) >= 22)
@@ -73,29 +80,29 @@ export class Runecrafting {
                     if (player.getSkillManager().getMaxLevel(Skill.RUNECRAFTING) >= 99)
                         amount = 10;
                 break;
-            case ASTRAL_RUNE:
+            case Rune.ASTRAL_RUNE:
                 if (player.getSkillManager().getMaxLevel(Skill.RUNECRAFTING) >= 82)
                     amount = 2;
                 break;
-            case BLOOD_RUNE:
+            case Rune.BLOOD_RUNE:
                 break;
-            case BODY_RUNE:
+            case Rune.BODY_RUNE:
                 if (player.getSkillManager().getMaxLevel(Skill.RUNECRAFTING) >= 46)
                     amount = 2;
                 if (player.getSkillManager().getMaxLevel(Skill.RUNECRAFTING) >= 92)
                     amount = 3;
                 break;
-            case CHAOS_RUNE:
+            case Rune.CHAOS_RUNE:
                 if (player.getSkillManager().getMaxLevel(Skill.RUNECRAFTING) >= 74)
                     amount = 2;
                 break;
-            case COSMIC_RUNE:
+            case Rune.COSMIC_RUNE:
                 if (player.getSkillManager().getMaxLevel(Skill.RUNECRAFTING) >= 59)
                     amount = 2;
                 break;
-            case DEATH_RUNE:
+            case Rune.DEATH_RUNE:
                 break;
-            case EARTH_RUNE:
+            case Rune.EARTH_RUNE:
                 if (player.getSkillManager().getMaxLevel(Skill.RUNECRAFTING) >= 26)
                     amount = 2;
                 if (player.getSkillManager().getMaxLevel(Skill.RUNECRAFTING) >= 52)
@@ -103,15 +110,15 @@ export class Runecrafting {
                 if (player.getSkillManager().getMaxLevel(Skill.RUNECRAFTING) >= 78)
                     amount = 4;
                 break;
-            case FIRE_RUNE:
+            case Rune.FIRE_RUNE:
                 if (player.getSkillManager().getMaxLevel(Skill.RUNECRAFTING) >= 35)
                     amount = 2;
                 if (player.getSkillManager().getMaxLevel(Skill.RUNECRAFTING) >= 70)
                     amount = 3;
                 break;
-            case LAW_RUNE:
+            case Rune.LAW_RUNE:
                 break;
-            case MIND_RUNE:
+            case Rune.MIND_RUNE:
                 if (player.getSkillManager().getMaxLevel(Skill.RUNECRAFTING) >= 14)
                     amount = 2;
                 if (player.getSkillManager().getMaxLevel(Skill.RUNECRAFTING) >= 28)
@@ -127,11 +134,11 @@ export class Runecrafting {
                 if (player.getSkillManager().getMaxLevel(Skill.RUNECRAFTING) >= 98)
                     amount = 8;
                 break;
-            case NATURE_RUNE:
+            case Rune.NATURE_RUNE:
                 if (player.getSkillManager().getMaxLevel(Skill.RUNECRAFTING) >= 91)
                     amount = 2;
                 break;
-            case WATER_RUNE:
+            case Rune.WATER_RUNE:
                 if (player.getSkillManager().getMaxLevel(Skill.RUNECRAFTING) >= 19)
                     amount = 2;
                 if (player.getSkillManager().getMaxLevel(Skill.RUNECRAFTING) >= 38)
@@ -148,12 +155,200 @@ export class Runecrafting {
         }
         return amount;
     }
+}
 
-    const runes = new Map<number, Rune>();
+class Talisman {
+
+    AIR_TALISMAN = { id: 1438, level: 1, location: { x: 2841, y: 4828 } };
+    MIND_TALISMAN = { id: 1448, level: 2, location: { x: 2793, y: 4827 } };
+    WATER_TALISMAN = { id: 1444, level: 5, location: { x: 2720, y: 4831 } };
+    EARTH_TALISMAN = { id: 1440, level: 9, location: { x: 2655, y: 4829 } };
+    FIRE_TALISMAN = { id: 1442, level: 14, location: { x: 2576, y: 4846 } };
+    BODY_TALISMAN = { id: 1446, level: 20, location: { x: 2522, y: 4833 } };
+    COSMIC_TALISMAN = { id: 1454, level: 27, location: { x: 2163, y: 4833 } };
+    CHAOS_TALISMAN = { id: 1452, level: 35, location: { x: 2282, y: 4837 } };
+    NATURE_TALISMAN = { id: 1462, level: 44, location: { x: 2400, y: 4834 } };
+    LAW_TALISMAN = { id: 1458, level: 54, location: { x: 2464, y: 4817 } };
+    DEATH_TALISMAN = { id: 1456, level: 65, location: { x: 2208, y: 4829 } };
+    BLOOD_TALISMAN = { id: 1450, level: 77, location: { x: 1722, y: 3826 } };
+
+    private static talismans: Map<number, Talisman> = new Map<number, Talisman>();
+
+    static initialize() {
+        for (let t of Object.values(Talisman)) {
+            this.talismans.set(t.talismanId, t);
+        }
+    }
+
+    constructor(public talismanId: number, public levelReq: number, public location: Location) { }
+
+    static forId(itemId: number): Talisman | undefined {
+        return this.talismans.get(itemId);
+    }
+
+    getItemId(): number {
+        return this.talismanId;
+    }
+
+    getLevelRequirement(): number {
+        return this.levelReq;
+    }
+
+    getPosition(): Location {
+        return { ...this.location };
+    }
+}
+
+export class Pouch  {
+    private static pouches: Map<number, Pouch> = new Map<number, Pouch>();
+
+    public static SMALL_POUCH = { id: 5509, level: 1, capacity: 3, time: -1 };
+    public static MEDIUM_POUCH = { id: 5510, level: 25, capacity: 6, time: 45 };
+    public static LARGE_POUCH = { id: 5512, level: 50, capacity: 9, time: 29 };
+    public static GIANT_POUCH = { id: 5514, level: 75, capacity: 12, time: 10 };
+
+    public static initialize() {
+        for (let p of Object.values(Pouch)) {
+            Pouch.pouches.set(p.itemId, p);
+        }
+    }
+
+    constructor(public itemId: number, public requiredLevel: number, public capacity: number, public decayChance: number) { }
+
+    public static forItemId(itemId: number): Pouch | undefined {
+        return Pouch.pouches.get(itemId);
+    }
+
+    public  getitemId(): number {
+        return this.itemId;
+    }
+
+    public getrequiredLevel(): number {
+        return this.requiredLevel;
+    }
+
+    public getcapacity(): number {
+        return this.capacity;
+    }
+
+    public getdecayChance(): number {
+        return this.decayChance;
+    }
+}
+
+export class PouchContainer {
+    pouch: Pouch;
+    runeEssenceAmt: number;
+    pureEssenceAmt: number;
+
+    constructor(pouch: Pouch, runeEssence?: number, pureEssence?: number) {
+        this.pouch = pouch;
+        this.runeEssenceAmt = runeEssence;
+        this.pureEssenceAmt = pureEssence;
+    }
+
+    public store(player: Player) {
+        if (this.getStoredAmount() >= this.pouch.capacity) {
+            player.sendMessage("Your pouch is already full.");
+            return;
+        }
+        if (player.getSkillManager().getMaxLevel(Skill.RUNECRAFTING) < this.pouch.requiredLevel) {
+            player.sendMessage(
+                "You need a Runecrafting level of at least " +
+                this.pouch.requiredLevel +
+                " to use this."
+            );
+            return;
+        }
+
+        for (let i = this.getStoredAmount(); i < this.pouch.capacity; i++) {
+            if (player.getInventory().contains(ItemIdentifiers.PURE_ESSENCE)) {
+                player.getInventory().deleteNumber(ItemIdentifiers.PURE_ESSENCE, 1);
+                this.pureEssenceAmt++;
+            } else if (player.getInventory().contains(ItemIdentifiers.RUNE_ESSENCE)) {
+                player.getInventory().deleteNumber(ItemIdentifiers.RUNE_ESSENCE, 1);
+                this.runeEssenceAmt++;
+            } else {
+                player.getPacketSender().sendMessage("You don't have any more essence to store.");
+                break;
+            }
+        }
+    }
+
+    public withdraw(player: Player) {
+        let total = this.getStoredAmount();
+        if (total === 0) {
+            player.sendMessage("Your pouch is already empty.");
+            return;
+        }
+        for (let i = 0; i < total; i++) {
+            if (player.getInventory().isFull()) {
+                player.getInventory().full();
+                break;
+            }
+            if (this.pureEssenceAmt > 0) {
+                player.getInventory().adds(ItemIdentifiers.PURE_ESSENCE, 1);
+                this.pureEssenceAmt--;
+            } else if (this.runeEssenceAmt > 0) {
+                player.getInventory().adds(ItemIdentifiers.RUNE_ESSENCE, 1);
+                this.runeEssenceAmt--;
+            } else {
+                player.getPacketSender().sendMessage("You don't have any more essence to withdraw.");
+                break;
+            }
+            }
+    }
+
+    public check(player: Player) {
+        player.sendMessage(
+            "Your " +
+            this.pouch.toString().replace("_", " ") +
+            " contains " +
+            this.runeEssenceAmt +
+            " Rune essence and " +
+            this.pureEssenceAmt +
+            " Pure essence."
+        );
+    }
+
+    public getStoredAmount(): number {
+        return this.runeEssenceAmt + this.pureEssenceAmt;
+    }
+
+    public getStoredRuneEssence(): number {
+        return this.runeEssenceAmt;
+    }
+
+    public getStoredPureEssence(): number {
+        return this.pureEssenceAmt;
+    }
+
+    public getPouch(): Pouch {
+        return this.pouch;
+    }
+
+}
+
+export class Rune {
+    public static readonly AIR_RUNE = new Rune(556, 1, 5, 14897, false );
+    public static readonly MIND_RUNE = new Rune(558, 2, 6, 14898, false );
+    public static readonly WATER_RUNE = new Rune(555, 5, 7, 14899, false );
+    public static readonly EARTH_RUNE = new Rune(557, 9, 8, 14900, false );
+    public static readonly FIRE_RUNE = new Rune(554, 14, 9, 14901, false );
+    public static readonly BODY_RUNE = new Rune(559, 20, 10, 14902, false );
+    public static readonly COSMIC_RUNE = new Rune(564, 27, 11,  14903, true );
+    public static readonly CHAOS_RUNE = new Rune(562, 35, 12, 14906, true );
+    public static readonly ASTRAL_RUNE = new Rune(9075, 40, 13, 14911, true );
+    public static readonly NATURE_RUNE = new Rune(561, 44, 14, 14905, true );
+    public static readonly LAW_RUNE = new Rune(563, 54, 15, 14904, true );
+    public static readonly DEATH_RUNE = new Rune(560, 65, 16, 14907, true );
+    public static readonly BLOOD_RUNE = new Rune(565,  75, 27, 27978, true );
+
+    static runes: Map<number, Rune> = new Map<number, Rune>();
 
     static {
-        for (const rune of Rune.values()) {
-            runes.set(rune.getObjectId(), rune);
+        for (const rune of Object.values(Rune)) {
+            this.runes.set(rune.getObjectId(), rune);
         }
     }
 
@@ -171,8 +366,8 @@ export class Runecrafting {
         this.pureRequired = pureRequired;
     }
 
-    public static forId(objectId: number): Optional<Rune> {
-        return runes.get(objectId) || undefined;
+    public static forId(objectId: number): Rune | undefined {
+        return this.runes.get(objectId);
     }
 
     public getRuneID(): number {
@@ -196,203 +391,3 @@ export class Runecrafting {
     }
 }
 
-class Talisman {
-    private static talismans: Map<number, Talisman> = new Map<number, Talisman>();
-    static initialize() {
-        for (let t of Object.values(TalismanEnum)) {
-            talismans.set(t.talismanId, t);
-        }
-    }
-
-    constructor(public talismanId: number, public levelReq: number, public location: Location) { }
-
-    static forId(itemId: number): Talisman | undefined {
-        return talismans.get(itemId);
-    }
-
-    getItemId(): number {
-        return this.talismanId;
-    }
-
-    getLevelRequirement(): number {
-        return this.levelReq;
-    }
-
-    getPosition(): Location {
-        return { ...this.location };
-    }
-}
-
-export class Pouch {
-    private static pouches: Map<number, Pouch> = new Map<number, Pouch>();
-
-    public static SMALL_POUCH = { id: 5509, level: 1, capacity: 3, time: -1 }
-    public static MEDIUM_POUCH = { id: 5510, level: 25, capacity: 6, time: 45 }
-    public static LARGE_POUCH = { id: 5512, level: 50, capacity: 9, time: 29 }
-    public static GIANT_POUCH = { id: 5514, level: 75, capacity: 12, time: 10 }
-
-    public static initialize() {
-        for (let p of Object.values(PouchEnum)) {
-            pouches.set(p.itemId, p);
-        }
-    }
-
-    constructor(public itemId: number, public requiredLevel: number, public capacity: number, public decayChance: number) { }
-
-    public static forItemId(itemId: number): Pouch | undefined {
-        return pouches.get(itemId);
-    }
-
-    public static getitemId(): number {
-        return this.itemId;
-    }
-
-    public static getrequiredLevel(): number {
-        return this.requiredLevel;
-    }
-
-    public static getcapacity(): number {
-        return this.capacity;
-    }
-
-    public static getdecayChance(): number {
-        return this.decayChance;
-    }
-}
-
-export class PouchContainer {
-    pouch: Pouch;
-    runeEssenceAmt: number;
-    pureEssenceAmt: number;
-    constructor(pouch: Pouch, runeEssence?: number, pureEssence?: number) {
-        this.pouch = pouch;
-        this.runeEssenceAmt = runeEssence;
-        this.pureEssenceAmt = pureEssence;
-    }
-
-    store(player: Player) {
-        if (this.getStoredAmount() >= this.pouch.capacity) {
-            player.sendMessage("Your pouch is already full.");
-            return;
-        }
-        if (player.getSkillLevel(Skill.RUNECRAFTING) < this.pouch.requiredLevel) {
-            player.sendMessage(
-                "You need a Runecrafting level of at least " +
-                this.pouch.requiredLevel +
-                " to use this."
-            );
-            return;
-        }
-
-        for (let i = this.getStoredAmount(); i < this.pouch.capacity; i++) {
-            if (player.hasItem(ItemIdentifiers.PURE_ESSENCE)) {
-                player.removeItem(ItemIdentifiers.PURE_ESSENCE, 1);
-                this.pureEssenceAmt++;
-            } else if (player.getInventory().contains(ItemIdentifiers.RUNE_ESSENCE)) {
-                player.getInventory().delete(ItemIdentifiers.RUNE_ESSENCE, 1);
-                runeEssenceAmt++;
-            } else {
-                player.getPacketSender().sendMessage("You don't have any more essence to store.");
-                break;
-            }
-        }
-    }
-
-    withdraw(player: Player) {
-        let total = this.getStoredAmount();
-        if (total === 0) {
-            player.sendMessage("Your pouch is already empty.");
-            return;
-        }
-        for (let i = 0; i < total; i++) {
-            if (player.isInventoryFull()) {
-                player.sendMessage("You do not have enough inventory space.");
-                break;
-            }
-            if (this.pureEssenceAmt > 0) {
-                player.addItem(ItemIdentifiers.PURE_ESSENCE, 1);
-                this.pureEssenceAmt--;
-            } else if (this.runeEssenceAmt > 0) {
-                player.addItem(ItemIdentifiers.RUNE_ESSENCE, 1);
-                this.runeEssenceAmt--;
-            } else {
-                player.sendMessage("You don't have any more essence to withdraw.");
-                break;
-            }
-        }
-    }
-
-    check(player: Player) {
-        player.sendMessage(
-            "Your " +
-            this.pouch.toString().replace("_", " ") +
-            " contains " +
-            this.runeEssenceAmt +
-            " Rune essence and " +
-            this.pureEssenceAmt +
-            " Pure essence."
-        );
-    }
-
-    getStoredRuneEssence(): number {
-        return this.runeEssenceAmt;
-    }
-
-    getStoredPureEssence(): number {
-        return this.pureEssenceAmt;
-    }
-
-    getPouch(): Pouch {
-        return this.pouch;
-    }
-
-}
-
-enum Rune {
-    AIR_RUNE = { id: 556, level: 1, craftAmount: 5, animationId: 14897, pureEssence: false },
-    MIND_RUNE = { id: 558, level: 2, craftAmount: 6, animationId: 14898, pureEssence: false },
-    WATER_RUNE = { id: 555, level: 5, craftAmount: 7, animationId: 14899, pureEssence: false },
-    EARTH_RUNE = { id: 557, level: 9, craftAmount: 8, animationId: 14900, pureEssence: false },
-    FIRE_RUNE = { id: 554, level: 14, craftAmount: 9, animationId: 14901, pureEssence: false },
-    BODY_RUNE = { id: 559, level: 20, craftAmount: 10, animationId: 14902, pureEssence: false },
-    COSMIC_RUNE = { id: 564, level: 27, craftAmount: 11, animationId: 14903, pureEssence: true },
-    CHAOS_RUNE = { id: 562, level: 35, craftAmount: 12, animationId: 14906, pureEssence: true },
-    ASTRAL_RUNE = { id: 9075, level: 40, craftAmount: 13, animationId: 14911, pureEssence: true },
-    NATURE_RUNE = { id: 561, level: 44, craftAmount: 14, animationId: 14905, pureEssence: true },
-    LAW_RUNE = { id: 563, level: 54, craftAmount: 15, animationId: 14904, pureEssence: true },
-    DEATH_RUNE = { id: 560, level: 65, craftAmount: 16, animationId: 14907, pureEssence: true },
-    BLOOD_RUNE = { id: 565, level: 75, craftAmount: 27, animationId: 27978, pureEssence: true }
-}
-
-enum Talisman {
-    AIR_TALISMAN = { id: 1438, level: 1, location: { x: 2841, y: 4828 } },
-    MIND_TALISMAN = { id: 1448, level: 2, location: { x: 2793, y: 4827 } },
-    WATER_TALISMAN = { id: 1444, level: 5, location: { x: 2720, y: 4831 } },
-    EARTH_TALISMAN = { id: 1440, level: 9, location: { x: 2655, y: 4829 } },
-    FIRE_TALISMAN = { id: 1442, level: 14, location: { x: 2576, y: 4846 } },
-    BODY_TALISMAN = { id: 1446, level: 20, location: { x: 2522, y: 4833 } },
-    COSMIC_TALISMAN = { id: 1454, level: 27, location: { x: 2163, y: 4833 } },
-    CHAOS_TALISMAN = { id: 1452, level: 35, location: { x: 2282, y: 4837 } },
-    NATURE_TALISMAN = { id: 1462, level: 44, location: { x: 2400, y: 4834 } },
-    LAW_TALISMAN = { id: 1458, level: 54, location: { x: 2464, y: 4817 } },
-    DEATH_TALISMAN = { id: 1456, level: 65, location: { x: 2208, y: 4829 } },
-    BLOOD_TALISMAN = { id: 1450, level: 77, location: { x: 1722, y: 3826 } },
-}
-
-interface Pouch {
-    id: number;
-    level: number;
-    capacity: number;
-    time: number;
-}
-
-interface Location {
-    x: number;
-    y: number;
-}
-
-interface Talisman {
-    talismanId: number;
-    levelReq: number;
-    location: Location;
-}

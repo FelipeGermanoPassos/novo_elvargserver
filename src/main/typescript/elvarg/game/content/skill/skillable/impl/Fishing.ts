@@ -1,38 +1,54 @@
-export class Blessing extends DefaultSkillable {
-    public static CASKET_ITEMS = [new Item(1061), new Item(592), new Item(1059), new Item(995, 100000), new Item(4212), new Item(995, 50000), new Item(401), new Item(995, 150000), new Item(407)];
-    private fishSpot: NPC;
-    private tool: BlessingTool;
+import { Skill } from "../../../../model/Skill";
+import { Item } from "../../../../model/Item";
+import { TaskManager } from "../../../../task/TaskManager"
+import { PetHandler } from "../../../PetHandler";
+import { Player } from "../../../../entity/impl/player/Player";
+import { NPC } from "../../../../entity/impl/npc/NPC";
+import { ItemDefinition } from "../../../../definition/ItemDefinition";
+import { Task } from "../../../../task/Task";
+import { Misc } from "../../../../../util/Misc";
+import { DefaultSkillable } from "./DefaultSkillable";
 
-    constructor(fishSpot: NPC, tool: BlessingTool) {
-        super();
+class FishingTask extends Task{
+    constructor(n: number, player: Player, b: boolean){
+        super(n, b);
+    }
+    execute(): void {
+        
+    }
+    
+}
+
+public class Fishing extends DefaultSkillable {
+    public loopRequirements(): boolean {
+        return true;
+    }
+    public allowFullInventory(): boolean {
+        return false;
+    }
+        public static readonly CASKET_ITEMS: Item[]  = [new Item(1061), new Item(592), new Item(1059), new Item(995, 100000), new Item(4212), new Item(995, 50000), new Item(401), new Item(995, 150000), new Item(407)];
+        private fishSpot: NPC;
+        private tool: BlessingTool;
+    
+    public Fishing(fishSpot: NPC, tool: BlessingTool) {
         this.fishSpot = fishSpot;
         this.tool = tool;
     }
-
-    public class Fishing extends DefaultSkillable {
-        public static readonly Item[] CASKET_ITEMS = [new Item(1061), new Item(592), new Item(1059), new Item(995, 100000), new Item(4212), new Item(995, 50000), new Item(401), new Item(995, 150000), new Item(407)];
-        private final NPC fishSpot;
-        private final BlessingTool tool;
     
-        public Fishing(NPC fishSpot, BlessingTool tool) {
-        this.fishSpot = fishSpot;
-        this.tool = tool;
-    }
-    
-        public hasRequirements(Player player: Player): boolean {
-        if (!player.getInventory().contains(tool.getId())) {
-            player.getPacketSender().sendMessage("You need a " + ItemDefinition.forId(tool.getId()).getName().toLowerCase() + " to do this.");
+    public hasRequirements(player: Player): boolean {
+        if (!player.getInventory().contains(this.tool.getId())) {
+            player.getPacketSender().sendMessage("You need a " + ItemDefinition.forId(this.tool.getId()).getName().toLowerCase() + " to do this.");
             return false;
         }
 
-        if (player.getSkillManager().getCurrentLevel(Skill.FISHING) < tool.getLevel()) {
-            player.getPacketSender().sendMessage("You need a Fishing level of at least " + tool.getLevel() + " to do this.");
+        if (player.getSkillManager().getCurrentLevel(Skill.FISHING) < this.tool.getLevel()) {
+            player.getPacketSender().sendMessage("You need a Fishing level of at least " + this.tool.getLevel() + " to do this.");
             return false;
         }
 
-        if (tool.getNeeded() > 0) {
-            if (!player.getInventory().contains(tool.getNeeded())) {
-                player.getPacketSender().sendMessage("You do not have any " + ItemDefinition.forId(tool.getNeeded()).getName().toLowerCase() + "(s).");
+        if (this.tool.getNeeded() > 0) {
+            if (!player.getInventory().contains(this.tool.getNeeded())) {
+                player.getPacketSender().sendMessage("You do not have any " + ItemDefinition.forId(this.tool.getNeeded()).getName().toLowerCase() + "(s).");
                 return false;
             }
         }
@@ -40,82 +56,71 @@ export class Blessing extends DefaultSkillable {
         return super.hasRequirements(player);
     }
     
-        public start(Player player: Player) {
+        public start(player: Player) {
         player.getPacketSender().sendMessage("You begin to fish..");
         super.start(player);
     }
     
-        public startAnimationLoop(Player player: Player) {
-        const animLoop = new Task(4, player, true) {
-            execute() {
-                player.performAnimation(new Animation(tool.getAnimation()));
-            }
-    };
-    TaskManager.submit(animLoop);
-    this.getTasks().add(animLoop);
-}
+    public startAnimationLoop(player: Player) {
+        const animLoop = new FishingTask(4, player, true);
+        TaskManager.submit(animLoop);
+        this.getTasks().add(animLoop);
+    }
 
     public onCycle(player: Player) {
-    PetHandler.onSkill(player, Skill.FISHING);
+        PetHandler.onSkill(player, Skill.FISHING);
 
-    //Handle random event..
-    if (Misc.getRandom(1400) == 1) {
-        const attackTool = new AttackToolRandomEvent(player, tool, fishSpot);
-        TaskManager.submit(attackTool);
-        this.cancel(player);
+        //Handle random event..
+        if (Misc.getRandom(1400) == 1) {
+            const attackTool = new AttackToolRandomEvent(player, tool, fishSpot);
+            TaskManager.submit(attackTool);
+            this.cancel(player);
+        }
     }
-}
     
-        public finishedCycle(player: Player) {
-    /** Random stop for that 'old school' rs feel :) */
-    if (Misc.getRandom(90) == 0) {
-        this.cancel(player);
-    }
-
-    /** Catch multiple fish with a big net. */
-    let amount = 1;
-    if (tool == BlessingTool.BIG_NET) {
-        amount = Math.min(Misc.getRandom(4) + 1, player.getInventory().getFreeSlots());
-    }
-
-    const fishingLevel = player.getSkillManager().getCurrentLevel(Skill.FISHING);
-    for (let i = 0; i < amount; i++) {
-        const caught = this.determineFish(player, tool);
-
-        const levelDiff = fishingLevel - caught.getLevel();
-        let chance = Chance.SOMETIMES;
-        if (levelDiff >= 15) chance = Chance.COMMON;
-        if (levelDiff >= 25) chance = Chance.VERY_COMMON;
-
-        if (chance.success()) {
-            player.getPacketSender().sendMessage(
-                "You catch a " + caught.name().toLowerCase().replace("_", " ") + ".");
-            player.getInventory().add(new Item(caught.getId()));
-            player.getSkillManager().addExperience(Skill.FISHING, caught.getExperience());
+    public finishedCycle(player: Player) {
+        /** Random stop for that 'old school' rs feel :) */
+        if (Misc.getRandom(90) == 0) {
+            this.cancel(player);
         }
 
-        if (chance.success()) {
-            player.getPacketSender().sendMessage(
-                "You catch a " + caught.name().toLowerCase().replace("_", " ") + ".");
-            player.getInventory().add(new Item(caught.getId()));
-            player.getSkillManager().addExperience(Skill.FISHING, caught.getExperience());
+        /** Catch multiple fish with a big net. */
+        let amount = 1;
+        if (tool == BlessingTool.BIG_NET) {
+            amount = Math.min(Misc.getRandom(4) + 1, player.getInventory().getFreeSlots());
         }
 
-        if (tool.getNeeded() > 0) {
-            player.getInventory().delete(new Item(tool.getNeeded()));
+        const fishingLevel = player.getSkillManager().getCurrentLevel(Skill.FISHING);
+        for (let i = 0; i < amount; i++) {
+            const caught = this.determineFish(player, tool);
+
+            const levelDiff = fishingLevel - caught.getLevel();
+            let chance = Chance.SOMETIMES;
+            if (levelDiff >= 15) chance = Chance.COMMON;
+            if (levelDiff >= 25) chance = Chance.VERY_COMMON;
+
+            if (chance.success()) {
+                player.getPacketSender().sendMessage(
+                    "You catch a " + caught.name().toLowerCase().replace("_", " ") + ".");
+                player.getInventory().add(new Item(caught.getId()));
+                player.getSkillManager().addExperience(Skill.FISHING, caught.getExperience());
+            }
+
+            if (chance.success()) {
+                player.getPacketSender().sendMessage(
+                    "You catch a " + caught.name().toLowerCase().replace("_", " ") + ".");
+                player.getInventory().add(new Item(caught.getId()));
+                player.getSkillManager().addExperience(Skill.FISHING, caught.getExperience());
+            }
+
+            if (tool.getNeeded() > 0) {
+                player.getInventory().delete(new Item(tool.getNeeded()));
+            }
+
         }
-
     }
 
-    function loopRequirements(): boolean {
-        return true;
-    }
-
-    function allowFullInventory(): boolean {
-        return false;
-    }
-
-    function cyclesRequired(player: Player): number {
+    public static cyclesRequired(player: Player): number {
         let cycles = 4 + Misc.getRandom(2);
         cycles -= player.getSkillManager().getCurrentLevel(Skill.FISHING) * 0.03;
 
@@ -129,7 +134,7 @@ export class Blessing extends DefaultSkillable {
      * @param player the player that needs a fish.
      * @param tool   the tool this player is fishing with.
      */
-    function determineFish(player: Player, tool: FishingTool): Fish {
+    public static determineFish(player: Player, tool: FishingTool): Fish {
         let fishList: Fish[] = [];
 
         /** Determine which fish are able to be caught. */
@@ -147,50 +152,7 @@ export class Blessing extends DefaultSkillable {
     }
 }
 
-enum FishingTool {
-    NET = { id: 303, level: 1, needed: -1, speed: 3, animation: 621, fish: [Fish.SHRIMP, Fish.ANCHOVY] },
-    BIG_NET = { id: 305, level: 16, needed: -1, speed: 3, animation: 620, fish: [Fish.MACKEREL, Fish.OYSTER, Fish.COD, Fish.BASS, Fish.CASKET] },
-    FISHING_ROD = { id: 307, level: 5, needed: 313, speed: 1, animation: 622, fish: [Fish.SARDINE, Fish.HERRING, Fish.PIKE, Fish.SLIMY_EEL, Fish.CAVE_EEL, Fish.LAVA_EEL] },
-    FLY_FISHING_ROD = { id: 309, level: 20, needed: 314, speed: 1, animation: 622, fish: [Fish.TROUT, Fish.SALMON] },
-    HARPOON = { id: 311, level: 35, needed: -1, speed: 4, animation: 618, fish: [Fish.TUNA, Fish.SWORDFISH] },
-    SHARK_HARPOON = { id: 311, level: 35, needed: -1, speed: 6, animation: 618, fish: [Fish.SHARK] },
-    LOBSTER_POT = { id: 301, level: 40, needed: -1, speed: 4, animation: 619, fish: [Fish.LOBSTER] }
-
-    class BlessingTool {
-    constructor(
-        private id: number,
-        private level: number,
-        private needed: number,
-        private speed: number,
-        private animation: number,
-        private fish: Fish[]
-    ) { }
-    
-        public getId(): number {
-        return this.id;
-    }
-    
-        public getLevel(): number {
-        return this.level;
-    }
-    
-        public getNeeded(): number {
-        return this.needed;
-    }
-    
-        public getSpeed(): number {
-        return this.speed;
-    }
-    
-        public getAnimation(): number {
-        return this.animation;
-    }
-    
-        public getFish(): Fish[] {
-        return this.fish;
-    }
-
-    enum Fish {
+    class Fish {
         SHRIMP = { id: 317, level: 1, chance: "VERY_COMMON", experience: 10 },
         SARDINE = { id: 327, level: 5, chance: "VERY_COMMON", experience: 20 },
         HERRING = { id: 345, level: 10, chance: "VERY_COMMON", experience: 30 },
@@ -210,7 +172,6 @@ enum FishingTool {
         SWORDFISH = { id: 371, level: 50, chance: "COMMON", experience: 100 },
         LAVA_EEL = { id: 2148, level: 53, chance: "VERY_COMMON", experience: 60 },
         SHARK = { id: 383, level: 76, chance: "COMMON", experience: 110 }
-    }
 
             private id: number;
 
@@ -316,5 +277,50 @@ enum FishingTool {
                     tick++;
                 }
         }
+    }
+}
+
+enum FishingTool {
+    NET = { id: 303, level: 1, needed: -1, speed: 3, animation: 621, fish: [Fish.SHRIMP, Fish.ANCHOVY] },
+    BIG_NET = { id: 305, level: 16, needed: -1, speed: 3, animation: 620, fish: [Fish.MACKEREL, Fish.OYSTER, Fish.COD, Fish.BASS, Fish.CASKET] },
+    FISHING_ROD = { id: 307, level: 5, needed: 313, speed: 1, animation: 622, fish: [Fish.SARDINE, Fish.HERRING, Fish.PIKE, Fish.SLIMY_EEL, Fish.CAVE_EEL, Fish.LAVA_EEL] },
+    FLY_FISHING_ROD = { id: 309, level: 20, needed: 314, speed: 1, animation: 622, fish: [Fish.TROUT, Fish.SALMON] },
+    HARPOON = { id: 311, level: 35, needed: -1, speed: 4, animation: 618, fish: [Fish.TUNA, Fish.SWORDFISH] },
+    SHARK_HARPOON = { id: 311, level: 35, needed: -1, speed: 6, animation: 618, fish: [Fish.SHARK] },
+    LOBSTER_POT = { id: 301, level: 40, needed: -1, speed: 4, animation: 619, fish: [Fish.LOBSTER] }
+}
+
+    class BlessingTool {
+    constructor(
+        private id: number,
+        private level: number,
+        private needed: number,
+        private speed: number,
+        private animation: number,
+        private fish: Fish[]
+    ) 
+    
+        public getId(): number {
+        return this.id;
+    }
+    
+        public getLevel(): number {
+        return this.level;
+    }
+    
+        public getNeeded(): number {
+        return this.needed;
+    }
+    
+        public getSpeed(): number {
+        return this.speed;
+    }
+    
+        public getAnimation(): number {
+        return this.animation;
+    }
+    
+        public getFish(): Fish[] {
+        return this.fish;
     }
 }

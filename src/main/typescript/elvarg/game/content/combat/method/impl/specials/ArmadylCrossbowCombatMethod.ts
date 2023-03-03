@@ -9,7 +9,7 @@ import { CombatFactory } from "../../../CombatFactory";
 import { Projectile } from "../../../../../model/Projectile";
 
 export class ArmadylCrossbowCombatMethod extends RangedCombatMethod {
-    private static readonly ANIMATION = new Animation(4230, Priority.HIGH);
+    private static readonly ANIMATION = new Animation(4230);
     hits(character: Mobile, target: Mobile) {
         return [new PendingHit(character, target, this, 2)];
     }
@@ -29,7 +29,7 @@ export class ArmadylCrossbowCombatMethod extends RangedCombatMethod {
         const player = character.getAsPlayer();
         CombatSpecial.drain(player, CombatSpecial.ARMADYL_CROSSBOW.getDrainAmount());
         player.performAnimation(ArmadylCrossbowCombatMethod.ANIMATION);
-        new Projectile(character, target, 301, 50, 70, 44, 35).sendProjectile();
+        Projectile.createProjectile(character, target, 301, 50, 70, 44, 35).sendProjectile();
         CombatFactory.decrementAmmo(player, target.getLocation(), 1);
     }
 }    

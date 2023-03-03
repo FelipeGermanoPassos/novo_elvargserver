@@ -24,7 +24,7 @@ import { TimerKey } from "../../../../../../util/timers/TimerKey";
 import { ItemIdentifiers } from "../../../../../../util/ItemIdentifiers";
 
 
-export class MidTribridMaxFighterPreset implements FighterPreset {
+export class MidTribridMaxFighterPreset extends FighterPreset {
     private static RANDOM = new RandomGen();
     private CombatAction = new CombatAction();
     public static BOT_MID_TRIBRID: Presetable = new Presetable("Mid Tribrid",

@@ -1,4 +1,6 @@
 import { Player } from "../entity/impl/player/Player";
+import { ItemContainer } from "../model/container/ItemContainer";
+import { SecondsTimer } from "../model/SecondsTimer";
 
 export class Dueling {
     public static readonly MAIN_INTERFACE_CONTAINER = 6669;
@@ -33,32 +35,6 @@ export class Dueling {
         this.container = new ItemContainer(player, 28, "Duel Container");
         this.rules = Array(DuelRule.values().length).fill(false);
     }
-
-    class Dueling {
-    public static MAIN_INTERFACE_CONTAINER = 6669;
-    private static DUELING_WITH_FRAME = 6671;
-    private static INTERFACE_ID = 6575;
-    private static CONFIRM_INTERFACE_ID = 6412;
-    private static SCOREBOARD_INTERFACE_ID = 6733;
-    private static SCOREBOARD_CONTAINER = 6822;
-    private static SCOREBOARD_USERNAME_FRAME = 6840;
-    private static SCOREBOARD_COMBAT_LEVEL_FRAME = 6839;
-    private static SECOND_INTERFACE_CONTAINER = 6670;
-    private static STATUS_FRAME_1 = 6684;
-    private static STATUS_FRAME_2 = 6571;
-    private static ITEM_LIST_1_FRAME = 6516;
-    private static ITEM_LIST_2_FRAME = 6517;
-    private static RULES_FRAME_START = 8242;
-    private static RULES_CONFIG_ID = 286;
-    private static TOTAL_WORTH_FRAME = 24234;
-    private player: Player;
-    private container: ItemContainer;
-    private rules: boolean[];
-    private interact: Player;
-    private configValue: number;
-    private state: DuelState;
-    private button_delay: SecondsTimer;
-    private request_delay: SecondsTimer;
 
     constructor(player: Player) {
         this.player = player;
@@ -717,7 +693,7 @@ export class Dueling {
         }
 
         // Count inventory slots from interact's container aswell as ours
-        for (let item of container.getItems()) {
+        for (let item of this.container.getItems()) {
             if (item == null || !item.isValid())
                 continue;
             if (!(item.getDefinition().isStackable() && player.getInventory().contains(item.getId()))) {
@@ -725,7 +701,7 @@ export class Dueling {
             }
         }
 
-        for (let item of interact.getDueling().getContainer().getItems()) {
+        for (let item of this.interact.getDueling().getContainer().getItems()) {
             if (item == null || !item.isValid())
                 continue;
             if (!(item.getDefinition().isStackable() && player.getInventory().contains(item.getId()))) {
@@ -737,11 +713,11 @@ export class Dueling {
     }
 
     public getButtonDelay(): SecondsTimer {
-        return button_delay;
+        return this.button_delay;
     }
 
     public getState(): DuelState {
-        return state;
+        return this.state;
     }
 
     public setState(state: DuelState) {
@@ -775,87 +751,86 @@ export class Dueling {
     public incrementConfigValue(configValue: number): void {
         this.configValue += configValue;
     }
-}
 
-class DuelRule {
-    private configId: number;
-    private buttonId: number;
-    private inventorySpaceReq: number;
-    private equipmentSlot: number;
+    class DuelRule {
+        private configId: number;
+        private buttonId: number;
+        private inventorySpaceReq: number;
+        private equipmentSlot: number;
 
-    constructor(configId: number, buttonId: number, inventorySpaceReq: number, equipmentSlot: number) {
-        this.configId = configId;
-        this.buttonId = buttonId;
-        this.inventorySpaceReq = inventorySpaceReq;
-        this.equipmentSlot = equipmentSlot;
-    }
-
-    public static forId(i: number) {
-        for (const r of Object.values(DuelRule)) {
-            if (r.ordinal() === i) {
-                return r;
-            }
+        constructor(configId: number, buttonId: number, inventorySpaceReq: number, equipmentSlot: number) {
+            this.configId = configId;
+            this.buttonId = buttonId;
+            this.inventorySpaceReq = inventorySpaceReq;
+            this.equipmentSlot = equipmentSlot;
         }
-        return null;
-    }
 
-    public static forButtonId(buttonId: number) {
-        for (const r of Object.values(DuelRule)) {
-            if (r.getButtonId() === buttonId) {
-                return r;
+        public static forId(i: number) {
+            for (const r of Object.values(DuelRule)) {
+                if (r.ordinal() === i) {
+                    return r;
+                }
             }
+            return null;
         }
-        return null;
+
+        public static forButtonId(buttonId: number) {
+            for (const r of Object.values(DuelRule)) {
+                if (r.getButtonId() === buttonId) {
+                    return r;
+                }
+            }
+            return null;
+        }
+
+        public getConfigId() {
+            return this.configId;
+        }
+
+        public getButtonId() {
+            return this.buttonId;
+        }
+
+        public getInventorySpaceReq() {
+            return this.inventorySpaceReq;
+        }
+
+        public getEquipmentSlot() {
+            return this.equipmentSlot;
+        }
+
+        public toString() {
+            return this.toString().toLowerCase();
+        }
     }
 
-    public getConfigId() {
-        return this.configId;
+
+    export enum DuelState {
+        NONE, REQUESTED_DUEL, DUEL_SCREEN, ACCEPTED_DUEL_SCREEN, CONFIRM_SCREEN, ACCEPTED_CONFIRM_SCREEN, STARTING_DUEL, IN_DUEL;
     }
 
-    public getButtonId() {
-        return this.buttonId;
+    export enum DuelRuleEnum {
+        NO_RANGED = 16,
+        NO_MELEE = 32,
+        NO_MAGIC = 64,
+        NO_SPECIAL_ATTACKS = 8192,
+        LOCK_WEAPON = 4096,
+        NO_FORFEIT = 1,
+        NO_POTIONS = 128,
+        NO_FOOD = 256,
+        NO_PRAYER = 512,
+        NO_MOVEMENT = 2,
+        OBSTACLES = 1024,
+        NO_HELM = 16384,
+        NO_CAPE = 32768,
+        NO_AMULET = 65536,
+        NO_AMMUNITION = 134217728,
+        NO_WEAPON = 131072,
+        NO_BODY = 262144,
+        NO_SHIELD = 524288,
+        NO_LEGS = 2097152,
+        NO_RING = 67108864,
+        NO_BOOTS = 16777216,
+        NO_GLOVES = 8388608,
     }
-
-    public getInventorySpaceReq() {
-        return this.inventorySpaceReq;
-    }
-
-    public getEquipmentSlot() {
-        return this.equipmentSlot;
-    }
-
-    public toString() {
-        return this.name().toLowerCase();
-    }
-}
-
-
-export public enum DuelState {
-    NONE, REQUESTED_DUEL, DUEL_SCREEN, ACCEPTED_DUEL_SCREEN, CONFIRM_SCREEN, ACCEPTED_CONFIRM_SCREEN, STARTING_DUEL, IN_DUEL;
-}
-
-enum DuelRule {
-    NO_RANGED = 16,
-    NO_MELEE = 32,
-    NO_MAGIC = 64,
-    NO_SPECIAL_ATTACKS = 8192,
-    LOCK_WEAPON = 4096,
-    NO_FORFEIT = 1,
-    NO_POTIONS = 128,
-    NO_FOOD = 256,
-    NO_PRAYER = 512,
-    NO_MOVEMENT = 2,
-    OBSTACLES = 1024,
-    NO_HELM = 16384,
-    NO_CAPE = 32768,
-    NO_AMULET = 65536,
-    NO_AMMUNITION = 134217728,
-    NO_WEAPON = 131072,
-    NO_BODY = 262144,
-    NO_SHIELD = 524288,
-    NO_LEGS = 2097152,
-    NO_RING = 67108864,
-    NO_BOOTS = 16777216,
-    NO_GLOVES = 8388608,
-}
 }

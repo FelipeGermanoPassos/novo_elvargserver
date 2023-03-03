@@ -1,4 +1,4 @@
-import { ByteToMessageDecoder, ChannelHandlerContext, ChannelFutureListener } from 'netty';
+import { ByteToMessageDecoder, ChannelHandlerContext, ChannelFutureListener, Unpooled, ByteBuf } from 'netty';
 import { Server } from './server';
 import { GameConstants } from './game-constants';
 import { ByteBufUtils } from './byte-buf-utils';
@@ -12,7 +12,9 @@ import { BigInteger } from 'big-integer';
 import { Random } from 'random';
 
 enum LoginDecoderState {
-    LOGIN_REQUEST
+    LOGIN_REQUEST,
+    LOGIN_TYPE,
+    LOGIN
 }
 
 export class LoginDecoder extends ByteToMessageDecoder {
@@ -23,7 +25,7 @@ export class LoginDecoder extends ByteToMessageDecoder {
     private hostAddressOverride: string | null = null;
 
     public static sendLoginResponse(ctx: ChannelHandlerContext, response: number) {
-        let buffer = Unpooled.buffer(Byte.BYTES);
+        let buffer = Unpooled.buffer(1);
         buffer.writeByte(response);
         ctx.writeAndFlush(buffer).addListener(ChannelFutureListener.CLOSE);
     }
@@ -68,7 +70,7 @@ export class LoginDecoder extends ByteToMessageDecoder {
         }
 
         // Send information to the client
-        let buf = Unpooled.buffer(Byte.BYTES + Long.BYTES);
+        let buf = Unpooled.buffer(1 + 8);
         buf.writeByte(0); // 0 = continue login
         buf.writeLong(LoginDecoder.random.nextLong()); // This long will be used for encryption later on
         ctx.writeAndFlush(buf);
@@ -180,11 +182,6 @@ export class LoginDecoder extends ByteToMessageDecoder {
                 } else {
                     LoginDecoder.sendLoginResponse(ctx, LoginResponses.INVALID_CREDENTIALS_COMBINATION);
                 }
-            }
-            enum LoginDecoderState {
-                LOGIN_REQUEST,
-                LOGIN_TYPE,
-                LOGIN
             }
         }
     }

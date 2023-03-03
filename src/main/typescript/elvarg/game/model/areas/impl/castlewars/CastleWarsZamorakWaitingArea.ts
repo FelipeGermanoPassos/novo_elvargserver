@@ -12,7 +12,7 @@ import { TaskManager } from '../../../../task/TaskManager';
 import { Equipment } from '../../../container/impl/Equipment';
 import { ItemContainer } from '../../../container/ItemContainer';
 
-class CastleWarsZamorakWaitingArea extends Area {
+export class CastleWarsZamorakWaitingArea extends Area {
     constructor() {
         super(Arrays.asList(new Boundary(2408, 2432, 9512, 9535,0)));
     }

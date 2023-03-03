@@ -1,5 +1,5 @@
 export class PlayerRights {
-    public static NONE = -1
+    public static NONE = new PlayerRights(-1, "")
     public static MODERATOR = 618
     public static ADMINISTRATOR = 619
     public static OWNER = 620

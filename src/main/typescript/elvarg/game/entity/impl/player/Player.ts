@@ -12,12 +12,11 @@ import { WeaponInterfaces } from "../../../content/combat/WeaponInterfaces";
 import { BountyHunter } from "../../../content/combat/bountyhunter/BountyHunter"
 import { PendingHit } from "../../../content/combat/hit/PendingHit";
 import { Autocasting } from "../../../content/combat/magic/Autocasting";
-import { Barrows } from "../../../content/minigames/impl/Barrows"
+import { Barrows, Brother } from "../../../content/minigames/impl/Barrows"
 import { Presetable } from "../../../content/presets/Presetable";
 import { Presetables } from "../../../content/presets/Presetables";
 import { SkillManager } from "../../../content/skill/SkillManager";
 import { Skillable } from "../../../content/skill/skillable/Skillable";
-import { Runecrafting, PouchContainer, Pouch } from "../../../content/skill/skillable/impl/Runecrafting"
 import { ActiveSlayerTask } from "../../../content/skill/slayer/ActiveSlayerTask"
 import { ItemDefinition } from "../../../definition/ItemDefinition";
 import { PlayerBotDefinition } from "../../../definition/PlayerBotDefinition";
@@ -28,21 +27,17 @@ import { PlayerBot } from "../playerbot/PlayerBot";
 import { Animation } from "../../../model/Animation";
 import { Appearance } from "../../../model/Appearance";
 import { ChatMessage } from "../../../model/ChatMessage";
-import { EffectTimer, EffectTimers } from "../../../model/EffectTimer";
 import { EnteredAmountAction } from "../../../model/EnteredAmountAction";
 import { EnteredSyntaxAction } from "../../../model/EnteredSyntaxAction";
 import { Flag } from "../../../model/Flag";
 import { ForceMovement } from "../../../model/ForceMovement";
 import { God } from "../../../model/God";
-import { Item } from "../../../model/Item";
 import { Location } from "../../../model/Location";
-import { MagicSpellbook, MagicSpellbooks } from "../../../model/MagicSpellbook";
 import { PlayerInteractingOption, PlayerInteractingOptions } from "../../../model/PlayerInteractingOption";
 import { PlayerRelations } from "../../../model/PlayerRelations";
 import { PlayerStatus } from "../../../model/PlayerStatus";
 import { SecondsTimer } from "../../../model/SecondsTimer";
 import { Skill, Skills } from "../../../model/Skill";
-import { SkullType, SkullTypes } from "../../../model/SkullType";
 import { AreaManager } from "../../../model/areas/AreaManager";
 import { Bank } from "../../../model/container/impl/Bank";
 import { Equipment } from "../../../model/container/impl/Equipment";
@@ -71,6 +66,11 @@ import { TimerKey } from "../../../../util/timers/TimerKey";
 import { Trading } from "../../../content/Trading";
 import { Dueling } from "../../../content/Duelling";
 import { QuickPrayers } from "../../../content/QuickPrayers";
+import { MagicSpellbook } from "../../../model/MagicSpellbook";
+import { PouchContainer, Pouch } from "../../../content/skill/skillable/impl/Runecrafting";
+import { SkullTypes } from "../../../model/SkullType";
+import { EffectTimers } from "../../../model/EffectTimer";
+import { PetHandler } from "../../../content/PetHandler";
 
 
 export class Player extends Mobile {
@@ -78,7 +78,7 @@ export class Player extends Mobile {
     public decreaseStats = new SecondsTimer();
     private localPlayers: Player[] = [];
     private localNpcs: NPC[] = [];
-    private packetSender = new PacketSender(this);
+    public packetSender = new PacketSender(this);
     public appearance = new Appearance(this);
     public skillManager = new SkillManager(this);
     public relations = new PlayerRelations(this);
@@ -103,17 +103,17 @@ export class Player extends Mobile {
     private chatMessageQueue = new Array<ChatMessage>();
     private currentChatMessage: ChatMessage;
     // Logout
-    private forcedLogoutTimer = new SecondsTimer();
+    public forcedLogoutTimer = new SecondsTimer();
     // Trading
     private trading = new Trading(this);
     private dueling = new Dueling(this);
-    private dialogueManager = new DialogueManager(this);
+    public dialogueManager = new DialogueManager(this);
     // Presets
     private currentPreset: Presetable;
     public presets: Presetable[] = new Array(Presetables.MAX_PRESETS);
     private openPresetsOnDeath = true;
 
-    private username: string;
+    public username: string;
     private passwordHashWithSalt: string;
     private hostAddress: string;
     private isDiscordLogin
@@ -121,11 +121,11 @@ export class Player extends Mobile {
     private longUsername: number;
     private session: PlayerSession;
     private playerInteractingOption = PlayerInteractingOptions.NONE;
-    private status: PlayerStatus = PlayerStatus.NONE;
+    public status: PlayerStatus = PlayerStatus.NONE;
     private currentClanChat: ClanChat;
     private clanChatName: string;
-    private shop: Shop;
-    private interfaceId: number = -1
+    public shop: Shop;
+    public interfaceId: number = -1
     private walkableInterfaceId: number = -1
     private multiIcon: number;
     private isRunning = true;
@@ -133,13 +133,13 @@ export class Player extends Mobile {
     private lastRunRecovery = new Stopwatch();
     private isDying: boolean;
     private allowRegionChangePacket: boolean;
-    private experienceLocked: boolean;
+    public experienceLocked: boolean;
     private forceMovement: ForceMovement;
     private currentPet: NPC;
     private skillAnimation: number;
     private drainingPrayer: boolean;
     private prayerPointDrain: number;
-    private spellbook = MagicSpellbooks.NORMAL;
+    private spellbook: MagicSpellbook;
     private previousTeleports = new Map<TeleportButton, Location>();
     private teleportInterfaceOpen: boolean;
     private destroyItem = -1;
@@ -154,7 +154,7 @@ export class Player extends Mobile {
     private skill: Skillable;
     private creationMenu: CreationMenu;
     // Entering data
-    private enteredAmountAction: EnteredAmountAction;
+    public enteredAmountAction: EnteredAmountAction;
     private enteredSyntaxAction: EnteredSyntaxAction;
 
     // Time the account was created
@@ -190,14 +190,14 @@ export class Player extends Mobile {
     // Barrows
     public barrowsCrypt: number;
     public barrowsChestsLooted: number;
-    public killedBrothers: boolean[] = Array(Barrows.Brother.values().length).fill(false);
+    public killedBrothers: boolean[] = Array(Brother.length).fill(false);
     private currentBrother: NPC;
     private preserveUnlocked: boolean;
     private rigourUnlocked: boolean;
     private auguryUnlocked: boolean;
     private targetTeleportUnlocked: boolean;
     // Banking
-    private currentBankTab: number;
+    public currentBankTab: number;
     public banks: Bank[] = Array(Bank.TOTAL_BANK_TABS).fill(null); // last index is for bank searches
     private noteWithdrawal: boolean;
     private insertMode: boolean;
@@ -206,14 +206,14 @@ export class Player extends Mobile {
     private placeholders = true;
     private infiniteHealth: boolean;
     private fightType = FightType.UNARMED_KICK;
-    private weapon: WeaponInterfaces;
+    public weapon: WeaponInterfaces;
     private autoRetaliate = true;
 
     // GWD
-    public godwarsKillcount: number[] = Array(God.values().length).fill(0);
+    public godwarsKillcount: number[] = Array(Object.keys(God).length / 2).fill(0);
 
     // Rights
-    private rights = PlayerRights.NONE;
+    public rights = PlayerRights.NONE;
     private donatorRights = DonatorRights.NONE;
     /**
      * The cached player update block for updating.
@@ -258,7 +258,7 @@ export class Player extends Mobile {
         PrayerHandler.deactivatePrayers(this);
         this.getEquipment().refreshItems();
         this.getInventory().refreshItems();
-        for (let skill of Skill.values())
+        for (let skill of Object.values(Skill))
             this.getSkillManager().setCurrentLevel(skill, this.getSkillManager().getMaxLevel(skill));
         this.setRunEnergy(100);
         this.getPacketSender().sendRunEnergy();
@@ -293,11 +293,11 @@ export class Player extends Mobile {
 
 
     public getAttackAnim(): number {
-        return this.getFightType().getAnimation();
+        return FightType.getAnimation();
     }
 
     public getAttackSound(): Sound {
-        return this.getFightType().getAttackSound();
+        return FightType.getAttackSound();
     }
 
     public getBlockAnim(): number {
@@ -419,15 +419,15 @@ export class Player extends Mobile {
         }
 
         // Send queued chat messages
-        if (!this.getChatMessageQueue().isEmpty()) {
+        if (this.getChatMessageQueue().length > 0) {
             this.setCurrentChatMessage(this.getChatMessageQueue().shift());
             this.getUpdateFlag().flag(Flag.CHAT);
-        } else {
+          } else {
             this.setCurrentChatMessage(null);
-        }
+          }
 
         // Increase run energy
-        if (this.runEnergy < 100 && (!this.getMovementQueue().isMoving() || !this.isRunning)) {
+        if (this.runEnergy < 100 && (!this.getMovementQueue().isMovings() || !this.isRunning)) {
             if (this.lastRunRecovery.elapsedTime(MovementQueue.runEnergyRestoreDelay(this))) {
                 this.runEnergy++;
                 this.getPacketSender().sendRunEnergy();
@@ -563,10 +563,10 @@ export class Player extends Mobile {
 
         let totalExp = 0;
         let skill: Skill;
-        for (skill of Skill.values()) {
+        for (const skill of Object.values(Skill)) {
             this.getSkillManager().updateSkill(skill);
             totalExp += this.getSkillManager().getExperience(skill);
-        }
+          }
         this.getPacketSender().sendTotalExp(totalExp);
 
         // Send friends and ignored players lists...
@@ -574,9 +574,9 @@ export class Player extends Mobile {
 
         // Reset prayer configs...
         PrayerHandler.resetAll(this);
-        this.getPacketSender().sendConfig(709, PrayerHandler.canUse(this, PrayerData.PRESERVE, false) ? 1 : 0);
-        this.getPacketSender().sendConfig(711, PrayerHandler.canUse(this, PrayerData.RIGOUR, false) ? 1 : 0);
-        this.getPacketSender().sendConfig(713, PrayerHandler.canUse(this, PrayerData.AUGURY, false) ? 1 : 0);
+        this.getPacketSender().sendConfig(709, PrayerHandler.canUse(this, PrayerHandler.PrayerDataList.PRESERVE, false) ? 1 : 0);
+        this.getPacketSender().sendConfig(711, PrayerHandler.canUse(this, PrayerHandler.PrayerDataList.RIGOUR, false) ? 1 : 0);
+        this.getPacketSender().sendConfig(713, PrayerHandler.canUse(this, PrayerHandler.PrayerDataList.AUGURY, false) ? 1 : 0);
 
         // Refresh item containers..
         this.getInventory().refreshItems();
@@ -599,7 +599,7 @@ export class Player extends Mobile {
         // Update weapon data and interfaces..
         WeaponInterfaces.assign(this);
         // Update weapon interface configs
-        this.getPacketSender().sendConfig(this.getFightType().getParentId(), this.getFightType().getChildId())
+        this.getPacketSender().sendConfig(FightType.getParentId(), FightType.getChildId())
             .sendConfig(172, this.autoRetaliateReturn() ? 1 : 0).updateSpecialAttackOrb();
 
         // Reset autocasting
@@ -630,8 +630,8 @@ export class Player extends Mobile {
             this.getPacketSender().sendEffectTimer(this.getCombat().getFireImmunityTimer().secondsRemaining(),
                 EffectTimers.ANTIFIRE);
         }
-        if (!this.getCombat().getTeleBlockTimer().finished()) {
-            this.getPacketSender().sendEffectTimer(this.getCombat().getTeleBlockTimer().secondsRemaining(),
+        if (!this.getCombat().getTeleblockTimer().finished()) {
+            this.getPacketSender().sendEffectTimer(this.getCombat().getTeleblockTimer().secondsRemaining(),
                 EffectTimers.TELE_BLOCK);
         }
 
@@ -750,11 +750,11 @@ export class Player extends Mobile {
         return this;
     }
 
-    public getRights(): typeof PlayerRights.NONE {
+    public getRights(): PlayerRights {
         return this.rights;
     }
 
-    public setRights(rights: typeof PlayerRights.NONE): this {
+    public setRights(rights: PlayerRights): this {
         this.rights = rights;
         return this;
     }
@@ -916,11 +916,11 @@ export class Player extends Mobile {
     }
 
     public static getCombatSpecial(): CombatSpecial {
-        return this.combatSpecial;
+        return this.getCombatSpecial();
     }
 
     public setCombatSpecial(combatSpecial: CombatSpecial) {
-        Player.combatSpecial = combatSpecial;
+        this.combatSpecial = combatSpecial;
     }
 
     public getRecoilDamage(): number {
@@ -935,7 +935,7 @@ export class Player extends Mobile {
         return this.spellbook;
     }
 
-    public setSpellbook(spellbook: typeof MagicSpellbooks.NORMAL) {
+    public setSpellbook(spellbook: MagicSpellbook) {
         this.spellbook = spellbook;
     }
 
@@ -1350,7 +1350,7 @@ export class Player extends Mobile {
         this.skill = skill;
     }
 
-    public public getCreationMenu(): CreationMenu {
+    public getCreationMenu(): CreationMenu {
         return this.creationMenu;
     }
 

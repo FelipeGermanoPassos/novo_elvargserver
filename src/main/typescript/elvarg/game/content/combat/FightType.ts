@@ -67,6 +67,7 @@ export class FightType {
     public static SCIMITAR_CHOP = { id: 390, animation: 43, style: 0, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.ACCURATE }
     public static SCIMITAR_LUNGE = { id: 390, animation: 43, style: 2, bonus: BonusManager.ATTACK_STAB, type: FightStyle.CONTROLLED }
     public static SCIMITAR_BLOCK = { id: 390, animation: 43, style: 3, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.DEFENSIVE }
+    public static SCIMITAR_SLASH = {id: 390, animation: 43, style :1, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.AGGRESSIVE}
     public static LONGSWORD_CHOP = { id: 390, animation: 43, style: 0, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.ACCURATE }
     public static LONGSWORD_SLASH = { id: 390, animation: 43, style: 1, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.AGGRESSIVE }
     public static LONGSWORD_LUNGE = { id: 412, animation: 43, style: 2, bonus: BonusManager.ATTACK_STAB, type: FightStyle.CONTROLLED }
@@ -171,8 +172,12 @@ export class FightType {
      *
      * @return the bonus type.
      */
-    public static getBonusType(): number {
-        return this.bonusType;
+    public getBonusType(): number {
+        return FightType.bonusType;
+    }
+
+    public static getBonusTypes():number {
+        return FightType.bonusType;
     }
 
     /**

@@ -1,4 +1,9 @@
-class TeleportTablets {
+import { Location } from "../Location";
+import { Player } from "../../entity/impl/player/Player";
+import { TeleportHandler } from "./TeleportHandler";
+import { TeleportType } from "./TeleportType";
+
+export class TeleportTablets {
     public static init(player: Player, itemId: number): boolean {
         let tab = TeleportTablet.getTab(itemId);
 

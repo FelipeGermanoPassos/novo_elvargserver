@@ -1,18 +1,16 @@
+import { DialogueOption } from "../../DialogueOption";
+import { Dialogue } from "../Dialogue";
+import { Player } from "../../../../entity/impl/player/Player";
+
 export class OptionDialogue extends Dialogue {
     private static readonly CHATBOX_INTERFACES = [13760, 2461, 2471, 2482, 2494];
     private action: DialogueOptionAction;
     private title: string;
     private options: string[];
 
-    constructor(index: number, title: string, action: DialogueOptionAction, ...options: string[]) {
-        super(index);
-        this.title = title;
-        this.action = action;
-        this.options = options;
-    }
-
     constructor(index: number, action: DialogueOptionAction, ...options: string[]) {
-        this(index, "Choose an Option", action, ...options);
+        super(index);
+        this.options = options;
     }
 
     public execute(option: DialogueOption): void {

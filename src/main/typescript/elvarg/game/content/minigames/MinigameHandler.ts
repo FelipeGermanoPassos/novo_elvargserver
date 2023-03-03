@@ -1,5 +1,7 @@
-import { Minigame } from "./Minigame";
 import { CastleWars } from "./impl/CastleWars";
+import { Player } from "../../entity/impl/player/Player";
+import { GameObject } from "../../entity/impl/object/GameObject";
+
 export class MinigameHandler {
     public static minigames = {
         CASTLEWARS: {

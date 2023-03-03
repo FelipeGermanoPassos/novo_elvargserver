@@ -34,7 +34,7 @@ export class HitQueue {
                 const firstHit = this.pendingDamage.shift();
 
                 // Check if it's present
-                if (!Objects.isNull(firstHit)) {
+                if (firstHit != null) {
 
                     // Update entity hit data and deal the actual damage.
                     character.setPrimaryHit(character.decrementHealth(firstHit));
@@ -49,7 +49,8 @@ export class HitQueue {
                 const secondHit = this.pendingDamage.shift();
 
                 // Check if it's present
-                if (!Objects.isNull(secondHit)) {
+                if (secondHit != null){
+                
 
                     // Update entity hit data and deal the actual damage.
                     character.setSecondaryHit(character.decrementHealth(secondHit));
@@ -63,7 +64,7 @@ export class HitQueue {
         this.pendingHits.push(c_h);
     }
 
-    public addPendingDamage(...hits: HitDamage[]) {
+    public addPendingDamage(hits: HitDamage[]) {
         hits.filter(h => h != null).forEach(h => this.pendingDamage.push(h));
     }
 
@@ -75,15 +76,15 @@ export class HitQueue {
 
     public isEmpty(exception: Mobile): boolean {
         for (let hit of this.pendingHits) {
-            if (hit == null) {
-                continue;
+          if (hit == null) {
+            continue;
+          }
+          if (hit.getAttacker() != null) {
+            if (hit.getAttacker() !== exception) {
+              return false;
             }
-            if (hit.getAttacker() != null) {
-                if (!hit.getAttacker().equals(exception)) {
-                    return false;
-                }
-            }
+          }
         }
         return true;
-    }
+      }
 }

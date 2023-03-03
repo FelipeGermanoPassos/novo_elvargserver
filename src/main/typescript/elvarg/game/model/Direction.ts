@@ -1,6 +1,6 @@
 import { Misc } from "../../util/Misc";
 
-enum Directions {
+export enum Directions {
     NORTH = 1,
     NORTH_EAST = 2,
     EAST = 4,

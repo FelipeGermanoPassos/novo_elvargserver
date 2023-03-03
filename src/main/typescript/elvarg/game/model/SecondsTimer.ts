@@ -16,8 +16,8 @@ export class SecondsTimer {
         this.seconds = seconds;
 
         //Reset and then start the stopwatch.
-        this.stopwatch.reset();
-        stopwatch.start();
+        this.stopwhatch.reset();
+        this.stopwhatch.start();
     }
 
     stop(): void {

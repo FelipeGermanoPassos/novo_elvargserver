@@ -16,7 +16,7 @@ export abstract class PrivateArea extends Area {
 
 
 
-    constructor(boundaries: Boundary[]) {
+    constructor(boundaries?: Boundary[]) {
         super();
         this.entities = [];
         this.clips = new Map();

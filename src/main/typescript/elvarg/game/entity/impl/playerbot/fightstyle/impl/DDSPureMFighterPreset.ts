@@ -1,4 +1,13 @@
-export class DDSPureMFighterPreset implements FighterPreset {
+import { FighterPreset } from "../FighterPreset";
+import { CombatSpecial } from "../../../../../content/combat/CombatSpecial";
+import { Presetable } from "../../../../../content/presets/Presetable";
+import { Mobile } from "../../../Mobile";
+import { PlayerBot } from "../../PlayerBot";
+import { CombatAction } from "../CombatAction";
+import { CombatSwitch } from "../CombatSwitch";
+import { MagicSpellbook } from "../../../../../model/MagicSpellbook";
+
+export class DDSPureMFighterPreset extends FighterPreset {
     private static BOT_DDS_PURE_M_73: Presetable = {
         name: "DDS Pure (M)",
         items: [

@@ -1,3 +1,5 @@
+import { Location } from "./Location";
+
 export class ForceMovement {
     private start: Location;
     private end: Location;

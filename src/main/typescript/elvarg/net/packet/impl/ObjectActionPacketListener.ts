@@ -1,6 +1,37 @@
-class ObjectActionPacketListener extends ObjectIdentifiers implements PacketExecutor {
+import { Player } from "../../../game/entity/impl/player/Player";
+import { Packet } from "../Packet";
+import { PacketConstants } from "../PacketConstants";
+import { PlayerRights } from "../../../game/model/rights/PlayerRights";
+import { Server } from "../../../Server";
+import { RegionManager } from "../../../game/collision/RegionManager";
+import { DepositBox } from "../../../game/content/DepositBox";
+import { CombatSpecial } from "../../../game/content/combat/CombatSpecial";
+import { MinigameHandler } from "../../../game/content/minigames/MinigameHandler";
+import { FightCaves } from "../../../game/content/minigames/impl/FightCaves";
+import { SkillManager } from "../../../game/content/skill/SkillManager";
+import { Smithing } from "../../../game/content/skill/skillable/impl/Smithing";
+import { EquipmentMaking } from "../../../game/content/skill/skillable/impl/Smithing";
+import { StallThieving } from '../../../game/content/skill/skillable/impl/Thieving'
+import { ObjectDefinition } from "../../../game/definition/ObjectDefinition";
+import { GameObject } from "../../../game/entity/impl/object/GameObject";
+import { MapObjects } from "../../../game/entity/impl/object/MapObjects";
+import { WebHandler } from "../../../game/entity/impl/object/impl/WebHandler";
+import { PrivateArea } from "../../../game/model/areas/impl/PrivateArea";
+import { SpellBookDialogue } from '../../../game/model/dialogues/builders/impl/SpellBookDialogue'
+import { TeleportHandler } from "../../../game/model/teleportation/TeleportHandler";
+import { TeleportType } from "../../../game/model/teleportation/TeleportType";
+import { TaskManager } from "../../../game/task/TaskManager";
+import { PacketExecutor } from "../PacketExecutor";
+import { ForceMovementTask } from "../../../game/task/impl/ForceMovementTask";
+import { ObjectIdentifiers } from "../../../util/ObjectIdentifiers";
+import { ObjectManager } from "../../../game/entity/impl/object/ObjectManager";
+import { MagicSpellbook } from "../../../game/model/MagicSpellbook";
+import { Skill } from "../../../game/model/Skill";
+import { ForceMovement } from "../../../game/model/ForceMovement";
+
+export class ObjectActionPacketListener extends ObjectIdentifiers implements PacketExecutor {
     private static firstClick(player: Player, object: GameObject) {
-        if(doorHandler(player, object)) {
+        if(ObjectActionPacketListener.doorHandler(player, object)) {
             return;
         }
     
@@ -31,37 +62,37 @@ class ObjectActionPacketListener extends ObjectIdentifiers implements PacketExec
                 }
                 WebHandler.handleSlashWeb(player, object, false);
                 break;
-        case KBD_LADDER_DOWN:
-            TeleportHandler.teleport(player, new Location(3069, 10255), TeleportType.LADDER_DOWN, false);
+        case ObjectActionPacketListener.KBD_LADDER_DOWN:
+            TeleportHandler.teleport(player, new Location(), TeleportType.LADDER_DOWN, false);
             break;
-        case KBD_LADDER_UP:
-            TeleportHandler.teleport(player, new Location(3017, 3850), TeleportType.LADDER_UP, false);
+        case ObjectActionPacketListener.KBD_LADDER_UP:
+            TeleportHandler.teleport(player, new Location(), TeleportType.LADDER_UP, false);
             break;
-        case KBD_ENTRANCE_LEVER:
-            if (!player.getCombat().getTeleBlockTimer().finished()) {
+        case ObjectActionPacketListener.KBD_ENTRANCE_LEVER:
+            if (!player.getCombat().getTeleblockTimer().finished()) {
                 player.getPacketSender().sendMessage("A magical spell is blocking you from teleporting.");
                 return;
             }
-            TeleportHandler.teleport(player, new Location(2271, 4680), TeleportType.LEVER, false);
+            TeleportHandler.teleport(player, new Location(), TeleportType.LEVER, false);
             break;
-        case KBD_EXIT_LEVER:
-            TeleportHandler.teleport(player, new Location(3067, 10253), TeleportType.LEVER, false);
+        case ObjectActionPacketListener.KBD_EXIT_LEVER:
+            TeleportHandler.teleport(player, new Location(), TeleportType.LEVER, false);
             break;
-        case FIGHT_CAVES_ENTRANCE:
+        case ObjectActionPacketListener.FIGHT_CAVES_ENTRANCE:
             player.moveTo(FightCaves.ENTRANCE.clone());
             FightCaves.start(player);
             break;
-        case FIGHT_CAVES_EXIT:
+        case ObjectActionPacketListener.FIGHT_CAVES_EXIT:
             player.moveTo(FightCaves.EXIT);
             break;
-        case PORTAL_51:
+        case ObjectActionPacketListener.PORTAL_51:
             //DialogueManager.sendStatement(player, "Construction will be avaliable in the future.");
             break;
         case ANVIL:
             EquipmentMaking.openInterface(player);
             break;
-        case ALTAR:
-        case CHAOS_ALTAR_2:
+        case ObjectActionPacketListener.ALTAR:
+        case ObjectActionPacketListener.CHAOS_ALTAR_2:
             player.performAnimation(new Animation(645));
             if (player.getSkillManager().getCurrentLevel(Skill.PRAYER) < player.getSkillManager()
                     .getMaxLevel(Skill.PRAYER)) {
@@ -71,31 +102,31 @@ class ObjectActionPacketListener extends ObjectIdentifiers implements PacketExec
             }
             break;
 
-        case BANK_CHEST:
+        case ObjectActionPacketListener.BANK_CHEST:
             player.getBank(player.getCurrentBankTab()).open();
             break;
 
-        case DITCH_PORTAL:
+        case ObjectActionPacketListener.DITCH_PORTAL:
             player.getPacketSender().sendMessage("You are teleported to the Wilderness ditch.");
-            player.moveTo(new Location(3087, 3520));
+            player.moveTo(new Location());
             break;
 
-        case WILDERNESS_DITCH:
+        case ObjectActionPacketListener.WILDERNESS_DITCH:
             //player.getMovementQueue().reset();
-            if (player.getForceMovement() == null && player.getClickDelay().elapsed(2000)) {
-                const crossDitch = new Location(0, player.getLocation().getY() < 3522 ? 3 : -3);
+            if (player.getForceMovement() == null && player.getClickDelay().elapsed()) {
+                const crossDitch = new Location();
                 TaskManager.submit(new ForceMovementTask(player, 3, new ForceMovement(player.getLocation().clone(),
                         crossDitch, 0, 70, crossDitch.getY() == 3 ? 0 : 2, 6132)));
                 player.getClickDelay().reset();
             }
             break;
 
-        case ANCIENT_ALTAR:
+        case ObjectActionPacketListener.ANCIENT_ALTAR:
             player.performAnimation(new Animation(645));
             player.getDialogueManager().start(new SpellBookDialogue());
             break;
 
-        case ORNATE_REJUVENATION_POOL:
+        case ObjectActionPacketListener.ORNATE_REJUVENATION_POOL:
             player.getPacketSender().sendMessage("You feel slightly renewed.");
             player.performGraphic(new Graphic(683));
             // Restore special attack
@@ -127,24 +158,24 @@ class ObjectActionPacketListener extends ObjectIdentifiers implements PacketExec
         return;
         }
         switch (object.getId()) {
-            case PORTAL_51:
+            case ObjectActionPacketListener.PORTAL_51:
                 //DialogueManager.sendStatement(player, "Construction will be avaliable in the future.");
                 break;
-            case FURNACE_18:
+            case ObjectActionPacketListener.FURNACE_18:
                 for (const bar of Smithing.Bar.values()) {
                     player.getPacketSender().sendInterfaceModel(bar.getFrame(), bar.getBar(), 150);
                 }
                 player.getPacketSender().sendChatboxInterface(2400);
                 break;
-            case BANK_CHEST:
-            case BANK:
-            case BANK_BOOTH:
-            case BANK_BOOTH_2:
-            case BANK_BOOTH_3:
-            case BANK_BOOTH_4:
+            case ObjectActionPacketListener.BANK_CHEST:
+            case ObjectActionPacketListener.BANK:
+            case ObjectActionPacketListener.BANK_BOOTH:
+            case ObjectActionPacketListener.BANK_BOOTH_2:
+            case ObjectActionPacketListener.BANK_BOOTH_3:
+            case ObjectActionPacketListener.BANK_BOOTH_4:
                 player.getBank(player.getCurrentBankTab()).open();
                 break;
-            case ANCIENT_ALTAR:
+            case ObjectActionPacketListener.ANCIENT_ALTAR:
                 player.getPacketSender().sendInterfaceRemoval();
                 MagicSpellbook.changeSpellbook(player, MagicSpellbook.NORMAL);
                 break;
@@ -153,10 +184,10 @@ class ObjectActionPacketListener extends ObjectIdentifiers implements PacketExec
         
         private static thirdClick(player: Player, object: GameObject) {
             switch (object.getId()) {
-            case PORTAL_51:
+            case ObjectActionPacketListener.PORTAL_51:
             //DialogueManager.sendStatement(player, "Construction will be avaliable in the future.");
             break;
-            case ANCIENT_ALTAR:
+            case ObjectActionPacketListener.ANCIENT_ALTAR:
             player.getPacketSender().sendInterfaceRemoval();
             MagicSpellbook.changeSpellbook(player, MagicSpellbook.ANCIENT);
             break;
@@ -165,10 +196,10 @@ class ObjectActionPacketListener extends ObjectIdentifiers implements PacketExec
 
             private static fourthClick(player: Player, object: GameObject) {
                 switch (object.getId()) {
-                case PORTAL_51:
+                case ObjectActionPacketListener.PORTAL_51:
                     //DialogueManager.sendStatement(player, "Construction will be avaliable in the future.");
                     break;
-                case ANCIENT_ALTAR:
+                case ObjectActionPacketListener.ANCIENT_ALTAR:
                     player.getPacketSender().sendInterfaceRemoval();
                     MagicSpellbook.changeSpellbook(player, MagicSpellbook.LUNAR);
                     break;
@@ -176,7 +207,7 @@ class ObjectActionPacketListener extends ObjectIdentifiers implements PacketExec
             }
 
             private static objectInteract(player: Player, id: number, x: number, y: number, clickType: number) {
-                const location = new Location(x, y, player.getLocation().getZ());
+                const location = new Location();
                 const object = MapObjects.get(player, id, location);
 
                 if (player.getRights() == PlayerRights.DEVELOPER) {
@@ -209,16 +240,16 @@ class ObjectActionPacketListener extends ObjectIdentifiers implements PacketExec
             
                     switch (clickType) {
                         case 1:
-                            firstClick(player, object);
+                            ObjectActionPacketListener.firstClick(player, object);
                             break;
                         case 2:
-                            secondClick(player, object);
+                            ObjectActionPacketListener.secondClick(player, object);
                             break;
                         case 3:
-                            thirdClick(player, object);
+                            ObjectActionPacketListener.thirdClick(player, object);
                             break;
                         case 4:
-                            fourthClick(player, object);
+                            ObjectActionPacketListener.fourthClick(player, object);
                             break;
                     }
                 });
@@ -250,7 +281,7 @@ class ObjectActionPacketListener extends ObjectIdentifiers implements PacketExec
                 const offset = open ? openOffset[object.getFace()] : closeOffset[object.getFace()];
                 /* adjust door direction based on if it needs to be opened or closed */
                 const face = open ? object.getFace() + 1 : object.getFace() - 1;
-                const loc = new Location( object.getLocation().getX() + offset[0], object.getLocation().getY() + offset[1], object.getLocation().getZ());
+                const loc = new Location();
                 const obj = new GameObject(open ? object.getId() + 1 : object.getId() - 1, loc, object.getType(), face , null);
         
                 /* spawns/despawns doors accordingly */

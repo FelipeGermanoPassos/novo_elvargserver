@@ -25,7 +25,7 @@ import { TeleportType } from "../../../../../model/teleportation/TeleportType";
 import { ItemIdentifiers } from "../../../../../../util/ItemIdentifiers";
 import { TimerKey } from "../../../../../../util/timers/TimerKey";
 
-export class TribridMaxFighterPreset implements FighterPreset {
+export class TribridMaxFighterPreset extends FighterPreset {
     private static BOT_HARD_TRIBRID: Presetable = new Presetable("Bot Tribrid",
         [
             new Item(ItemIdentifiers.ARMADYL_CROSSBOW), new Item(ItemIdentifiers.ARMADYL_GODSWORD), new Item(ItemIdentifiers.RANGING_POTION_4_), new Item(ItemIdentifiers.SUPER_COMBAT_POTION_4_),

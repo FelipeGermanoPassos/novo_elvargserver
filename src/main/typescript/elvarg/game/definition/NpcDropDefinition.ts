@@ -109,7 +109,7 @@ export class NPCDrop {
     }
 
     toItem(random: RandomGen): Item {
-        return new Item(this.itemId, random.inclusive(this.minAmount, this.maxAmount));
+        return new Item(this.itemId, random.getInclusive(this.minAmount, this.maxAmount));
     }
 
     getChance(): number {

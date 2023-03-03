@@ -1,4 +1,4 @@
-import { World } from '../../../Worlds'
+import { World } from '../../../World'
 
 export abstract class GameSyncTask {
     private players: boolean;

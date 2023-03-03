@@ -259,7 +259,7 @@ export class ItemContainer {
         return this.items[slot];
     }
 
-    public switchItem(to: ItemContainer, item: Item sort: boolean, refresh: boolean): ItemContainer {
+    public switchItem(to: Bank, item: Item sort: boolean, refresh: boolean): ItemContainer {
         if (this.getItems()[slot].getId() !== item.getId()) {
         return this;
         }
@@ -380,7 +380,7 @@ export class ItemContainer {
      * @param item The item to add.
      * @return The ItemContainer instance.
      */
-    public add(item: Item): ItemContainer {
+    public add(item: number): ItemContainer {
         return this.add(item, true);
     }
         
@@ -391,7 +391,7 @@ export class ItemContainer {
      * @param amount The amount of the item.
      * @return The ItemContainer instance.
      */
-    public add(id: number, amount: number): ItemContainer {
+    public adds(id: number, amount: number): ItemContainer {
         return this.add(new Item(id, amount));
     }
 
@@ -443,7 +443,7 @@ export class ItemContainer {
         return this;
     }
 
-    public delete(item: Item): ItemContainer {
+    public deletes(item: number): ItemContainer {
         return this.delete(item.getId(), item.getAmount());
     }
         
@@ -455,7 +455,7 @@ export class ItemContainer {
      *             the first one found).
      * @return The ItemContainer instance.
      */
-    public delete(item: Item, slot: number): ItemContainer {
+    public deleteItem(item: Item, slot: number): ItemContainer {
         return this.delete(item, slot, true);
     }
     
@@ -466,11 +466,11 @@ export class ItemContainer {
      * @param amount The amount of the item to delete.
      * @return The ItemContainer instance.
      */
-    public delete(id: number, amount: number): ItemContainer {
+    public deleteNumber(id: number, amount: number): ItemContainer {
         return this.delete(id, amount, true);
     }
     
-    public delete(item: Item, refresh: boolean): ItemContainer {
+    public deleteBoolean(item: Item, refresh: boolean): ItemContainer {
         return this.delete(item.getId(), item.getAmount(), refresh);
     }
     

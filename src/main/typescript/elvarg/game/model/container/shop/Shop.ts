@@ -16,8 +16,8 @@ export class Shop {
     public static CURRENCY_COINS = ShopCurrencies.COINS;
     
     public id: number;
-    private name: string;
-    private originalStock: Item[];
+    public name: string;
+    public originalStock: Item[];
     public currentStock: Item[] = new Array(Shop.MAX_SHOP_ITEMS);
     private restocking: boolean;
     public currency: ShopCurrency;

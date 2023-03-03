@@ -1,3 +1,14 @@
+import { Graphic } from "../../../model/Graphic";
+import { GraphicHeight } from "../../../model/GraphicHeight";
+import { Player } from "../../../entity/impl/player/Player";
+import { CombatEquipment } from "../CombatEquipment";
+import { Mobile } from "../../../entity/impl/Mobile";
+import { PoisonType } from "../../../task/impl/CombatPoisonEffect";
+import { CombatFactory } from "../CombatFactory";
+import { Projectile } from "../../../model/Projectile";
+import { Equipment } from "../../../model/container/impl/Equipment";
+import { Skill } from "../../../model/Skill";
+
 export class RangedData {
     private static rangedWeapons: Map<number, RangedWeapon> = new Map<number, RangedWeapon>();
     private static rangedAmmunition: Map<number, Ammunition> = new Map<number, Ammunition>();
@@ -6,13 +17,13 @@ export class RangedData {
         let multiplier: number = 1.0;
 
         switch (p.getCombat().getAmmunition()) {
-            case ENCHANTED_DIAMOND_BOLT:
+            case Ammunitions.ENCHANTED_DIAMOND_BOLT:
                 target.performGraphic(new Graphic(758, GraphicHeight.MIDDLE));
                 multiplier = 1.15;
                 break;
 
-            case ENCHANTED_DRAGONSTONE_DRAGON_BOLT:
-            case ENCHANTED_DRAGON_BOLT:
+            case Ammunitions.ENCHANTED_DRAGONSTONE_DRAGON_BOLT:
+            case Ammunitions.ENCHANTED_DRAGON_BOLT:
                 let multiply: boolean = true;
                 if (target.isPlayer()) {
                     let t: Player = target.getAsPlayer();
@@ -24,12 +35,12 @@ export class RangedData {
                 }
                 break;
 
-            case ENCHANTED_EMERALD_BOLT:
+            case Ammunitions.ENCHANTED_EMERALD_BOLT:
                 target.performGraphic(new Graphic(752));
                 CombatFactory.poisonEntity(target, PoisonType.MILD);
                 break;
 
-            case ENCHANTED_JADE_BOLT:
+            case Ammunitions.ENCHANTED_JADE_BOLT:
                 target.performGraphic(new Graphic(755));
                 multiplier = 1.05;
                 break;
@@ -39,8 +50,8 @@ export class RangedData {
                 multiplier = 1.15;
                 break;
 
-            case ENCHANTED_DRAGONSTONE_DRAGON_BOLT:
-            case ENCHANTED_DRAGON_BOLT:
+            case Ammunitions.ENCHANTED_DRAGONSTONE_DRAGON_BOLT:
+            case Ammunitions.ENCHANTED_DRAGON_BOLT:
                 let multiply = true;
                 if (target.isPlayer()) {
                     let t = target.getAsPlayer();
@@ -53,17 +64,17 @@ export class RangedData {
                 }
                 break;
 
-            case ENCHANTED_EMERALD_BOLT:
+            case Ammunitions.ENCHANTED_EMERALD_BOLT:
                 target.performGraphic(new Graphic(752));
                 CombatFactory.poisonEntity(target, PoisonType.MILD);
                 break;
 
-            case ENCHANTED_JADE_BOLT:
+            case Ammunitions.ENCHANTED_JADE_BOLT:
                 target.performGraphic(new Graphic(755));
                 multiplier = 1.05;
                 break;
 
-            case ENCHANTED_ONYX_BOLT:
+            case Ammunitions.ENCHANTED_ONYX_BOLT:
                 target.performGraphic(new Graphic(753));
                 multiplier = 1.26;
                 let heal = (damage * 0.25) + 10;
@@ -77,15 +88,15 @@ export class RangedData {
                 }
                 break;
 
-            case ENCHANTED_PEARL_BOLT:
+            case Ammunitions.ENCHANTED_PEARL_BOLT:
                 target.performGraphic(new Graphic(750));
                 multiplier = 1.1;
                 break;
 
-            case ENCHANTED_RUBY_BOLT:
+            case Ammunitions.ENCHANTED_RUBY_BOLT:
                 break;
 
-            case ENCHANTED_SAPPHIRE_BOLT:
+            case Ammunitions.ENCHANTED_SAPPHIRE_BOLT:
                 target.performGraphic(new Graphic(751));
                 if (target.isPlayer()) {
                     const t = target.getAsPlayer();
@@ -103,7 +114,7 @@ export class RangedData {
                 }
                 break;
 
-            case ENCHANTED_TOPAZ_BOLT:
+            case Ammunitions.ENCHANTED_TOPAZ_BOLT:
                 target.performGraphic(new Graphic(757));
                 if (target.isPlayer()) {
                     const t = target.getAsPlayer();
@@ -111,7 +122,7 @@ export class RangedData {
                     t.getPacketSender().sendMessage("Your Magic level has been reduced.");
                 }
                 break;
-            case ENCHANTED_OPAL_BOLT:
+            case Ammunitions.ENCHANTED_OPAL_BOLT:
                 target.performGraphic(new Graphic(749));
                 multiplier = 1.3;
                 break;
@@ -131,7 +142,7 @@ export class RangedData {
         this.type = type;
     }
 
-    public static getFor(p: Player) {
+    public static getsFor(p: Player) {
         let weapon = p.getEquipment().getItems()[Equipment.WEAPON_SLOT].getId();
         return this.rangedWeapons.get(weapon);
     }
@@ -156,76 +167,76 @@ export class RangedData {
         }
     }
 
-    const Ammunition: Map<Ammunition, AmmunitionData> = new Map<Ammunition, AmmunitionData>([
-        [Ammunition.BRONZE_ARROW, { graphic: new Graphic(19, GraphicHeight.HIGH), damage: 10, weight: 7 }],
-        [Ammunition.IRON_ARROW, { graphic: new Graphic(18, GraphicHeight.HIGH), damage: 9, weight: 10 }],
-        [Ammunition.STEEL_ARROW, { graphic: new Graphic(20, GraphicHeight.HIGH), damage: 11, weight: 16 }],
-        [Ammunition.MITHRIL_ARROW, { graphic: new Graphic(21, GraphicHeight.HIGH), damage: 12, weight: 22 }],
-        [Ammunition.ADAMANT_ARROW, { graphic: new Graphic(22, GraphicHeight.HIGH), damage: 13, weight: 31 }],
-        [Ammunition.RUNE_ARROW, { graphic: new Graphic(24, GraphicHeight.HIGH), damage: 15, weight: 50 }],
-        [Ammunition.ICE_ARROW, { graphic: new Graphic(25, GraphicHeight.HIGH), damage: 16, weight: 58 }],
-        [Ammunition.BROAD_ARROW, { graphic: new Graphic(20, GraphicHeight.HIGH), damage: 11, weight: 58 }],
-        [Ammunition.DRAGON_ARROW, { graphic: new Graphic(1111, GraphicHeight.HIGH), damage: 1120, weight: 65 }],
-        [Ammunition.BRONZE_BOLT, { graphic: new Graphic(955, GraphicHeight.HIGH), damage: 27, weight: 13 }],
-        [Ammunition.OPAL_BOLT, { graphic: new Graphic(955, GraphicHeight.HIGH), damage: 27, weight: 20 }],
-        [Ammunition.ENCHANTED_OPAL_BOLT, { graphic: new Graphic(955, GraphicHeight.HIGH), damage: 27, weight: 20 }],
-        [Ammunition.IRON_BOLT, { graphic: new Graphic(955, GraphicHeight.HIGH), damage: 27, weight: 28 }],
-        [Ammunition.JADE_BOLT, { graphic: new Graphic(955, GraphicHeight.HIGH), damage: 27, weight: 31 }],
-        [Ammunition.ENCHANTED_JADE_BOLT, { graphic: new Graphic(955, GraphicHeight.HIGH), damage: 27, weight: 31 }],
-        [Ammunition.STEEL_BOLT, { graphic: new Graphic(955, GraphicHeight.HIGH), damage: 27, weight: 35 }],
-        [Ammunition.PEARL_BOLT, { graphic: new Graphic(955, GraphicHeight.HIGH), damage: 27, weight: 38 }],
-        [Ammunition.ENCHANTED_PEARL_BOLT, { graphic: new Graphic(955, GraphicHeight.HIGH), damage: 27, weight: 38 }],
-        [Ammunition.MITHRIL_BOLT, { graphic: new Graphic(955, GraphicHeight.HIGH), damage: 27, weight: 40 }],
-        [Ammunition.RUNITE_BOLT, { graphic: new Graphic(955, GraphicHeight.HIGH), damage: 27, weight: 115 }],
-        [Ammunition.DIAMOND_BOLT, { graphic: new Graphic(955, GraphicHeight.HIGH), damage: 27, weight: 105 }],
-        [Ammunition.ENCHANTED_DIAMOND_BOLT, { graphic: new Graphic(955, GraphicHeight.HIGH), damage: 27, weight: 105 }],
-        [Ammunition.DRAGON_BOLT, { graphic: new Graphic(955, GraphicHeight.HIGH), damage: 27, weight: 117 }],
-        [Ammunition.ENCHANTED_DRAGON_BOLT, { graphic: new Graphic(955, GraphicHeight.HIGH), damage: 27, weight: 117 }],
-        [Ammunition.ONYX_BOLT, { graphic: new Graphic(955, GraphicHeight.HIGH), damage: 27, weight: 120 }],
-        [Ammunition.ENCHANTED_ONYX_BOLT, { graphic: new Graphic(955, GraphicHeight.HIGH), damage: 27, weight: 120 }],
-        [Ammunition.ENCHANTED_DRAGONSTONE_DRAGON_BOLT, { graphic: new Graphic(955, GraphicHeight.HIGH), damage: 27, weight: 122 }],
-        [Ammunition.BRONZE_DART, { graphic: new Graphic(232, GraphicHeight.HIGH), damage: 226, weight: 1 }],
-        [Ammunition.IRON_DART, { graphic: new Graphic(233, GraphicHeight.HIGH), damage: 227, weight: 4 }],
-        [Ammunition.STEEL_DART, { graphic: new Graphic(234, GraphicHeight.HIGH), damage: 228, weight: 6 }],
-        [Ammunition.BRONZE_KNIFE, { graphic: new Graphic(219, GraphicHeight.HIGH), damage: 212, weight: 3 }],
-        [Ammunition.BRONZE_KNIFE_P1, { graphic: new Graphic(219, GraphicHeight.HIGH), damage: 212, weight: 3 }],
-        [Ammunition.BRONZE_KNIFE_P2, { graphic: new Graphic(219, GraphicHeight.HIGH), damage: 212, weight: 3 }],
-        [Ammunition.MITHRIL_KNIFE, { graphic: new Graphic(223, GraphicHeight.HIGH), damage: 215, weight: 10 }],
-        [Ammunition.MITHRIL_KNIFE_P1, { graphic: new Graphic(223, GraphicHeight.HIGH), damage: 215, weight: 10 }],
-        [Ammunition.MITHRIL_KNIFE_P2, { graphic: new Graphic(223, GraphicHeight.HIGH), damage: 215, weight: 10 }],
-        [Ammunition.BRONZE_JAVELIN, { graphic: null, damage: 200, weight: 25 }],
-        [Ammunition.IRON_JAVELIN, { graphic: null, damage: 201, weight: 42 }],
-        [Ammunition.STEEL_JAVELIN, { graphic: null, damage: 202, weight: 64 }],
-        [Ammunition.MITHRIL_JAVELIN, { graphic: null, damage: 203, weight: 85 }],
-        [Ammunition.ADAMANT_JAVELIN, { graphic: null, damage: 204, weight: 107 }],
-        [Ammunition.RUNE_JAVELIN, { graphic: null, damage: 205, weight: 124 }],
-        [Ammunition.DRAGON_JAVELIN, { graphic: null, damage: 1301, weight: 150 }],
-        [Ammunition.TOKTZ_XIL_UL, { graphic: null, damage: 442, weight: 58 }],
-        [Ammunition.BOLT_RACK, { graphic: null, damage: 27, weight: 55 }],
-    ]);
-
-    const NO_GROUND_DROP = new Set<Ammunition>([Ammunition.BRONZE_JAVELIN, Ammunition.IRON_JAVELIN, Ammunition.STEEL_JAVELIN, Ammunition.ADAMANT_JAVELIN, Ammunition.RUNE_JAVELIN, Ammunition.DRAGON_JAVELIN]);
-
-
-    let rangedAmmunition = new Map<number, Ammunition>();
-
-    public static getFor(p: Player): Ammunition {
-    //First try to get a throw weapon as ammo
-    let weapon = p.getEquipment().getItems()[Equipment.WEAPON_SLOT].getId();
-    let throwWeapon = rangedAmmunition.get(weapon);
-
-    //Toxic blowpipe should always fire dragon darts.
-    if (weapon == 12926) {
-        return Ammunition.DRAGON_DART;
+    public getDefaultDistance() {
+        return defaultDistance;
+    }
+        
+    public getLongRangeDistance() {
+        return longRangeDistance;
+    }
+    
+    public getLongRangeFightType(): FightType {
+        return longRangeFightType;
     }
 
-    //Didnt find one. Try arrows
-    if (throwWeapon == null) {
-        return rangedAmmunition.get(p.getEquipment().getItems()[Equipment.AMMUNITION_SLOT].getId());
+    public static getFor(p: Player): Ammunitions {
+        //First try to get a throw weapon as ammo
+        let weapon = p.getEquipment().getItems()[Equipment.WEAPON_SLOT].getId();
+        let throwWeapon = rangedAmmunition.get(weapon);
+    
+        //Toxic blowpipe should always fire dragon darts.
+        if (weapon == 12926) {
+            return Ammunitions.DRAGON_DART;
+        }
+    
+        //Didnt find one. Try arrows
+        if (throwWeapon == null) {
+            return rangedAmmunition.get(p.getEquipment().getItems()[Equipment.AMMUNITION_SLOT].getId());
+        }
+    
+        return throwWeapon;
     }
 
-    return throwWeapon;
-}
+    public static getFors(item: number): Ammunitions {
+        //First try to get a throw weapon as ammo
+        let throwWeapon = rangedAmmunition.get(item);
+    
+        //Didnt find one. Try arrows
+        if (throwWeapon == null) {
+            return rangedAmmunition.get(item);
+        }
+    
+        return throwWeapon;
+    }
+    
+    public getItemId(): number {
+        return this.itemId;
+    }
+    
+    public getStartGraphic(): Graphic {
+        return this.startGfx;
+    }
+    
+    public getProjectileId(): number {
+        return this.projectileId;
+    }
+    
+    public getStrength(): number {
+        return this.strength;
+    }
+    
+    public dropOnFloor(): boolean {
+        return !this.NO_GROUND_DROP.has(this);
+    }
+
+
+
+    const NO_GROUND_DROP = new Set<Ammunitions>([Ammunitions.BRONZE_JAVELIN, Ammunitions.IRON_JAVELIN, Ammunitions.STEEL_JAVELIN, Ammunitions.ADAMANT_JAVELIN, Ammunitions.RUNE_JAVELIN, Ammunitions.DRAGON_JAVELIN]);
+
+
+    let rangedAmmunition = new Map<number, Ammunitions>();
+
+
 
     private startGfx: Graphic;
     private itemId: number;
@@ -240,37 +251,7 @@ constructor(itemId: number, startGfx: Graphic, projectileId: number, strength: n
     rangedAmmunition.set(itemId, this);
 }
 
-    public static getFor(item: number): Ammunition {
-    //First try to get a throw weapon as ammo
-    let throwWeapon = rangedAmmunition.get(item);
 
-    //Didnt find one. Try arrows
-    if (throwWeapon == null) {
-        return rangedAmmunition.get(item);
-    }
-
-    return throwWeapon;
-}
-
-    public getItemId(): number {
-    return this.itemId;
-}
-
-    public getStartGraphic(): Graphic {
-    return this.startGfx;
-}
-
-    public getProjectileId(): number {
-    return this.projectileId;
-}
-
-    public getStrength(): number {
-    return this.strength;
-}
-
-    public dropOnFloor(): boolean {
-    return !NO_GROUND_DROP.has(this);
-}
 
 const RangedWeaponTypes: { [key in RangedWeaponType]: IRangedWeaponType } = {
     KNIFE: { longRangeFightType: FightType.KNIFE_LONGRANGE, defaultDistance: 4, longRangeDistance: 6 },
@@ -279,17 +260,7 @@ const RangedWeaponTypes: { [key in RangedWeaponType]: IRangedWeaponType } = {
     LONGBOW: { longRangeFightType: FightType.LONGBOW_LONGRANGE, defaultDistance: 9, longRangeDistance: 10 },
 }
 
-    public getDefaultDistance() {
-    return defaultDistance;
-}
-    
-    public getLongRangeDistance() {
-    return longRangeDistance;
-}
 
-    public getLongRangeFightType(): FightType {
-    return longRangeFightType;
-}
 }
 
 export enum RangedWeaponType {
@@ -307,7 +278,6 @@ interface IRangedWeaponType {
     defaultDistance: number,
     longRangeDistance: number
 }
-
 
 export enum Ammunitions {
     BRONZE_ARROW = 882,

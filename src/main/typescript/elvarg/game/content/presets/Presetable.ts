@@ -32,7 +32,7 @@ export class Presetable {
      */
     private readonly isGlobal: boolean;
 
-    constructor(name: string, inventory: Item[], equipment: Item[], stats: number[], spellbook: MagicSpellbook, isGlobal: boolean) {
+    constructor(name: string, inventory: Item[], equipment: Item[], stats: number[], spellbook, isGlobal: boolean) {
         this.isGlobal = false;
         this.name = name;
         this.inventory = inventory;
@@ -81,19 +81,19 @@ export class Presetable {
         return this.stats;
     }
 
-    setStats(stats: number[]) {
+    public setStats(stats: number[]) {
         this.stats = stats;
     }
 
-    getSpellbook(): MagicSpellbook {
+    public getSpellbook(): MagicSpellbook {
         return this.spellbook;
     }
 
-    setSpellbook(spellbook: MagicSpellbook) {
+    public setSpellbook(spellbook: MagicSpellbook) {
         this.spellbook = spellbook;
     }
 
-    getIsGlobal(): boolean {
+    public getIsGlobal(): boolean {
         return this.isGlobal;
     }
 

@@ -16,7 +16,7 @@ import { Flag } from '../../../Flag';
 
 
 
-class CastleWarsSaradominWaitingArea extends Area {
+export class CastleWarsSaradominWaitingArea extends Area {
     constructor() {
         super(Arrays.asList(new Boundary(2368, 2392, 9481, 9497,0)));
     }

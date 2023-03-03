@@ -1,3 +1,6 @@
+import { Player } from "../../../entity/impl/player/Player";
+import { SlayerTask } from '../slayer/SlayerTask'
+import { SlayerMaster } from '../slayer/SlayerMaster'
 export class Slayer {
     public static assign(player: Player): boolean {
         let master: SlayerMaster = SlayerMaster.TURAEL;

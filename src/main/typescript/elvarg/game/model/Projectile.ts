@@ -13,7 +13,9 @@ export class Projectile {
     private lockon: Mobile;
     private delay: number;
     private privateArea: PrivateArea;
-    constructor(start: Location, end: Location, lockon: Mobile, projectileId: number, delay: number, speed: number, startHeight: number, endHeight: number, privateArea: PrivateArea) {
+
+    constructor(start: Location, end: Location, lockon: Mobile, projectileId: number, delay: number, speed: number,
+        startHeight: number, endHeight: number, privateArea: PrivateArea) {
         this.start = start;
         this.lockon = lockon;
         this.end = end;
@@ -23,7 +25,23 @@ export class Projectile {
         this.startHeight = startHeight;
         this.endHeight = endHeight;
         this.privateArea = privateArea;
+        }
+
+        static createProjectile(source: Mobile, victim: Mobile, projectileId: number, delay: number, speed: number,
+                            startHeight: number, endHeight: number) {
+        return new Projectile(
+            source.getLocation(),
+            victim.getLocation(),
+            victim,
+            projectileId,
+            delay,
+            speed,
+            startHeight,
+            endHeight,
+            source.getPrivateArea()
+        );
     }
+
 
     public sendProjectile(): void {
         for (let player of World.getPlayers()) {

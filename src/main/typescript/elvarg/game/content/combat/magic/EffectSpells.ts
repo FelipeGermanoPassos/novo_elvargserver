@@ -1,7 +1,8 @@
 import { Mobile } from "../../../entity/impl/Mobile";
 import { Player } from "../../../entity/impl/player/Player";
-import { UpdateFlag } from "../../../model/UpdateFlag"
 import { Spell } from "./Spell";
+import { Skill } from "../../../model/Skill";
+import { EffectSpell}
 
 export class EffectSpells {
     public static handleSpell(player: Player, button: number) {
@@ -26,7 +27,7 @@ export class EffectSpells {
                 let i = 0;
                 player.getInventory().getValidItems().forEach(invItem => {
                     if (invItem.getId() == 526) {
-                        player.getInventory().delete(526, 1).add(spell.get() == EffectSpell.BONES_TO_PEACHES ? 6883 : 1963, 1);
+                        player.getInventory().delete(526, 1).add(spell.get() == EffectSpells.BONES_TO_PEACHES ? 6883 : 1963, 1);
                         i++;
                     }
                 });

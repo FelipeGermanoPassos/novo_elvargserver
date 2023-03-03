@@ -228,6 +228,6 @@ export class PlayerRelations {
 
 }
 
-enum PrivateChatStatus {
+export enum PrivateChatStatus {
     ON, FRIENDS_ONLY, OFF
 }

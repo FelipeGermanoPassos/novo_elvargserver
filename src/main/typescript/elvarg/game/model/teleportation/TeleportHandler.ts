@@ -1,4 +1,9 @@
 
+import { Player } from "../../entity/impl/player/Player";
+import { WildernessArea } from "../areas/impl/WildernessArea";
+import { StringBuilder } from 'stringbuilder'
+import { Area } from "../areas/Area";
+
 export class TeleportHandler {
 
     /**

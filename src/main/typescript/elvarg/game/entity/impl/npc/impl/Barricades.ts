@@ -21,7 +21,7 @@ export class Barricades {
 
     private static barricades: Location[] = [];
     private static getBlackListedTiles(player: Player, requestedTile: Location): boolean {
-        return [new Location(1, 1, 0)].find(t => t.equals(requestedTile)) !== undefined;
+        return [new Location(1, 1)].find(t => t.equals(requestedTile)) !== undefined;
     }
 
     public static checkTile(tile: Location): void {

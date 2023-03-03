@@ -1,48 +1,43 @@
-class BirdNest {
-    private static AMOUNT: number = 1;
-    private static SEEDS_NEST_CHANCE: number = 0.64;
-    private static GOLD_NEST_CHANCE: number = 0.32;
+import { Misc } from "../../../../../../util/Misc";
+import { Player } from "../../../../../entity/impl/player/Player";
+import { ItemOnGroundManager } from "../../../../../entity/impl/grounditem/ItemOnGroundManager";
+import { ItemIdentifiers } from "../../../../../../util/ItemIdentifiers";
+import { Item } from "../../../../../model/Item";
+
+export class BirdNest {
+    public static AMOUNT: number = 1;
+    public static SEEDS_NEST_CHANCE: number = 0.64;
+    public static GOLD_NEST_CHANCE: number = 0.32;
     public static NEST_DROP_CHANCE: number = 256;
 
-    public static Nest = {
-        RED_BIRD_NEST: "RED_BIRD_NEST",
-        GREEN_BIRD_NEST: "GREEN_BIRD_NEST",
-        BLUE_BIRD_NEST: "BLUE_BIRD_NEST",
-        SEEDS_NEST: "SEEDS_NEST",
-        GOLD_BIRD_NEST: "GOLD_BIRD_NEST",
-        EMPTY: "EMPTY"
-    }
-
     public static getById(id: number) {
-        for (const nest in this.Nest) {
-            if (nest.getId() === id) {
+        for (const nest in Nest) {
+            if (Rings.getId() === id) {
                 return nest;
             }
         }
         return null;
     }
 
-    export function getSeedById(id: number): Seed | undefined {
-    for (let seed in Seed) {
-        if (Seed[seed].id === id) {
-            return Seed[seed];
-        }
-    }
-}
-
-export function getSeedByName(name: string): Seed | undefined {
-    for (let seed in Seed) {
-        if (Seed[seed].name === name) {
-            return Seed[seed];
+    public static  getSeedById(id: number): Seed | undefined {
+        for (let seed in Seed) {
+            if (Seed[seed].id === id) {
+                return Seed[seed];
+            }
         }
     }
 
+    public static getSeedByName(name: string): Seed | undefined {
+        for (let seed in Seed) {
+            if (Seed[seed].name === name) {
+                return Seed[seed];
+            }
+        }
+    }
+
 }
 
-
-}
-
-class Ring {
+export class Rings {
     private id: number;
     private name: string;
 
@@ -51,36 +46,8 @@ class Ring {
         this.name = name;
     }
 
-    public getId(): number {
-        return this.id;
-    }
-
-    public getName(): string {
-        return this.name;
-    }
-
-    static handleDropNest(player: Player) {
-        if (player.getLocation().getZ() > 0) {
-            return;
-        }
-        let random = Math.random();
-        let nest: Nest;
-        if (random < SEEDS_NEST_CHANCE) {
-            nest = Nest.SEEDS_NEST;
-        } else if (random < SEEDS_NEST_CHANCE + GOLD_NEST_CHANCE) {
-            nest = Nest.GOLD_BIRD_NEST;
-        } else {
-            let color = Misc.getRandom(2);
-            nest = color === 1 ? Nest.RED_BIRD_NEST : color === 2 ? Nest.GREEN_BIRD_NEST : Nest.BLUE_BIRD_NEST;
-        }
-        if (nest != null) {
-            ItemOnGroundManager.register(player, new Item(nest.getId(), 1));
-            player.getPacketSender().sendMessage("@red@A bird's nest falls out of the tree.");
-        }
-    }
-
     static handleSearchNest(p: Player, itemId: number) {
-        let nest = Nest.getById(itemId);
+        let nest = BirdNest.getById(itemId);
         if (!nest) {
             return;
         }
@@ -88,35 +55,35 @@ class Ring {
             p.getPacketSender().sendMessage("Your inventory is too full to take anything out of the bird's nest.");
             return;
         }
-        p.getInventory().delete(itemId, 1);
-        p.getInventory().add(Nest.EMPTY.getId(), 1);
+        p.getInventory().deleteNumber(itemId, 1);
+        p.getInventory().adds(Nest.EMPTY.getId(), 1);
         if (nest == Nest.GOLD_BIRD_NEST) {
-            searchRingNest(p, itemId);
+            this.searchRingNest(p, itemId);
         } else if (nest == Nest.SEEDS_NEST) {
-            searchSeedNest(p, itemId);
+            this.searchSeedNest(p, itemId);
         } else {
-            searchEggNest(p, itemId);
+            this.searchEggNest(p, itemId);
         }
     }
 
 
     static searchEggNest(player: Player, itemId: number) {
         let eggId = 0;
-        if (itemId == BIRD_NEST) {
-            eggId = BIRDS_EGG;
-        } else if (itemId == BIRD_NEST_3) {
-            eggId = BIRDS_EGG_2;
-        } else if (itemId == BIRD_NEST_2) {
-            eggId = BIRDS_EGG_3;
+        if (itemId == ItemIdentifiers.BIRD_NEST) {
+            eggId = ItemIdentifiers.BIRDS_EGG;
+        } else if (itemId == ItemIdentifiers.BIRD_NEST_3) {
+            eggId = ItemIdentifiers.BIRDS_EGG_2;
+        } else if (itemId == ItemIdentifiers.BIRD_NEST_2) {
+            eggId = ItemIdentifiers.BIRDS_EGG_3;
         }
         if (eggId != 0) {
-            player.getInventory().add(eggId, AMOUNT);
+            player.getInventory().adds(eggId, BirdNest.AMOUNT);
             player.getPacketSender().sendMessage("You take the bird's egg out of the bird's nest.");
         }
     }
 
     private static searchSeedNest(player: Player, itemId: number) {
-        if (itemId != BIRD_NEST_4) {
+        if (itemId != ItemIdentifiers.BIRD_NEST_4) {
             return;
         }
         let random = Misc.getRandom(1000);
@@ -151,18 +118,18 @@ class Ring {
             seed = Seed.SPIRIT;
         }
         if (seed != null) {
-            player.getInventory().add(seed.getId(), AMOUNT);
+            player.getInventory().adds(Rings.getId(), BirdNest.AMOUNT);
             if (seed == Seed.ACORN) {
-                player.getPacketSender().sendMessage(`You take an ${seed.getName()} out of the bird's nest.`);
+                player.getPacketSender().sendMessage(`You take an ${Rings.getName()} out of the bird's nest.`);
             } else if (seed == Seed.APPLE || seed == Seed.ORANGE) {
-                player.getPacketSender().sendMessage(`You take an ${seed.getName()} tree seed out of the bird's nest.`);
+                player.getPacketSender().sendMessage(`You take an ${Rings.getName()} tree seed out of the bird's nest.`);
             } else {
-                player.getPacketSender().sendMessage("You take a " + seed.getName() + " tree seed out of the bird's nest.");
+                player.getPacketSender().sendMessage("You take a " + Rings.getName() + " tree seed out of the bird's nest.");
             }
         }
     }
     static searchRingNest(player: Player, itemId: number) {
-        if (itemId != BIRD_NEST_5) {
+        if (itemId != ItemIdentifiers.BIRD_NEST_5) {
             return;
         }
         let random = Misc.getRandom(100);
@@ -179,11 +146,11 @@ class Ring {
             ring = Ring.DIAMOND;
         }
         if (ring != null) {
-            player.getInventory().add(ring.getId(), AMOUNT);
+            player.getInventory().adds(Ring.getId(), BirdNest.AMOUNT);
             if (ring == Ring.EMERALD) {
-                player.getPacketSender().sendMessage(`You take an ${ring.getName()} ring out of the bird's nest.`);
+                player.getPacketSender().sendMessage(`You take an ${Rings.getName()} ring out of the bird's nest.`);
             } else {
-                player.getPacketSender().sendMessage(`You take a ${ring.getName()} ring out of the bird's nest.`);
+                player.getPacketSender().sendMessage(`You take a ${Rings.getName()} ring out of the bird's nest.`);
             }
         }
     }
@@ -191,31 +158,90 @@ class Ring {
 }
 
 
-enum Ring {
-    GOLD = 1635,
-    SAPPHIRE = 1637,
-    EMERALD = 1639,
-    RUBY = 1641,
+class Ring {
+    GOLD = 1635;
+    SAPPHIRE = 1637;
+    EMERALD = 1639;
+    RUBY = 1641;
     DIAMOND = 1643
+
+    private readonly id: number;
+    private readonly name: String;
+
+    constructor( id: number, name: String) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public getId(): number {
+        return this.id;
+    }
+
+    public getName(): String {
+        return this.name;
+    }
 }
 
-export enum Seed {
-    ACORN = { id: 5312, name: "acorn" },
-    WILLOW = { id: 5313, name: "willow" },
-    MAPLE = { id: 5314, name: "maple" },
-    YEW = { id: 5315, name: "yew" },
-    MAGIC = { id: 5316, name: "magic" },
-    SPIRIT = { id: 5317, name: "spirit" },
-    APPLE = { id: 5283, name: "apple" },
-    BANANA = { id: 5284, name: "banana" },
-    ORANGE = { id: 5285, name: "orange" },
-    CURRY = { id: 5286, name: "curry" },
-    PINEAPPLE = { id: 5287, name: "pineapple" },
-    PAPAYA = { id: 5288, name: "papaya" },
-    PALM = { id: 5289, name: "palm" },
-    CALQUAT = { id: 5290, name: "calquat" }
+export class Seed {
+    public static readonly ACORN = { id: 5312, name: "acorn" };
+    public static readonly WILLOW = { id: 5313, name: "willow" };
+    public static readonly MAPLE = { id: 5314, name: "maple" };
+    public static readonly YEW = { id: 5315, name: "yew" };
+    public static readonly MAGIC = { id: 5316, name: "magic" };
+    public static readonly SPIRIT = { id: 5317, name: "spirit" };
+    public static readonly APPLE = { id: 5283, name: "apple" };
+    public static readonly BANANA = { id: 5284, name: "banana" };
+    public static readonly ORANGE = { id: 5285, name: "orange" };
+    public static readonly CURRY = { id: 5286, name: "curry" };
+    public static readonly PINEAPPLE = { id: 5287, name: "pineapple" };
+    public static readonly PAPAYA = { id: 5288, name: "papaya" };
+    public static readonly PALM = { id: 5289, name: "palm" };
+    public static readonly CALQUAT = { id: 5290, name: "calquat" }
+
+    private readonly id: number;
+        private readonly name: String;
+
+        constructor(id: number, name: String) {
+            this.id = id;
+            this.name = name;
+        }
+
+        public getId(): number {
+            return this.id;
+        }
+
+        public getName(): String {
+            return this.name;
+        }
 }
 
+export class Nest {
+    RED_BIRD_NEST = 'RED_BIRD_NEST';
+    GREEN_BIRD_NEST = "GREEN_BIRD_NEST";
+    BLUE_BIRD_NEST = "BLUE_BIRD_NEST";
+    SEEDS_NEST = "SEEDS_NEST";
+    GOLD_BIRD_NEST =  "GOLD_BIRD_NEST";
+    EMPTY = "EMPTY";
+
+    private readonly id: number
+
+    constructor(id: number) {
+        this.id = id;
+    }
+
+    public getId(): number {
+        return this.id;
+    }
+
+    public static getById(id: number): Nest {
+        for (nest: Nest : values()) {
+            if (nest.getId() == id) {
+                return nest;
+            }
+        }
+        return null;
+    }
+}
 
 
 

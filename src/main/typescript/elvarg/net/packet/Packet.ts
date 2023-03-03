@@ -1,4 +1,7 @@
 import { ByteBuf } from 'netty';
+import { PacketType } from './PacketType';
+import { ValueType } from './ValueType';
+import { StringBuilder } from 'stringbuilder'
 
 export class Packet {
     constructor(opcode: number, type: PacketType, buffer: ByteBuf) {
@@ -8,10 +11,8 @@ export class Packet {
     }
 
     private opcode: number;
-    private type: PacketType;
+    public type: PacketType;
     private buffer: ByteBuf;
-
-
 
     public getOpcode(): number {
         return this.opcode;
@@ -98,7 +99,6 @@ export class Packet {
         return value > 32767 ? value - 0x10000 : value;
     }
 
-    class Packet {
     // ... previous code
     public readLEShort(): number {
         let value = (this.readByte() & 0xFF) | (this.readByte() & 0xFF) << 8;

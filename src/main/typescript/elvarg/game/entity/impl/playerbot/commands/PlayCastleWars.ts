@@ -1,3 +1,8 @@
+import { Equipment } from "../../../../model/container/impl/Equipment";
+import { BotCommand } from "./BotCommand";
+import { TaskManager } from "../../../../task/TaskManager";
+import { PlayerBot } from "../PlayerBot";
+import { Task } from "../../../../task/Task";
 export class PlayCastleWars implements BotCommand {
     public triggers(): string[] {
         return ["castlewars", " cw"];

@@ -1,4 +1,23 @@
-class UseItemPacketListener implements PacketExecutor {
+import { Player } from "../../../game/entity/impl/player/Player";
+import { PacketExecutor } from "../PacketExecutor";
+import { Packet } from "../Packet";
+import { Herblore } from "../../../game/content/skill/skillable/impl/Herblore";
+import { Fletching } from "../../../game/content/skill/skillable/impl/Fletching";
+import { ItemIdentifiers } from "../../../util/ItemIdentifiers";
+import { CombatFactory } from "../../../game/content/combat/CombatFactory";
+import { World } from "../../../game/World";
+import { NPCInteractionSystem } from "../../../game/entity/impl/npc/NPCInteractionSystem";
+import { ObjectIdentifiers } from "../../../util/ObjectIdentifiers";
+import { WebHandler } from "../../../game/entity/impl/object/impl/WebHandler";
+import { CastleWars } from "../../../game/content/minigames/impl/CastleWars";
+import { Bank } from "../../../game/model/container/impl/Bank";
+import { BuriableBone, AltarOffering } from "../../../game/content/skill/skillable/impl/Prayer";
+import { CreationMenu } from "../../../game/model/menu/CreationMenu";
+import { ItemOnGroundManager } from "../../../game/entity/impl/grounditem/ItemOnGroundManager";
+import { PacketConstants } from "../PacketConstants";
+import { Optonal } from 'optional'
+
+export class UseItemPacketListener implements PacketExecutor {
     private static itemOnItem(player: Player, packet: Packet) {
     let usedWithSlot = packet.readUnsignedShort();
     let itemUsedSlot = packet.readUnsignedShortA();
@@ -24,32 +43,32 @@ class UseItemPacketListener implements PacketExecutor {
             || Fletching.fletchCrossbow(player, used.getId(), usedWith.getId())) {
         return;
         }
-        if ((used.getId() === DRAGON_DEFENDER || usedWith.getId() === DRAGON_DEFENDER)
-        && (used.getId() === AVERNIC_DEFENDER_HILT || usedWith.getId() === AVERNIC_DEFENDER_HILT)) {
+        if ((used.getId() === ItemIdentifiers.DRAGON_DEFENDER || usedWith.getId() === ItemIdentifiers.DRAGON_DEFENDER)
+        && (used.getId() === ItemIdentifiers.AVERNIC_DEFENDER_HILT || usedWith.getId() === ItemIdentifiers.AVERNIC_DEFENDER_HILT)) {
         if (player.busy() || CombatFactory.inCombat(player)) {
         player.getPacketSender().sendMessage("You cannot do that right now.");
         return;
         }
-        if (player.getInventory().contains(DRAGON_DEFENDER) && player.getInventory().contains(AVERNIC_DEFENDER_HILT)) {
-        player.getInventory().delete(DRAGON_DEFENDER, 1).delete(AVERNIC_DEFENDER_HILT, 1).add(AVERNIC_DEFENDER, 1);
+        if (player.getInventory().contains(ItemIdentifiers.DRAGON_DEFENDER) && player.getInventory().contains(ItemIdentifiers.AVERNIC_DEFENDER_HILT)) {
+        player.getInventory().delete(ItemIdentifiers.DRAGON_DEFENDER, 1).delete(ItemIdentifiers.AVERNIC_DEFENDER_HILT, 1).add(ItemIdentifiers.AVERNIC_DEFENDER, 1);
         player.getPacketSender().sendMessage("You attach your Avernic hilt onto the Dragon defender..");
         }
         return;
         }
             //Blowpipe reload
-    else if (used.getId() === TOXIC_BLOWPIPE || usedWith.getId() === TOXIC_BLOWPIPE) {
-        let reload = used.getId() === TOXIC_BLOWPIPE ? usedWith.getId() : used.getId();
-        if (reload === ZULRAHS_SCALES) {
+    else if (used.getId() === ItemIdentifiers.TOXIC_BLOWPIPE || usedWith.getId() === ItemIdentifiers.TOXIC_BLOWPIPE) {
+        let reload = used.getId() === ItemIdentifiers.TOXIC_BLOWPIPE ? usedWith.getId() : used.getId();
+        if (reload === ItemIdentifiers.ZULRAHS_SCALES) {
             const amount = player.getInventory().getAmount(12934);
             player.incrementBlowpipeScales(amount);
-            player.getInventory().delete(ZULRAHS_SCALES, amount);
+            player.getInventory().delete(ItemIdentifiers.ZULRAHS_SCALES);
             player.getPacketSender().sendMessage(`You now have ${player.getBlowpipeScales()} Zulrah scales in your blowpipe.`);
         } else {
             player.getPacketSender().sendMessage("You cannot load the blowpipe with that!");
         }
     }
 
-    private static itemOnNpc(player: Player, packet: Packet) {
+    public itemOnNpc(player: Player, packet: Packet) {
         const id = packet.readShortA();
         const index = packet.readShortA();
         const slot = packet.readLEShort();
@@ -101,7 +120,7 @@ class UseItemPacketListener implements PacketExecutor {
     if (item == null || item.getId() !== itemId)
         return;
 
-    const position = new Location(objectX, objectY, player.getLocation().getZ());
+    const position = new Location();
 
     const object = MapObjects.get(player, objectId, position);
 
@@ -226,10 +245,10 @@ private static itemOnGroundItem(player: Player, packet: Packet) {
             player.setPositionToFace(groundItem.getPosition());
             //Handle used item..
             switch (inventory_item) {
-                case TINDERBOX: //Lighting a fire..
+                case ItemIdentifiers.TINDERBOX: //Lighting a fire..
                     let log = LightableLog.getForItem(ground_item_id);
                     if (log) {
-                        player.getSkillManager().startSkillable(new Firemaking(log, groundItem));
+                        player.getSkillManager().startSkillable(new Firemaking());
                         return;
                     }
                     break;
@@ -242,19 +261,19 @@ private static itemOnGroundItem(player: Player, packet: Packet) {
         return;
     switch (packet.getOpcode()) {
         case PacketConstants.ITEM_ON_ITEM:
-            itemOnItem(player, packet);
+            UseItemPacketListener.itemOnItem(player, packet);
             break;
         case PacketConstants.ITEM_ON_OBJECT:
-            itemOnObject(player, packet);
+            UseItemPacketListener.itemOnObject(player, packet);
             break;
         case PacketConstants.ITEM_ON_GROUND_ITEM:
-            itemOnGroundItem(player, packet);
+            UseItemPacketListener.itemOnGroundItem(player, packet);
             break;
         case PacketConstants.ITEM_ON_NPC:
-            itemOnNpc(player, packet);
+            UseItemPacketListener.itemOnNpc(player, packet);
             break;
         case PacketConstants.ITEM_ON_PLAYER:
-            itemOnPlayer(player, packet);
+            UseItemPacketListener.itemOnPlayer(player, packet);
             break;
     }
     }

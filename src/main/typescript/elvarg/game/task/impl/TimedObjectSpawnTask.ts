@@ -3,7 +3,7 @@ import { ObjectManager } from "../../entity/impl/object/ObjectManager";
 import { Optional } from 'optional'
 import { Action } from '../../model/Action';
 import { Task } from "../Task";
-class TimedObjectSpawnTask extends Task {
+export class TimedObjectSpawnTask extends Task {
     private temp: GameObject;
     private ticks: number;
     private action: Optional<Action>;

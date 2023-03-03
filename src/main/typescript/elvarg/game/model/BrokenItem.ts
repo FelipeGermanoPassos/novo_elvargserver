@@ -54,5 +54,60 @@ export class BrokenItem {
     public static get(originalId: number): BrokenItem | undefined {
         return BrokenItem.brokenItems.get(originalId);
     }
+
+    public static getValueLoseOnDeath(player: Player): number {
+        let cost = 0;
+      
+        for (const b of Object.values(BrokenItem)) {
+          const amt = player.getInventory().getAmount(b.getOriginalItem());
+      
+          if (amt > 0) {
+            cost += Math.floor(ItemDefinition.forId(b.getOriginalItem()).getBloodMoneyValue() * BrokenItem.REPAIR_COST_MULTIPLIER) * amt;
+          }
+      
+          const amtEq = player.getEquipment().getAmount(b.getOriginalItem());
+      
+          if (amtEq > 0) {
+            cost += Math.floor(ItemDefinition.forId(b.getOriginalItem()).getBloodMoneyValue() * BrokenItem.REPAIR_COST_MULTIPLIER) * amtEq;
+          }
+        }
+      
+        return cost;
+      }
+
+    public static  repair(player: Player): boolean {
+        const fullCost = BrokenItem.getRepairCost(player);
+            if (fullCost > player.getInventory().getAmount(ItemIdentifiers.BLOOD_MONEY)) {
+                return false;
+            }
+        
+            for (const b of BrokenItem.brokenItems.values()) {
+                const amt = player.getInventory().getAmount(b.brokenItem);
+                if (amt > 0) {
+                    const cost = Math.floor(ItemDefinition.forId(b.originalItem).getBloodMoneyValue() * BrokenItem.REPAIR_COST_MULTIPLIER * amt);
+                    if (player.getInventory().getAmount(ItemIdentifiers.BLOOD_MONEY) >= cost) {
+                        player.getInventory().delete(b.getBrokenItem());
+                        player.getInventory().delete(b.getBrokenItem());
+                        player.getInventory().add(b.brokenItem);
+                    } else {
+                        return false;
+                    }
+                }
+            }
+        
+            return true;
+    }
+    
+    public getOriginalItem(): number {
+        return this.originalItem;
+    }
+
+    public getBrokenItem(): number {
+        return this.brokenItem;
+    }
+
+    
+
+
 }
 BrokenItem.init();

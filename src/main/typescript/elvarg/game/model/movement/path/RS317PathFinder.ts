@@ -1,4 +1,10 @@
-public class RS317PathFinder {
+
+import { Mobile } from "../../../entity/impl/Mobile";
+import { Location } from "../../Location";
+import { RegionManager } from "../../../collision/RegionManager";
+
+export public class RS317PathFinder {
+
 
     private static readonly DEFAULT_PATH_LENGTH = 4000;
 
@@ -36,7 +42,7 @@ public class RS317PathFinder {
             tileQueueX.push(curX);
             tileQueueY.push(curY);
             let foundPath = false;
-            while (tail != tileQueueX.length && tileQueueX.length < DEFAULT_PATH_LENGTH) {
+            while (tail != tileQueueX.length && tileQueueX.length < RS317PathFinder.DEFAULT_PATH_LENGTH) {
                 curX = tileQueueX[tail];
                 curY = tileQueueY[tail];
                 const curAbsX = gc.getLocation().getRegionX() * 8 + curX;
@@ -45,7 +51,7 @@ public class RS317PathFinder {
                     foundPath = true;
                     break;
                 }
-                tail = (tail + 1) % DEFAULT_PATH_LENGTH;
+                tail = (tail + 1) % RS317PathFinder.DEFAULT_PATH_LENGTH;
 
                 if (cost.length < curX || cost[curX].length < curY) {
                     return;

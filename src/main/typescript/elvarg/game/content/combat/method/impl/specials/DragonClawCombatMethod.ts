@@ -8,7 +8,7 @@ import { PendingHit } from "../../../hit/PendingHit";
 
 export class DragonClawCombatMethod extends MeleeCombatMethod {
 
-    private static readonly ANIMATION = new Animation(7527, Priority.HIGH);
+    private static readonly ANIMATION = new Animation(7527);
     private static readonly GRAPHIC = new Graphic(1171, Priority.HIGH);
 
     public hits(character: Mobile, target: Mobile): PendingHit[] {

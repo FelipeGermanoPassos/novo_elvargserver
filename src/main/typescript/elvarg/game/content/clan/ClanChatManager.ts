@@ -33,10 +33,12 @@ export class ClanChatManager {
                 let name = input.getUint8(0);
                 let owner = input.getUint8(1);
                 let index = input.getUint16(2);
-                let clan = new ClanChat(owner, name, index);
-                clan.setRankRequirements(ClanChat.RANK_REQUIRED_TO_ENTER, ClanChatRank.forId(input.getUint16(2)));
-                clan.setRankRequirements(ClanChat.RANK_REQUIRED_TO_KICK, ClanChatRank.forId(input.getUint16(2)));
-                clan.setRankRequirements(ClanChat.RANK_REQUIRED_TO_TALK, ClanChatRank.forId(input.getUint16(2)));
+                let clan = new ClanChat();
+                const rankId = input.getUint16(2);
+                const rankNumber = parseInt(rankId)
+                clan.setRankRequirements(ClanChat.RANK_REQUIRED_TO_ENTER, ClanChatRank.forMenuId(rankNumber));
+                clan.setRankRequirements(ClanChat.RANK_REQUIRED_TO_KICK, ClanChatRank.forMenuId(rankNumber));
+                clan.setRankRequirements(ClanChat.RANK_REQUIRED_TO_TALK, ClanChatRank.forMenuId(rankNumber));
                 let offset = 2;
                 let totalRanks = input.getInt16(0);
                 for (let i = 0; i < totalRanks; i++) {
@@ -46,12 +48,12 @@ export class ClanChatManager {
                     offset += nameLength;
                     let rankId = input.getUint16(offset);
                     offset += 2;
-                    clan.getRankedNames().set(name, ClanChatRank.forId(rankId));
+                    clan.getRankedNames().set(name, ClanChatRank.forMenuId(rankId));
                 }
                 let totalBans = input.getInt16(0);
                 for (let i = 0; i < totalBans; i++) {
                     let input = new DataView(data.buffer);
-                    clan.addBannedName(input.getUint8(0));
+                    clan.addBannedName(input.getUint8(0).toString());
                 }
                 ClanChatManager.clans[index] = clan;
             }
@@ -72,18 +74,18 @@ export class ClanChatManager {
                 fs.appendFileSync(file, clan.getOwnerName() + '\n');
                 fs.appendFileSync(file, clan.getIndex().toString() + '\n');
                 output.write(clan.getRankRequirement()[ClanChat.RANK_REQUIRED_TO_ENTER] != null
-                    ? clan.getRankRequirement()[ClanChat.RANK_REQUIRED_TO_ENTER].ordinal()
+                    ? clan.getRankRequirement()[ClanChat.RANK_REQUIRED_TO_ENTER].getId()
                     : -1);
                 output.write(clan.getRankRequirement()[ClanChat.RANK_REQUIRED_TO_KICK] != null
-                    ? clan.getRankRequirement()[ClanChat.RANK_REQUIRED_TO_KICK].ordinal()
+                    ? clan.getRankRequirement()[ClanChat.RANK_REQUIRED_TO_KICK].getId()
                     : -1);
                 output.write(clan.getRankRequirement()[ClanChat.RANK_REQUIRED_TO_TALK] != null
                     ? clan.getRankRequirement()[ClanChat.RANK_REQUIRED_TO_TALK].ordinal()
                     : -1);
-                fs.appendFileSync(file, clan.getRankedNames().size() + '\n');
+                fs.appendFileSync(file, clan.getRankedNames().size + '\n');
                 for (let iterator of clan.getRankedNames().entries()) {
                     let name = iterator[0];
-                    let rank = iterator[1].ordinal();
+                    let rank = iterator[1].getId();
                     fs.appendFileSync(file, name + '\n');
                     output.write(rank);
                 }
@@ -112,14 +114,14 @@ export class ClanChatManager {
             player.getPacketSender().sendMessage("An error occured! Please contact an administrator and report this.");
             return null;
         }
-        ClanChatManager.clans[index] = new ClanChat(player, name, index);
+        ClanChatManager.clans[index] = new ClanChat();
         ClanChatManager.clans[index].getRankedNames().set(player.getUsername(), chatRank.OWNER);
         ClanChatManager.clans[index].setRankRequirements(ClanChat.RANK_REQUIRED_TO_KICK, chatRank.OWNER);
         return ClanChatManager.clans[index];
     }
 
     public static joinChat(player: Player, channel: string): void {
-        if (channel == null || channel.equals("") || channel.equals("null")) {
+        if (channel == null || channel === "" || channel === "null") {
             return;
         }
         if (player.getCurrentClanChat() != null) {
@@ -131,7 +133,7 @@ export class ClanChatManager {
             if (clan == null) {
                 continue;
             }
-            if (clan.getName().toLowerCase().equals(channel)) {
+            if (clan.getName().toLowerCase() === channel) {
                 ClanChatManager.join(player, clan);
                 return;
             }
@@ -145,7 +147,7 @@ export class ClanChatManager {
             if (clan.getOwner() === null) {
                 clan.setOwner(player);
             }
-            clan.giveRank(player, chatRank.OWNER);
+            clan.givePlayerRank(player, chatRank.OWNER);
         }
         player.getPacketSender().sendMessage("Attempting to join channel...");
         if (clan.getMembers().length >= 100) {

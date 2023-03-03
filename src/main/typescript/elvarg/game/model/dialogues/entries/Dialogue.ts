@@ -1,4 +1,6 @@
-abstract class Dialogue {
+import { Player } from "../../../entity/impl/player/Player";
+
+export abstract class Dialogue {
     private index: number;
     private continueAction: DialogueAction;
 

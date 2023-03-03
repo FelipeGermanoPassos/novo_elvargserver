@@ -1,4 +1,9 @@
-class SpecialAttackPacketListener implements PacketExecutor {
+import { Player } from "../../../game/entity/impl/player/Player";
+import { PacketExecutor } from "../PacketExecutor";
+import { Packet } from "../Packet";
+import { CombatSpecial } from "../../../game/content/combat/CombatSpecial";
+
+export class SpecialAttackPacketListener implements PacketExecutor {
     execute(player: Player, packet: Packet) {
         let specialBarButton = packet.readInt();
     
@@ -8,20 +13,4 @@ class SpecialAttackPacketListener implements PacketExecutor {
     
         CombatSpecial.activate(player);
     }
-}
-
-interface PacketExecutor {
-execute(player: Player, packet: Packet): void;
-}
-
-interface Player {
-getHitpoints(): number;
-}
-
-interface Packet {
-readInt(): number;
-}
-
-interface CombatSpecial {
-activate(player: Player): void;
-}    
+} 

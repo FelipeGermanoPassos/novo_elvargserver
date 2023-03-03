@@ -166,13 +166,14 @@ export class World {
     }
 
     public static findCacheObject(player: Player, id: number, loc: Location): GameObject {
-        return MapObjects.get(player, id, loc);
+        return MapObjects.getPrivateArea(player, id, loc);
     }
 
-    public static sendLocalGraphics(id: number, position: Location) {
-        const nearbyPlayers = players.filter(p => p !== null && p.getLocation().isWithinDistance(position, 32)) as Player[];
-        if (nearbyPlayers.length > 0) {
-            nearbyPlayers.forEach(p => p.getPacketSender().sendGraphic(new Graphic(id, 0), position));
+    public static sendLocalGraphics(id: number, position: Location): void {
+        for (const player of World.players) {
+          if (player && player.getLocation().isWithinDistance(position, 32)) {
+            player.getPacketSender().sendGraphic(new Graphic(id), position);
+          }
         }
     }
 

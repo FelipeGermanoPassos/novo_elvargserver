@@ -1,6 +1,8 @@
-import { Player } from './Player';
-import { World } from './World';
-import { Packet } from './Packet';
+import { Player } from '../../../game/entity/impl/player/Player';
+import { World } from '../../../game/World';
+import { Packet } from '../Packet';
+import { PlayerRights } from '../../../game/model/rights/PlayerRights';
+import { PacketConstants } from '../PacketConstants';
 
 export class PlayerOptionPacketListener {
     public static attack(player: Player, packet: Packet) {
@@ -87,16 +89,16 @@ export class PlayerOptionPacketListener {
 
         switch (packet.getOpcode()) {
             case PacketConstants.ATTACK_PLAYER_OPCODE:
-                this.attack(player, packet);
+                PlayerOptionPacketListener.attack(player, packet);
                 break;
             case PacketConstants.PLAYER_OPTION_1_OPCODE:
-                this.option1(player, packet);
+                PlayerOptionPacketListener.option1(player, packet);
                 break;
                 case PacketConstants.PLAYER_OPTION_2_OPCODE:
-                    option2(player, packet);
+                    PlayerOptionPacketListener.option2(player, packet);
                     break;
                 case PacketConstants.PLAYER_OPTION_3_OPCODE:
-                    option3(player, packet);
+                    PlayerOptionPacketListener.option3(player, packet);
                     break;
             }
         }

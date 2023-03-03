@@ -1,4 +1,5 @@
-abstract class DialogueBuilder {
+import { Dialogue } from "../entries/Dialogue";
+export abstract class DialogueBuilder {
     private dialogues: Map<number, Dialogue> = new Map();
 
     constructor() {

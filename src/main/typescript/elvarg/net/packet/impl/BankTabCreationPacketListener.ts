@@ -8,7 +8,7 @@ export class BankTabCreationPacketListener implements PacketExecutor {
     execute(player: Player, packet: Packet) {
         let interfaceId = packet.readInt();
         let fromSlot = packet.readShort();
-        let to_tab = packet.readLEShort();
+        let to_tab = packet.readShort();
 
         let fromBankTab = interfaceId - Bank.CONTAINER_START;
         if (fromBankTab >= 0 && fromBankTab < Bank.TOTAL_BANK_TABS) {

@@ -24,7 +24,7 @@ export class ShopManager extends ShopIdentifiers {
         player.shop = shop;
         
         player.packetSender.sendItemContainer(player.inventory, Shop.INVENTORY_INTERFACE_ID);
-        player.packetSender.sendInterfaceItems(Shop.ITEM_CHILD_ID, shop.currentStockList);
+        player.packetSender.sendInterfaceItems(Shop.ITEM_CHILD_ID, shop.getCurrentStockList());
     
         player.packetSender.sendString(Shop.NAME_INTERFACE_CHILD_ID, shop.name);
     

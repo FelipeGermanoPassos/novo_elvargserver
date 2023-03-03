@@ -27,7 +27,7 @@ export class VenenatisCombatMethod extends CombatMethod {
     start(character: Mobile, target: Mobile) {
         if (this.currentAttackType === CombatType.MAGIC) {
             character.performAnimation(VenenatisCombatMethod.MAGIC_ATTACK_ANIMATION);
-            new Projectile(character, target, 165, 40, 55, 31, 43).sendProjectile();
+            Projectile.createProjectile(character, target, 165, 40, 55, 31, 43).sendProjectile();
         } else if (this.currentAttackType === CombatType.MELEE) {
             character.performAnimation(VenenatisCombatMethod.MELEE_ATTACK_ANIMATION);
         }

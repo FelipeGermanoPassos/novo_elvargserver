@@ -136,9 +136,7 @@ export class PriceChecker extends ItemContainer {
     }
 
     public withdraw(id: number, amount: number, slot: number): boolean {
-        if (this.player.getStatus() == PlayerStatus.PRICE_CHECKING && this.player.getInterfaceId() == INTERFACE_ID) {
-        
-        Copy code
+        if (this.player.getStatus() == PlayerStatus.PRICE_CHECKING && this.player.getInterfaceId() == PriceChecker.INTERFACE_ID) {
             // Verify item
             if (this.items[slot].getId() == id) {
 

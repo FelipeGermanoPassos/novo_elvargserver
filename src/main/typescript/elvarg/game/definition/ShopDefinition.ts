@@ -1,4 +1,5 @@
 import { Item } from "../model/Item";
+import { ShopCurrencies } from "../model/container/shop/currency/ShopCurrencies";
 
 export class ShopDefinition {
 

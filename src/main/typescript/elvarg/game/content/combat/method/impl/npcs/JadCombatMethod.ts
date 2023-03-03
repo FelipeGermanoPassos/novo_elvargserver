@@ -10,9 +10,9 @@ import { Misc } from "../../../../../../util/Misc";
 
 export class JadCombatMethod extends CombatMethod {
 
-    private static MAGIC_ATTACK_ANIM = new Animation(2656, Priority.MEDIUM);
-    private static RANGED_ATTACK_ANIM = new Animation(2652, Priority.MEDIUM);
-    private static MELEE_ATTACK_ANIM = new Animation(2655, Priority.MEDIUM);
+    private static MAGIC_ATTACK_ANIM = new Animation(2656);
+    private static RANGED_ATTACK_ANIM = new Animation(2652);
+    private static MELEE_ATTACK_ANIM = new Animation(2655);
     private static MAGIC_ATTACK_PROJECTILE = 448;
     private static RANGED_ATTACK_GRAPHIC = new Graphic(451, Priority.MEDIUM);
     private combatType: CombatType;
@@ -32,7 +32,8 @@ export class JadCombatMethod extends CombatMethod {
                 break;
             case CombatType.MAGIC:
                 character.performAnimation(JadCombatMethod.MAGIC_ATTACK_ANIM);
-                new Projectile(character, target, JadCombatMethod.MAGIC_ATTACK_PROJECTILE, 25, 100, 110, 33).sendProjectile();
+                const projectile2 = Projectile.createProjectile(character, target, 395, 25, 100, 110, 33);
+                projectile2.sendProjectile();
                 break;
             default:
                 break;

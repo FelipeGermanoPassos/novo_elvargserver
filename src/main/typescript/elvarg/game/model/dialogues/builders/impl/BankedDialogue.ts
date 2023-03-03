@@ -13,9 +13,9 @@ import com.elvarg.game.model.dialogues.entries.impl.OptionDialogue;
 export class BankerDialogue extends DynamicDialogueBuilder {
 
     build(player: Player) {
-        this.add(new NpcDialogue(0, NpcIdentifiers.BANKER, "Hello would you like to open the bank?"));
+        this.add(new NpcDialogue(0, NpcIdentifiers.BANKER, "Hello would you like to open the bank?", player.getDialogueManager().startDialog(this, 3)));
 
-        this.add(new OptionDialogue(1, (option) => {
+        this.add(new OptionDialogue(1, (option: DialogueOption) => {
             switch (option) {
                 case DialogueOption.FIRST_OPTION:
                     player.getBank(player.getCurrentBankTab()).open();

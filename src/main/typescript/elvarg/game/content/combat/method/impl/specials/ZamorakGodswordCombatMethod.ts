@@ -8,7 +8,7 @@ import { PendingHit } from "../../../hit/PendingHit";
 import { CombatFactory } from "../../../CombatFactory";
 
 export class ZamorakGodswordCombatMethod extends MeleeCombatMethod {
-    private static ANIMATION = new Animation(7638, Priority.HIGH);
+    private static ANIMATION = new Animation(7638);
     private static GRAPHIC = new Graphic(1210, Priority.HIGH);
 
     start(character: Mobile, target: Mobile) {
@@ -18,7 +18,7 @@ export class ZamorakGodswordCombatMethod extends MeleeCombatMethod {
 
     handleAfterHitEffects(hit: PendingHit) {
         if (hit.isAccurate()) {
-            hit.getTarget().performGraphic(GRAPHIC);
+            hit.getTarget().performGraphic(ZamorakGodswordCombatMethod.GRAPHIC);
             CombatFactory.freeze(hit.getTarget(), 15);
         }
     }

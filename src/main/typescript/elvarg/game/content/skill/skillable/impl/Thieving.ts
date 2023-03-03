@@ -1,4 +1,4 @@
-class Thieving {
+export class Thieving {
     private static readonly THIEVING_ANIMATION = new Animation(881);
     private static readonly STUNNED_GFX = new Graphic(254, GraphicHeight.HIGH);
     private static readonly NPC_ATTACK_ANIMATION = new Animation(401);

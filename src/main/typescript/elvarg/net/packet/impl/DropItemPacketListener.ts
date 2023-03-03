@@ -1,15 +1,26 @@
+import { PacketExecutor } from "../PacketExecutor";
+import { Packet } from "../Packet";
+import { Player } from "../../../game/entity/impl/player/Player";
+import { Item } from "../../../game/model/Item";
+import { Sound } from "../../../game/Sound";
+import { Inventory } from "../../../game/model/container/impl/Inventory";
+import { ItemOnGroundManager } from "../../../game/entity/impl/grounditem/ItemOnGroundManager";
+import { WildernessArea } from "../../../game/model/areas/impl/WildernessArea";
+import { Sounds } from "../../../game/Sounds";
+import { PetHandler } from '../../../game/content/PetHandler'
+import { PlayerRights } from "../../../game/model/rights/PlayerRights";
+
 export class DropItemPacketListener implements PacketExecutor {
 
     public static destroyItemInterface(player: Player, item: Item) {
         player.setDestroyItem(item.getId());
-        let info = [{ "Are you sure you want to discard this item?", "14174"}, { "Yes.", "14175"}, { "No.", "14176"}, { "", "14177"}, { "This item will vanish once it hits the floor.", "14182"}, { "You cannot get it back if discarded.", "14183"}, { item.getDefinition().getName(), "14184"}];
-        player.getPacketSender().sendItemOnInterface(14171, item.getId(), 0, item.getAmount());
+        let info: { [key: string]: string }[] = [    { "Are you sure you want to discard this item?": "14174" },    { "Yes.": "14175" },    { "No.": "14176" },    { "": "14177" },    { "This item will vanish once it hits the floor.": "14182" },    { "You cannot get it back if discarded.": "14183" },    { [item.getDefinition().getName()]: "14184" }];
+        player.getPacketSender().sendItemOnInterface(14171, item.getId(),item.getAmount());
         for (let i = 0; i < info.length; i++)
             player.getPacketSender().sendString(parseInt(info[i][1]), info[i][0]);
         player.getPacketSender().sendChatboxInterface(14170);
     }
 
-    export class DropItemPacketListener implements PacketExecutor {
     public execute(player: Player, packet: Packet) {
         let id = packet.readUnsignedShortA();
         let interface_id = packet.readUnsignedShort();
@@ -41,7 +52,7 @@ export class DropItemPacketListener implements PacketExecutor {
         }
 
         if (player.getRights() == PlayerRights.DEVELOPER) {
-            player.getPacketSender().sendMessage("Drop item: " + Integer.toString(item.getId()) + ".");
+            player.getPacketSender().sendMessage("Drop item: " + item.getId().toString() + ".");
         }
 
         player.getPacketSender().sendInterfaceRemoval();
@@ -67,7 +78,7 @@ export class DropItemPacketListener implements PacketExecutor {
 
             Sounds.sendSound(player, Sound.DROP_ITEM);
         } else {
-            destroyItemInterface(player, item);
+            DropItemPacketListener.destroyItemInterface(player, item);
         }
     }
 }

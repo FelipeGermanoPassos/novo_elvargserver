@@ -11,7 +11,7 @@ export class Frame126 {
 }
 
 export class FrameUpdater {
-    private interfaceTextMap = new HashMap<number, Frame126>();
+    public interfaceTextMap = new HashMap<number, Frame126>();
     shouldUpdate(text: string, id: number): boolean {
         if (!this.interfaceTextMap.has(id)) {
             this.interfaceTextMap.set(id, new Frame126(text, id));

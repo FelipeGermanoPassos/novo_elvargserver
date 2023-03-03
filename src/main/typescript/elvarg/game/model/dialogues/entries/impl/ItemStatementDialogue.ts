@@ -1,3 +1,6 @@
+import { Dialogue } from "../Dialogue";
+import { Player } from "../../../../entity/impl/player/Player";
+
 class ItemStatementDialogue extends Dialogue {
     private static CHATBOX_INTERFACES = [4885, 4890, 4896, 4903];
     private title: string;

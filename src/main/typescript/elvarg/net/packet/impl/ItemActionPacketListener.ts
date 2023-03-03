@@ -1,4 +1,28 @@
-class ItemActionPacketListener implements PacketExecutor {
+import { PacketExecutor } from "../PacketExecutor";
+import { Packet } from "../Packet";
+import { Player } from "../../../game/entity/impl/player/Player";
+import { Barricades } from "../../../game/entity/impl/npc/impl/Barricades";
+import { Herblore } from '../../../game/content/skill/skillable/impl/Herblore'
+import { Food } from "../../../game/content/Food";
+import { TeleportHandler } from "../../../game/model/teleportation/TeleportHandler";
+import { TeleportTablets } from '../../../game/model/teleportation/TeleportTablets'
+import { TeleportType } from "../../../game/model/teleportation/TeleportType";
+import { ItemIdentifiers } from "../../../util/ItemIdentifiers";
+import { Runecrafting } from "../../../game/content/skill/skillable/impl/Runecrafting";
+import { PotionConsumable } from '../../../game/content/PotionConsumable'
+import { Barrows } from '../../../game/content/minigames/impl/Barrows'
+import { Animation } from "../../../game/model/Animation";
+import { Task } from "../../../game/task/Task";
+import { TaskManager } from "../../../game/task/TaskManager";
+import { PacketConstants } from "../PacketConstants";
+import { WildernessArea } from "../../../game/model/areas/impl/WildernessArea";
+import { CombatSpecial } from "../../../game/content/combat/CombatSpecial";
+import { ItemDefinition } from "../../../game/definition/ItemDefinition";
+import { Prayer } from '../../../game/content/skill/skillable/impl/Prayer'
+import { Gambling } from '../../../game/content/Gambiling'
+import { GameConstants } from "../../../game/GameConstants";
+
+export class ItemActionPacketListener implements PacketExecutor {
     execute(player: Player, packet: Packet) {
         let interfaceId = packet.readUnsignedShort();
         let itemId = packet.readShort();
@@ -11,7 +35,7 @@ class ItemActionPacketListener implements PacketExecutor {
             return;
         }
 
-        if (player.isTeleporting() || player.getHitpoints() <= 0) {
+        if (player.isTeleportingReturn() || player.getHitpoints() <= 0) {
             return;
         }
 
@@ -78,7 +102,7 @@ class ItemActionPacketListener implements PacketExecutor {
                     if (player.getSpecialPercentage() < 100) {
                         player.getPacketSender().sendInterfaceRemoval();
                         player.performAnimation(new Animation(829));
-                        player.getInventory().delete(9520, 1);
+                        player.getInventory().delete(9520);
                         player.setSpecialPercentage(100);
                         CombatSpecial.updateBar(player);
                         player.getPacketSender().sendMessage("You now have 100% special attack energy.");

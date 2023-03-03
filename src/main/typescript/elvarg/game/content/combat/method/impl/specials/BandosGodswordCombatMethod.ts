@@ -6,10 +6,11 @@ import { PendingHit } from "../../../hit/PendingHit";
 import { Mobile } from "../../../../../entity/impl/Mobile";
 import { CombatSpecial } from "../../../CombatSpecial";
 import { Skill } from "../../../../../model/Skill";
+import { Misc } from "../../../../../../util/Misc";
 
 export class BandosGodswordCombatMethod extends MeleeCombatMethod {
 
-    private static ANIMATION = new Animation(7642, Priority.HIGH);
+    private static ANIMATION = new Animation(7642);
     private static GRAPHIC = new Graphic(1212, Priority.HIGH);
 
     start(character: Mobile, target: Mobile) {

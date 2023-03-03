@@ -3,7 +3,7 @@ import { Server } from '../../Server';
 import { World } from '../../game/World';
 import { Player } from '../../game/entity/impl/player/Player';
 import { Misc } from '../../util/Misc';
-import { DiscordUtil } from '../../util/DiscordUtil';
+import { DiscordUtil, DiscordInfo } from '../../util/DiscordUtil';
 import { PlayerPunishment } from '../../util/PlayerPunishment';
 import { GameConstants } from '../../game/GameConstants';
 
@@ -23,7 +23,7 @@ export class LoginResponses {
     public static OLD_CLIENT_VERSION = 30;
     public static NEW_ACCOUNT = -1;
 
-    public static evaluate(player: Player, msg: LoginDetailsMessage): number {
+    public static async evaluate(player: Player, msg: LoginDetailsMessage) {
         if (World.getPlayers().isFull()) {
             return this.LOGIN_WORLD_FULL;
         }
@@ -37,7 +37,7 @@ export class LoginResponses {
             return this.INVALID_CREDENTIALS_COMBINATION;
         }
 
-        if (World.getPlayerByName(player.getUsername()).isPresent()) {
+        if (World.getPlayerByName(player.getUsername())) {
             return this.LOGIN_ACCOUNT_ONLINE;
         }
 
@@ -49,7 +49,7 @@ export class LoginResponses {
         }
 
         // Attempt to load the character file..
-        let playerLoadingResponse = getPlayerResult(player, msg);
+        let playerLoadingResponse = await LoginResponses.getPlayerResult(player, msg);
 
         // New player?
         if (playerLoadingResponse === this.NEW_ACCOUNT) {
@@ -64,7 +64,7 @@ export class LoginResponses {
 
     private static getDiscordResult(player: Player, msg: LoginDetailsMessage): number {
         try {
-            let discordInfo: DiscordUtil.DiscordInfo;
+            let discordInfo: DiscordInfo;
             if (msg.getUsername() === DiscordUtil.DiscordConstants.USERNAME_AUTHZ_CODE) {
                 discordInfo = DiscordUtil.getDiscordInfoWithCode(msg.getPassword());
             } else if (msg.getUsername() === DiscordUtil.DiscordConstants.USERNAME_CACHED_TOKEN) {
@@ -74,7 +74,7 @@ export class LoginResponses {
                 return LoginResponses.LOGIN_INVALID_CREDENTIALS;
             }
 
-            player.setUsername(discordInfo.username);
+            player.setUsername(discordInfo.usernam);
 
             let playerSave = GameConstants.PLAYER_PERSISTENCE.load(player.getUsername());
             if (!playerSave) {
@@ -93,7 +93,7 @@ export class LoginResponses {
         return LoginResponses.LOGIN_INVALID_CREDENTIALS;
     }
 
-    private static getPlayerResult(player: Player, msg: LoginDetailsMessage): number {
+    private static async getPlayerResult(player: Player, msg: LoginDetailsMessage) {
         let plainPassword = msg.getPassword();
         if (msg.getIsDiscord()) {
             return LoginResponses.getDiscordResult(player, msg);
@@ -101,11 +101,11 @@ export class LoginResponses {
 
         let playerSave = GameConstants.PLAYER_PERSISTENCE.load(player.getUsername());
         if (!playerSave) {
-            player.setPasswordHashWithSalt(GameConstants.PLAYER_PERSISTENCE.encryptPassword(plainPassword));
+            player.setPasswordHashWithSalt(await GameConstants.PLAYER_PERSISTENCE.encryptPassword(plainPassword));
             return LoginResponses.NEW_ACCOUNT;
         }
 
-        if (msg.getIsDiscord() !== playerSave.isDiscordLogin()) {
+        if (msg.getIsDiscord() !== playerSave.isDiscordLoginReturn()) {
             // User attempting Discord login on a non-Discord account
             return LoginResponses.LOGIN_BAD_SESSION_ID;
         }

@@ -43,7 +43,7 @@ export class DepositBox {
             return;
 
         /** Adds item to the bank **/
-        Bank.deposit(player, itemId, slotId, amount);
+        Bank.deposits(player, itemId, slotId, amount);
         /** Refreshes interface / Inventory **/
         this.refresh(player);
     }

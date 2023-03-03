@@ -1,4 +1,22 @@
-class NPCOptionPacketListener {
+import { Player } from "../../../game/entity/impl/player/Player";
+import { Packet } from "../Packet";
+import { World } from "../../../game/World";
+import { PacketConstants } from "../PacketConstants";
+import { CombatSpells } from "../../../game/content/combat/magic/CombatSpells";
+import { PetHandler } from "../../../game/content/PetHandler";
+import { QuestHandler } from "../../../game/content/quests/QuestHandler";
+import { Fishing } from '../../../game/content/skill/skillable/impl/Fishing'
+import { FishingTool } from '../../../game/content/skill/skillable/impl/Fishing'
+import { Pickpocketing } from '../../../game/content/skill/skillable/impl/Thieving'
+import { ParduDialogue } from '../../../game/model/dialogues/builders/impl/ParduDialogue'
+import { PlayerRights } from "../../../game/model/rights/PlayerRights";
+import { NPCInteractionSystem } from "../../../game/entity/impl/npc/NPCInteractionSystem";
+import { ShopManager } from "../../../game/model/container/shop/ShopManager";
+import { NPC } from "../../../game/entity/impl/npc/NPC";
+import { EmblemTraderDialogue } from "../../../game/model/dialogues/builders/impl/EmblemTraderDialogue";
+import { ShopIdentifiers } from "../../../util/ShopIdentifiers";
+
+export class NPCOptionPacketListener {
     execute(player: Player, packet: Packet) {
         if (player.busy()) {
             return;

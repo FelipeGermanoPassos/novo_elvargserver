@@ -2,6 +2,7 @@ import { GameConstants, World, Location, TaskManager } from "com.elvarg.game"
 import { Player, ItemOnGround, State, GroundItemRespawnTask } from "com.elvarg.game.entity.impl.grounditem"
 import { Item } from "com.elvarg.game.model"
 import { Optional } from "java.util"
+import { OperationType } from "../object/ObjectManager"
 
 export class ItemOnGroundManager {
     public static readonly STATE_UPDATE_DELAY: number = 50
@@ -29,13 +30,13 @@ export class ItemOnGroundManager {
             case State.SEEN_BY_PLAYER:
                 if (item.getOwner().isPresent()) {
                     let owner = World.getPlayerByName(item.getOwner().get())
-                    owner.ifPresent(o => ItemOnGroundManager.perform(o, item, type))
+                    owner.ifPresent(o => ItemOnGroundManager.perform(o, item))
                 }
                 break;
             case State.SEEN_BY_EVERYONE:
                 for (let player of World.getPlayers()) {
                     if (player) {
-                        ItemOnGroundManager.perform(player, item, type)
+                        ItemOnGroundManager.perform(player, item)
                     }
                 }
                 break;
@@ -151,7 +152,7 @@ export class ItemOnGroundManager {
         this.registerNonGlobal(player, item, player.getLocation().clone());
     }
 
-    public static registerNonGlobal(player: Player, item: Item, position: Location) {
+    public static registerNonGlobals(player: Player, item: Item, position: Location) {
         this.register(new ItemOnGround(State.SEEN_BY_PLAYER, Optional.of(player.getUsername()), position, item, false, -1, player.getPrivateArea()));
     }
 

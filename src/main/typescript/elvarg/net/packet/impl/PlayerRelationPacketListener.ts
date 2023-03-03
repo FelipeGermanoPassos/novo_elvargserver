@@ -1,4 +1,12 @@
-class PlayerRelationPacketListener implements PacketExecutor {
+
+import { Player } from '../../../game/entity/impl/player/Player';
+import { World } from '../../../game/World';
+import { Packet } from '../Packet';
+import { PacketConstants } from '../PacketConstants';
+import { PacketExecutor } from '../PacketExecutor';
+import { Misc } from '../../../util/Misc';
+
+export class PlayerRelationPacketListener implements PacketExecutor {
 
     execute(player: Player, packet: Packet) {
         try {

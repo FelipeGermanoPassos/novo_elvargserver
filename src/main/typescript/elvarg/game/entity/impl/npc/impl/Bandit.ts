@@ -14,8 +14,8 @@ export class Bandit extends NPC {
 
     public isAggressiveTo(player: Player): boolean {
         // Bandits are only aggressive towards players who have god affiliated items
-        const saradominItemCount = Equipment.getItemCount(player, "Saradomin", true);
-        const zamorakItemCount = Equipment.getItemCount(player, "Zamorak", true);
+        const saradominItemCount = Equipment.ITEM_COUNT;
+        const zamorakItemCount = Equipment.ITEM_COUNT;
 
         return saradominItemCount > 0 || zamorakItemCount > 0;
     }

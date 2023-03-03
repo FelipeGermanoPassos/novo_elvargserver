@@ -1,5 +1,13 @@
 
-import { CombatSpells } "./CombatSpells";
+import { CombatSpells } from "./CombatSpells";
+import { Player } from "../../../entity/impl/player/Player";
+import { MagicSpellbook } from "../../../model/MagicSpellbook";
+import { FightType } from "../FightType";
+import { Skills } from "../../../model/Skill";
+import { ItemIdentifiers } from "../../../../util/ItemIdentifiers";
+import { BonusManager } from "../../../model/equipment/BonusManager";
+import { WeaponInterfaces } from "../WeaponInterfaces";
+
 export class Autocasting {
 
     // Autocast buttons
@@ -10,8 +18,8 @@ export class Autocasting {
     private static readonly REGULAR_AUTOCAST_TAB = 1829;
     private static readonly ANCIENT_AUTOCAST_TAB = 1689;
     private static readonly IBANS_AUTOCAST_TAB = 12050;
-    public static readonly ANCIENT_SPELL_AUTOCAST_STAFFS = new Set<number>([KODAI_WAND, MASTER_WAND,
-        ANCIENT_STAFF, NIGHTMARE_STAFF, VOLATILE_NIGHTMARE_STAFF, ELDRITCH_NIGHTMARE_STAFF, TOXIC_STAFF_OF_THE_DEAD, ELDER_WAND, STAFF_OF_THE_DEAD, STAFF_OF_LIGHT]);
+    public static readonly ANCIENT_SPELL_AUTOCAST_STAFFS = new Set<number>([ItemIdentifiers.KODAI_WAND, ItemIdentifiers.MASTER_WAND,
+        ItemIdentifiers.ANCIENT_STAFF, ItemIdentifiers.NIGHTMARE_STAFF, ItemIdentifiers.VOLATILE_NIGHTMARE_STAFF, ItemIdentifiers.ELDRITCH_NIGHTMARE_STAFF, ItemIdentifiers.TOXIC_STAFF_OF_THE_DEAD, ItemIdentifiers.ELDER_WAND, ItemIdentifiers.STAFF_OF_THE_DEAD, ItemIdentifiers.STAFF_OF_LIGHT]);
 
     public static readonly AUTOCAST_SPELLS = new Map<number, CombatSpells>();
 
@@ -54,14 +62,14 @@ export class Autocasting {
 
     public static handleAutocastTab(player: Player, actionButtonId: number) {
         if (Autocasting.AUTOCAST_SPELLS.has(actionButtonId)) {
-            setAutocast(player, Autocasting.AUTOCAST_SPELLS.get(actionButtonId).getSpell());
+            Autocasting.setAutocast(player, Autocasting.AUTOCAST_SPELLS.get(actionButtonId).getSpell());
             WeaponInterfaces.assign(player);
             return true;
         }
         switch (actionButtonId) {
             case Autocasting.CLOSE_REGULAR_AUTOCAST_BUTTON:
             case Autocasting.CLOSE_ANCIENT_AUTOCAST_BUTTON:
-                setAutocast(player, null); // When clicking cancel, remove autocast?
+                Autocasting.setAutocast(player, null); // When clicking cancel, remove autocast?
                 player.getPacketSender().sendTabInterface(0, player.getWeapon().getInterfaceId());
                 return true;
         }
@@ -93,7 +101,7 @@ export class Autocasting {
                 player.getPacketSender().sendTabInterface(0, Autocasting.ANCIENT_AUTOCAST_TAB);
                 break;
             case MagicSpellbook.NORMAL:
-                if (player.getEquipment().getWeapon().getId() == ANCIENT_STAFF) {
+                if (player.getEquipment().getWeapon().getId() == ItemIdentifiers.ANCIENT_STAFF) {
                     player.getPacketSender().sendMessage("You can only autocast ancient magicks with that.");
                     return true;
                 }
@@ -111,27 +119,27 @@ export class Autocasting {
         if (!cbSpell) {
             return false;
         }
-        if (cbSpell.levelRequired() > player.getSkillManager().getCurrentLevel(Skill.MAGIC)) {
+        if (cbSpell.levelRequired() > player.getSkillManager().getCurrentLevel(Skills.MAGIC)) {
             player.getPacketSender().sendMessage("You need a Magic level of at least " + cbSpell.levelRequired() + " to cast this spell.");
-            setAutocast(player, null);
+            Autocasting.setAutocast(player, null);
             return true;
         }
         if (player.getCombat().getAutocastSpell() != null && player.getCombat().getAutocastSpell() == cbSpell) {
 
             //Player is already autocasting this spell. Turn it off.
-            setAutocast(player, null);
+            Autocasting.setAutocast(player, null);
 
         } else {
 
             //Set the new autocast spell
-            setAutocast(player, cbSpell);
+            Autocasting.setAutocast(player, cbSpell);
 
         }
 
         return true;
     }
 
-    public static setAutocast(player: Player, spell: CombatSpell) {
+    public static setAutocast(player: Player, spell: CombatSpells) {
         // First, set the Player's preferred autocast spell
         player.getCombat().setAutocastSpell(spell);
 
@@ -147,7 +155,7 @@ export class Autocasting {
         }
 
         BonusManager.update(player);
-        updateConfigsOnAutocast(player, spell != null);
+        Autocasting.updateConfigsOnAutocast(player, spell != null);
     }
 
     private static readonly STAFF_FIGHT_TYPES: FightType[] = [
@@ -158,8 +166,8 @@ export class Autocasting {
 
     private static updateConfigsOnAutocast(player: Player, autocast: boolean) {
         if (autocast) {
-            for (let type of STAFF_FIGHT_TYPES) {
-                player.getPacketSender().sendConfig(type.getParentId(), 3);
+            for (let type of Autocasting.STAFF_FIGHT_TYPES) {
+                player.getPacketSender().sendConfig(FightType.getParentId(), 3);
             }
         }
     }

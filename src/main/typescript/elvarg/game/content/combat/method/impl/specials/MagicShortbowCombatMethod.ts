@@ -11,8 +11,8 @@ import { GraphicHeight } from "../../../../../model/GraphicHeight";
 import { Mobile } from "../../../../../entity/impl/Mobile";
 
 export class MagicShortbowCombatMethod extends RangedCombatMethod {
-    private static ANIMATION = new Animation(1074, Priority.HIGH);
-    private static GRAPHIC = new Graphic(250, GraphicHeight.HIGH, Priority.HIGH);
+    private static ANIMATION = new Animation(1074);
+    private static GRAPHIC = new Graphic(250, GraphicHeight.HIGH);
 
     hits(character: Mobile, target: Mobile): PendingHit[] {
         return [new PendingHit(character, target, this, 3), new PendingHit(character, target, this, 2)];
@@ -34,8 +34,8 @@ export class MagicShortbowCombatMethod extends RangedCombatMethod {
         CombatSpecial.drain(player, CombatSpecial.MAGIC_SHORTBOW.getDrainAmount());
         player.performAnimation(MagicShortbowCombatMethod.ANIMATION);
         player.performGraphic(MagicShortbowCombatMethod.GRAPHIC);
-        new Projectile(player, target, 249, 40, 57, 43, 31).sendProjectile();
-        new Projectile(character, target, 249, 33, 57, 48, 31).sendProjectile();
+        Projectile.createProjectile(player, target, 249, 40, 57, 43, 31).sendProjectile();
+        Projectile.createProjectile(character, target, 249, 33, 57, 48, 31).sendProjectile();
         CombatFactory.decrementAmmo(player, target.getLocation(), 2);
     }
 

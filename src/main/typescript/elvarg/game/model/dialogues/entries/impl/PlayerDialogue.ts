@@ -1,16 +1,17 @@
-class PlayerDialogue extends Dialogue {
+import { Dialogue } from "../Dialogue";
+import { Player } from "../../../../entity/impl/player/Player";
+import { DialogueExpression } from "../../DialogueExpression";
+import { Misc } from "../../../../../util/Misc";
+
+export class PlayerDialogue extends Dialogue {
     private static CHATBOX_INTERFACES = [971, 976, 982, 989];
     private text: string;
     private expression: DialogueExpression;
 
-    constructor(index: number, text: string, expression: DialogueExpression) {
+    constructor(index: number, text: string, expression?: DialogueExpression) {
         super(index);
         this.text = text;
         this.expression = expression;
-    }
-
-    constructor(index: number, text: string) {
-        this(index, text, DialogueExpression.CALM);
     }
 
     send(player: Player) {
@@ -23,7 +24,7 @@ class PlayerDialogue extends Dialogue {
         if (length > 5) {
             length = 5;
         }
-        let startDialogueChildId = CHATBOX_INTERFACES[length - 1];
+        let startDialogueChildId = PlayerDialogue.CHATBOX_INTERFACES[length - 1];
         let headChildId = startDialogueChildId - 2;
         player.getPacketSender().sendPlayerHeadOnInterface(headChildId);
         player.getPacketSender().sendInterfaceAnimation(headChildId, expression.getExpression());

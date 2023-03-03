@@ -1,4 +1,8 @@
-class ChatSettingsPacketListener {
+import { Player } from "../../../game/entity/impl/player/Player";
+import { PrivateChatStatus } from "../../../game/model/PlayerRelations";
+import { Packet } from "../Packet";
+
+export class ChatSettingsPacketListener {
     execute(player: Player, packet: Packet) {
         let publicMode = packet.readByte();
         let privateMode = packet.readByte();

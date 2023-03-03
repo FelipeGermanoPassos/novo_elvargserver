@@ -1,4 +1,9 @@
-class ExamineNpcPacketListener implements PacketExecutor {
+import { Packet } from "../Packet";
+import { Player } from "../../../game/entity/impl/player/Player";
+import { PacketExecutor } from "../PacketExecutor";
+import { NpcDefinition } from "../../../game/definition/NpcDefinition";
+
+export class ExamineNpcPacketListener implements PacketExecutor {
     execute(player: Player, packet: Packet) {
         let npcId = packet.readShort();
 

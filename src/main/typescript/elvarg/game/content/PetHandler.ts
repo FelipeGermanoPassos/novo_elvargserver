@@ -10,7 +10,7 @@ import { Skill } from "../model/Skill";
 import { Bank } from "../model/container/impl/Bank";
 import { Misc } from "../../util/Misc";
 
-class PetHandler {
+export class PetHandler {
     private static INTERACTION_ANIM = new Animation(827);
 
     public static onSkill(player: Player, skill: Skill) {

@@ -2,22 +2,21 @@ import { Command } from '../../../model/commands/Command';
 import { Player } from '../../../entity/impl/player/Player';
 import { World } from '../../../World';
 import { PlayerPunishment } from '../../../../util/PlayerPunishment';
-import { DonatorRights } from '../../rights/DonatorRights';
-import { PlayerRights } from '../../rights/PlayerRights';
+import { Misc } from '../../../../util/Misc';
 
 class Yell implements Command {
     static getYellPrefix(player: Player) {
         if (!player.getRights().getYellTag().isEmpty()) {
             return player.getRights().getYellTag();
         }
-        return player.getDonatorRights().DonatorRights.getYellTag();
+        return player.getDonatorRights().getYellTag();
     }
 
     static getYellDelay(player: Player) {
         if (player.isStaff()) {
             return 0;
         }
-        return player.getDonatorRights().DonatorRights.getYellDelay();
+        return player.getDonatorRights().getYellDelay();
     }
 
     execute(player: Player, command: string, parts: string[]) {

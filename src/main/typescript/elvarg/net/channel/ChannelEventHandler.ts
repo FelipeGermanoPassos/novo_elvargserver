@@ -1,7 +1,6 @@
 import { ChannelHandlerContext } from 'netty';
 import { NetworkConstants } from './network';
-import { Player } from './entity/player';
-import { World } from './game';
+import { World } from '../../game/World';
 
 export class ChannelEventHandler {
     public channelInactive(ctx: ChannelHandlerContext) {
@@ -30,7 +29,7 @@ export class ChannelEventHandler {
     }
 
     public exceptionCaught(ctx: ChannelHandlerContext, t: Error) {
-        if (!(t instanceof IOError)) {
+        if (!(t instanceof Error)) {
             console.log(t);
         }
 

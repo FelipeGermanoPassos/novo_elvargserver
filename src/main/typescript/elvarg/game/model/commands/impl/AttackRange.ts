@@ -5,7 +5,7 @@ import { CombatFactory } from "../../../content/combat/CombatFactory";
 import { Location } from "../../Location";
 import { PlayerRights } from "../../rights/PlayerRights";
 
-class AttackRange implements Command {
+export class AttackRange implements Command {
     public static readonly PURPLE_GLOW = new Graphic(332,0);
 
     execute(player: Player, command: string, parts: string[]): void {

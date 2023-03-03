@@ -1,11 +1,11 @@
 export class IsaacRandom {
     private static readonly GOLDEN_RATIO: number = 0x9e3779b9;
-    private static readonly LOG_SIZE: number = Long.BYTES;
-    private static readonly SIZE: number = 1 << LOG_SIZE;
-    private static MASK: number = SIZE - 1 << 2;
-    private readonly results: number[] = new Array(SIZE);
-    private readonly state: number[] = new Array(SIZE);
-    private count: number = SIZE;
+    private static readonly LOG_SIZE: number = 8;
+    private static readonly SIZE: number = 1 << IsaacRandom.LOG_SIZE;
+    private static MASK: number = IsaacRandom.SIZE - 1 << 2;
+    private readonly results: number[] = new Array(IsaacRandom.SIZE);
+    private readonly state: number[] = new Array(IsaacRandom.SIZE);
+    private count: number = IsaacRandom.SIZE;
     private accumulator: number;
     private last: number;
     private counter: number;
@@ -23,59 +23,59 @@ export class IsaacRandom {
             x = this.state[i];
             this.accumulator ^= this.accumulator << 13;
             this.accumulator += this.state[j++];
-            this.state[i] = y = this.state[(x & MASK) >> 2] + this.accumulator + this.last;
-            this.results[i++] = this.last = this.state[(y >> LOG_SIZE & MASK) >> 2] + x;
+            this.state[i] = y = this.state[(x & IsaacRandom.MASK) >> 2] + this.accumulator + this.last;
+            this.results[i++] = this.last = this.state[(y >> IsaacRandom.LOG_SIZE & IsaacRandom.MASK) >> 2] + x;
 
             x = this.state[i];
             this.accumulator ^= this.accumulator >>> 6;
             this.accumulator += this.state[j++];
-            this.state[i] = y = this.state[(x & MASK) >> 2] + this.accumulator + this.last;
-            this.results[i++] = this.last = this.state[(y >> LOG_SIZE & MASK) >> 2] + x;
+            this.state[i] = y = this.state[(x & IsaacRandom.MASK) >> 2] + this.accumulator + this.last;
+            this.results[i++] = this.last = this.state[(y >> IsaacRandom.LOG_SIZE & IsaacRandom.MASK) >> 2] + x;
 
             x = this.state[i];
             this.accumulator ^= this.accumulator << 2;
             this.accumulator += this.state[j++];
-            this.state[i] = y = this.state[(x & MASK) >> 2] + this.accumulator + this.last;
-            this.results[i++] = this.last = this.state[(y >> LOG_SIZE & MASK) >> 2] + x;
+            this.state[i] = y = this.state[(x & IsaacRandom.MASK) >> 2] + this.accumulator + this.last;
+            this.results[i++] = this.last = this.state[(y >> IsaacRandom.LOG_SIZE & IsaacRandom.MASK) >> 2] + x;
 
             x = this.state[i];
             this.accumulator ^= this.accumulator >>> 16;
             this.accumulator += this.state[j++];
-            this.state[i] = y = this.state[(x & MASK) >> 2] + this.accumulator + this.last;
-            this.results[i++] = this.last = this.state[(y >> LOG_SIZE & MASK) >> 2] + x;
+            this.state[i] = y = this.state[(x & IsaacRandom.MASK) >> 2] + this.accumulator + this.last;
+            this.results[i++] = this.last = this.state[(y >> IsaacRandom.LOG_SIZE & IsaacRandom.MASK) >> 2] + x;
         }
 
-        for (let j = 0; j < SIZE / 2;) {
-            let x = state[i];
-            accumulator ^= accumulator << 13;
-            accumulator += state[j++];
-            state[i] = y = state[(x & MASK) >> 2] + accumulator + last;
-            results[i++] = last = state[(y >> LOG_SIZE & MASK) >> 2] + x;
+        for (let j = 0; j < IsaacRandom.SIZE / 2;) {
+            let x = this.state[i];
+            this.accumulator ^= this.accumulator << 13;
+            this.accumulator += this.state[j++];
+            this.state[i] = y = this.state[(x & IsaacRandom.MASK) >> 2] + this.accumulator + this.last;
+            this.results[i++] = this.last = this.state[(y >> IsaacRandom.LOG_SIZE & IsaacRandom.MASK) >> 2] + x;
 
-            x = state[i];
-            accumulator ^= accumulator >>> 6;
-            accumulator += state[j++];
-            state[i] = y = state[(x & MASK) >> 2] + accumulator + last;
-            results[i++] = last = state[(y >> LOG_SIZE & MASK) >> 2] + x;
+            x = this.state[i];
+            this.accumulator ^= this.accumulator >>> 6;
+            this.accumulator += this.state[j++];
+            this.state[i] = y = this.state[(x & IsaacRandom.MASK) >> 2] + this.accumulator + this.last;
+            this.results[i++] = this.last = this.state[(y >> IsaacRandom.LOG_SIZE & IsaacRandom.MASK) >> 2] + x;
 
-            x = state[i];
-            accumulator ^= accumulator << 2;
-            accumulator += state[j++];
-            state[i] = y = state[(x & MASK) >> 2] + accumulator + last;
-            results[i++] = last = state[(y >> LOG_SIZE & MASK) >> 2] + x;
+            x = this.state[i];
+            this.accumulator ^= this.accumulator << 2;
+            this.accumulator += this.state[j++];
+            this.state[i] = y = this.state[(x & IsaacRandom.MASK) >> 2] + this.accumulator + this.last;
+            this.results[i++] = this.last = this.state[(y >> IsaacRandom.LOG_SIZE & IsaacRandom.MASK) >> 2] + x;
 
-            x = state[i];
-            accumulator ^= accumulator >>> 16;
-            accumulator += state[j++];
-            state[i] = y = state[(x & MASK) >> 2] + accumulator + last;
-            results[i++] = last = state[(y >> LOG_SIZE & MASK) >> 2] + x;
+            x = this.state[i];
+            this.accumulator ^= this.accumulator >>> 16;
+            this.accumulator += this.state[j++];
+            this.state[i] = y = this.state[(x & IsaacRandom.MASK) >> 2] + this.accumulator + this.last;
+            this.results[i++] = this.last = this.state[(y >> IsaacRandom.LOG_SIZE & IsaacRandom.MASK) >> 2] + x;
         }
     }
 
     private init() {
         let i: number;
         let a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number;
-        a = b = c = d = e = f = g = h = GOLDEN_RATIO;
+        a = b = c = d = e = f = g = h = IsaacRandom.GOLDEN_RATIO;
 
         for (i = 0; i < 4; ++i) {
             a ^= b << 11;
@@ -104,15 +104,15 @@ export class IsaacRandom {
             a += b;
         }
 
-        for (i = 0; i < SIZE; i += 8) { /* fill in mem[] with messy stuff */
-            a += results[i];
-            b += results[i + 1];
-            c += results[i + 2];
-            d += results[i + 3];
-            e += results[i + 4];
-            f += results[i + 5];
-            g += results[i + 6];
-            h += results[i + 7];
+        for (i = 0; i < IsaacRandom.SIZE; i += 8) { /* fill in mem[] with messy stuff */
+            a += this.results[i];
+            b += this.results[i + 1];
+            c += this.results[i + 2];
+            d += this.results[i + 3];
+            e += this.results[i + 4];
+            f += this.results[i + 5];
+            g += this.results[i + 6];
+            h += this.results[i + 7];
 
             a ^= b << 11;
             d += a;
@@ -138,25 +138,25 @@ export class IsaacRandom {
             h ^= a >>> 9;
             c += h;
             a += b;
-            state[i] = a;
-            state[i + 1] = b;
-            state[i + 2] = c;
-            state[i + 3] = d;
-            state[i + 4] = e;
-            state[i + 5] = f;
-            state[i + 6] = g;
-            state[i + 7] = h;
+            this.state[i] = a;
+            this.state[i + 1] = b;
+            this.state[i + 2] = c;
+            this.state[i + 3] = d;
+            this.state[i + 4] = e;
+            this.state[i + 5] = f;
+            this.state[i + 6] = g;
+            this.state[i + 7] = h;
         }
 
-        for (i = 0; i < SIZE; i += 8) {
-            a += state[i];
-            b += state[i + 1];
-            c += state[i + 2];
-            d += state[i + 3];
-            e += state[i + 4];
-            f += state[i + 5];
-            g += state[i + 6];
-            h += state[i + 7];
+        for (i = 0; i < IsaacRandom.SIZE; i += 8) {
+            a += this.state[i];
+            b += this.state[i + 1];
+            c += this.state[i + 2];
+            d += this.state[i + 3];
+            e += this.state[i + 4];
+            f += this.state[i + 5];
+            g += this.state[i + 6];
+            h += this.state[i + 7];
             a ^= b << 11;
             d += a;
             b += c;
@@ -181,16 +181,16 @@ export class IsaacRandom {
             h ^= a >>> 9;
             c += h;
             a += b;
-            state[i] = a;
-            state[i + 1] = b;
-            state[i + 2] = c;
-            state[i + 3] = d;
-            state[i + 4] = e;
-            state[i + 5] = f;
-            state[i + 6] = g;
-            state[i + 7] = h;
+            this.state[i] = a;
+            this.state[i + 1] = b;
+            this.state[i + 2] = c;
+            this.state[i + 3] = d;
+            this.state[i + 4] = e;
+            this.state[i + 5] = f;
+            this.state[i + 6] = g;
+            this.state[i + 7] = h;
         }
-        isaac();
+        this.isaac();
     }
 
     public nextInt(): number {

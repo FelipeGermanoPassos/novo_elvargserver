@@ -1,7 +1,7 @@
 import { Food } from "../../../../content/Food"
 import { PotionConsumable } from "../../../../content/PotionConsumable"
 import { PrayerHandler } from "../../../../content/PrayerHandler";
-import { CombatFactory } from "../../../../content/combat/CombatFactory";
+import { CombatFactory, CanAttackResponse } from "../../../../content/combat/CombatFactory";
 import { Presetables } from "../../../../content/presets/Presetables";
 import { Mobile } from "../../Mobile";
 import { Player } from "../../player/Player";
@@ -60,7 +60,7 @@ export class CombatInteraction {
         }
 
         let area = this.playerBot.getArea();
-        if (area != null && area.getPlayers().some(p => CombatFactory.canAttack(this.playerBot, combatMethod, p) == CombatFactory.CanAttackResponse.CAN_ATTACK)) {
+        if (area != null && area.getPlayers().some(p => CombatFactory.canAttack(this.playerBot, combatMethod, p) == CanAttackResponse.CAN_ATTACK)) {
             this.potUp();
         }
 

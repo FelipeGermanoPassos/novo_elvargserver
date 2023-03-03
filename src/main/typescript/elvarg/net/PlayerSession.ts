@@ -11,6 +11,8 @@ import { PacketConstants } from './packet/PacketConstants';
 import { Misc } from '../util/Misc';
 import { NetworkConstants } from './NetworkConstants';
 import { SocketIO } from 'socket.io';
+import { PlayerRights } from '../game/model/rights/PlayerRights';
+
 export class PlayerSession {
     private packetsQueue: Packet[] = [];
     private lastPacketOpcodeQueue: number[] = [];
@@ -22,8 +24,8 @@ export class PlayerSession {
         this.player = new Player(this);
     }
 
-    public finalizeLogin(msg: LoginDetailsMessage) {
-        let response = LoginResponses.evaluate(this.player, msg);
+    public async finalizeLogin(msg: LoginDetailsMessage) {
+        let response = await LoginResponses.evaluate(this.player, msg);
 
         this.player.setLongUsername(Misc.stringToLong(this.player.getUsername()));
 

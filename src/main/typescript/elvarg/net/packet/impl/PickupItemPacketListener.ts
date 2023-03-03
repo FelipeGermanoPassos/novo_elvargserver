@@ -1,15 +1,26 @@
-public class PickupItemPacketListener implements PacketExecutor {
+import { Player } from "../../../game/entity/impl/player/Player";
+import { Packet } from "../Packet";
+import { PlayerRights } from "../../../game/model/rights/PlayerRights";
+import { PacketExecutor } from "../PacketExecutor";
+import { ItemOnGroundManager } from "../../../game/entity/impl/grounditem/ItemOnGroundManager";
+import { ItemDefinition } from "../../../game/definition/ItemDefinition";
+import { Optional } from 'optional'
+import { OperationType } from "../../../game/entity/impl/object/ObjectManager";
+import { Sound } from "../../../game/Sound";
+import { Sounds } from "../../../game/Sounds";
+
+export class PickupItemPacketListener implements PacketExecutor {
     execute(player: Player, packet: Packet) {
         const y = packet.readLEShort();
         const itemId = packet.readShort();
         const x = packet.readLEShort();
-        const position = new Location(x, y, player.getLocation().getZ());
+        const position = new Location();
 
         if (player.getRights() == PlayerRights.DEVELOPER) {
             player.getPacketSender().sendMessage("Pick up item: " + itemId + ". " + position.toString());
         }
 
-        if (player.busy() || !player.getLastItemPickup().elapsed(300)) {
+        if (player.busy() || !player.getLastItemPickup().elapsed()) {
             // If player is busy or last item was picked up less than 0.3 seconds ago
             return;
         }
@@ -45,7 +56,7 @@ public class PickupItemPacketListener implements PacketExecutor {
                             player.getPacketSender().sendMessage("You cannot hold that more of that item.");
                             return;
                         } else {
-                            int currentAmount = item.get().getItem().getAmount();
+                            let currentAmount: number = item.get().getItem().getAmount();
                             item.get().setOldAmount(currentAmount);
                             item.get().getItem().decrementAmountBy(playerCanHold);
                             ItemOnGroundManager.perform(item.get(), OperationType.ALTER);

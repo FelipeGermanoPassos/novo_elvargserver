@@ -5,7 +5,7 @@ import { Packet } from '../net/packet/Packet';
 import { PacketExecutor } from '../net/packet/PacketExecutor';
 import { Player } from '../entity/impl/player/Player';
 
-class MovementPacketListener implements PacketExecutor {
+export class MovementPacketListener implements PacketExecutor {
 
     private static FLOATING_WORLD_MAP_INTERFACE = 54000;
 

@@ -52,7 +52,8 @@ export class ChaosFanaticCombatMethod extends CombatMethod {
         character.forceChat(ChaosFanaticCombatMethod.QUOTES[Misc.getRandom(ChaosFanaticCombatMethod.QUOTES.length - 1)]);
 
         if (this.attack == Attack.DEFAULT_MAGIC_ATTACK) {
-            new Projectile(character, target, 554, 62, 80, 31, 43, 0, 0).sendProjectile();
+            const projectile2 = Projectile.createProjectile(character, target, 554, 62, 80, 31, 43);
+            projectile2.sendProjectile();
             if (Misc.getRandom(1) == 0) {
                 TaskManager.submit(new Task(3, target, false) {
                     execute() {

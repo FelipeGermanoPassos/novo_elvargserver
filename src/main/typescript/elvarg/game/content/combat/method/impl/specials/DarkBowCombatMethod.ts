@@ -12,12 +12,12 @@ import { Mobile } from "../../../../../entity/impl/Mobile";
 
 export class DarkBowCombatMethod extends RangedCombatMethod {
 
-    private static ANIMATION = new Animation(426, Priority.HIGH);
-    private static GRAPHIC = new Graphic(1100, GraphicHeight.HIGH, Priority.HIGH);
+    private static ANIMATION = new Animation(426);
+    private static GRAPHIC = new Graphic(1100, GraphicHeight.HIGH);
 
     public hits(character: Mobile, target: Mobile): PendingHit[] {
-        return [new PendingHit(character, target, this, false, 3),
-        new PendingHit(character, target, this, false, 2)];
+        return [new PendingHit(character, target, this, 3, false),
+        new PendingHit(character, target, this, 2, false)];
     }
 
     public canAttack(character: Mobile, target: Mobile): boolean {
@@ -39,8 +39,8 @@ export class DarkBowCombatMethod extends RangedCombatMethod {
         if (player.getCombat().getAmmunition() != Ammunitions.DRAGON_ARROW) {
             projectileId = 1101;
         }
-        new Projectile(player, target, projectileId, 40, 70, 43, 31).sendProjectile();
-        new Projectile(character, target, projectileId, 33, 74, 48, 31).sendProjectile();
+        Projectile.createProjectile(player, target, projectileId, 40, 70, 43, 31).sendProjectile();
+        Projectile.createProjectile(character, target, projectileId, 33, 74, 48, 31).sendProjectile();
         CombatFactory.decrementAmmo(player, target.getLocation(), 2);
     }
 

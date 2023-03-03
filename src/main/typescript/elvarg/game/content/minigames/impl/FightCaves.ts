@@ -3,6 +3,8 @@ import { World } from "../../../Worlds";
 import { TaskManager } from "../../../task/TaskManager";
 import { FightCavesArea } from "../../../model/areas/impl/FightCavesArea";
 import { TztokJad } from "../../../entity/impl/npc/impl/TztokJad";
+import { Player } from "../../../entity/impl/player/Player";
+import { Task } from "../../../task/Task";
 
 export class FightCaves {
     public static readonly ENTRANCE: Location = new Location(2413, 5117);

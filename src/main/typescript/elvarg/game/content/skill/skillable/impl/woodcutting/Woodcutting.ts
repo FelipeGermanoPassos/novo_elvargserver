@@ -1,4 +1,31 @@
-class Woodcutting extends DefaultSkillable {
+import { Player } from "../../../../../entity/impl/player/Player";
+import { GameObject } from "../../../../../entity/impl/object/GameObject";
+import { TaskManager } from "../../../../../task/TaskManager";
+import { Sounds } from "../../../../../Sounds";
+import { PetHandler } from "../../../../PetHandler";
+import { Task } from "../../../../../task/Task";
+import { Sound } from "../../../../../Sound";
+import { Misc } from "../../../../../../util/Misc";
+import { Equipment } from "../../../../../model/container/impl/Equipment";
+import { Skill } from "../../../../../model/Skill";
+import { MapObjects } from "../../../../../entity/impl/object/MapObjects";
+import { TimedObjectReplacementTask } from "../../../../../task/impl/TimedObjectReplacementTask";
+import { Rings, BirdNest } from './BirdNest'
+import { Animation } from "../../../../../model/Animation";
+import { DefaultSkillable } from '../DefaultSkillable'
+
+class WoodcuttingTask extends Task{
+
+    constructor(c: number, player: Player, b: boolean, private readonly execFunction: Function){
+        super(4, true)
+    }
+
+    execute(): void {
+        this.execFunction();
+    }
+}
+
+export class Woodcutting extends DefaultSkillable {
     // The GameObject to cut down.
     private treeObject: GameObject;
     // The treeObject as an enumerated type which contains information about it, such as required level.
@@ -18,18 +45,20 @@ class Woodcutting extends DefaultSkillable {
     }
 
     public startAnimationLoop(player: Player) {
-        const animLoop = new Task(4, player, true, () => {
+        const animLoop = new WoodcuttingTask(4, player, true, () => {
             Sounds.sendSound(player, Sound.WOODCUTTING_CHOP);
             player.performAnimation(this.axe.getAnimation());
         });
-        TaskManager.submit(animLoop);
-        this.getTasks().add(animLoop);
 
-        const soundLoop = new Task(2, player, false, () => {
+        TaskManager.submit(animLoop);
+        DefaultSkillable.getTasks().add(animLoop);
+
+        const soundLoop = new WoodcuttingTask(2, player, false, () => {
             Sounds.sendSound(player, Sound.WOODCUTTING_CHOP);
         });
+        
         TaskManager.submit(soundLoop);
-        this.getTasks().add(soundLoop);
+        DefaultSkillable.getTasks().add(soundLoop);
     }
 
     public onCycle(player: Player) {
@@ -38,91 +67,93 @@ class Woodcutting extends DefaultSkillable {
 
     public finishedCycle(player: Player) {
         //Add logs..
-        player.getInventory().add(this.tree.getLogId(), 1);
+        player.getInventory().adds(this.tree.getLogId(), 1);
         player.getPacketSender().sendMessage("You get some logs.");
         //Add exp..
         player.getSkillManager().addExperience(Skill.WOODCUTTING, this.tree.getXpReward());
         //The chance of getting a bird nest from a tree is 1/256 each time you would normally get a log, regardless of the type of tree.
-        if (Misc.getRandom(NEST_DROP_CHANCE) == 1) {
-            handleDropNest(player);
+        if (Misc.getRandom(BirdNest.NEST_DROP_CHANCE) == 1) {
+            Rings.handleDropNest(player);
         }
         //Regular trees should always despawn.
         //Multi trees are random.
         if (!this.tree.isMulti() || Misc.getRandom(15) >= 2) {
             //Stop skilling...
-            this.cancel(player);
+            DefaultSkillable.cancel(player);
 
             //Despawn object and respawn it after a short period of time...
             TaskManager.submit(new TimedObjectReplacementTask(this.treeObject, new GameObject(1343, this.treeObject.getLocation(), 10, 0, player.getPrivateArea()), this.tree.getRespawnTimer()));
         }
     }
 
-    function cyclesRequired(player: Player): number {
-    let cycles = tree.getCycles() + Misc.getRandom(4);
-    cycles -= player.getSkillManager().getMaxLevel(Skill.WOODCUTTING) * 0.1;
-    cycles -= cycles * axe.get().getSpeed();
-    return Math.max(3, (int) cycles);
-}
+    public cyclesRequired(player: Player): number {
+        let cycles: number = this.tree.getCycles() + Misc.getRandom(4);
+        cycles -= player.getSkillManager().getMaxLevel(Skill.WOODCUTTING) * 0.1;
+        cycles -= cycles * this.axe.get().getSpeed();
+      
+        return Math.max(3, Math.floor(cycles));
+      }
 
-hasRequirements(player: Player): boolean {
-    //Attempt to find an axe..
-    axe = Optional.empty();
-    for (let a of Axe.values()) {
-        if (player.getEquipment().getItems()[Equipment.WEAPON_SLOT].getId() == a.getId()
-            || player.getInventory().contains(a.getId())) {
+    public hasRequirements(player: Player): boolean {
+        //Attempt to find an axe..
+        this.axe = empty();
+        for (let a of Axe.values()) {
+            if (player.getEquipment().getItems()[Equipment.WEAPON_SLOT].getId() == a.getId()
+                || player.getInventory().contains(a.getId())) {
 
-            //If we have already found an axe,
-            //don't select others that are worse or can't be used
-            if (axe.isPresent()) {
-                if (player.getSkillManager().getMaxLevel(Skill.WOODCUTTING) < a.getRequiredLevel()) {
-                    continue;
+                //If we have already found an axe,
+                //don't select others that are worse or can't be used
+                if (this.axe.isPresent()) {
+                    if (player.getSkillManager().getMaxLevel(Skill.WOODCUTTING) < a.getRequiredLevel()) {
+                        continue;
+                    }
+                    if (a.getRequiredLevel() < this.axe.get().getRequiredLevel()) {
+                        continue;
+                    }
                 }
-                if (a.getRequiredLevel() < axe.get().getRequiredLevel()) {
-                    continue;
-                }
+
+                axe = Optional.of(a);
             }
-
-            axe = Optional.of(a);
         }
-    }
 
-    //Check if we found one..
-    if (!axe.isPresent()) {
-        player.getPacketSender().sendMessage("You don't have an axe which you can use.");
-        return false;
-    }
+        //Check if we found one..
+        if (!this.axe.isPresent()) {
+            player.getPacketSender().sendMessage("You don't have an axe which you can use.");
+            return false;
+        }
 
-    //Check if we have the required level to cut down this {@code tree} using the {@link Axe} we found..
-    if (player.getSkillManager().getCurrentLevel(Skill.WOODCUTTING) < axe.get().getRequiredLevel()) {
-        player.getPacketSender().sendMessage("You don't have an axe which you have the required Woodcutting level to use.");
-        return false;
-    }
+        //Check if we have the required level to cut down this {@code tree} using the {@link Axe} we found..
+        if (player.getSkillManager().getCurrentLevel(Skill.WOODCUTTING) < axe.get().getRequiredLevel()) {
+            player.getPacketSender().sendMessage("You don't have an axe which you have the required Woodcutting level to use.");
+            return false;
+        }
 
-    //Check if we have the required level to cut down this {@code tree}..
-    if (player.getSkillManager().getCurrentLevel(Skill.WOODCUTTING) < tree.getRequiredLevel()) {
-        player.getPacketSender().sendMessage("You need a Woodcutting level of at least " + tree.getRequiredLevel() + " to cut this tree.");
-        return false;
-    }
+        //Check if we have the required level to cut down this {@code tree}..
+        if (player.getSkillManager().getCurrentLevel(Skill.WOODCUTTING) < tree.getRequiredLevel()) {
+            player.getPacketSender().sendMessage("You need a Woodcutting level of at least " + tree.getRequiredLevel() + " to cut this tree.");
+            return false;
+        }
 
-    //Finally, check if the tree object remains there.
-    //Another player may have cut it down already.
-    if (!MapObjects.exists(treeObject)) {
-        return false;
-    }
+        //Finally, check if the tree object remains there.
+        //Another player may have cut it down already.
+        if (!MapObjects.exists(treeObject)) {
+            return false;
+        }
 
-    return super.hasRequirements(player);
-}
+        return this.hasRequirements(player);
+    }
 
     public loopRequirements(): boolean {
-    return true;
-}
+        return true;
+    }
 
-        public allowFullInventory(): boolean {
-    return false;
-}
-        
-        public getTreeObject(): GameObject {
-    return this.treeObject;
+    public allowFullInventory(): boolean {
+        return false;
+    }
+
+    public getTreeObject(): GameObject {
+        return this.treeObject;
+    }
 }
 
 class Axe {
@@ -154,17 +185,8 @@ class Axe {
         return this.animation;
     }
 }
-interface TreeInfo {
-    objects: number[];
-    requiredLevel: number;
-    xpReward: number;
-    logId: number;
-    cycles: number;
-    respawnTimer: number;
-    multi: boolean;
-}
 
-const trees = new Map<number, TreeInfo>();
+const trees = new Map<number, Tree>();
 
 (() => {
     for (const t of Object.values(Tree)) {
@@ -222,19 +244,19 @@ class Tree {
     }
 }
 
-enum Axe {
-    BRONZE_AXE = { id: 1351, level: 1, speed: 0.03, animation: new Animation(879) },
-    IRON_AXE = { id: 1349, level: 1, speed: 0.05, animation: new Animation(877) },
-    STEEL_AXE = { id: 1353, level: 6, speed: 0.09, animation: new Animation(875) },
-    BLACK_AXE = { id: 1361, level: 6, speed: 0.11, animation: new Animation(873) },
-    MITHRIL_AXE = { id: 1355, level: 21, speed: 0.13, animation: new Animation(871) },
-    ADAMANT_AXE = { id: 1357, level: 31, speed: 0.16, animation: new Animation(869) },
-    RUNE_AXE = { id: 1359, level: 41, speed: 0.19, animation: new Animation(867) },
-    DRAGON_AXE = { id: 6739, level: 61, speed: 0.25, animation: new Animation(2846) },
-    INFERNAL = { id: 13241, level: 61, speed: 0.3, animation: new Animation(2117) },
+class AxeEnum {
+    BRONZE_AXE = { id: 1351, level: 1, speed: 0.03, animation: new Animation(879) };
+    IRON_AXE = { id: 1349, level: 1, speed: 0.05, animation: new Animation(877) };
+    STEEL_AXE = { id: 1353, level: 6, speed: 0.09, animation: new Animation(875) };
+    BLACK_AXE = { id: 1361, level: 6, speed: 0.11, animation: new Animation(873) };
+    MITHRIL_AXE = { id: 1355, level: 21, speed: 0.13, animation: new Animation(871) };
+    ADAMANT_AXE = { id: 1357, level: 31, speed: 0.16, animation: new Animation(869) };
+    RUNE_AXE = { id: 1359, level: 41, speed: 0.19, animation: new Animation(867) };
+    DRAGON_AXE = { id: 6739, level: 61, speed: 0.25, animation: new Animation(2846) };
+    INFERNAL = { id: 13241, level: 61, speed: 0.3, animation: new Animation(2117) };
 }
 
-enum Tree {
+class Trees {
     NORMAL = {
         level: 1,
         exp: 25,
@@ -243,7 +265,7 @@ enum Tree {
         time: 10,
         tick: 8,
         member: false,
-    },
+    };
     ACHEY = {
         level: 1,
         exp: 25,
@@ -252,7 +274,7 @@ enum Tree {
         time: 13,
         tick: 9,
         member: false,
-    },
+    };
     OAK = {
         level: 15,
         exp: 38,
@@ -261,7 +283,7 @@ enum Tree {
         time: 14,
         tick: 11,
         member: true,
-    },
+    };
     WILLOW = {
         level: 30,
         exp: 68,
@@ -270,7 +292,7 @@ enum Tree {
         time: 15,
         tick: 14,
         member: true,
-    },
+    };
     TEAK = {
         level: 35,
         exp: 85,
@@ -279,7 +301,7 @@ enum Tree {
         time: 16,
         tick: 16,
         member: true,
-    },
+    };
     DRAMEN = {
         level: 36,
         exp: 88,
@@ -288,7 +310,7 @@ enum Tree {
         time: 16,
         tick: 17,
         member: true,
-    },
+    };
     MAPLE = {
         level: 45,
         exp: 100,
@@ -297,7 +319,7 @@ enum Tree {
         time: 17,
         tick: 18,
         member: true,
-    },
+    };
     MAHOGANY = {
         level: 50,
         exp: 125,
@@ -306,7 +328,7 @@ enum Tree {
         time: 17,
         tick: 20,
         member: true,
-    },
+    };
     YEW = {
         level: 60,
         exp: 175,
@@ -315,7 +337,7 @@ enum Tree {
         time: 18,
         tick: 28,
         member: true,
-    },
+    };
     MAGIC = {
         level: 75,
         exp: 250,
@@ -324,7 +346,7 @@ enum Tree {
         time: 20,
         tick: 40,
         member: true,
-    },
+    };
     REDWOOD = {
         level: 90,
         exp: 380,
@@ -333,5 +355,5 @@ enum Tree {
         time: 22,
         tick: 43,
         member: true,
-    },
+    };
 }

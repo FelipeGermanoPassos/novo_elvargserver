@@ -1,3 +1,6 @@
+import { PlayerSession } from "./PlayerSession";
+import { Player } from "../game/entity/impl/player/Player";
+
 export class PlayerBotSession extends PlayerSession {
     private player: Player;
 

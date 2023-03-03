@@ -2,6 +2,7 @@ import { EffectSpell } from '../../content/combat/magic/EffectSpells';
 import { Animation, Graphic, GraphicHeight, Skill } from '../../model/';
 import { Player } from '../../entity/impl/player';
 import { Packet } from '../../net/packet';
+import { PacketConstants } from '../PacketConstants';
 
 export class MagicOnItemPacketListener {
 

@@ -12,7 +12,7 @@ import { Area } from "./Area";
 import { CanAttackResponse } from "../../content/combat/CombatFactory";
 import { Boundary } from "../Boundary";
 
-class AreaManager {
+export class AreaManager {
 
     public static areas: Area[] = [];
 

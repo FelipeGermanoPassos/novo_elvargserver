@@ -1,4 +1,5 @@
-class Herblore extends ItemIdentifiers {
+import { Player } from "../../../../entity/impl/player/Player";
+export class Herblore extends ItemIdentifiers {
     private static ANIMATION: Animation = new Animation(363);
 
     public static concatenate(player: Player, itemUsed: Item, usedOn: Item): boolean {

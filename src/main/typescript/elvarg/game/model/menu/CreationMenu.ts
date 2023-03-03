@@ -68,7 +68,7 @@ export class CreationMenu {
     }
 }
 
-interface CreationMenuAction {
+export interface CreationMenuAction {
     /**
     * This method will execute when a player clicks
     * on an item in the creation menu chatbox

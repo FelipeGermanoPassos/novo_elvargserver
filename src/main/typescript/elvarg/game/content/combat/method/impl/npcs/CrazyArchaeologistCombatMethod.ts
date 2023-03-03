@@ -59,8 +59,9 @@ export class CrazyArchaeologistCombatMethod extends CombatMethod {
         character.forceChat(CrazyArchaeologistCombatMethod.QUOTES[Misc.getRandom(CrazyArchaeologistCombatMethod.QUOTES.length - 1)]);
 
         if (this.attack == Attack.DEFAULT_RANGED_ATTACK) {
-            character.performAnimation(CrazyArchaeologistCombatMethod.RANSGED_ATTACK_ANIM);
-            new Projectile(character, target, 1259, 40, 65, 31, 43).sendProjectile();
+            character.performAnimation(CrazyArchaeologistCombatMethod.RANGED_ATTACK_ANIM);
+            const projectile2 = Projectile.createProjectile(character, target, 1259, 40, 65, 31, 43);
+            projectile2.sendProjectile();
             TaskManager.submit(new Task(3, target, false) {
                 execute() {
                     target.performGraphic(CrazyArchaeologistCombatMethod.RANGED_END_GFX);

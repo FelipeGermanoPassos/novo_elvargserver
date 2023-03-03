@@ -1,4 +1,11 @@
 import { Mobile } from "../../../entity/impl/Mobile";
+import { Server } from "../../../../Server";
+import { RegionManager } from "../../../collision/RegionManager";
+import { CombatConstants } from '../../../content/combat/CombatConstants'
+import { Location } from "../../Location";
+import { PrivateArea } from "../../areas/impl/PrivateArea";
+import { AttackRange } from '../../../model/commands/impl/AttackRange'
+import { PlayerRights } from "../../rights/PlayerRights";
 
 export class PathFinder {
     static WEST = 0x1280108;
@@ -40,7 +47,7 @@ export class PathFinder {
             [9, -3], [9, -2], [9, -1], [9, 1], [9, 2], [9, 3], [9, 4], [10, 0]
         ]);
 
-        function isInDiagonalBlock(attacker: Location, attacked: Location): boolean {
+    public  isInDiagonalBlock(attacker: Location, attacked: Location): boolean {
     return attacked.getX() - 1 == attacker.getX() && attacked.getY() + 1 == attacker.getY()
         || attacker.getX() - 1 == attacked.getX() && attacker.getY() + 1 == attacked.getY()
         || attacked.getX() + 1 == attacker.getX() && attacked.getY() - 1 == attacker.getY()
@@ -49,7 +56,7 @@ export class PathFinder {
         || attacker.getX() + 1 == attacked.getX() && attacker.getY() + 1 == attacker.getY();
 }
 
-function isDiagonalLocation(att: Mobile, def: Mobile): boolean {
+public static isDiagonalLocation(att: Mobile, def: Mobile): boolean {
     let attacker = att.getLocation().clone();
     let attacked = def.getLocation().clone();
     let isDia = attacker.getX() - 1 == attacked.getX() && attacker.getY() + 1 == attacked.getY() //top left
@@ -59,31 +66,31 @@ function isDiagonalLocation(att: Mobile, def: Mobile): boolean {
     return isDia;
 }
 
-public function calculateCombatRoute(player: Mobile, target: Mobile) {
-    calculateRoute(player, 0, target.location.x, target.location.y, 1, 1, 0, 0, false);
+public static calculateCombatRoute(player: Mobile, target: Mobile) {
+    PathFinder.calculateRoute(player, 0, target.Mobile.location.x, target.location.y, 1, 1, 0, 0, false);
     player.mobileInteraction = target;
 }
 
-public function calculateEntityRoute(player: Mobile, destX: number, destY: number) {
+public static calculateEntityRoute(player: Mobile, destX: number, destY: number) {
     calculateRoute(player, 0, destX, destY, 1, 1, 0, 0, false);
 }
 
-public static function calculateWalkRoute(player: Mobile, destX: number, destY: number) {
+public static calculateWalkRoute(player: Mobile, destX: number, destY: number) {
     calculateRoute(player, 0, destX, destY, 0, 0, 0, 0, true);
 }
 
-public function calculateObjectRoute(entity: Mobile, size: number, destX: number, destY: number, xLength: number, yLength: number, direction: number, blockingMask: number) {
+public static calculateObjectRoute(entity: Mobile, size: number, destX: number, destY: number, xLength: number, yLength: number, direction: number, blockingMask: number) {
     calculateRoute(entity, size, destX, destY, xLength, yLength, direction, blockingMask, false);
 }
 
-public function getClosestAttackableTile(attacker: Mobile, defender: Mobile, distance: number): Location | null {
-    const privateArea = attacker.privateArea;
-    const targetLocation = defender.location;
+public static getClosestAttackableTile(attacker: Mobile, defender: Mobile, distance: number): Location | null {
+    const privateArea = attacker.getPrivateArea;
+    const targetLocation = defender.getLocation;
 
     if (distance === 1) {
-        const size = attacker.size;
-        const followingSize = defender.size;
-        const current = attacker.location;
+        const size = attacker.size();
+        const followingSize = defender.size();
+        const current = attacker.getLocation;
 
         const tiles: Location[] = [];
         for (const tile of defender.outterTiles()) {
@@ -167,7 +174,7 @@ public static getTilesForDistance(center: Location, distance: number): Location[
     return deltas.map((d) => center.clone().translate(d[0], d[1]));
 }
 
-export function calculateRoute(entity: Mobile, size: number, destX: number, destY: number, xLength: number, yLength: number, direction: number, blockingMask: number, basicPather: boolean): number {
+export static calculateRoute(entity: Mobile, size: number, destX: number, destY: number, xLength: number, yLength: number, direction: number, blockingMask: number, basicPather: boolean): number {
 
     /** RS Protocol **/
     const byte0 = 104;

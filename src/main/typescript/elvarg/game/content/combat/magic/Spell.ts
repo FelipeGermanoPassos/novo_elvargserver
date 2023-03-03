@@ -1,7 +1,12 @@
+import { Player } from "../../../entity/impl/player/Player";
+import { Skill } from "../../../model/Skill";
+import { Autocasting } from "./Autocasting";
+import { PlayerMagicStaff } from "./PlayerMagicStaff";
+
 export class Spell {
     public canCast(player: Player, delete: boolean): boolean {
     if (player.skillManager.getCurrentLevel(Skill.MAGIC) < levelRequired()) {
-        player.packetSender.sendMessage(
+        Player.packetSender.sendMessage(
             `You need a Magic level of ${levelRequired()} to cast this spell.`);
         player.combat.reset();
         return false;
@@ -61,18 +66,19 @@ export class Spell {
     }
     return true;
 }
-getSpellbook(): MagicSpellbook {
-    return MagicSpellbook.NORMAL;
+
+    getSpellbook(): MagicSpellbook {
+        return MagicSpellbook.NORMAL;
+    }
+
+
+
+    interface Spells {
+        spellId(): number;
+        levelRequired(): number;
+        baseExperience(): number;
+        itemsRequired(player: Player): Optional<Item[]>;
+        equipmentRequired(player: Player): Optional<Item[]>;
+        startCast(cast: Mobile, castOn: Mobile): void;
+    }
 }
-
-
-
-interface Spells {
-    spellId(): number;
-    levelRequired(): number;
-    baseExperience(): number;
-    itemsRequired(player: Player): Optional<Item[]>;
-    equipmentRequired(player: Player): Optional<Item[]>;
-    startCast(cast: Mobile, castOn: Mobile): void;
-}
-

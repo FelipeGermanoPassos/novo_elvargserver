@@ -22,17 +22,15 @@ export class WealthType {
             wealth += item.getDefinition().getValue();
         }
         let type = wealthTypes.VERY_LOW;
-        if (wealth >= Emblem.MYSTERIOUS_EMBLEM_1.value) {
+        const emblem = Emblem.find((e) => wealth >= e.value);
+        if (emblem) {
+        if (emblem === Emblem[5]) {
+            type = wealthTypes.HIGH;
+        } else if (emblem === Emblem[8]) {
+            type = wealthTypes.VERY_HIGH;
+        } else {
             type = wealthTypes.LOW;
         }
-        if (wealth >= Emblem.MYSTERIOUS_EMBLEM_3.value) {
-            type = wealthTypes.MEDIUM;
-        }
-        if (wealth >= Emblem.MYSTERIOUS_EMBLEM_6.value) {
-            type = wealthTypes.HIGH;
-        }
-        if (wealth >= Emblem.MYSTERIOUS_EMBLEM_9.value) {
-            type = wealthTypes.VERY_HIGH;
         }
         return type;
     }

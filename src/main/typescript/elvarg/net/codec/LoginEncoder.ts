@@ -1,4 +1,4 @@
-import { ChannelHandlerContext, MessageToByteEncoder } from 'netty';
+import { ChannelHandlerContext, MessageToByteEncoder, ByteBuf } from 'netty';
 import { LoginResponsePacket, LoginResponses } from '../login';
 
 /**

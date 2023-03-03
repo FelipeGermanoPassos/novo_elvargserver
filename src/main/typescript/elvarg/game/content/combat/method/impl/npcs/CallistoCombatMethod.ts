@@ -33,7 +33,8 @@ export class CallistoCombatMethod extends CombatMethod {
     start(character: Mobile, target: Mobile) {
         character.performAnimation(CallistoCombatMethod.MELEE_ATTACK_ANIMATION);
         if (this.currentAttackType === CombatType.MAGIC) {
-            new Projectile(character, target, 395, 40, 60, 31, 43).sendProjectile();
+            const projectile2 = Projectile.createProjectile(character, target, 395, 40, 60, 31, 43);
+            projectile2.sendProjectile();
         }
     }
 
@@ -46,7 +47,7 @@ export class CallistoCombatMethod extends CombatMethod {
 
         if (this.comboTimer.finished()) {
             if (Misc.getRandom(10) <= 2) {
-                this.comboTimer.start();
+                this.comboTimer.start(5);
                 this.currentAttackType = CombatType.MAGIC;
                 character.getCombat().performNewAttack(true);
             }
@@ -67,7 +68,7 @@ export class CallistoCombatMethod extends CombatMethod {
         if (!player.getTimers().has(TimerKey.STUN) && Misc.getRandom(100) <= 10) {
             player.performAnimation(new Animation(3131));
             const toKnock = new Location(player.getLocation().getX() > 3325 ? -3 : 1 + Misc.getRandom(2),
-                player.getLocation().getY() > 3834 && player.getLocation().getY() < 3843 ? 3 : -3, 0);
+                player.getLocation().getY() > 3834 && player.getLocation().getY() < 3843 ? 3 : -3);
             TaskManager.submit(new ForceMovementTask(player, 3,
                 new ForceMovement(player.getLocation().clone(), toKnock, 0, 15, 0, 0)));
             CombatFactory.stun(player, 4, false);

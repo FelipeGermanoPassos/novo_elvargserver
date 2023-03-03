@@ -61,7 +61,7 @@ export class ObjectDefinition extends ObjectIdentifiers {
     static dumpNames() {
         let writer = fs.writeFile("./Cache/object_names.txt");
         for (let i = 0; i < ObjectDefinition.totalObjects; i++) {
-            let def = forId(i);
+            let def = ObjectDefinition.forId(i);
             let name = def == null ? "null" : def.name;
             writer.write("ID: " + i + ", name: " + name + "");
             writer.newLine();

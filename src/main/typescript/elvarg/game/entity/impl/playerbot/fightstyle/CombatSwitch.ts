@@ -6,6 +6,7 @@ import { EquipPacketListener } from "../../../../../net/packet/impl/EquipPacketL
 import { TimerKey } from "../../../../../util/timers/TimerKey";
 import { CombatAction } from "./CombatAction";
 import { PrayerData } from "../../../../content/PrayerHandler";
+import { Player } from "../../player/Player";
 
 
 export abstract class CombatSwitch implements CombatAction {
@@ -27,9 +28,9 @@ export abstract class CombatSwitch implements CombatAction {
         this.instant = false;
     }
 
-    private doSwitch(playerBot: PlayerBot) {
+    private doSwitch(playerBot: PlayerBot, player: Player) {
         for (let prayer of this.prayers) {
-            PrayerHandler.activatePrayer(playerBot, prayer);
+            PrayerHandler.activatePrayer(player, prayer);
         }
         for (let itemId of this.switchItemIds) {
             let item = ItemInSlot.getFromInventory(itemId, playerBot.getInventory());
@@ -37,11 +38,11 @@ export abstract class CombatSwitch implements CombatAction {
             if (item == null) {
                 continue;
             }
-            EquipPacketListener.equipFromInventory(playerBot, item);
+            EquipPacketListener.equipFromInventory(player, item);
         }
     }
-    public perform(playerBot: PlayerBot, enemy: Mobile) {
-        this.doSwitch(playerBot);
+    public perform(player: Player, enemy: Mobile) {
+        this.doSwitch(player);
         this.performAfterSwitch(playerBot, enemy);
     }
 

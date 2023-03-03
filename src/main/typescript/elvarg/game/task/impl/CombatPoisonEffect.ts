@@ -56,7 +56,7 @@ export class CombatPoisonEffect extends Task {
   }
 }
 
-enum PoisonType {
+export enum PoisonType {
   VERY_WEAK = 2,
   WEAK = 3,
   MILD = 4,

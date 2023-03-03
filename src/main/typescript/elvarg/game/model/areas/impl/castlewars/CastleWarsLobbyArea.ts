@@ -9,7 +9,7 @@ import {obj} from  '../../../../../util/ObjectIdentifiers';
 
 
 
-class CastleWarsLobbyArea extends Area {
+export class CastleWarsLobbyArea extends Area {
     private lanthus: Lanthus;
 
     constructor() {

@@ -56,6 +56,7 @@ import { ListSizesCommand } from '../../model/commands/impl/ListSizesCommand'
 import { AttackRange } from '../../model/commands/impl/AttackRange'
 import { DebugCommand } from '../../model/commands/impl/DebugCommand'
 import { Command } from '../../model/commands/Command'
+import { GroundItemCommand } from '../../model/commands/GroundItemCommand'
 
 export class CommandManager {
 

@@ -16,6 +16,7 @@ import { DialogueOption } from '../../../game/model/dialogues/DialogueOption';
 import { BonusManager } from '../../../game/model/equipment/BonusManager';
 import { PlayerRights } from '../../../game/model/rights/PlayerRights';
 import { Packet } from '../Packet';
+import { Dueling } from '../../../game/content/Duelling';
 
 export class ButtonClickPacketListener implements PacketExecutor {
   public static readonly FIRST_DIALOGUE_OPTION_OF_FIVE: number = 2494;
@@ -120,7 +121,7 @@ export class ButtonClickPacketListener implements PacketExecutor {
   execute(player: Player, packet: Packet): void {
     let button = packet.readInt();
 
-    if (player.getHitpoints() <= 0 || player.isTeleporting()) {
+    if (player.getHitpoints() <= 0 || player.isTeleporting) {
       return;
     }
 
@@ -128,7 +129,7 @@ export class ButtonClickPacketListener implements PacketExecutor {
       player.getPacketSender().sendMessage("Button clicked: " + button.toString() + ".");
     }
 
-    if (handlers(player, button)) {
+    if (ButtonClickPacketListener.handlers(player, button)) {
       return;
     }
 
@@ -161,7 +162,7 @@ export class ButtonClickPacketListener implements PacketExecutor {
           player.getPacketSender().sendInterfaceRemoval();
         }
         if (player.getRunEnergy() > 0) {
-          player.setRunning(!player.isRunning());
+          player.setRunning(!player.isRunningReturn());
         } else {
           player.setRunning(false);
         }
@@ -207,7 +208,7 @@ export class ButtonClickPacketListener implements PacketExecutor {
         player.getPriceChecker().withdrawAll();
         break;
 
-      case PRICE_CHECKER_DEPOSIT_ALL:
+      case ButtonClickPacketListener.PRICE_CHECKER_DEPOSIT_ALL:
         player.getPriceChecker().depositAll();
         break;
 
@@ -229,14 +230,14 @@ export class ButtonClickPacketListener implements PacketExecutor {
       case ButtonClickPacketListener.TOGGLE_AUTO_RETALIATE_2276:
       case ButtonClickPacketListener.TOGGLE_AUTO_RETALIATE_5570:
       case ButtonClickPacketListener.TOGGLE_AUTO_RETALIATE_1698:
-        player.setAutoRetaliate(!player.autoRetaliate());
+        player.setAutoRetaliate(!player.autoRetaliateReturn());
         break;
 
       case ButtonClickPacketListener.DESTROY_ITEM:
         let item = player.getDestroyItem();
         player.getPacketSender().sendInterfaceRemoval();
         if (item != -1) {
-          player.getInventory().delete(item, player.getInventory().getAmount(item));
+          player.getInventory().delete(item);
         }
         break;
 
@@ -245,8 +246,8 @@ export class ButtonClickPacketListener implements PacketExecutor {
         break;
 
       case ButtonClickPacketListener.TOGGLE_EXP_LOCK:
-        player.setExperienceLocked(!player.experienceLocked());
-        if (player.experienceLocked()) {
+        player.setExperienceLocked(!player.experienceLockedReturn());
+        if (player.experienceLockedReturn()) {
           player.getPacketSender().sendMessage("Your experience is now @red@locked.");
         } else {
           player.getPacketSender().sendMessage("Your experience is now @red@unlocked.");
@@ -263,25 +264,25 @@ export class ButtonClickPacketListener implements PacketExecutor {
       case ButtonClickPacketListener.FIRST_DIALOGUE_OPTION_OF_FOUR:
       case ButtonClickPacketListener.FIRST_DIALOGUE_OPTION_OF_THREE:
       case ButtonClickPacketListener.FIRST_DIALOGUE_OPTION_OF_TWO:
-        player.getDialogueManager().handleOption(player, DialogueOption.FIRST_OPTION);
+        player.getDialogueManager().handleOption(DialogueOption.FIRST_OPTION);
         break;
       case ButtonClickPacketListener.SECOND_DIALOGUE_OPTION_OF_FIVE:
       case ButtonClickPacketListener.SECOND_DIALOGUE_OPTION_OF_FOUR:
       case ButtonClickPacketListener.SECOND_DIALOGUE_OPTION_OF_THREE:
       case ButtonClickPacketListener.SECOND_DIALOGUE_OPTION_OF_TWO:
-        player.getDialogueManager().handleOption(player, DialogueOption.SECOND_OPTION);
+        player.getDialogueManager().handleOption(DialogueOption.SECOND_OPTION);
         break;
       case ButtonClickPacketListener.THIRD_DIALOGUE_OPTION_OF_FIVE:
       case ButtonClickPacketListener.THIRD_DIALOGUE_OPTION_OF_FOUR:
       case ButtonClickPacketListener.THIRD_DIALOGUE_OPTION_OF_THREE:
-        player.getDialogueManager().handleOption(player, DialogueOption.THIRD_OPTION);
+        player.getDialogueManager().handleOption(DialogueOption.THIRD_OPTION);
         break;
       case ButtonClickPacketListener.FOURTH_DIALOGUE_OPTION_OF_FIVE:
       case ButtonClickPacketListener.FOURTH_DIALOGUE_OPTION_OF_FOUR:
-        player.getDialogueManager().handleOption(player, DialogueOption.FOURTH_OPTION);
+        player.getDialogueManager().handleOption(DialogueOption.FOURTH_OPTION);
         break;
       case ButtonClickPacketListener.FIFTH_DIALOGUE_OPTION_OF_FIVE:
-        player.getDialogueManager().handleOption(player, DialogueOption.FIFTH_OPTION);
+        player.getDialogueManager().handleOption(DialogueOption.FIFTH_OPTION);
         break;
       default:
         // player.getPacketSender().sendMessage("Player "+player.getUsername()+", click button: "+button);

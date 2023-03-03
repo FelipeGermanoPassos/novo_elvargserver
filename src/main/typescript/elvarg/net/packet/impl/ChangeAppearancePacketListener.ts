@@ -4,7 +4,7 @@ import { Flag } from 'com/elvarg/game/model/Flag';
 import { Packet } from 'com/elvarg/net/packet';
 import { PacketExecutor } from 'com/elvarg/net/packet/PacketExecutor';
 
-class ChangeAppearancePacketListener implements PacketExecutor {
+export class ChangeAppearancePacketListener implements PacketExecutor {
     private static readonly ALLOWED_COLORS: number[][] = [
         [0, 11], // hair color
         [0, 15], // torso color
@@ -37,18 +37,18 @@ class ChangeAppearancePacketListener implements PacketExecutor {
             if (gender !== 0 && gender !== 1) {
                 return;
             }
-            const apperances = new Array(MALE_VALUES.length);
-            const colors = new Array(ALLOWED_COLORS.length);
+            const apperances = new Array(ChangeAppearancePacketListener.MALE_VALUES.length);
+            const colors = new Array(ChangeAppearancePacketListener.ALLOWED_COLORS.length);
             for (let i = 0; i < apperances.length; i++) {
                 let value = packet.readByte();
-                if (value < (gender === 0 ? MALE_VALUES[i][0] : FEMALE_VALUES[i][0]) || value > (gender === 0 ? MALE_VALUES[i][1] : FEMALE_VALUES[i][1]))
-                    value = (gender === 0 ? MALE_VALUES[i][0] : FEMALE_VALUES[i][0]);
+                if (value < (gender === 0 ? ChangeAppearancePacketListener.MALE_VALUES[i][0] : ChangeAppearancePacketListener.FEMALE_VALUES[i][0]) || value > (gender === 0 ? ChangeAppearancePacketListener.MALE_VALUES[i][1] : ChangeAppearancePacketListener.FEMALE_VALUES[i][1]))
+                    value = (gender === 0 ? ChangeAppearancePacketListener.MALE_VALUES[i][0] : ChangeAppearancePacketListener.FEMALE_VALUES[i][0]);
                 apperances[i] = value;
             }
             for (let i = 0; i < colors.length; i++) {
                 let value = packet.readByte();
-                if (value < ALLOWED_COLORS[i][0] || value > ALLOWED_COLORS[i][1])
-                    value = ALLOWED_COLORS[i][0];
+                if (value < ChangeAppearancePacketListener.ALLOWED_COLORS[i][0] || value > ChangeAppearancePacketListener.ALLOWED_COLORS[i][1])
+                    value = ChangeAppearancePacketListener.ALLOWED_COLORS[i][0];
                 colors[i] = value;
             }
             if (player.getAppearance().canChangeAppearance() && player.getInterfaceId() > 0) {

@@ -6,7 +6,7 @@ export class Boundary {
     private readonly y2: number;
     public height: number;
 
-    constructor(x: number, x2: number, y: number, y2: number, height: number) {
+    constructor(x: number, x2: number, y: number, y2: number, height?: number) {
         this.x = x;
         this.x2 = x2;
         this.y = y;

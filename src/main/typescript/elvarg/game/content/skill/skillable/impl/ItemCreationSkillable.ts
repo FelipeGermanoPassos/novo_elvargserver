@@ -1,4 +1,5 @@
-class ItemCreationSkillalble extends DefaultSkillable {
+import { DefaultSkillable } from "./DefaultSkillable";
+export class ItemCreationSkillable extends DefaultSkillable {
     private requiredItems: RequiredItem[];
     /**
      * The item we're making.

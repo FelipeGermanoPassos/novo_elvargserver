@@ -1,4 +1,4 @@
-class Mining extends DefaultSkillable {
+export class Mining extends DefaultSkillable {
     private rockObject: GameObject;
     private rock: Rock;
     private pickaxe: Optional<Pickaxe> = Optional.empty();

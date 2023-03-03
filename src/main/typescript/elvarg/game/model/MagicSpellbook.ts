@@ -1,7 +1,7 @@
 import { Autocasting } from '../content/combat/magic/Autocasting';
 import { Player } from '../entity/impl/player/Player';
 import { TeleportType } from '../model/teleportation/TeleportType';
-
+import { Skill } from './Skill';
 
 
 export class MagicSpellbook {

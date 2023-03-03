@@ -1,8 +1,8 @@
-import { Player } from "../../entity/impl/player/Player";
-import { Command } from "../../model/commands/Command";
-import { CommandManager } from "../../model/commands/CommandManager";
-import { Packet } from "../../net/packet/Packet";
-import { PacketExecutor } from "../../net/packet/PacketExecutor";
+import { Player } from "../../../game/entity/impl/player/Player";
+import { Command } from "../../../game/model/commands/Command";
+import { CommandManager } from "../../../game/model/commands/CommandManager";
+import { Packet } from "../Packet";
+import { PacketExecutor } from "../PacketExecutor";
 
 export class CommandPacketListener implements PacketExecutor {
     public static readonly OP_CODE = 103;

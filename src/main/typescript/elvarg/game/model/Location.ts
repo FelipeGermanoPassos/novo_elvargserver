@@ -6,11 +6,11 @@ export class Location {
     /**
      * The x coordinate of the position.
      */
-    private x: number;
+    public x: number;
     /**
      * The y coordinate of the position.
      */
-    private y: number;
+    public y: number;
     /**
      * The height level of the position.
      */
@@ -109,7 +109,7 @@ export class Location {
     }
 
     clone(): Location {
-        let location = new Location(this.x, this.y, this.z);
+        let location = new Location(this.x, this.y);
         location.x = this.x;
         location.y = this.y;
         location.z = this.z;
@@ -148,15 +148,15 @@ export class Location {
         let x = (this.x + position.x);
         let y = (this.y + position.y);
         let z = (this.z + position.z);
-        return new Location(x, y, z);
+        return new Location(x, y);
     }
 
     getMove(direction: Direction): Location {
-        return this.move(new Location(direction.x, direction.y, 0));
+        return this.move(new Location(direction.x, direction.y));
     }
 
     static delta(a: Location, b: Location): Location {
-        return new Location(b.x - a.x, b.y - a.y, 0);
+        return new Location(b.x - a.x, b.y - a.y);
     }
 
     distanceToPoint(pointX: number, pointY: number): number {
@@ -218,12 +218,12 @@ export class Location {
     }
 
     translate(x: number, y: number, z: number): Location {
-        return new Location(this.x + x, this.y + y, this.z + z);
+        return new Location(this.x + x, this.y + y);
     }
 
     rotate(degrees: number): Location {
         let rx = Math.floor((this.x * Math.cos(degrees)) - (this.y * Math.sin(degrees)));
         let ry = Math.floor((this.x * Math.sin(degrees)) + (this.y * Math.cos(degrees)));
-        return new Location(rx, ry, this.z);
+        return new Location(rx, ry);
     }
 }

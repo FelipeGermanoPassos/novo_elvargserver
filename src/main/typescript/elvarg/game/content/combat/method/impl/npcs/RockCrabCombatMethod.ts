@@ -21,7 +21,7 @@ export class RockCrabCombatMethod extends MeleeCombatMethod {
     onCombatEnded(character: Mobile, target: Mobile) {
         let npc = character.getAsNpc();
 
-        if (npc == null || npc.isDying()) {
+        if (npc == null || npc.isDyingFunction()) {
             return;
         }
 

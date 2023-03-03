@@ -12,12 +12,14 @@ export abstract class PlayerPersistence {
     abstract save(player: Player): void;
     abstract exists(username: string): boolean;
 
-    public encryptPassword(plainPassword: string): string {
-        return PasswordUtil.generatePasswordHashWithSalt(plainPassword);
+    public async encryptPassword(plainPassword: string): Promise<string> {
+        const passwordEncrypt: string = await PasswordUtil.generatePasswordHashWithSalt(plainPassword);
+        return passwordEncrypt;
     }
 
-    public checkPassword(password: string, playerSave: PlayerSave): boolean {
+    public async checkPassword(password: string, playerSave: PlayerSave): Promise<boolean> {
         let passwordHashWithSalt = playerSave.getPasswordHashWithSalt();
-        return PasswordUtil.passwordsMatch(password, passwordHashWithSalt);
+        let isMatch: boolean = await PasswordUtil.passwordsMatch(password, passwordHashWithSalt);
+        return isMatch;
     }
 }

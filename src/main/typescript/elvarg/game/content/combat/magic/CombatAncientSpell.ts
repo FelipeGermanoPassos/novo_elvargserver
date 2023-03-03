@@ -3,10 +3,11 @@ import { Player } from "../../../entity/impl/player/Player";
 import { Item } from "../../../model/Item";
 import { MagicSpellbook } from "../../../model/MagicSpellbook"
 import { CombatSpell } from "./CombatSpell";
+import { Optional } from 'optional'
 
 export abstract class CombatAncientSpell extends CombatSpell {
 
-    public getSpellbook(): MagicSpellbook {
+    public getSpellbook() {
         return MagicSpellbook.ANCIENT;
     }
 

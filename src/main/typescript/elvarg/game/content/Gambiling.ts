@@ -4,7 +4,7 @@ import { MovementQueue } from '../model/movement/MovementQueue';
 import { TaskManager } from '../task/TaskManager';
 import { GameObject } from '../entity/impl/object/GameObject';
 
-class Gambling {
+export class Gambling {
     public static MITHRIL_SEEDS = 299;
 
     public static plantFlower(player: Player) {

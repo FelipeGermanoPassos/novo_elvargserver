@@ -9,6 +9,8 @@ import { Mobile } from "../../../entity/impl/Mobile";
 import { BonusManager } from "../../../model/equipment/BonusManager";
 import { Skills } from "../../../model/Skill";
 import { CombatEquipment } from "../../combat/CombatEquipment";
+import { FightType } from '../FightType';
+import { Player } from '../../../entity/impl/player/Player';
 
 export class AccuracyFormulasDpsCalc {
     static randomFloat() {
@@ -82,7 +84,7 @@ export class AccuracyFormulasDpsCalc {
 
         att *= prayerBonus;
 
-        let fightStyle = player.getFightType().getStyle();
+        let fightStyle = FightType.getStyle();
         if (fightStyle == FightStyle.ACCURATE)
             att += 3;
         else if (fightStyle == FightStyle.CONTROLLED)
@@ -93,7 +95,7 @@ export class AccuracyFormulasDpsCalc {
 
         // Special attack
         if (player.isSpecialActivated()) {
-            att *= player.getCombatSpecial().getAccuracyMultiplier();
+            att *= Player.getCombatSpecial().getAccuracyMultiplier()
         }
 
         return att;
@@ -114,7 +116,7 @@ export class AccuracyFormulasDpsCalc {
         let attSlash = player.getBonusManager().getAttackBonus()[BonusManager.ATTACK_SLASH];
         let attCrush = player.getBonusManager().getAttackBonus()[BonusManager.ATTACK_CRUSH];
 
-        switch (player.getFightType().getBonusType()) {
+        switch (FightType.getBonusTypes()) {
             case BonusManager.ATTACK_STAB:
                 attRoll *= attStab + 64;
                 break;
@@ -164,7 +166,7 @@ export class AccuracyFormulasDpsCalc {
 
         def *= prayerBonus;
 
-        let fightStyle = player.getFightType().getStyle();
+        let fightStyle = FightType.getStyle();
         if (fightStyle == FightStyle.DEFENSIVE)
             def += 3;
         else if (fightStyle == FightStyle.CONTROLLED)
@@ -248,7 +250,7 @@ export class AccuracyFormulasDpsCalc {
         }
         rngStrength = (rngStrength * prayerMod);
 
-        let fightStyle = player.getFightType().getStyle();
+        let fightStyle = FightType.getStyle();
         if (fightStyle == FightStyle.ACCURATE)
             rngStrength += 3;
 
@@ -298,7 +300,7 @@ export class AccuracyFormulasDpsCalc {
 
         mag *= prayerBonus;
 
-        let fightStyle = player.getFightType().getStyle();
+        let fightStyle = FightType.getStyle();
         if (fightStyle == FightStyle.ACCURATE)
             mag += 3;
         else if (fightStyle == FightStyle.DEFENSIVE)
