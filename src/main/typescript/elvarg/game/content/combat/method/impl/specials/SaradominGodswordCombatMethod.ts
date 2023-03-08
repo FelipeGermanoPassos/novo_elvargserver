@@ -26,12 +26,12 @@ export class SaradominGodswordCombatMethod extends MeleeCombatMethod {
             const level = player.getSkillManager().getCurrentLevel(Skill.HITPOINTS) + damageHeal > player.getSkillManager().getMaxLevel(Skill.HITPOINTS)
                 ? player.getSkillManager().getMaxLevel(Skill.HITPOINTS)
                 : player.getSkillManager().getCurrentLevel(Skill.HITPOINTS) + damageHeal;
-            player.getSkillManager().setCurrentLevel(Skill.HITPOINTS, level);
+            player.getSkillManager().setCurrentLevels(Skill.HITPOINTS, level);
         }
         if (player.getSkillManager().getCurrentLevel(Skill.PRAYER) < player.getSkillManager().getMaxLevel(Skill.PRAYER)) {
             const level = player.getSkillManager().getCurrentLevel(Skill.PRAYER) + damagePrayerHeal > player.getSkillManager().getMaxLevel(Skill.PRAYER) ? player.getSkillManager().getMaxLevel(Skill.PRAYER)
                 : player.getSkillManager().getCurrentLevel(Skill.PRAYER) + damagePrayerHeal;
-            player.getSkillManager().setCurrentLevel(Skill.PRAYER, level);
+            player.getSkillManager().setCurrentLevels(Skill.PRAYER, level);
         }
     }
 }

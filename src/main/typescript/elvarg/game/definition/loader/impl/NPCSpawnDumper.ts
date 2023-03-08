@@ -6,17 +6,19 @@ import { Location } from '../../../model/Location';
 import fs from "fs";
 
 export class NPCSpawnDumper extends DefinitionLoader {
-    load() {
-        const r =  fs(this.file());
+    async load(): Promise<void> {
+        const r = fs.createReadStream(this.file(), { encoding: 'utf-8' });
         let s: string;
 
-        const path = Paths.get(GameConstants.DEFINITIONS_DIRECTORY, "gay.json");
-        const file = path.toFile();
-        file.parent.writable = true;
-        const w =  fs(file, true);
-        const builder: JSON = new JSON().setPrettyPrinting().create();;
+        const path = require('path');
+        const file = path.join(GameConstants.DEFINITIONS_DIRECTORY, "gay.json");
+        fs.mkdirSync(path.dirname(file), { recursive: true });
+        const w = fs.createWriteStream(file, { flags: 'a' });
+        const builder = JSON.stringify(JSON.stringify({ }, null, 2));
 
-        while ((s = r.readLine()) != null) {
+        const lineReader = require('readline').createInterface({ input: r });
+        for await (const line of lineReader) {
+            s = line;
             if (s.startsWith("/"))
                 continue;
             const data = s.split(" ");
@@ -25,7 +27,7 @@ export class NPCSpawnDumper extends DefinitionLoader {
             const y = parseInt(data[3]);
             const z = parseInt(data[4]);
 
-            w.write(JSON.stringify(new NpcSpawnDefinition(id, new Location(x, y, z), FacingDirection.SOUTH, 2)));
+            w.write(JSON.stringify(new NpcSpawnDefinition(id, new Location(x, y), FacingDirection.SOUTH, 2)));
             w.write(",");
             w.write("\n");
         }

@@ -1,4 +1,24 @@
-class ItemContainerActionPacketListener {
+import { EquipmentMaking } from "../../../game/content/skill/skillable/impl/Smithing";
+import { Player } from "../../../game/entity/impl/player/Player";
+import { Packet } from "../Packet";
+import { Bank } from "../../../game/model/container/impl/Bank";
+import { DepositBox } from "../../../game/content/DepositBox";
+import { Dueling } from "../../../game/content/Duelling";
+import { Trading } from "../../../game/content/Trading";
+import { PriceChecker } from "../../../game/model/container/impl/PriceChecker";
+import { Shop } from "../../../game/model/container/shop/Shop";
+import { ShopManager } from "../../../game/model/container/shop/ShopManager";
+import { PlayerStatus } from "../../../game/model/PlayerStatus";
+import { Equipment } from "../../../game/model/container/impl/Equipment";
+import { BonusManager } from "../../../game/model/equipment/BonusManager";
+import { WeaponInterfaces } from "../../../game/content/combat/WeaponInterfaces";
+import { CombatSpecial } from "../../../game/content/combat/CombatSpecial";
+import { Autocasting } from "../../../game/content/combat/magic/Autocasting";
+import { PacketConstants } from "../PacketConstants";
+import { Item } from "../../../game/model/Item";
+import { Flag } from "../../../game/model/Flag";
+
+export class ItemContainerActionPacketListener {
     static firstAction(player: Player, packet: Packet) {
         let containerId = packet.readInt();
         let slot = packet.readShortA();
@@ -51,7 +71,7 @@ class ItemContainerActionPacketListener {
                 break;
 
             case Bank.INVENTORY_INTERFACE_ID:
-                Bank.deposit(player, id, slot, 1);
+                Bank.deposits(player, id, slot, 1);
                 break;
 
             case Shop.ITEM_CHILD_ID:
@@ -74,7 +94,7 @@ class ItemContainerActionPacketListener {
                     player.getEquipment().setItem(slot, new Item(-1, 0));
 
                     if (stackItem) {
-                        player.getInventory().add(item.getId(), item.getAmount());
+                        player.getInventory().adds(item.getId(), item.getAmount());
                     } else {
                         player.getInventory().setItem(inventorySlot, item);
                     }
@@ -99,10 +119,10 @@ class ItemContainerActionPacketListener {
         }
     }
 
-    private static void secondAction(Player player, Packet packet) {
-            int interfaceId = packet.readInt();
-            int id = packet.readLEShortA();
-            int slot = packet.readLEShort();
+    private static secondAction(player: Player, packet: Packet): void {
+        let interfaceId = packet.readInt();
+        let id = packet.readShortA();
+        let slot = packet.readLEShort();
 
         // Bank withdrawal..
         if (interfaceId >= Bank.CONTAINER_START && interfaceId < Bank.CONTAINER_START + Bank.TOTAL_BANK_TABS) {
@@ -136,7 +156,7 @@ class ItemContainerActionPacketListener {
                 }
                 break;
             case Bank.INVENTORY_INTERFACE_ID:
-                Bank.deposit(player, id, slot, 5);
+                Bank.deposits(player, id, slot, 5);
                 break;
             case Dueling.MAIN_INTERFACE_CONTAINER:
                 if (player.getStatus() == PlayerStatus.DUELING) {
@@ -237,7 +257,7 @@ class ItemContainerActionPacketListener {
                 }
                 break;
             case Bank.INVENTORY_INTERFACE_ID:
-                Bank.deposit(player, id, slot, -1);
+                Bank.deposits(player, id, slot, -1);
                 break;
             // Withdrawing items from duel
             case Dueling.MAIN_INTERFACE_CONTAINER:
@@ -277,7 +297,7 @@ class ItemContainerActionPacketListener {
 
         // Bank withdrawal..
         if (interfaceId >= Bank.CONTAINER_START && interfaceId < Bank.CONTAINER_START + Bank.TOTAL_BANK_TABS) {
-            player.setEnteredAmountAction((amount) => {
+            player.setEnteredAmountAction((amount: number) => {
                 Bank.withdraw(player, id, slot, amount, interfaceId - Bank.CONTAINER_START);
             });
             player.getPacketSender().sendEnterAmountPrompt("How many would you like to withdraw?");
@@ -306,7 +326,7 @@ class ItemContainerActionPacketListener {
 
             case Bank.INVENTORY_INTERFACE_ID:
                 player.setEnteredAmountAction((amount) => {
-                    Bank.deposit(player, id, slot, amount);
+                    Bank.deposits(player, id, slot, amount);
                 });
                 player.getPacketSender().sendEnterAmountPrompt("How many would you like to bank?");
                 break;

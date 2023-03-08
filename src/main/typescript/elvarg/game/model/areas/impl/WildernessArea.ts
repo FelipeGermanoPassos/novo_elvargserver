@@ -8,7 +8,6 @@ import { CanAttackResponse } from "../../../content/combat/CombatFactory";
 import { Player } from "../../../entity/impl/player/Player";
 import { PlayerBot } from "../../../entity/impl/playerbot/PlayerBot";
 import { PlayerRights } from "../../rights/PlayerRights";
-import { Optional } from "../../../../../../../../node_modules/optional-typescript/dist/index";
 
 export class WildernessArea extends Area {
     getName(): string {
@@ -73,7 +72,7 @@ export class WildernessArea extends Area {
         if (character.isPlayer()) {
             const player = character.getAsPlayer();
             player.setWildernessLevel(WildernessArea.getLevel(player.getLocation().getY()));
-            player.getPacketSender().sendString(199, "Level: " + player.getWildernessLevel());
+            player.getPacketSender().sendString( "Level: " + player.getWildernessLevel(),199);
         }
     }
 

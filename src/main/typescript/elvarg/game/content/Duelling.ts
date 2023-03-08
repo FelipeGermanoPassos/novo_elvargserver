@@ -1,6 +1,12 @@
 import { Player } from "../entity/impl/player/Player";
 import { ItemContainer } from "../model/container/ItemContainer";
 import { SecondsTimer } from "../model/SecondsTimer";
+import { PlayerStatus } from "../model/PlayerStatus";
+import { Misc } from "../../util/Misc";
+import { ItemDefinition } from "../definition/ItemDefinition";
+import { Equipment } from "../model/container/impl/Equipment";
+import { Inventory } from "../model/container/impl/Inventory";
+import { Trading } from "./Trading";
 
 export class Dueling {
     public static readonly MAIN_INTERFACE_CONTAINER = 6669;
@@ -30,27 +36,23 @@ export class Dueling {
     private button_delay = new SecondsTimer();
     private request_delay = new SecondsTimer();
 
-    constructor(player: Player) {
-        this.player = player;
-        this.container = new ItemContainer(player, 28, "Duel Container");
-        this.rules = Array(DuelRule.values().length).fill(false);
-    }
 
     constructor(player: Player) {
+        this.rules = Array(DuelRule.values().length).fill(false);
         this.player = player;
         this.container = new ItemContainer(player, {
             stackType: StackType.DEFAULT,
             refreshItems: () => {
-                player.getPacketSender().sendInterfaceSet(INTERFACE_ID, Trading.CONTAINER_INVENTORY_INTERFACE);
+                player.getPacketSender().sendInterfaceSet(Dueling.INTERFACE_ID, Trading.CONTAINER_INVENTORY_INTERFACE);
                 player.getPacketSender().sendItemContainer(player..getInventory(),
                     Trading.INVENTORY_CONTAINER_INTERFACE);
-                player.getPacketSender().sendInterfaceItems(MAIN_INTERFACE_CONTAINER,
+                player.getPacketSender().sendInterfaceItems(Dueling.MAIN_INTERFACE_CONTAINER,
                     player.getDueling().getContainer().getValidItems());
-                player.getPacketSender().sendInterfaceItems(SECOND_INTERFACE_CONTAINER,
+                player.getPacketSender().sendInterfaceItems(Dueling.SECOND_INTERFACE_CONTAINER,
                     interact.getDueling().getContainer().getValidItems());
-                interact.getPacketSender().sendInterfaceItems(MAIN_INTERFACE_CONTAINER,
+                interact.getPacketSender().sendInterfaceItems(Dueling.MAIN_INTERFACE_CONTAINER,
                     interact.getDueling().getContainer().getValidItems());
-                interact.getPacketSender().sendInterfaceItems(SECOND_INTERFACE_CONTAINER,
+                interact.getPacketSender().sendInterfaceItems(Dueling.SECOND_INTERFACE_CONTAINER,
                     player.getDueling().getContainer().getValidItems());
                 return this;
             },
@@ -177,12 +179,12 @@ export class Dueling {
         this.player.getPacketSender().sendInteractionOption("null", 1, false);
 
         // Reset rule toggle configs
-        this.player.getPacketSender().sendConfig(RULES_CONFIG_ID, 0);
+        this.player.getPacketSender().sendConfig(Dueling.RULES_CONFIG_ID, 0);
 
         // Update strings on interface
         this.player.getPacketSender()
-            .sendString(DUELING_WITH_FRAME, `@or1@Dueling with: @whi@${this.interact.getUsername()}@or1@          Combat level: @whi@${this.interact.getSkillManager().getCombatLevel()}`)
-            .sendString(STATUS_FRAME_1, "").sendString(669, "Lock Weapon")
+            .sendString(Dueling.DUELING_WITH_FRAME, `@or1@Dueling with: @whi@${this.interact.getUsername()}@or1@          Combat level: @whi@${this.interact.getSkillManager().getCombatLevel()}`)
+            .sendString(Dueling.STATUS_FRAME_1, "").sendString(669, "Lock Weapon")
             .sendString(8278, "Neither player is allowed to change weapon.");
 
         // Send equipment on the interface..
@@ -252,7 +254,7 @@ export class Dueling {
 
         // Clear toggles
         this.configValue = 0;
-        this.player.getPacketSender().sendConfig(RULES_CONFIG_ID, 0);
+        this.player.getPacketSender().sendConfig(Dueling.RULES_CONFIG_ID, 0);
 
         // Update right click options..
         this.player.getPacketSender().sendInteractionOption("Challenge", 1, false);
@@ -262,16 +264,16 @@ export class Dueling {
         this.player.getPacketSender().sendEntityHintRemoval(true);
 
         // Clear items on interface
-        this.player.getPacketSender().clearItemOnInterface(MAIN_INTERFACE_CONTAINER)
-            .clearItemOnInterface(SECOND_INTERFACE_CONTAINER);
+        this.player.getPacketSender().clearItemOnInterface(Dueling.MAIN_INTERFACE_CONTAINER)
+            .clearItemOnInterface(Dueling.SECOND_INTERFACE_CONTAINER);
     }
 
 
     public handleItem(id: number, amount: number, slot: number, from: ItemContainer, to: ItemContainer) {
-        if (this.player.getInterfaceId() == INTERFACE_ID) {
+        if (this.player.getInterfaceId() == Dueling.INTERFACE_ID) {
 
             // Validate this stake action..
-            if (!validate(this.player, this.interact, PlayerStatus.DUELING,
+            if (!Dueling.validate(this.player, this.interact, PlayerStatus.DUELING,
                 [DuelState.DUEL_SCREEN, DuelState.ACCEPTED_DUEL_SCREEN])) {
                 return;
             }
@@ -288,8 +290,8 @@ export class Dueling {
             if (this.interact.getDueling().getState() == DuelState.ACCEPTED_DUEL_SCREEN) {
                 this.interact.getDueling().setState(DuelState.DUEL_SCREEN);
             }
-            this.player.getPacketSender().sendString(STATUS_FRAME_1, "@red@DUEL MODIFIED!");
-            this.interact.getPacketSender().sendString(STATUS_FRAME_1, "@red@DUEL MODIFIED!");
+            this.player.getPacketSender().sendString(Dueling.STATUS_FRAME_1, "@red@DUEL MODIFIED!");
+            this.interact.getPacketSender().sendString(Dueling.STATUS_FRAME_1, "@red@DUEL MODIFIED!");
 
             // Handle the item switch..
             if (this.state == DuelState.DUEL_SCREEN && this.interact.getDueling().getState() == DuelState.DUEL_SCREEN) {
@@ -331,7 +333,7 @@ export class Dueling {
     public acceptDuel() {
 
         // Validate this stake action..
-        if (!this.validate(player, interact, PlayerStatus.DUELING, [DuelState.DUEL_SCREEN,
+        if (!Dueling.validate(this.player, this.interact, PlayerStatus.DUELING, [DuelState.DUEL_SCREEN,
         DuelState.ACCEPTED_DUEL_SCREEN, DuelState.CONFIRM_SCREEN, DuelState.ACCEPTED_CONFIRM_SCREEN])) {
             return;
         }
@@ -351,16 +353,16 @@ export class Dueling {
         if (this.state == DuelState.DUEL_SCREEN) {
 
             // Verify that the interact can receive all items first..
-            const slotsRequired = this.getFreeSlotsRequired(player);
-            if (player.getInventory().getFreeSlots() < slotsRequired) {
-                player.getPacketSender()
+            const slotsRequired = this.getFreeSlotsRequired(this.player);
+            if (this.player.getInventory().getFreeSlots() < slotsRequired) {
+                this.player.getPacketSender()
                     .sendMessage(`You need at least ${slotsRequired} free inventory slots for this duel.`);
                 return;
             }
 
             if (this.rules[DuelRule.NO_MELEE.ordinal()] && this.rules[DuelRule.NO_RANGED.ordinal()]
                 && this.rules[DuelRule.NO_MAGIC.ordinal()]) {
-                player.getPacketSender().sendMessage("You must enable at least one of the three combat styles.");
+                this.player.getPacketSender().sendMessage("You must enable at least one of the three combat styles.");
                 return;
             }
 
@@ -368,49 +370,46 @@ export class Dueling {
             this.setState(DuelState.ACCEPTED_DUEL_SCREEN);
 
             // Update status...
-            player.getPacketSender().sendString(STATUS_FRAME_1, "Waiting for other player..");
-            interact_.getPacketSender().sendString(STATUS_FRAME_1, `${player.getUsername()} has accepted.`);
+            this.player.getPacketSender().sendString(STATUS_FRAME_1, "Waiting for other player..");
+            interact_.getPacketSender().sendString(STATUS_FRAME_1, `${this.player.getUsername()} has accepted.`);
 
             // Check if both have accepted..
             if (this.state == DuelState.ACCEPTED_DUEL_SCREEN && t_state == DuelState.ACCEPTED_DUEL_SCREEN) {
 
                 // Technically here, both have accepted.
                 // Go into confirm screen!
-                player.getDueling().confirmScreen();
+                this.player.getDueling().confirmScreen();
                 interact_.getDueling().confirmScreen();
             } else {
                 if (interact_.isPlayerBot()) {
                     interact_.getDueling().acceptDuel();
                 }
             }
-        } else if (this.state == DuelState.CONFIRM_SCREEN) {
+        } else if (this.state === DuelState.CONFIRM_SCREEN) {
             // Both are in the same state. Do the second-stage accept.
             this.setState(DuelState.ACCEPTED_CONFIRM_SCREEN);
 
             // Update status...
-            player.getPacketSender().sendString(STATUS_FRAME_2,
-                `Waiting for ${interact_.getUsername()}'s confirmation..`);
-            interact_.getPacketSender().sendString(STATUS_FRAME_2,
-                "" + player.getUsername() + " has accepted. Do you wish to do the same?");
+            this.player.getPacketSender().sendString(Dueling.STATUS_FRAME_2, `Waiting for ${interact_.getUsername()}'s confirmation..`);
+            interact_.getPacketSender().sendString(Dueling.STATUS_FRAME_2, `${this.player.getUsername()} has accepted. Do you wish to do the same?`);
 
             // Check if both have accepted..
-            if (state == DuelState.ACCEPTED_CONFIRM_SCREEN && t_state == DuelState.ACCEPTED_CONFIRM_SCREEN) {
+            if (this.state === DuelState.ACCEPTED_CONFIRM_SCREEN && t_state === DuelState.ACCEPTED_CONFIRM_SCREEN) {
+                // Both accepted, start duel
 
-            // Both accepted, start duel
+                // Decide where they will spawn in the arena..
+                const obstacle = this.rules[DuelRule.OBSTACLES];
+                const movementDisabled = this.rules[DuelRule.NO_MOVEMENT];
 
-            // Decide where they will spawn in the arena..
-            final boolean obstacle = rules[DuelRule.OBSTACLES.ordinal()];
-            final boolean movementDisabled = rules[DuelRule.NO_MOVEMENT.ordinal()];
+                let pos1 = this.getRandomSpawn(obstacle);
+                let pos2 = this.getRandomSpawn(obstacle);
 
-            Location pos1 = getRandomSpawn(obstacle);
-            Location pos2 = getRandomSpawn(obstacle);
-
-                // Make them spaw next to eachother
+                // Make them spawn next to each other
                 if (movementDisabled) {
                     pos2 = pos1.clone().add(-1, 0);
                 }
 
-                player.getDueling().startDuel(pos1);
+                this.player.getDueling().startDuel(pos1);
                 interact_.getDueling().startDuel(pos2);
             } else {
                 if (interact_.isPlayerBot()) {
@@ -419,7 +418,7 @@ export class Dueling {
             }
         }
 
-        button_delay.start(1);
+        this.button_delay.start(1);
     }
 
     public getRandomSpawn(obstacle: boolean): Location {
@@ -431,55 +430,55 @@ export class Dueling {
 
     private confirmScreen() {
         // Update state
-        player.getDueling().setState(DuelState.CONFIRM_SCREEN);
+        this.player.getDueling().setState(DuelState.CONFIRM_SCREEN);
 
         // Send new interface frames
-        let this_items = Trading.listItems(container);
-        let interact_item = Trading.listItems(interact.getDueling().getContainer());
-        player.getPacketSender().sendString(ITEM_LIST_1_FRAME, this_items);
-        player.getPacketSender().sendString(ITEM_LIST_2_FRAME, interact_item);
+        let this_items = Trading.listItems(this.container);
+        let interact_item = Trading.listItems(this.interact.getDueling().getContainer());
+        this.player.getPacketSender().sendString(Dueling.ITEM_LIST_1_FRAME, this_items);
+        this.player.getPacketSender().sendString(Dueling.ITEM_LIST_2_FRAME, interact_item);
 
         // Reset all previous strings related to rules
         for (let i = 8238; i <= 8253; i++) {
-            player.getPacketSender().sendString(i, "");
+            this.player.getPacketSender().sendString(i, "");
         }
 
         // Send new ones
-        player.getPacketSender().sendString(8250, "Hitpoints will be restored.");
-        player.getPacketSender().sendString(8238, "Boosted stats will be restored.");
+        this.player.getPacketSender().sendString(8250, "Hitpoints will be restored.");
+        this.player.getPacketSender().sendString(8238, "Boosted stats will be restored.");
         if (rules[DuelRule.OBSTACLES.ordinal()]) {
-            player.getPacketSender().sendString(8239, "@red@There will be obstacles in the arena.");
+            this.player.getPacketSender().sendString(8239, "@red@There will be obstacles in the arena.");
         }
-        player.getPacketSender().sendString(8240, "");
-        player.getPacketSender().sendString(8241, "");
+        this.player.getPacketSender().sendString(8240, "");
+        this.player.getPacketSender().sendString(8241, "");
 
-        let ruleFrameIndex = RULES_FRAME_START;
+        let ruleFrameIndex = Dueling.RULES_FRAME_START;
         for (let i = 0; i < DuelRule.values().length; i++) {
             if (i == DuelRule.OBSTACLES.ordinal())
                 continue;
-            if (rules[i]) {
-                player.getPacketSender().sendString(ruleFrameIndex, "" + DuelRule.forId(i).toString());
+            if (this.rules[i]) {
+                this.player.getPacketSender().sendString(ruleFrameIndex, "" + DuelRule.forId(i).toString());
                 ruleFrameIndex++;
             }
         }
 
-        player.getPacketSender().sendString(STATUS_FRAME_2, "");
+        this.player.getPacketSender().sendString(Dueling.STATUS_FRAME_2, "");
 
         // Send new interface..
-        player.getPacketSender().sendInterfaceSet(CONFIRM_INTERFACE_ID, Inventory.INTERFACE_ID);
-        player.getPacketSender().sendItemContainer(player.getInventory(), Trading.INVENTORY_CONTAINER_INTERFACE);
+        this.player.getPacketSender().sendInterfaceSet(Dueling.CONFIRM_INTERFACE_ID, Inventory.INTERFACE_ID);
+        this.player.getPacketSender().sendItemContainer(this.player.getInventory(), Trading.INVENTORY_CONTAINER_INTERFACE);
     }
 
-    public checkRule(button: number): boolean {
+    public checkRules(button: number): boolean {
         let rule = DuelRule.forButtonId(button);
         if (rule != null) {
-            checkRule(rule);
+            this.checkRule(rule);
             return true;
         }
         return false;
     }
 
-    private checkRule(rule: DuelRule) {
+    public checkRule(rule: DuelRule) {
 
         // Check if we're actually dueling..
         if (this.player.getStatus() != PlayerStatus.DUELING) {
@@ -487,7 +486,7 @@ export class Dueling {
         }
 
         // Verify stake...
-        if (!this.validate(this.player, this.interact, PlayerStatus.DUELING,
+        if (!Dueling.validate(this.player, this.interact, PlayerStatus.DUELING,
             [DuelState.DUEL_SCREEN, DuelState.ACCEPTED_DUEL_SCREEN])) {
             return;
         }
@@ -509,8 +508,8 @@ export class Dueling {
             this.interact.getDueling().getRules()[rule.ordinal()] = this.rules[rule.ordinal()];
 
             // Send toggles for both players.
-            this.player.getPacketSender().sendToggle(RULES_CONFIG_ID, this.configValue);
-            this.interact.getPacketSender().sendToggle(RULES_CONFIG_ID, this.configValue);
+            this.player.getPacketSender().sendToggle(Dueling.RULES_CONFIG_ID, this.configValue);
+            this.interact.getPacketSender().sendToggle(Dueling.RULES_CONFIG_ID, this.configValue);
 
             // Send modify status
             if (this.state == DuelState.ACCEPTED_DUEL_SCREEN) {
@@ -519,16 +518,16 @@ export class Dueling {
             if (this.interact.getDueling().getState() == DuelState.ACCEPTED_DUEL_SCREEN) {
                 this.interact.getDueling().setState(DuelState.DUEL_SCREEN);
             }
-            this.player.getPacketSender().sendString(STATUS_FRAME_1, "@red@DUEL MODIFIED!");
-            this.interact.getPacketSender().sendString(STATUS_FRAME_1, "@red@DUEL MODIFIED!");
+            this.player.getPacketSender().sendString(Dueling.STATUS_FRAME_1, "@red@DUEL MODIFIED!");
+            this.interact.getPacketSender().sendString(Dueling.STATUS_FRAME_1, "@red@DUEL MODIFIED!");
 
             // Inform them about this "custom" rule.
-            if (rule == DuelRule.LOCK_WEAPON && rules[rule.ordinal()]) {
-                player.getPacketSender()
+            if (rule == DuelRule.LOCK_WEAPON && this.rules[rule.ordinal()]) {
+                this.player.getPacketSender()
                     .sendMessage(
                         "@red@Warning! The rule 'Lock Weapon' has been enabled. You will not be able to change")
                     .sendMessage("@red@weapon during the duel!");
-                interact.getPacketSender()
+                this.interact.getPacketSender()
                     .sendMessage(
                         "@red@Warning! The rule 'Lock Weapon' has been enabled. You will not be able to change")
                     .sendMessage("@red@weapon during the duel!");
@@ -549,64 +548,64 @@ export class Dueling {
             if (this.rules[i]) {
                 if (rule.getEquipmentSlot() < 0)
                     continue;
-                if (player.getEquipment().getItems()[rule.getEquipmentSlot()].getId() > 0) {
-                    const item = new Item(player.getEquipment().getItems()[rule.getEquipmentSlot()].getId(),
-                        player.getEquipment().getItems()[rule.getEquipmentSlot()].getAmount());
-                    player.getEquipment().delete(item);
-                    player.getInventory().add(item);
+                if (this.player.getEquipment().getItems()[rule.getEquipmentSlot()].getId() > 0) {
+                    const item = new Item(this.player.getEquipment().getItems()[rule.getEquipmentSlot()].getId(),
+                        this.player.getEquipment().getItems()[rule.getEquipmentSlot()].getAmount());
+                    this.player.getEquipment().deletes(item);
+                    this.player.getInventory().add(item);
                 }
             }
         }
         if (this.rules[DuelRule.NO_WEAPON.ordinal()] || this.rules[DuelRule.NO_SHIELD.ordinal()]) {
-            if (player.getEquipment().getItems()[Equipment.WEAPON_SLOT].getId() > 0) {
-                if (ItemDefinition.forId(player.getEquipment().getItems()[Equipment.WEAPON_SLOT].getId())
+            if (this.player.getEquipment().getItems()[Equipment.WEAPON_SLOT].getId() > 0) {
+                if (ItemDefinition.forId(this.player.getEquipment().getItems()[Equipment.WEAPON_SLOT].getId())
                     .isDoubleHanded()) {
-                    const item = new Item(player.getEquipment().getItems()[Equipment.WEAPON_SLOT].getId(),
-                        player.getEquipment().getItems()[Equipment.WEAPON_SLOT].getAmount());
-                    player.getEquipment().delete(item);
-                    player.getInventory().add(item);
+                    const item = new Item(this.player.getEquipment().getItems()[Equipment.WEAPON_SLOT].getId(),
+                        this.player.getEquipment().getItems()[Equipment.WEAPON_SLOT].getAmount());
+                    this.player.getEquipment().deletes(item);
+                    this.player.getInventory().add(item);
                 }
             }
         }
 
-        player.getPacketSender().clearItemOnInterface(MAIN_INTERFACE_CONTAINER)
-            .clearItemOnInterface(SECOND_INTERFACE_CONTAINER);
+        this.player.getPacketSender().clearItemOnInterface(Dueling.MAIN_INTERFACE_CONTAINER)
+            .clearItemOnInterface(Dueling.SECOND_INTERFACE_CONTAINER);
 
         // Update right click options..
-        player.getPacketSender().sendInteractionOption("Attack", 2, true);
-        player.getPacketSender().sendInteractionOption("null", 1, false);
+        this.player.getPacketSender().sendInteractionOption("Attack", 2, true);
+        this.player.getPacketSender().sendInteractionOption("null", 1, false);
 
         // Reset attributes..
-        player.resetAttributes();
+        this.player.resetAttributes();
 
         // Freeze the player
-        if (rules[DuelRule.NO_MOVEMENT.ordinal()]) {
-            player.getMovementQueue().reset().setBlockMovement(true);
+        if (this.rules[NO_MOVEMENT.ordinal()]) {
+            this.player.getMovementQueue().reset().setBlockMovement(true);
         }
 
         // Send interact hints
-        player.getPacketSender().sendPositionalHint(interact.getLocation().clone(), 10);
-        player.getPacketSender().sendEntityHint(interact);
+        this.player.getPacketSender().sendPositionalHint(this.interact.getLocation().clone(), 10);
+        this.player.getPacketSender().sendEntityHint(this.interact);
 
         // Teleport the player
-        player.moveTo(telePos);
+        this.player.moveTo(telePos);
 
         // Make them interact with eachother
-        player.setMobileInteraction(interact);
+        this.player.setMobileInteraction(this.interact);
 
         // Send countdown as a task
         setTimeout(() => {
             let timer = 3;
             const countdown = setInterval(() => {
-                if (player.getDueling().getState() != DuelState.STARTING_DUEL) {
+                if (this.player.getDueling().getState() != DuelState.STARTING_DUEL) {
                     clearInterval(countdown);
                     return;
                 }
                 if (timer === 3 || timer === 2 || timer === 1) {
-                    player.forceChat(`${timer}..`);
+                    this.player.forceChat(`${timer}..`);
                 } else {
-                    player.getDueling().setState(DuelState.IN_DUEL);
-                    player.forceChat("FIGHT!!");
+                    this.player.getDueling().setState(DuelState.IN_DUEL);
+                    this.player.forceChat("FIGHT!!");
                     clearInterval(countdown);
                 }
                 timer--;
@@ -616,56 +615,56 @@ export class Dueling {
 
     public duelLost() {
         // Make sure both players are in a duel..
-        if (validate(player, interact, null, [DuelState.STARTING_DUEL, DuelState.IN_DUEL])) {
+        if (Dueling.validate(this.player, this.interact, null, [DuelState.STARTING_DUEL, DuelState.IN_DUEL])) {
             // Add won items to a list..
             let totalValue = 0;
             let winnings: Item[] = [];
-            for (let item of interact.getDueling().getContainer().getValidItems()) {
-                interact.getInventory().add(item);
+            for (let item of this.interact.getDueling().getContainer().getValidItems()) {
+                this.interact.getInventory().add(item);
                 winnings.push(item);
                 totalValue += item.getDefinition().getValue();
             }
-            for (let item of player.getDueling().getContainer().getValidItems()) {
-                interact.getInventory().add(item);
+            for (let item of this.player.getDueling().getContainer().getValidItems()) {
+                this.interact.getInventory().add(item);
                 winnings.push(item);
                 totalValue += item.getDefinition().getValue();
             }
 
             // Send interface data..
-            interact.getPacketSender().sendString(SCOREBOARD_USERNAME_FRAME, player.getUsername())
-                .sendString(SCOREBOARD_COMBAT_LEVEL_FRAME, "" + player.getSkillManager().getCombatLevel())
-                .sendString(TOTAL_WORTH_FRAME,
+            this.interact.getPacketSender().sendString(Dueling.SCOREBOARD_USERNAME_FRAME, this.player.getUsername())
+                .sendString(Dueling.SCOREBOARD_COMBAT_LEVEL_FRAME, "" + this.player.getSkillManager().getCombatLevel())
+                .sendString(Dueling.TOTAL_WORTH_FRAME,
                     "@yel@Total: @or1@" + Misc.insertCommasToNumber("" + totalValue + "") + " value!");
 
             // Send winnings onto interface
-            interact.getPacketSender().sendInterfaceItems(SCOREBOARD_CONTAINER, winnings);
+            this.interact.getPacketSender().sendInterfaceItems(Dueling.SCOREBOARD_CONTAINER, winnings);
 
             // Send the scoreboard interface
-            interact.getPacketSender().sendInterface(SCOREBOARD_INTERFACE_ID);
+            this.interact.getPacketSender().sendInterface(Dueling.SCOREBOARD_INTERFACE_ID);
 
             // Restart the winner's stats
-            interact.resetAttributes();
+            this.interact.resetAttributes();
 
             // Move players home
             let spawn = new Location(3366, 3266);
-            interact.moveTo(spawn.clone().add(Misc.getRandom(4), Misc.getRandom(2)));
-            player.moveTo(spawn.clone().add(Misc.getRandom(4), Misc.getRandom(2)));
+            this.interact.moveTo(spawn.clone().add(Misc.getRandom(4), Misc.getRandom(2)));
+            this.player.moveTo(spawn.clone().add(Misc.getRandom(4), Misc.getRandom(2)));
 
             // Send messages
-            interact.getPacketSender().sendMessage("You won the duel!");
-            player.getPacketSender().sendMessage("You lost the duel!");
+            this.interact.getPacketSender().sendMessage("You won the duel!");
+            this.player.getPacketSender().sendMessage("You lost the duel!");
 
             // Reset attributes for both
-            interact.getDueling().resetAttributes();
-            player.getDueling().resetAttributes();
+            this.interact.getDueling().resetAttributes();
+            this.player.getDueling().resetAttributes();
         } else {
 
-            player.getDueling().resetAttributes();
-            player.getPacketSender().sendInterfaceRemoval();
+            this.player.getDueling().resetAttributes();
+            this.player.getPacketSender().sendInterfaceRemoval();
 
-            if (interact != null) {
-                interact.getDueling().resetAttributes();
-                interact.getPacketSender().sendInterfaceRemoval();
+            if (this.interact != null) {
+                this.interact.getDueling().resetAttributes();
+                this.interact.getPacketSender().sendInterfaceRemoval();
             }
         }
     }
@@ -751,86 +750,85 @@ export class Dueling {
     public incrementConfigValue(configValue: number): void {
         this.configValue += configValue;
     }
+}
 
-    class DuelRule {
-        private configId: number;
-        private buttonId: number;
-        private inventorySpaceReq: number;
-        private equipmentSlot: number;
+export class DuelRule {
+    public static readonly NO_RANGED = new DuelRule(16, 6725, -1, -1);
+    public static readonly NO_MELEE = new DuelRule(32, 6726, -1, -1);
+    public static readonly NO_MAGIC = new DuelRule(64, 6727, -1, -1);
+    public static readonly NO_SPECIAL_ATTACKS = new DuelRule(8192, 7816, -1, -1);
+    public static readonly LOCK_WEAPON = new DuelRule(4096, 670, -1, -1);
+    public static readonly NO_FORFEIT = new DuelRule(1, 6721, -1, -1);
+    public static readonly NO_POTIONS = new DuelRule(128, 6728, -1, -1);
+    public static readonly NO_FOOD = new DuelRule(256, 6729, -1, -1);
+    public static readonly NO_PRAYER = new DuelRule(512, 6730, -1, -1);
+    public static readonly NO_MOVEMENT = new DuelRule(2, 6722, -1, -1);
+    public static readonly OBSTACLES = new DuelRule(1024, 6732, -1, -1);
 
-        constructor(configId: number, buttonId: number, inventorySpaceReq: number, equipmentSlot: number) {
-            this.configId = configId;
-            this.buttonId = buttonId;
-            this.inventorySpaceReq = inventorySpaceReq;
-            this.equipmentSlot = equipmentSlot;
-        }
+    public static readonly NO_HELM = new DuelRule(16384, 13813, 1, Equipment.HEAD_SLOT);
+    public static readonly NO_CAPE = new DuelRule(32768, 13814, 1, Equipment.CAPE_SLOT);
+    public static readonly NO_AMULET = new DuelRule(65536, 13815, 1, Equipment.AMULET_SLOT);
+    public static readonly NO_AMMUNITION = new DuelRule(134217728, 13816, 1, Equipment.AMMUNITION_SLOT);
+    public static readonly NO_WEAPON = new DuelRule(131072, 13817, 1, Equipment.WEAPON_SLOT);
+    public static readonly NO_BODY = new DuelRule(262144, 13818, 1, Equipment.BODY_SLOT);
+    public static readonly NO_SHIELD = new DuelRule(524288, 13819, 1, Equipment.SHIELD_SLOT);
+    public static readonly NO_LEGS = new DuelRule(2097152, 13820, 1, Equipment.LEG_SLOT);
+    public static readonly NO_RING = new DuelRule(67108864, 13821, 1, Equipment.RING_SLOT);
+    public static readonly NO_BOOTS = new DuelRule(16777216, 13822, 1, Equipment.FEET_SLOT);
+    public static readonly NO_GLOVES = new DuelRule(8388608, 13823, 1, Equipment.HANDS_SLOT);
 
-        public static forId(i: number) {
-            for (const r of Object.values(DuelRule)) {
-                if (r.ordinal() === i) {
-                    return r;
-                }
+    private configId: number;
+    private buttonId: number;
+    private inventorySpaceReq: number;
+    private equipmentSlot: number;
+
+    constructor(configId: number, buttonId: number, inventorySpaceReq: number, equipmentSlot: number) {
+        this.configId = configId;
+        this.buttonId = buttonId;
+        this.inventorySpaceReq = inventorySpaceReq;
+        this.equipmentSlot = equipmentSlot;
+    }
+
+    public static forId(i: number) {
+        for (const r of Object.values(DuelRule)) {
+            if (r.ordinal() === i) {
+                return r;
             }
-            return null;
         }
+        return null;
+    }
 
-        public static forButtonId(buttonId: number) {
-            for (const r of Object.values(DuelRule)) {
-                if (r.getButtonId() === buttonId) {
-                    return r;
-                }
+    public static forButtonId(buttonId: number) {
+        for (const r of Object.values(DuelRule)) {
+            if (r.getButtonId() === buttonId) {
+                return r;
             }
-            return null;
         }
-
-        public getConfigId() {
-            return this.configId;
-        }
-
-        public getButtonId() {
-            return this.buttonId;
-        }
-
-        public getInventorySpaceReq() {
-            return this.inventorySpaceReq;
-        }
-
-        public getEquipmentSlot() {
-            return this.equipmentSlot;
-        }
-
-        public toString() {
-            return this.toString().toLowerCase();
-        }
+        return null;
     }
 
-
-    export enum DuelState {
-        NONE, REQUESTED_DUEL, DUEL_SCREEN, ACCEPTED_DUEL_SCREEN, CONFIRM_SCREEN, ACCEPTED_CONFIRM_SCREEN, STARTING_DUEL, IN_DUEL;
+    public getConfigId() {
+        return this.configId;
     }
 
-    export enum DuelRuleEnum {
-        NO_RANGED = 16,
-        NO_MELEE = 32,
-        NO_MAGIC = 64,
-        NO_SPECIAL_ATTACKS = 8192,
-        LOCK_WEAPON = 4096,
-        NO_FORFEIT = 1,
-        NO_POTIONS = 128,
-        NO_FOOD = 256,
-        NO_PRAYER = 512,
-        NO_MOVEMENT = 2,
-        OBSTACLES = 1024,
-        NO_HELM = 16384,
-        NO_CAPE = 32768,
-        NO_AMULET = 65536,
-        NO_AMMUNITION = 134217728,
-        NO_WEAPON = 131072,
-        NO_BODY = 262144,
-        NO_SHIELD = 524288,
-        NO_LEGS = 2097152,
-        NO_RING = 67108864,
-        NO_BOOTS = 16777216,
-        NO_GLOVES = 8388608,
+    public getButtonId() {
+        return this.buttonId;
     }
+
+    public getInventorySpaceReq() {
+        return this.inventorySpaceReq;
+    }
+
+    public getEquipmentSlot() {
+        return this.equipmentSlot;
+    }
+
+    public toString() {
+        return this.toString().toLowerCase();
+    }
+}
+
+
+export enum DuelState {
+    NONE, REQUESTED_DUEL, DUEL_SCREEN, ACCEPTED_DUEL_SCREEN, CONFIRM_SCREEN, ACCEPTED_CONFIRM_SCREEN, STARTING_DUEL, IN_DUEL;
 }

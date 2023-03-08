@@ -3,7 +3,7 @@ import { CombatFactory } from "../../../content/combat/CombatFactory";
 import { Player } from "../../../entity/impl/player/Player";
 import { SkullType, SkullTypes } from "caminho/para/a/classe/SkullType";
 
-class Skull implements Command {
+export class Skull implements Command {
     execute(player: Player, command: string, parts: string[]): void {
         if (CombatFactory.inCombat(player)) {
             player.getPacketSender().sendMessage("You cannot change that during combat!");

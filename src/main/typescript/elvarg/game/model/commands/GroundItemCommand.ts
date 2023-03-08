@@ -5,7 +5,7 @@ import { ItemOnGroundManager } from '../../entity/impl/grounditem/ItemOnGroundMa
 import { Item } from '../Item';
 export class GroundItemCommand implements Command {
     execute(player: Player, command: string, parts: string[]) {
-        ItemOnGroundManager.register(player, new Item(995, 10000));
+        ItemOnGroundManager.registers(player, new Item(995, 10000));
         player.getPacketSender().sendMessage("Spawned ground item..");
     }
     canUse(player: Player) {

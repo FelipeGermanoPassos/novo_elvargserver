@@ -34,6 +34,7 @@ import { PlayerRelationPacketListener } from '../../net/packet/impl/PlayerRelati
 import { TradeRequestPacketListener } from '../../net/packet/impl/TradeRequestPacketListener'
 import { CreationMenuPacketListener } from '../../net/packet/impl/CreationMenuPacketListener'
 import { TeleportPacketListener } from '../../net/packet/impl/TeleportPacketListener'
+import { ItemContainerActionPacketListener } from '../../net/packet/impl/ItemContainerActionPacketListener'
 
 export class PacketConstants {
 	public static readonly PACKETS: PacketExecutor[] = new Array(257);

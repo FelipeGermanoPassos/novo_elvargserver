@@ -1,5 +1,4 @@
 import { Task } from "../Task";
-import { Optional } from "../../../../../../../node_modules/optional-typescript/dist/index";
 import { World } from "../../World";
 import { Slayer } from '../../../game/content/skill/slayer/Slayer'
 import { NPC } from "../../entity/impl/npc/NPC";
@@ -15,7 +14,7 @@ import { NPCRespawnTask } from '../impl/NPCRespawnTask'
 export class NPCDeathTask extends Task {
     private npc: NPC
     private ticks: number;
-    private killer: Optional<Player>;
+    private killer: Player | null;
     
     /**
      * The NPCDeathTask constructor.
@@ -33,7 +32,7 @@ export class NPCDeathTask extends Task {
             case 1:
                 this.npc.getMovementQueue().setBlockMovement(true).reset();
                 this.killer = this.npc.getCombat().getKiller(true);
-                this.npc.performAnimation(new Animation(this.npc.getCurrentDefinition().getDeathAnim(), Priority.HIGH));
+                this.npc.performAnimation(new Animation(this.npc.getCurrentDefinition().getDeathAnim()));
                 this.npc.getCombat().reset();
                 this.npc.setMobileInteraction(null);
                 break;

@@ -12,7 +12,7 @@ export class MasterCommand implements Command {
         for (let skillName in Skill) {
             let skill: Skill = Skill[skillName];
             let level = SkillManager.getMaxAchievingLevel(skill);
-            player.getSkillManager().setCurrentLevel(skill, level).setMaxLevel(skill, level).setExperience(skill,
+            player.getSkillManager().setCurrentLevels(skill, level).setMaxLevel(skill, level).setExperience(skill,
                 SkillManager.getExperienceForLevel(level));
         }
         WeaponInterfaces.assign(player);

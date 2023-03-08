@@ -34,7 +34,7 @@ export class Fletching extends ItemIdentifiers {
         return false;
     }
 
-    const fletchCrossbow = (player: Player, itemUsed: number, itemUsedWith: number): boolean => {
+    public static fletchCrossbow = (player: Player, itemUsed: number, itemUsedWith: number): boolean => {
         for (const c of FletchableCrossbow.values()) {
             if ((c.getStock() === itemUsed || c.getStock() === itemUsedWith)
                 && (c.getLimbs() === itemUsed || c.getLimbs() === itemUsedWith)) {
@@ -47,7 +47,7 @@ export class Fletching extends ItemIdentifiers {
         return false;
     }
 
-    const stringBow = (player: Player, itemUsed: number, itemUsedWith: number): boolean => {
+    public static stringBow = (player: Player, itemUsed: number, itemUsedWith: number): boolean => {
         if (itemUsed === BOW_STRING || itemUsedWith === BOW_STRING || itemUsed === CROSSBOW_STRING || itemUsedWith === CROSSBOW_STRING) {
             const string = itemUsed === BOW_STRING || itemUsed === CROSSBOW_STRING ? itemUsed : itemUsedWith;
             const unstrung = itemUsed === BOW_STRING || itemUsed === CROSSBOW_STRING ? itemUsedWith : itemUsed;
@@ -67,7 +67,7 @@ export class Fletching extends ItemIdentifiers {
         return false;
     }
 
-    const fletchLog = (player: Player, itemUsed: number, itemUsedWith: number): boolean => {
+    public static fletchLog = (player: Player, itemUsed: number, itemUsedWith: number): boolean => {
         if (itemUsed === ItemIdentifiers.KNIFE || itemUsedWith === ItemIdentifiers.KNIFE) {
             const logId = itemUsed === ItemIdentifiers.KNIFE ? itemUsedWith : itemUsed;
             const list = FletchableLog.logs.get(logId);

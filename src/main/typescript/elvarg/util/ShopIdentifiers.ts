@@ -10,4 +10,10 @@ export class ShopIdentifiers {
     public static PURE_SHOP: number = 8;
     public static TOOL_SHOP: number = 9;
     public static POINTS_SHOP: number = 10;
+
+    private value: number;
+
+    constructor(n1: number){
+        this.value = n1
+    }
 }

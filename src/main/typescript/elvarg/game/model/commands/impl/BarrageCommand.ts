@@ -2,7 +2,7 @@ import {Player} from '../../../entity/impl/player/Player';
 import {PlayerRights} from '../../../model/rights/PlayerRights';
 import {Command} from '../../../model/commands/Command';
 
-class BarrageCommand implements Command {
+export class BarrageCommand implements Command {
     execute(player: Player, command: string, parts: string[]): void {
 
     }

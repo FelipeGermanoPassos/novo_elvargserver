@@ -1,7 +1,6 @@
 import { Area } from '../../../model/areas/Area';
 import { Boundary } from '../../../model/Boundary';
 import { Player } from '../../../entity/impl/player/Player'
-import { Optional } from 'optional'
 import { Mobile } from '../../../entity/impl/Mobile';
 
 export class KingBlackDragonArea extends Area {

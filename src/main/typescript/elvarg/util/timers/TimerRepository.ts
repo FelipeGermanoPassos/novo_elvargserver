@@ -3,7 +3,7 @@ import { Timer } from '../timers/Timer'
 
 
 
-class TimerRepository {
+export class TimerRepository {
     private timer = new Map<TimerKey, Timer>();
 
     public has(key: TimerKey): boolean {
@@ -14,6 +14,11 @@ class TimerRepository {
     public register(timer: Timer) {
         this.timer.set(timer.key(), timer);
     }
+    
+    public registerTimerKey(key: TimerKey): void {
+        this.timers().set(key, new Timer(key, key.getTicks()));
+    }
+
 
     public left(key: TimerKey): number {
         let timer = this.timer.get(key);

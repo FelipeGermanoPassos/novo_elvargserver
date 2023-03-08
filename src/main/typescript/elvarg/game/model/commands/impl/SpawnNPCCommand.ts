@@ -4,7 +4,7 @@ import { PlayerRights } from '../../rights/PlayerRights';
 import { World } from '../../../World';
 import { NPC } from '../../../entity/impl/npc/NPC';
 
-class SpawnNPCCommand implements Command {
+export class SpawnNPCCommand implements Command {
     execute(player: Player, command: string, parts: string[]) {
     let npc = NPC.create(parseInt(parts[1]), player.getLocation().clone());
     World.getAddNPCQueue().add(npc);

@@ -4,11 +4,14 @@ import {Optional} from 'optional'
 import {GodwarsFollower} from '../../../entity/impl/npc/impl/GodwarsFollower'
 import {Boundary} from '../../../model/Boundary';
 import {Area} from '../../../model/areas/Area';
+import { Arrays } from 'collections'
 
 export class GodwarsDungeonArea extends Area {
     public static BOUNDARY = new Boundary(2800, 2950, 5200, 5400,0);
 
-    constructor
+    constructor(){
+        super(Arrays.asList(GodwarsDungeonArea.BOUNDARY));
+    }
     
     postEnter(character: Mobile) {
         if (character.isPlayer()) {
@@ -63,11 +66,11 @@ export class GodwarsDungeonArea extends Area {
 
     defeated(player: Player, character: Mobile) {
         if (character instanceof GodwarsFollower) {
-            let gwdFollower = character as GodwarsFollower;
-            let index = gwdFollower.getGod().ordinal();
-            let current = player.getGodwarsKillcount()[index];
-            player.setGodwarsKillcount(index, current + 1);
-            this.updateInterface(player);
+          let gwdFoller: GodwarsFollower = character as GodwarsFollower;
+          let index: number = gwdFoller.getGod().ordinal();
+          let current: number = player.getGodwarsKillcount()[index];
+          player.setGodwarsKillcount(index, current + 1);
+          this.updateInterface(player);
         }
     }
 
@@ -77,7 +80,7 @@ export class GodwarsDungeonArea extends Area {
 
     private updateInterface(player: Player) {
         for (let i = 0; i < player.getGodwarsKillcount().length; i++) {
-            player.getPacketSender().sendString(42575 + i, player.getGodwarsKillcount()[i].toString());
+            player.getPacketSender().sendString( player.getGodwarsKillcount()[i].toString(), 42575 + i);
         }
     }
 }

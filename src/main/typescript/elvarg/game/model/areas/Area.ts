@@ -14,7 +14,7 @@ export abstract class Area {
     private players: { [key: number]: Player } = {};
     private playerBots: { [key: number]: PlayerBot } = {};
 
-    constructor(boundaries: Boundary[]) {
+    constructor(boundaries?: Boundary[]) {
         this.boundaries = boundaries;
     }
 
@@ -136,15 +136,15 @@ export abstract class Area {
     }
 
     public getNpcs(): NPC[] {
-        return Array.from(this.npcs.values());
+        return Object.values(this.npcs);
     }
 
     public getPlayers(): Player[] {
-        return Array.from(this.players.values());
-    }
-
-    public getPlayerBots(): PlayerBot[] {
-        return Array.from(this.playerBots.values());
-    }
+        return Object.values(this.players);
+      }
+      
+      public getPlayerBots(): PlayerBot[] {
+        return Object.values(this.playerBots);
+      }
 }
 

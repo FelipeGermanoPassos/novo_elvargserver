@@ -22,7 +22,7 @@ export class GameConstants {
     public static readonly CONCURRENCY: boolean = false;
     public static readonly GAME_ENGINE_PROCESSING_CYCLE_RATE: number = 600;
     public static readonly QUEUED_LOOP_THRESHOLD: number = 45;
-    public static readonly DEFAULT_LOCATION: Location = new Location(3089, 3524);
+    public static readonly DEFAULT_LOCATION = new Location(3089, 3524);
     public static readonly QUEUE_SWITCHING_REFRESH: boolean = true;
     public static readonly DROP_THRESHOLD: number = 2;
     public static readonly COMBAT_SKILLS_EXP_MULTIPLIER: number = 6;
@@ -80,6 +80,6 @@ export class GameConstants {
     ];
 
     public static readonly PLAYER_BOT_PASSWORD: string = "wirfunerpro4n!1";
-    public static readonly PLAYER_BOT_OVERRIDE: number[] = [PlayerRights.MODERATOR, PlayerRights.ADMINISTRATOR, PlayerRights.DEVELOPER, PlayerRights.OWNER];
+    public static readonly PLAYER_BOT_OVERRIDE: number[] = [PlayerRights.MODERATOR.getSpriteId(), PlayerRights.ADMINISTRATOR.getSpriteId(), PlayerRights.DEVELOPER.getSpriteId(), PlayerRights.OWNER.getSpriteId()];
 }
 

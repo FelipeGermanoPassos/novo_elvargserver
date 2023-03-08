@@ -28,9 +28,9 @@ export class PlayerDialogue extends Dialogue {
         let headChildId = startDialogueChildId - 2;
         player.getPacketSender().sendPlayerHeadOnInterface(headChildId);
         player.getPacketSender().sendInterfaceAnimation(headChildId, expression.getExpression());
-        player.getPacketSender().sendString(startDialogueChildId - 1, player.getUsername());
+        player.getPacketSender().sendString( player.getUsername(), startDialogueChildId - 1);
         for (let i = 0; i < length; i++) {
-            player.getPacketSender().sendString(startDialogueChildId + i, lines[i]);
+            player.getPacketSender().sendString(lines[i], startDialogueChildId + i);
         }
         player.getPacketSender().sendChatboxInterface(startDialogueChildId - 3);
     }

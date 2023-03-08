@@ -55,11 +55,11 @@ export class RegionManager {
     }
 
     public static getRegion(x: number, y: number): Region | undefined {
-        loadMapFiles(x, y);
+        RegionManager.loadMapFiles(x, y);
         let regionX = x >> 3;
         let regionY = y >> 3;
         let regionId = ((regionX / 8) << 8) + (regionY / 8);
-        return RegionManager.getRegion(regionId);
+        return RegionManager.getRegionid(regionId);
     }
     private static addClippingForVariableObject(x: number, y: number, height: number, type: number, direction: number, tall: boolean, privateArea: PrivateArea) {
         if (type == 0) {
@@ -403,7 +403,7 @@ export class RegionManager {
 
     public static removeClipping(x: number, y: number, height: number, shift: number, privateArea: PrivateArea) {
         if (privateArea) {
-            privateArea.removeClip(new Location(x, y));
+            privateArea.removeClip(new Location(x, y, height));
             return;
         }
         const r = RegionManager.getRegion(x, y);
@@ -527,7 +527,7 @@ export class RegionManager {
             a = to;
             b = from;
         }
-        return this.canProjectileAttack(attacker.size(), from, to);
+        return this.canProjectileAttack(attacker, from, to);
     }
     public static canProjectileAttackTarget(attacker: Mobile, target: Mobile): boolean {
         let a = attacker.getLocation();
@@ -542,7 +542,7 @@ export class RegionManager {
             a = target.getLocation();
             b = attacker.getLocation();
         }
-        return RegionManager.canProjectileAttack(attacker.size(), a, b);
+        return RegionManager.canProjectileAttack(attacker, a, b);
     }
 
     public static canProjectileAttackReturn(a: Location, b: Location, size: number, area: PrivateArea): boolean {

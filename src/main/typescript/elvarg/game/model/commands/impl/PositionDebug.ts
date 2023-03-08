@@ -2,7 +2,7 @@ import { PlayerRights } from '../../../model/rights/PlayerRights';
 import { Command } from '../../../model/commands/Command';
 import { Player } from '../../../entity/impl/player/Player';
 
-class PositionDebug implements Command {
+export class PositionDebug implements Command {
 
     execute(player: Player, command: string, parts: string[]) {
         player.getPacketSender().sendMessage(player.getLocation().toString());

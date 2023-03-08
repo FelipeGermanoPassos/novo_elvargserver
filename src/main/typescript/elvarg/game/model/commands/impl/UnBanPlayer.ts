@@ -4,7 +4,7 @@ import { PlayerRights } from '../../rights/PlayerRights';
 import { PlayerPunishment } from '../../../../util/PlayerPunishment';
 import { GameConstants } from '../../../GameConstants';
 
-class UnBanPlayer implements Command {
+export class UnBanPlayer implements Command {
     execute(player: Player, command: string, parts: string[]) {
         let player2 = command.substring(parts[0].length + 1);
 

@@ -32,7 +32,7 @@ export class CombatInteraction {
 
         let combatMethod = CombatFactory.getMethod(this.playerBot);
         if (this.attackTarget != null) {
-            if (CombatFactory.canAttack(this.playerBot, combatMethod, this.attackTarget) != CombatFactory.CanAttackResponse.CAN_ATTACK) {
+            if (CombatFactory.canAttack(this.playerBot, combatMethod, this.attackTarget) != CanAttackResponse.CAN_ATTACK) {
                 this.attackTarget = null;
                 this.playerBot.getCombat().setUnderAttack(null);
                 return;
@@ -48,7 +48,7 @@ export class CombatInteraction {
                 }
             }
         } else {
-            PrayerHandler.resetAll(this.playerBot);
+            PrayerHandler.resetAll(playerBot);
         }
 
         if (this.playerBot.getHitpoints() <= 0) {
@@ -87,7 +87,7 @@ export class CombatInteraction {
         // Boost range
         if (!this.playerBot.getSkillManager().isBoosted(Skill.RANGED)) {
             let pot = PotionConsumable.RANGE_POTIONS.getIds().map(id => ItemInSlot.getFromInventory(id, this.playerBot.getInventory()))
-                .filter(Objects.nonNull)
+                .filter(item => item != null)
                 .find(p => p);
 
             if (pot) {
@@ -98,7 +98,7 @@ export class CombatInteraction {
         // Boost all
         if (!this.playerBot.getSkillManager().isBoosted(Skill.STRENGTH)) {
             let pot = PotionConsumable.SUPER_COMBAT_POTIONS.getIds().map(id => ItemInSlot.getFromInventory(id, this.playerBot.getInventory()))
-                .filter(Objects.nonNull)
+                .filter(item => item != null)
                 .find(p => p);
 
             if (pot) {
@@ -163,7 +163,7 @@ export class CombatInteraction {
     private edibleItemSlot(): any {
         let edible: any = Array.from(Food.Edible.values())
             .map(food => ItemInSlot.getFromInventory(food.getItem().getId(), this.playerBot.getInventory()))
-            .filter(Objects.nonNull)
+            .filter(item => item != null)
             .find(x => x);
 
         return edible;
@@ -181,12 +181,7 @@ export class CombatInteraction {
         this.playerBot.setFollowing(null);
         this.playerBot.getCombat().setUnderAttack(null);
 
-        TaskManager.submit(new Task(Misc.randomInclusive(10, 20), this.playerBot, false) {
-            execute(): void {
-                this.reset();
-                this.stop();
-            }
-        });
+        TaskManager.submit(new MyTask(Misc.randomInclusive(10, 20), this.playerBot, false));
     }
 
     // Called when this bot is assigned a Player target in the wilderness
@@ -208,4 +203,18 @@ export class CombatInteraction {
         // Teleport this bot back to their home location after some time
         TeleportHandler.teleport(this.playerBot, this.playerBot.getDefinition().getSpawnLocation(), TeleportType.NORMAL, false);
     }
-}    
+}
+
+class MyTask extends Task {
+    constructor(delay: number, playerBot: PlayerBot, isImmediate: boolean) {
+      super(delay, isImmediate);
+    }
+  
+    execute(): void {
+      this.reset();
+      this.stop();
+    }
+  
+    reset(): void {
+    }
+  }

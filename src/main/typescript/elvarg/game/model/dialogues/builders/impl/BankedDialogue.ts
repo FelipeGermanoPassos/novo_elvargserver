@@ -5,11 +5,6 @@ import { DynamicDialogueBuilder } from '../../../../model/dialogues/builders/Dyn
 import { NpcDialogue } from '../../../../model/dialogues/entries/impl/NpcDialogue'
 import { DialogueOption } from "../../DialogueOption";
 
-
-import com.elvarg.game.model.dialogues.entries.impl.OptionDialogue;
-
-
-
 export class BankerDialogue extends DynamicDialogueBuilder {
 
     build(player: Player) {

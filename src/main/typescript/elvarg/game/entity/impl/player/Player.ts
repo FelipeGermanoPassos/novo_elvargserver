@@ -68,8 +68,8 @@ import { Dueling } from "../../../content/Duelling";
 import { QuickPrayers } from "../../../content/QuickPrayers";
 import { MagicSpellbook } from "../../../model/MagicSpellbook";
 import { PouchContainer, Pouch } from "../../../content/skill/skillable/impl/Runecrafting";
-import { SkullTypes } from "../../../model/SkullType";
-import { EffectTimers } from "../../../model/EffectTimer";
+import { SkullType } from "../../../model/SkullType";
+import { EffectTimer } from "../../../model/EffectTimer";
 import { PetHandler } from "../../../content/PetHandler";
 
 
@@ -101,7 +101,7 @@ export class Player extends Mobile {
     private targetSearchTimer = new SecondsTimer();
     public recentKills: string[] = []; // Contains ip addresses of recent kills
     private chatMessageQueue = new Array<ChatMessage>();
-    private currentChatMessage: ChatMessage;
+    public currentChatMessage: ChatMessage;
     // Logout
     public forcedLogoutTimer = new SecondsTimer();
     // Trading
@@ -118,9 +118,9 @@ export class Player extends Mobile {
     private hostAddress: string;
     private isDiscordLogin
     private cachedDiscordAccessToken: string;
-    private longUsername: number;
+    public longUsername: number;
     private session: PlayerSession;
-    private playerInteractingOption = PlayerInteractingOptions.NONE;
+    private playerInteractingOption: PlayerInteractingOption;
     public status: PlayerStatus = PlayerStatus.NONE;
     private currentClanChat: ClanChat;
     private clanChatName: string;
@@ -134,7 +134,7 @@ export class Player extends Mobile {
     private isDying: boolean;
     private allowRegionChangePacket: boolean;
     public experienceLocked: boolean;
-    private forceMovement: ForceMovement;
+    public forceMovement: ForceMovement;
     private currentPet: NPC;
     private skillAnimation: number;
     private drainingPrayer: boolean;
@@ -169,7 +169,7 @@ export class Player extends Mobile {
     private consecutiveTasks: number;
 
     // Combat
-    public skullType: SkullTypes = SkullTypes.WHITE_SKULL;
+    public skullType: SkullType;
     public combatSpecial: CombatSpecial;
     private recoilDamage: number;
     private vengeanceTimer = new SecondsTimer();
@@ -214,7 +214,7 @@ export class Player extends Mobile {
 
     // Rights
     public rights = PlayerRights.NONE;
-    private donatorRights = DonatorRights.NONE;
+    public donatorRights = DonatorRights.NONE;
     /**
      * The cached player update block for updating.
      */
@@ -252,19 +252,19 @@ export class Player extends Mobile {
         this.setWildernessLevel(0);
         this.setRecoilDamage(0);
         this.setSkullTimer(0);
-        this.setSkullType(SkullTypes.WHITE_SKULL);
+        this.setSkullType(SkullType.WHITE_SKULL);
         WeaponInterfaces.assign(this);
         BonusManager.update(this);
         PrayerHandler.deactivatePrayers(this);
         this.getEquipment().refreshItems();
         this.getInventory().refreshItems();
         for (let skill of Object.values(Skill))
-            this.getSkillManager().setCurrentLevel(skill, this.getSkillManager().getMaxLevel(skill));
+            this.getSkillManager().setCurrentLevels(skill, this.getSkillManager().getMaxLevel(skill));
         this.setRunEnergy(100);
         this.getPacketSender().sendRunEnergy();
         this.getMovementQueue().setBlockMovement(false).reset();
-        this.getPacketSender().sendEffectTimer(0, EffectTimers.ANTIFIRE).sendEffectTimer(0, EffectTimers.FREEZE)
-            .sendEffectTimer(0, EffectTimers.VENGEANCE).sendEffectTimer(0, EffectTimers.TELE_BLOCK);
+        this.getPacketSender().sendEffectTimer(0, EffectTimer.ANTIFIRE).sendEffectTimer(0, EffectTimer.FREEZE)
+            .sendEffectTimer(0, EffectTimer.VENGEANCE).sendEffectTimer(0, EffectTimer.TELE_BLOCK);
         this.getPacketSender().sendPoisonType(0);
         this.getPacketSender().sendSpecialAttackState(false);
         this.setUntargetable(false);
@@ -318,7 +318,7 @@ export class Player extends Mobile {
             }
         }
 
-        this.getSkillManager().setCurrentLevel(Skills.HITPOINTS, hitpoints);
+        this.getSkillManager().setCurrentLevels(Skills.HITPOINTS, hitpoints);
         this.getPacketSender().sendSkill(Skills.HITPOINTS);
         if (this.getHitpoints() <= 0 && !this.isDying)
             this.appendDeath();
@@ -574,9 +574,9 @@ export class Player extends Mobile {
 
         // Reset prayer configs...
         PrayerHandler.resetAll(this);
-        this.getPacketSender().sendConfig(709, PrayerHandler.canUse(this, PrayerHandler.PrayerDataList.PRESERVE, false) ? 1 : 0);
-        this.getPacketSender().sendConfig(711, PrayerHandler.canUse(this, PrayerHandler.PrayerDataList.RIGOUR, false) ? 1 : 0);
-        this.getPacketSender().sendConfig(713, PrayerHandler.canUse(this, PrayerHandler.PrayerDataList.AUGURY, false) ? 1 : 0);
+        this.getPacketSender().sendConfig(709, PrayerHandler.canUse(this, PrayerData.PRESERVE, false) ? 1 : 0);
+        this.getPacketSender().sendConfig(711, PrayerHandler.canUse(this, PrayerData.RIGOUR, false) ? 1 : 0);
+        this.getPacketSender().sendConfig(713, PrayerHandler.canUse(this, PrayerData.AUGURY, false) ? 1 : 0);
 
         // Refresh item containers..
         this.getInventory().refreshItems();
@@ -606,10 +606,10 @@ export class Player extends Mobile {
         Autocasting.setAutocast(this, null);
 
         // Send pvp stats..
-        this.getPacketSender().sendString(52029, "@or1@Killstreak: " + this.getKillstreak())
-            .sendString(52030, "@or1@Kills: " + this.getTotalKills()).sendString(52031, "@or1@Deaths: " + this.getDeaths())
-            .sendString(52033, "@or1@K/D Ratio: " + this.getKillDeathRatio())
-            .sendString(52034, "@or1@Donated: " + this.getAmountDonated());
+        this.getPacketSender().sendString( "@or1@Killstreak: " + this.getKillstreak(), 52029)
+            .sendString( "@or1@Kills: " + this.getTotalKills(), 52030).sendString("@or1@Deaths: " + this.getDeaths(), 52031)
+            .sendString("@or1@K/D Ratio: " + this.getKillDeathRatio(), 52033)
+            .sendString("@or1@Donated: " + this.getAmountDonated(), 52034);
 
         // Join clanchat
         ClanChatManager.onLogin(this);
@@ -624,15 +624,15 @@ export class Player extends Mobile {
         }
 
         if (!this.getVengeanceTimer().finished()) {
-            this.getPacketSender().sendEffectTimer(this.getVengeanceTimer().secondsRemaining(), EffectTimers.VENGEANCE);
+            this.getPacketSender().sendEffectTimer(this.getVengeanceTimer().secondsRemaining(), EffectTimer.VENGEANCE);
         }
         if (!this.getCombat().getFireImmunityTimer().finished()) {
             this.getPacketSender().sendEffectTimer(this.getCombat().getFireImmunityTimer().secondsRemaining(),
-                EffectTimers.ANTIFIRE);
+                EffectTimer.ANTIFIRE);
         }
         if (!this.getCombat().getTeleblockTimer().finished()) {
             this.getPacketSender().sendEffectTimer(this.getCombat().getTeleblockTimer().secondsRemaining(),
-                EffectTimers.TELE_BLOCK);
+                EffectTimer.TELE_BLOCK);
         }
 
         this.decreaseStats.start(60);
@@ -836,7 +836,7 @@ export class Player extends Mobile {
         return this.playerInteractingOption;
     }
 
-    public setPlayerInteractingOption(playerInteractingOption: PlayerInteractingOptions): Player {
+    public setPlayerInteractingOption(playerInteractingOption: PlayerInteractingOption): Player {
         this.playerInteractingOption = playerInteractingOption;
         return this;
     }
@@ -1286,11 +1286,11 @@ export class Player extends Mobile {
         return this.specialAttackRestore;
     }
 
-    public getSkullType(): SkullTypes {
+    public getSkullType(): SkullType {
         return this.skullType;
     }
 
-    public setSkullType(skullType: SkullTypes) {
+    public setSkullType(skullType: SkullType) {
         this.skullType = skullType;
     }
 
@@ -1622,9 +1622,5 @@ export class Player extends Mobile {
             return;
         }
         this.questProgress = questProgress;
-    }
-
-    getSize() {
-
     }
 }

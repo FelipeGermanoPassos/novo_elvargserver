@@ -67,7 +67,8 @@ export class VetionCombatMethod implements CombatMethod {
             const attackPositions: Location[] = [];
             attackPositions.push(targetPos);
             for (let i = 0; i < 2; i++) {
-                attackPositions.push(new Location());
+                attackPositions.push(new Location((targetPos.getX() - 1) + Misc.getRandom(3),
+                (targetPos.getY() - 1) + Misc.getRandom(3)));
             }
             for (const pos of attackPositions) {
                 new Projectile(character.getLocation(), pos, null, 280, 40, 80, 31, 43, character.getPrivateArea()).sendProjectile();
@@ -77,12 +78,12 @@ export class VetionCombatMethod implements CombatMethod {
                 for (const player of character.getAsNpc().getPlayersWithinDistance(10)) {
                     if (player.getLocation().equals(pos)) {
                         player.getCombat().getHitQueue()
-                            .addPendingDamage(new HitDamage(Misc.getRandom(25), HitMask.RED));
+                            .addPendingDamage([new HitDamage(Misc.getRandom(25), HitMask.RED)]);
                     }
                 }
             }
             this.finished(character, target)}));
-            character.getTimers().register(TimerKey.COMBAT_ATTACK, 5);
+            character.getTimers().registers(TimerKey.COMBAT_ATTACK, 5);
         }
     }
 

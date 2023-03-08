@@ -3,6 +3,9 @@ import { DynamicDialogueBuilder } from "./builders/DynamicDialogueBuilder";
 import { DialogueBuilder } from "./builders/DialogueBuilder";
 import { Dialogue } from "./entries/Dialogue";
 import { TestStaticDialogue } from '../../model/dialogues/builders/impl/TestStaticDialogue'
+import { DialogueOption } from "./DialogueOption";
+import { OptionsDialogue } from "./entries/impl/OptionsDialogue";
+import { OptionDialogue } from "./entries/impl/OptionDialogue";
 
 export class DialogueManager {
     public static STATIC_DIALOGUES: Map<number, DialogueBuilder> = new Map<number, DialogueBuilder>();
@@ -11,7 +14,7 @@ export class DialogueManager {
         DialogueManager.STATIC_DIALOGUES.set(0, new TestStaticDialogue());
     }
 
-
+    private readonly player: Player;
 
     /**
      * A {@link Map} which holds all of the current dialogue entries and indexes.
@@ -59,7 +62,7 @@ export class DialogueManager {
             return;
         }
 
-        this.start(this.index + 1);
+        this.startDialogue(this.index + 1);
     }
 
     public startDialogue(index: number): void {
@@ -106,9 +109,9 @@ export class DialogueManager {
     public handleOption(option: DialogueOption): void {
         const dialogue = this.dialogues.get(this.index);
         if (dialogue instanceof OptionsDialogue) {
-            (dialogue as OptionsDialogue).execute(option.ordinal(), this.player);
+            (dialogue as OptionsDialogue).execute(option, this.player);
             return;
-        }
+          }
         if (!(dialogue instanceof OptionDialogue)) {
             this.player.getPacketSender().sendInterfaceRemoval();
             return;

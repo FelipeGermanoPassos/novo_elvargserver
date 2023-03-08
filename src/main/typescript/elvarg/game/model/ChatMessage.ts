@@ -2,13 +2,13 @@ export class ChatMessage
 {
     // *
     // 	 * The color of the message.
-    private colour:number;
+    public colour:number;
     // *
     // 	 * The effects of the message.
-    private effects:number;
+    public effects:number;
     // *
     // 	 * The actual text of the message.
-    private text:number[];
+    public text:number[];
     // *
     //     * The Message constructor.
     //     *

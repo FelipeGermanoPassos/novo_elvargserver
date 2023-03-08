@@ -7,17 +7,15 @@ import { ObjectManager } from '../../../entity/impl/object/ObjectManager';
 import { ItemOnGroundManager } from '../../../entity/impl/grounditem/ItemOnGroundManager'
 import { GameObject } from '../../../entity/impl/object/GameObject';
 import { Mobile } from '../../../entity/impl/Mobile';
+import { Location } from '../../Location';
 
 export abstract class PrivateArea extends Area {
     public entities: Entity[];
     private clips: Map<Location, number>;
     private destroyed: boolean;
 
-
-
-
     constructor(boundaries?: Boundary[]) {
-        super();
+        super(boundaries);
         this.entities = [];
         this.clips = new Map();
         this.destroyed = false;

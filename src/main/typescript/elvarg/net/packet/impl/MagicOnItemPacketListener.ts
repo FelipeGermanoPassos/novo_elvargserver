@@ -1,7 +1,10 @@
-import { EffectSpell } from '../../content/combat/magic/EffectSpells';
-import { Animation, Graphic, GraphicHeight, Skill } from '../../model/';
-import { Player } from '../../entity/impl/player';
-import { Packet } from '../../net/packet';
+import { EffectSpell } from '../../../game/content/combat/magic/EffectSpells';
+import { Animation } from '../../../game/model/Animation';
+import { Graphic } from '../../../game/model/Graphic';
+import { GraphicHeight } from '../../../game/model/GraphicHeight';
+import { Skill } from '../../../game/model/Skill';
+import { Player } from '../../../game/entity/impl/player/Player';
+import { Packet } from '../Packet';
 import { PacketConstants } from '../PacketConstants';
 
 export class MagicOnItemPacketListener {
@@ -13,7 +16,7 @@ export class MagicOnItemPacketListener {
                 let itemId = packet.readShortA();
                 let childId = packet.readShort();
                 let spellId = packet.readShortA();
-                if (!player.getClickDelay().elapsed(1300)) return;
+                if (!player.getClickDelay().elapsedTime(1300)) return;
                 if (slot < 0 || slot >= player.getInventory().capacity()) return;
                 if (player.getInventory().getItems()[slot].getId() != itemId) return;
                 let spell = EffectSpell.forSpellId(spellId);
@@ -32,15 +35,15 @@ export class MagicOnItemPacketListener {
                         if (!spell.get().getSpell().canCast(player, true)) {
                             return;
                         }
-                        player.getInventory().delete(itemId, 1);
+                        player.getInventory().deleteNumber(itemId, 1);
                         player.performAnimation(new Animation(712));
                         if (spell.get() == EffectSpell.LOW_ALCHEMY) {
-                            player.getInventory().add(995, item.getDefinition().getLowAlchValue());
+                            player.getInventory().adds(995, item.getDefinition().getLowAlchValue());
                         } else {
-                            player.getInventory().add(995, item.getDefinition().getHighAlchValue());
+                            player.getInventory().adds(995, item.getDefinition().getHighAlchValue());
                         }
                         player.performGraphic(new Graphic(112, GraphicHeight.HIGH));
-                        player.getSkillManager().addExperience(Skill.MAGIC, spell.get().getSpell().baseExperience());
+                        player.getSkillManager().addExperiences(Skill.MAGIC, spell.get().getSpell().baseExperience());
                         player.getPacketSender().sendTab(6);
                         break;
                     default:

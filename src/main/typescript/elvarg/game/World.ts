@@ -60,7 +60,7 @@ export class World {
     /**
      * The collection of {@link Players}s waiting to be added to the game.
      */
-    private static addNPCQueue = new Array<NPC>();
+    public static addNPCQueue = new Array<NPC>();
 
     /**
      * The collection of {@link Players}s waiting to be removed from the game.
@@ -85,7 +85,7 @@ export class World {
 
     
     public static getPlayerByName(username: string): Player | undefined {
-        return this.players.find(p => p !== null && p.getUsername().equals(Misc.formatText(username)));
+        return this.players.search(p => p !== null && p.getUsername().equals(Misc.formatText(username)));
       }
 
     /**
@@ -178,7 +178,7 @@ export class World {
     }
 
     public getPlayerByName(username: string): Player | undefined {
-        return World.players.find(p => p != null && p.getUsername().toLowerCase() === username.toLowerCase());
+        return World.players.search(p => p != null && p.getUsername().toLowerCase() === username.toLowerCase());
     }
 
     public sendMessage(message: string) {

@@ -1,10 +1,21 @@
 import { Location } from "../../../model/Location";
-import { World } from "../../../Worlds";
+import { World } from "../../../World";
 import { TaskManager } from "../../../task/TaskManager";
 import { FightCavesArea } from "../../../model/areas/impl/FightCavesArea";
 import { TztokJad } from "../../../entity/impl/npc/impl/TztokJad";
 import { Player } from "../../../entity/impl/player/Player";
 import { Task } from "../../../task/Task";
+
+class FightCavesTask extends Task{
+
+    constructor(private readonly execFunction: Function){
+        super(4, true)
+    }
+
+    execute(): void {
+        this.execFunction();
+    }
+}
 
 export class FightCaves {
     public static readonly ENTRANCE: Location = new Location(2413, 5117);
@@ -15,11 +26,14 @@ export class FightCaves {
     public static start(player: Player) {
         const area = new FightCavesArea();
         area.add(player);
-        TaskManager.submit(new Task(14, player, false, () => {
-            if (area.isDestroyed()) {
-                return;
-            }
-            World.getAddNPCQueue().add(new TztokJad(player, area, FightCaves.JAD_NPC_ID, FightCaves.JAD_SPAWN_POS.clone()));
+        TaskManager.submit(new FightCavesTask(() => {
+            const result = [14, player, false];
+            const callback = () => {
+                if (area.isDestroyed()) {
+                    return;
+                }
+                World.getAddNPCQueue().add(new TztokJad(player, area, FightCaves.JAD_NPC_ID, FightCaves.JAD_SPAWN_POS.clone()));
+            };
         }));
     }
 }

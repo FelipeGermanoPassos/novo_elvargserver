@@ -7,7 +7,7 @@ import { CombatAction } from "../CombatAction";
 import { CombatSwitch } from "../CombatSwitch";
 import { FighterPreset } from "../FighterPreset";
 import { Item } from "../../../../../model/Item";
-import { MagicSpellbook } from "../../../../../model/MagicSpellbook";
+import { TimerKey } from "../../../../../../util/timers/TimerKey";
 import { ItemIdentifiers } from "../../../../../../util/ItemIdentifiers";
 export class GRangerFighterPreset implements FighterPreset {
     eatAtPercent
@@ -48,39 +48,32 @@ export class GRangerFighterPreset implements FighterPreset {
         specialAttack: true
     };
 
-    const COMBAT_ACTIONS: CombatAction[] = [
-        new CombatSwitch([ItemIdentifiers.GRANITE_MAUL], {
-            shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-                return playerBot.getSpecialPercentage() >= 50 &&
-                    // Don't switch to Melee if we're frozen
-                    playerBot.getMovementQueue().getMobility().canMove() &&
-                    // Switch if the enemy has enabled protect from missles or has lowish health
-                    (!enemy.getPrayerActive()[PrayerHandler.PROTECT_FROM_MELEE] && enemy.getHitpointsAfterPendingDamage() < 45);
-            },
-            performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void {
-                playerBot.getCombat().attack(enemy);
-                CombatSpecial.activate(playerBot);
-                CombatSpecial.activate(playerBot);
-            },
-        }),
-        new CombatSwitch([ItemIdentifiers.RUNE_CROSSBOW, ItemIdentifiers.DRAGON_BOLTS_E_], {
-            shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-                return enemy.getHitpoints() < 40;
-            },
-            performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void {
-                playerBot.getCombat().attack(enemy);
-            },
-        }),
-        new CombatSwitch([ItemIdentifiers.MAGIC_SHORTBOW, ItemIdentifiers.RUNE_ARROW], {
-            shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-                return true;
-            },
-            performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void {
-                playerBot.setSpecialActivated(false);
-                playerBot.getCombat().attack(enemy);
-            },
-        }),
-    ];
+    export const COMBAT_ACTIONS: CombatAction[] = [
+        new CombatSwitch([ItemIdentifiers.DRAGON_DAGGER_P_PLUS_PLUS_]) {
+          shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
+            const canAttackNextTick = playerBot.getTimers().getTicks(TimerKey.COMBAT_ATTACK) <= 1;
+            return canAttackNextTick && playerBot.getSpecialPercentage() >= 25 &&
+                   enemy.getHitpoints() < 46;
+          }
+      
+          performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void {
+            if (!playerBot.isSpecialActivated()) {
+              CombatSpecial.activate(playerBot);
+            }
+            playerBot.getCombat().attack(enemy);
+          }
+        },
+        new CombatSwitch([ItemIdentifiers.DRAGON_SCIMITAR]) {
+          shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
+            return true;
+          }
+      
+          performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void {
+            playerBot.setSpecialActivated(false);
+            playerBot.getCombat().attack(enemy);
+          }
+        },
+      ];
 
     getItemPreset(): Presetable {
         return this.BOT_G_MAULER_70;
@@ -96,4 +89,3 @@ export class GRangerFighterPreset implements FighterPreset {
     
             
 
-]

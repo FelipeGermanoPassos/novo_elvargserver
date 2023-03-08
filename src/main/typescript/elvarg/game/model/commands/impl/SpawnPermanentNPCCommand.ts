@@ -5,7 +5,7 @@ import { NPC } from '../../../entity/impl/npc/NPC';
 import { World } from '../../../World';
 import { NpcDefinition } from '../../../definition/NpcDefinition';
 
-class SpawnPermanentNPCCommand implements Command {
+export class SpawnPermanentNPCCommand implements Command {
 
     execute(player: Player, command: string, parts: string[]) {
         try {

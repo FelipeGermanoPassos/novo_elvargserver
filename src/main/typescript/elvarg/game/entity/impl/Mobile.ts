@@ -19,20 +19,31 @@ import { TaskManager } from "../../task/TaskManager";
 import { Stopwatch } from "../../../util/Stopwatch";
 import {TimerRepository} from "../../../util/timers/TimerRepository";
 
+class MobileTask extends Task{
+    constructor(ticks: number, private readonly execFunc: Function){
+        super(ticks, false);
+    }
+    execute(): void {
+        this.execFunc();
+        this.stop()
+    }
+    
+}
+
 export class Mobile extends Entity {
     private index: number;
-    private lastKnownRegion: Location;
+    public lastKnownRegion: Location;
     private timers = new TimerRepository();
     private combat = new Combat(this);
     private movementQueue = new MovementQueue(this);
-    private forcedChat: string;
-    private walkingDirection: Direction = Directions.NONE;
-    private runningDirection: Direction = Directions.NONE;
+    public forcedChat: string;
+    public walkingDirection: Direction = Direction.NONE;
+    public runningDirection: Direction = Direction.NONE;
     private lastCombat = new Stopwatch();
-    private updateFlag = new UpdateFlag();
-    private positionToFace: Location;
-    private animation: Animation;
-    private graphic: Graphic;
+    public updateFlag = new UpdateFlag();
+    public positionToFace: Location;
+    public animation: Animation;
+    public graphic: Graphic;
     private following: Mobile;
     
     private attributes = new Map<Object, Object>();
@@ -122,47 +133,38 @@ export class Mobile extends Entity {
     }
 
     performAnimation(animation: Animation) {
-        if (this.animation != null && animation != null) {
-            if (this.animation.getPriority().ordinal() > animation.getPriority().ordinal()) {
-                return;
-            }
+    if (this.animation != null && animation != null) {
+        if (this.animation.getPriority() > animation.getPriority()) {
+            return;
         }
-
-        this.animation = animation;
-        this.getUpdateFlag().flag(Flag.ANIMATION);
     }
 
-    performGraphic(graphic: Graphic) {
-        if (this.graphic != null && graphic != null) {
-            if (this.graphic.getPriority().ordinal() > graphic.getPriority().ordinal()) {
-                return;
-            }
-        }
+    this.animation = animation;
+    this.getUpdateFlag().flag(Flag.ANIMATION);
+}
 
-        this.graphic = graphic;
-        this.getUpdateFlag().flag(Flag.GRAPHIC);
+performGraphic(graphic: Graphic) {
+    if (this.graphic != null && graphic != null) {
+        if (this.graphic.getPriority() > graphic.getPriority()) {
+            return;
+        }
     }
+
+    this.graphic = graphic;
+    this.getUpdateFlag().flag(Flag.GRAPHIC);
+}
 
     delayedAnimation(animation: Animation, ticks: number) {
-        TaskManager.submit(new Task(ticks, false) {
-            execute() {
-                this.performAnimation(animation);
-                this.stop();
-            }
-        });
+        TaskManager.submit(new MobileTask(ticks, ()=>{ this.performAnimation(animation);
+        }));
     }
 
     delayedGraphic(graphic: Graphic, ticks: number) {
-        TaskManager.submit(new Task(ticks, false) {
-            execute() {
-                this.performGraphic(graphic);
-                this.stop();
-            }
-        });
+        TaskManager.submit(new MobileTask(ticks, () => {this.performGraphic(graphic)}));
     }
 
     boundaryTiles(): Location[] {
-        const size = this.size();
+        const size: number = this.getSize();
         const tiles: Location[] = new Array(size * size);
         let index = 0;
         for (let x = 0; x < size; x++) {
@@ -174,7 +176,7 @@ export class Mobile extends Entity {
     }
 
     outterTiles(): Location[] {
-        const size = this.size();
+        const size = this.getSize();
         const tiles: Location[] = new Array(size * 4);
         let index = 0;
         for (let x = 0; x < size; x++) {
@@ -189,7 +191,7 @@ export class Mobile extends Entity {
     }
 
     tiles(): Location[] {
-        const size = this.size();
+        const size = this.getSize();
         const tiles: Location[] = new Array(size * size);
         let index = 0;
         for (let x = 0; x < size; x++) {
@@ -314,7 +316,7 @@ export class Mobile extends Entity {
     getPrayerActive(): boolean[] {
         return this.prayerActive;
     }
-    setPrayerActive(prayerActive: boolean[]): Mobile {
+    setPrayerActives(prayerActive: boolean[]): Mobile {
         this.prayerActive = prayerActive;
         return this;
     }
@@ -333,7 +335,7 @@ export class Mobile extends Entity {
         return this;
     }
 
-    setCurseActive(id: number, curseActive: boolean): Mobile {
+    setCurseActives(id: number, curseActive: boolean): Mobile {
         this.curseActive[id] = curseActive;
         return this;
     }
@@ -403,11 +405,11 @@ export class Mobile extends Entity {
     }
 
     isRegistered(): boolean {
-        return this.registered;
+        return this.registred;
     }
 
     setRegistered(registered: boolean): void {
-        this.registered = registered;
+        this.registred = registered;
     }
 
     isNeedsPlacement(): boolean {

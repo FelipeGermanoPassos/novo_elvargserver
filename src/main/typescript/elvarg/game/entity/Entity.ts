@@ -37,7 +37,7 @@ export abstract class Entity {
     /**
      * Returns the size of this {@link Entities}.
      */
-    abstract getSize(): void;
+    abstract getSize(): number;
 
     /**
      * Gets the entity position.
@@ -65,7 +65,7 @@ export abstract class Entity {
         return Entity.area;
     }
 
-    public getPrivateArea(): PrivateArea | null {
+    public getPrivateArea(): PrivateArea {
         return (Entity.area instanceof PrivateArea ? (Entity.area as PrivateArea) : null);
     }
 }

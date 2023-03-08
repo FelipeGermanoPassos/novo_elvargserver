@@ -1,4 +1,4 @@
-import { WeaponInterface } from "./WeaponInterfaces";
+import { WeaponInterfaces } from "./WeaponInterfaces";
 import { AbyssalDaggerCombatMethod } from "./method/impl/specials/AbyssalDaggerCombatMethod";
 import { AbyssalTentacleCombatMethod } from './method/impl/specials/AbyssalTentacleCombatMethod'
 import { BarrelchestAnchorCombatMethod } from './method/impl/specials/BarrelchestAnchorCombatMethod'
@@ -30,7 +30,7 @@ import { CombatType } from "./CombatType";
 import { TaskManager } from "../../task/TaskManager";
 import { RestoreSpecialAttackTask } from '../../task/impl/RestoreSpecialAttackTask'
 import { Equipment } from "../../model/container/impl/Equipment";
-import { DuelRuleEnum } from "../Duelling";
+import { DuelRule } from "../Duelling";
 
 
 
@@ -41,7 +41,7 @@ export class CombatSpecial {
         1,
         1,
         new AbyssalWhipCombatMethod(),
-        WeaponInterface.WHIP
+        WeaponInterfaces.WHIP
     )
     public static readonly ABYSSAL_TENTACLE = new CombatSpecial(
         [12006],
@@ -49,7 +49,7 @@ export class CombatSpecial {
         1,
         1,
         new AbyssalTentacleCombatMethod(),
-        WeaponInterface.WHIP
+        WeaponInterfaces.WHIP
     )
     public static readonly BARRELSCHEST_ANCHOR = new CombatSpecial(
         [10887],
@@ -57,7 +57,7 @@ export class CombatSpecial {
         1.22,
         1.10,
         new BarrelchestAnchorCombatMethod(),
-        WeaponInterface.WARHAMMER
+        WeaponInterfaces.WARHAMMER
     )
     public static readonly DRAGON_SCIMITAR = new CombatSpecial(
         [4587],
@@ -65,7 +65,7 @@ export class CombatSpecial {
         1.00,
         1.25,
         new DragonScimitarCombatMethod(),
-        WeaponInterface.SCIMITAR
+        WeaponInterfaces.SCIMITAR
     )
     public static readonly DRAGON_LONGSWORD = new CombatSpecial(
         [1305],
@@ -73,7 +73,7 @@ export class CombatSpecial {
         1.15,
         1.25,
         new DragonLongswordCombatMethod(),
-        WeaponInterface.LONGSWORD
+        WeaponInterfaces.LONGSWORD
     )
     public static readonly DRAGON_MACE =  new CombatSpecial(
         [1434],
@@ -81,7 +81,7 @@ export class CombatSpecial {
         1.5,
         1.25,
         new DragonMaceCombatMethod(),
-        WeaponInterface.MACE
+        WeaponInterfaces.MACE
     )
     public static readonly DRAGON_WARHAMMER =  new CombatSpecial (
         [13576],
@@ -89,7 +89,7 @@ export class CombatSpecial {
         1.5,
         1.00,
         new DragonWarhammerCombatMethod(),
-        WeaponInterface.WARHAMMER
+        WeaponInterfaces.WARHAMMER
     )
     public static readonly SARADOMIN_SWORD = new CombatSpecial(
         [11838],
@@ -97,7 +97,7 @@ export class CombatSpecial {
         1.0,
         1.0,
         new SaradominSwordCombatMethod(),
-        WeaponInterface.SARADOMIN_SWORD
+        WeaponInterfaces.SARADOMIN_SWORD
     )
     public static readonly ARMADYL_GODSWORD = new CombatSpecial(
         [11802],
@@ -105,7 +105,7 @@ export class CombatSpecial {
         1.375,
         2,
         new ArmadylGodswordCombatMethod(),
-        WeaponInterface.GODSWORD
+        WeaponInterfaces.GODSWORD
     )
     public static readonly SARADOMIN_GODSWORD = new CombatSpecial(
         [11806],
@@ -113,7 +113,7 @@ export class CombatSpecial {
         1.1,
         1.5,
         new SaradominGodswordCombatMethod(),
-        WeaponInterface.GODSWORD
+        WeaponInterfaces.GODSWORD
     )
     public static readonly BANDOS_GODSWORD = new CombatSpecial(
         [11804],
@@ -121,7 +121,7 @@ export class CombatSpecial {
         1.21,
         1.5,
         new BandosGodswordCombatMethod(),
-        WeaponInterface.GODSWORD
+        WeaponInterfaces.GODSWORD
     )
     public static readonly ZAMORAK_GODSWORD = new CombatSpecial(
         [11808],
@@ -129,7 +129,7 @@ export class CombatSpecial {
         1.1,
         1.5,
         new ZamorakGodswordCombatMethod(),
-        WeaponInterface.GODSWORD
+        WeaponInterfaces.GODSWORD
     )
     public static readonly ABYSSAL_BLUDGEON = new CombatSpecial(
         [13263],
@@ -137,7 +137,7 @@ export class CombatSpecial {
         1.20,
         1.0,
         new AbyssalBludgeonCombatMethod(),
-        WeaponInterface.ABYSSAL_BLUDGEON
+        WeaponInterfaces.ABYSSAL_BLUDGEON
     )
     public static readonly DRAGON_HALBERD = new CombatSpecial(
         [3204],
@@ -145,7 +145,7 @@ export class CombatSpecial {
         1.1,
         1.35,
         new DragonHalberdCombatMethod(),
-        WeaponInterface.HALBERD
+        WeaponInterfaces.HALBERD
     )
     public static readonly DRAGON_DAGGER = new CombatSpecial(
         [1215, 1231, 5680, 5698],
@@ -153,7 +153,7 @@ export class CombatSpecial {
         1.15,
         1.20,
         new DragonDaggerCombatMethod(),
-        WeaponInterface.DRAGON_DAGGER
+        WeaponInterfaces.DRAGON_DAGGER
     )
     public static readonly ABYSSAL_DAGGER = new CombatSpecial (
         [13271],
@@ -161,7 +161,7 @@ export class CombatSpecial {
         0.85,
         1.25,
         new AbyssalDaggerCombatMethod(),
-        WeaponInterface.ABYSSAL_DAGGER
+        WeaponInterfaces.ABYSSAL_DAGGER
     )
     public static readonly GRANITE_MAUL = new CombatSpecial(
         [4153, 12848],
@@ -169,7 +169,7 @@ export class CombatSpecial {
         1,
         1,
         new GraniteMaulCombatMethod(),
-        WeaponInterface.GRANITE_MAUL
+        WeaponInterfaces.GRANITE_MAUL
     )
     public static readonly DRAGON_CLAWS = new CombatSpecial(
         [13652],
@@ -177,7 +177,7 @@ export class CombatSpecial {
         1,
         1.35,
         new DragonClawCombatMethod(),
-        WeaponInterface.CLAW
+        WeaponInterfaces.CLAWS
     )
     public static readonly MAGIC_SHORTBOW = new CombatSpecial(
         [861],
@@ -185,7 +185,7 @@ export class CombatSpecial {
         1,
         1,
         new MagicShortbowCombatMethod(),
-        WeaponInterface.SHORTBOW
+        WeaponInterfaces.SHORTBOW
     )
     public static readonly DARK_BOW = new CombatSpecial(
         [11235],
@@ -193,7 +193,7 @@ export class CombatSpecial {
         1.5,
         1.35,
         new DarkBowCombatMethod(),
-        WeaponInterface.DARK_BOW
+        WeaponInterfaces.DARK_BOW
     )
     public static readonly ARMADYL_CROSSBOW = new CombatSpecial(
         [11785],
@@ -201,7 +201,7 @@ export class CombatSpecial {
         1,
         2.0,
         new ArmadylCrossbowCombatMethod(),
-        WeaponInterface.CROSSBOW
+        WeaponInterfaces.CROSSBOW
     )
     public static readonly BALLISTA = new CombatSpecial(
         [19481],
@@ -209,10 +209,10 @@ export class CombatSpecial {
         1.25,
         1.45,
         new BallistaCombatMethod(),
-        WeaponInterface.BALLISTA
+        WeaponInterfaces.BALLISTA
     )
 
-    constructor(identifiers: any, drainAmount: number, strengthMultiplier: number, accuracyMultiplier: number, combatMethod: CombatMethod, weaponInterface: WeaponInterface){
+    constructor(identifiers: any, drainAmount: number, strengthMultiplier: number, accuracyMultiplier: number, combatMethod: CombatMethod, weaponInterface: WeaponInterfaces){
         this.identifiers = identifiers
         this.drainAmount = drainAmount
         this.strengthMultiplier = strengthMultiplier
@@ -221,14 +221,14 @@ export class CombatSpecial {
         this.weaponInterface = weaponInterface
     }
 
-    SPECIAL_ATTACK_WEAPON_IDS = new Set(CombatSpecial.values().flatMap((cs) => cs.identifiers));
+    SPECIAL_ATTACK_WEAPON_IDS = new Set(Object.values(CombatSpecial).flatMap((cs) => cs.identifiers));
 
     private drainAmount: number;
     private strengthMultiplier: number;
     private accuracyMultiplier: number;
     private combatMethod: any;
     private weaponType: any;
-    private weaponInterface: WeaponInterface
+    private weaponInterface: WeaponInterfaces
     private identifiers: [];
 
 
@@ -261,8 +261,8 @@ export class CombatSpecial {
             player.getPacketSender().sendInterfaceComponentMoval(specialAmount >= specialCheck ? 500 : 0, 0, --specialBar);
             specialCheck--;
         }
-        player.getPacketSender().updateSpecialAttackOrb().sendString(player.getWeapon().getSpecialMeter(),
-            player.isSpecialActivated() ? ("@yel@ Special Attack (" + player.getSpecialPercentage() + "%)") : ("@bla@ Special Attack (" + player.getSpecialPercentage() + "%)"));
+        player.getPacketSender().updateSpecialAttackOrb().sendString(
+            player.isSpecialActivated() ? ("@yel@ Special Attack (" + player.getSpecialPercentage() + "%)") : ("@bla@ Special Attack (" + player.getSpecialPercentage() + "%)"), player.getWeapon().getSpecialMeter());
         player.getPacketSender().sendSpecialAttackState(player.isSpecialActivated());
     }
 
@@ -274,7 +274,7 @@ export class CombatSpecial {
             return;
         }
 
-        for (let c of CombatSpecial.values()) {
+        for (let c of Object.values(CombatSpecial)) {
             if (player.getWeapon() == c.getWeaponType()) {
                 if (c.identifiers.some(id => player.getEquipment().get(Equipment.WEAPON_SLOT).getId() == id)) {
                     player.getPacketSender().sendInterfaceDisplayState(player.getWeapon().getSpecialBar(), false);
@@ -295,7 +295,7 @@ export class CombatSpecial {
             return;
         }
 
-        if (player.getDueling().inDuel() && player.getDueling().getRules()[DuelRuleEnum.NO_SPECIAL_ATTACKS.ordinal()]) {
+        if (player.getDueling().inDuel() && player.getDueling().getRules()[DuelRule.NO_SPECIAL_ATTACKS.getButtonId()]) {
             return;
         }
 
@@ -354,7 +354,7 @@ export class CombatSpecial {
         return this.combatMethod;
     }
 
-    public getWeaponType(): WeaponInterface {
+    public getWeaponType(): WeaponInterfaces {
         return this.weaponType;
     }
 

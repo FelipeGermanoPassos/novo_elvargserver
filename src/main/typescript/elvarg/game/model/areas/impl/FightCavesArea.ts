@@ -1,6 +1,5 @@
 import { Boundary } from '../../../model/Boundary';
 import { Player } from '../../../entity/impl/player/Player'
-import { Optional } from 'optional'
 import { Mobile } from '../../../entity/impl/Mobile'
 import { Item } from '../../../model/Item'
 import { FightCaves } from '../../../content/minigames/impl/FightCaves';
@@ -39,11 +38,11 @@ export class FightCavesArea extends PrivateArea {
         return true;
     }
 
-    public dropItemsOnDeath(player: Player, killer: Optional<Player>): boolean {
+    public dropItemsOnDeath(player: Player, killer: Player): boolean {
         return false;
     }
-
-    public handleDeath(player: Player, killer: Optional<Player>): boolean {
+    
+    public handleDeath(player: Player, killer: Player): boolean {
         player.moveTo(FightCaves.EXIT);
         //DialogueManager.start(player, 24);
         return true;

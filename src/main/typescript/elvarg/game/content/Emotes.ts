@@ -11,7 +11,7 @@ export class Emotes {
     public static doEmote(player: Player, button: number) {
         const data = EmoteData.forId(button);
         if (data) {
-            animation(player, data.animation, data.graphic);
+            Emotes.handleAnimation(player, data.animation, data.graphic);
             return true;
         }
 
@@ -30,14 +30,14 @@ export class Emotes {
                         // custom capes
                     }
                 }
-                handleAnimation(player, cape.getAnimation(), cape.getGraphic());
+                Emotes.handleAnimation(player, cape.getAnimation(), cape.getGraphic());
             }
             return true;
         }
         return false;
     }
 
-    handleAnimation(player: Player, anim: Animation, graphic: Graphic) {
+    public static handleAnimation(player: Player, anim: Animation, graphic: Graphic) {
         if (CombatFactory.inCombat(player)) {
             player.getPacketSender().sendMessage("You cannot do this right now.");
             return;

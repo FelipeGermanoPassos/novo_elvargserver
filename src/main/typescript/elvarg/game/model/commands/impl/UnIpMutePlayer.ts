@@ -4,7 +4,7 @@ import { PlayerRights } from '../../rights/PlayerRights';
 import { World } from '../../../World';
 import { CombatFactory } from '../../../content/combat/CombatFactory';
 
-class UnIpMutePlayer implements Command {
+export class UnIpMutePlayer implements Command {
     execute(player: Player, command: string, parts: string[]) {
     let player2 = command.substring(parts[0].length + 1);
     let plr = World.getPlayerByName(player2);

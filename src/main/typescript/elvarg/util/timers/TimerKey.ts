@@ -1,36 +1,30 @@
 import { Misc } from 'misc';
 
-export enum TimerKey {
-    FOOD,
-    KARAMBWAN,
-    POTION,
-    COMBAT_ATTACK,
-    FREEZE,
-    FREEZE_IMMUNITY,
-    STUN,
-    ATTACK_IMMUNITY,
-    CASTLEWARS_TAKE_ITEM,
-    STEPPING_OUT,
-    BOT_WAIT_FOR_PLAYERS
+export class TimerKey {
+	public static readonly FOOD = new TimerKey();
+	public static readonly KARAMBWAN = new TimerKey();
+	public static readonly POTION = new TimerKey();
+	public static readonly COMBAT_ATTACK= new TimerKey();
+	public static readonly FREEZE = new TimerKey();
+	public static readonly FREEZE_IMMUNITY = new TimerKey(); 
+	public static readonly STUN =  new TimerKey();
+	public static readonly ATTACK_IMMUNITY = new TimerKey();
+	public static readonly CASTLEWARS_TAKE_ITEM = new TimerKey();
+	public static readonly STEPPING_OUT = new TimerKey();
+	public static readonly BOT_WAIT_FOR_PLAYERS = new TimerKey(Misc.getTicks(180 /* 3 minutes */));
+
+	private ticks: number;
+
+
+	constructor(ticks?: number) {
+		this.ticks = ticks;
+	}
+
+	public getTicks(): number {
+		return this.ticks;
+	}
 }
 
-export let ticks: { [key in TimerKey]: number } = {
-    [TimerKey.FOOD]: 0,
-    [TimerKey.KARAMBWAN]: 0,
-    [TimerKey.POTION]: 0,
-    [TimerKey.COMBAT_ATTACK]: 0,
-    [TimerKey.FREEZE]: 0,
-    [TimerKey.FREEZE_IMMUNITY]: 0,
-    [TimerKey.STUN]: 0,
-    [TimerKey.ATTACK_IMMUNITY]: 0,
-    [TimerKey.CASTLEWARS_TAKE_ITEM]: 0,
-    [TimerKey.STEPPING_OUT]: 0,
-    [TimerKey.BOT_WAIT_FOR_PLAYERS]: Misc.getTicks(180)
-}
-export namespace TimerKey {
-    export function getTicks(key: TimerKey) {
-        return ticks[key];
-    }
-}
+
 
 

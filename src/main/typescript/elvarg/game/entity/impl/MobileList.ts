@@ -1,12 +1,6 @@
 import { Mobile } from './Mobile';
 
 export class MobileList<E extends Mobile> implements Iterable<E> {
-    find(arg0: (p: any) => boolean): import("./player/Player").Player {
-        throw new Error('Method not implemented.');
-    }
-    filter(arg0: (p: any) => any) {
-        throw new Error('Method not implemented.');
-    }
     private slotQueue: Queue<number> = new ArrayDeque<number>();
     private capacity: number;
     private characters: E[];
@@ -47,7 +41,7 @@ export class MobileList<E extends Mobile> implements Iterable<E> {
         return false;
     }
 
-    public remove(e: E): boolean {
+    public removes(e: E): boolean {
         if (e === null) {
             return false;
         }
@@ -123,7 +117,7 @@ export class MobileList<E extends Mobile> implements Iterable<E> {
         this.size = 0;
     }
 
-    private remove(item: E): void {
+    public remove(item: E): void {
         // implementation of remove method
     }
 }

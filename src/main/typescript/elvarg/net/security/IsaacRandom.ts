@@ -10,7 +10,7 @@ export class IsaacRandom {
     private last: number;
     private counter: number;
 
-    public isaacRandom(seed: number[]) {
+    public constructor(seed: number[]) {
         let length = Math.min(seed.length, this.results.length);
         this.results.splice(0, length, ...seed);
         this.init();

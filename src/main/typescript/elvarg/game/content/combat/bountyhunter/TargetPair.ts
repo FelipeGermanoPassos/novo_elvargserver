@@ -1,4 +1,4 @@
-import { Player } from '../../../entity/impl/player/Player';
+    import { Player } from '../../../entity/impl/player/Player';
 
 export class TargetPair {
     private player1: Player;

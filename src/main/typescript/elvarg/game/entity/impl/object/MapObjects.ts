@@ -137,7 +137,7 @@ export class MapObjects {
         RegionManager.removeObjectClipping(object);
     }
 
-    static clear(position: Location, clipShift: number, player: Player) {
+    static clear(position: Location, clipShift: number) {
         const hash = this.getHash(position.getX(), position.getY(), position.getZ());
 
         if (this.mapObjects.has(hash)) {
@@ -149,7 +149,7 @@ export class MapObjects {
             }
         }
 
-        RegionManager.removeClipping(position.getX(), position.getY(), position.getZ(), clipShift, player.getPrivateArea());
+        RegionManager.removeClipping(position.getX(), position.getY(), position.getZ(), clipShift, null);
     }
 
     static getHash(x: number, y: number, z: number): number {

@@ -7,6 +7,17 @@ import { BotCommand } from "./BotCommand";
 import { CommandType } from "./CommandType";
 import { Teleportable } from "../../../../model/teleportation/Teleportable";
 
+class GoToDuelArenaTask extends Task{
+    constructor(p: number, private readonly execFunc:Function){
+        super(5,false)
+    }
+    execute(): void {
+        this.execFunc()
+        this.stop()
+    }
+    
+}
+
 export class GoToDuelArena implements BotCommand {
     triggers(): string[] {
         return ["duel arena"];
@@ -14,14 +25,8 @@ export class GoToDuelArena implements BotCommand {
 
     start(playerBot: PlayerBot, args: string[]): void {
         playerBot.sendChat("Going to Duel Arena - see ya soon!");
-
-        TaskManager.submit(new Task({ delay: 5, key: playerBot.getIndex(), immediate: false }) {
-            execute() {
-                TeleportHandler.teleport(playerBot, Teleportable.DUEL_ARENA.getPosition(), TeleportType.NORMAL, false)
-                stop();
-            }
-        })
-
+        const goToDuelArenaTask = new GoToDuelArenaTask(playerBot.getIndex(), () => {TeleportHandler.teleport(playerBot, Teleportable.DUEL_ARENA.getPosition(), TeleportType.NORMAL, false)});
+        TaskManager.submit(goToDuelArenaTask);
         playerBot.stopCommand();
     }
 

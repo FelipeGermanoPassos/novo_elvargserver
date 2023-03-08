@@ -36,19 +36,19 @@ export class Runecrafting {
             }
             player.performGraphic(Runecrafting.CRAFT_RUNES_GRAPHIC);
             player.performAnimation(Runecrafting.CRAFT_RUNES_ANIMATION);
-			let craftAmount: number = this.craftAmount(rune.get(), player);
+			let craftAmount: number = this.craftAmount(Rune.forId(0), player);
             let xpGain: number = 0;
             for (let i = 0; i < 28; i++) {
                 if (!player.getInventory().contains(essence)) {
                 break;
                 }
                 player.getInventory().deleteNumber(essence, 1);
-                player.getInventory().adds(rune.get().getRuneID(), craftAmount);
-                xpGain += rune.get().getXP();
+                player.getInventory().adds(rune.getRuneID(), craftAmount);
+                xpGain += rune.getXP();
             }
 
             // Finally add the total experience they gained..
-            player.getSkillManager().addExperience(Skill.RUNECRAFTING, xpGain);
+            player.getSkillManager().addExperiences(Skill.RUNECRAFTING, xpGain);
 
             // Pets..
             PetHandler.onSkill(player, Skill.RUNECRAFTING);
@@ -59,7 +59,7 @@ export class Runecrafting {
     private static craftAmount(rune: Rune, player: Player) {
         let amount = 1;
         switch (rune) {
-            case AIR_RUNE:
+            case Rune.AIR_RUNE:
                 if (player.getSkillManager().getMaxLevel(Skill.RUNECRAFTING) >= 11)
                     amount = 2;
                 if (player.getSkillManager().getMaxLevel(Skill.RUNECRAFTING) >= 22)
@@ -202,10 +202,10 @@ class Talisman {
 export class Pouch  {
     private static pouches: Map<number, Pouch> = new Map<number, Pouch>();
 
-    public static SMALL_POUCH = { id: 5509, level: 1, capacity: 3, time: -1 };
-    public static MEDIUM_POUCH = { id: 5510, level: 25, capacity: 6, time: 45 };
-    public static LARGE_POUCH = { id: 5512, level: 50, capacity: 9, time: 29 };
-    public static GIANT_POUCH = { id: 5514, level: 75, capacity: 12, time: 10 };
+    public static SMALL_POUCH = new Pouch( 5509, 1, 3, -1 );
+    public static MEDIUM_POUCH = new Pouch( 5510, 25, 6, 45 );
+    public static LARGE_POUCH = new Pouch( 5512, 50, 9, 29 );
+    public static GIANT_POUCH = new Pouch( 5514, 75, 12, 10 );
 
     public static initialize() {
         for (let p of Object.values(Pouch)) {

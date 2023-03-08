@@ -1,9 +1,9 @@
 
-import { Player } from "../../entity/impl/player/Player";
-import { ByteBufUtils } from "../../net/ByteBufUtils";
-import { Packet } from "../../net/packet/Packet";
-import { PacketConstants } from "../../net/packet/PacketConstants";
-import { PacketExecutor } from "../../net/packet/PacketExecutor";
+import { Player } from "../../../game/entity/impl/player/Player";
+import { ByteBufUtils } from "../../../net/ByteBufUtils";
+import { Packet } from "../../../net/packet/Packet";
+import { PacketConstants } from "../../../net/packet/PacketConstants";
+import { PacketExecutor } from "../../../net/packet/PacketExecutor";
 
 export class EnterInputPacketListener implements PacketExecutor {
 

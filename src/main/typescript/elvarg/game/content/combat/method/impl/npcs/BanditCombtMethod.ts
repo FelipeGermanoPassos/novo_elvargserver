@@ -3,7 +3,7 @@ import { Mobile } from "../../../../../entity/impl/Mobile";
 import { Equipment } from "../../../../../model/container/impl/Equipment";
 
 export class BanditCombtMethod extends MeleeCombatMethod {
-    onCombatBegan(character: Mobile, target: Mobile) {
+    public onCombatBegan(character: Mobile, target: Mobile) {
         if (!character || !target) {
             return;
         }

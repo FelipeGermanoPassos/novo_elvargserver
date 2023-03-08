@@ -9,7 +9,7 @@ import {NpcIdentifiers} from "../../../../../util/NpcIdentifiers"
 export class Perdu implements NPCInteraction {
     
     public firstOptionClick(player: Player, npc: NPC): void {
-        player.getDialogueManager().start(new ParduDialogue());
+        player.getDialogueManager().startDialogues(new ParduDialogue());
     }
 
     public secondOptionClick(player: Player, npc: NPC): void {

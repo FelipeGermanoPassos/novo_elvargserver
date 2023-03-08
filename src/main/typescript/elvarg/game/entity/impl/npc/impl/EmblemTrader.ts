@@ -8,19 +8,19 @@ import { ShopIdentifiers } from "../../../../../util/ShopIdentifiers"
 export class EmblemTrader implements NPCInteraction {
 
     public firstOptionClick(player: Player, npc: NPC): void {
-        player.getDialogueManager().start(new EmblemTraderDialogue());
+        player.getDialogueManager().startDialogues(new EmblemTraderDialogue());
     }
 
     public secondOptionClick(player: Player, npc: NPC): void {
-        ShopManager.open(player, ShopIdentifiers.PVP_SHOP);
+        ShopManager.opens(player, ShopIdentifiers.PVP_SHOP);
     }
 
     public thirdOptionClick(player: Player, npc: NPC): void {
-        player.getDialogueManager().start(new EmblemTraderDialogue(), 2);
+        player.getDialogueManager().startDialog(new EmblemTraderDialogue(), 2);
     }
 
     public forthOptionClick(player: Player, npc: NPC): void {
-        player.getDialogueManager().start(new EmblemTraderDialogue(), 5);
+        player.getDialogueManager().startDialog(new EmblemTraderDialogue(), 5);
     }
 
     public useItemOnNpc(player: Player, npc: NPC, itemId: number, slot: number): void {

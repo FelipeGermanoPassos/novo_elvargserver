@@ -3,142 +3,142 @@ import { Sound } from '../../Sound';
 import { BonusManager } from '../../model/equipment/BonusManager';
 
 export class FightType {
-    public static STAFF_BASH = { id: 401, animation: 43, style: 0, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.ACCURATE }
-    public static STAFF_POUND = { id: 406, animation: 43, style: 1, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.AGGRESSIVE }
-    public static STAFF_FOCUS = { id: 406, animation: 43, style: 2, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.DEFENSIVE }
-    public static WARHAMMER_POUND = { id: 401, animation: 43, style: 0, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.ACCURATE }
-    public static WARHAMMER_PUMMEL = { id: 401, animation: 43, style: 1, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.AGGRESSIVE }
-    public static WARHAMMER_BLOCK = { id: 401, animation: 43, style: 2, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.DEFENSIVE }
-    public static MAUL_POUND = { id: 2661, animation: 43, style: 0, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.ACCURATE }
-    public static MAUL_PUMMEL = { id: 2661, animation: 43, style: 1, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.AGGRESSIVE }
-    public static MAUL_BLOCK = { id: 2661, animation: 43, style: 2, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.DEFENSIVE }
-    public static ELDER_MAUL_POUND = { id: 7516, animation: 43, style: 0, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.ACCURATE }
-    public static ELDER_MAUL_PUMMEL = { id: 7516, animation: 43, style: 1, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.AGGRESSIVE }
-    public static ELDER_MAUL_BLOCK = { id: 7516, animation: 43, style: 2, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.DEFENSIVE }
-    public static GRANITE_MAUL_POUND = { id: 1665, animation: 43, style: 0, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.ACCURATE }
-    public static GRANITE_MAUL_PUMMEL = { id: 1665, animation: 43, style: 1, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.AGGRESSIVE }
-    public static GRANITE_MAUL_BLOCK = { id: 1665, animation: 43, style: 2, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.DEFENSIVE }
-    public static SCYTHE_REAP = { id: 414, animation: 43, style: 0, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.ACCURATE }
-    public static SCYTHE_CHOP = { id: 382, animation: 43, style: 1, bonus: BonusManager.ATTACK_STAB, type: FightStyle.AGGRESSIVE }
-    public static SCYTHE_JAB = { id: 2066, animation: 43, style: 2, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.CONTROLLED }
-    public static SCYTHE_BLOCK = { id: 382, animation: 43, style: 3, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.DEFENSIVE }
-    public static BATTLEAXE_CHOP = { id: 401, animation: 43, style: 0, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.ACCURATE }
-    public static BATTLEAXE_HACK = { id: 401, animation: 43, style: 1, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.AGGRESSIVE }
-    public static BATTLEAXE_SMASH = { id: 401, animation: 43, style: 2, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.AGGRESSIVE }
-    public static BATTLEAXE_BLOCK = { id: 401, animation: 43, style: 3, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.DEFENSIVE }
-    public static GREATAXE_CHOP = { id: 2062, animation: 43, style: 0, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.ACCURATE }
-    public static GREATAXE_HACK = { id: 2062, animation: 43, style: 1, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.AGGRESSIVE }
-    public static GREATAXE_SMASH = { id: 2066, animation: 43, style: 2, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.AGGRESSIVE }
-    public static GREATAXE_BLOCK = { id: 2062, animation: 43, style: 3, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.DEFENSIVE }
-    public static CROSSBOW_ACCURATE = { id: 4230, animation: 43, style: 0, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.ACCURATE }
-    public static CROSSBOW_RAPID = { id: 4230, animation: 43, style: 1, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.AGGRESSIVE }
-    public static CROSSBOW_LONGRANGE = { id: 4230, animation: 43, style: 2, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.DEFENSIVE }
-    public static KARILS_CROSSBOW_ACCURATE = { id: 2075, animation: 43, style: 0, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.ACCURATE }
-    public static KARILS_CROSSBOW_RAPID = { id: 2075, animation: 43, style: 1, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.AGGRESSIVE }
-    public static KARILS_CROSSBOW_LONGRANGE = { id: 2075, animation: 43, style: 2, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.DEFENSIVE }
-    public static BALLISTA_ACCURATE = { id: 7218, animation: 43, style: 0, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.ACCURATE }
-    public static BALLISTA_RAPID = { id: 7218, animation: 43, style: 1, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.AGGRESSIVE }
-    public static BALLISTA_LONGRANGE = { id: 7218, animation: 43, style: 2, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.DEFENSIVE }
-    public static BLOWPIPE_ACCURATE = { id: 5061, animation: 43, style: 0, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.ACCURATE }
-    public static BLOWPIPE_RAPID = { id: 5061, animation: 43, style: 1, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.AGGRESSIVE }
-    public static BLOWPIPE_LONGRANGE = { id: 5061, animation: 43, style: 2, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.DEFENSIVE }
-    public static ABYSSAL_BLUDGEON_CHOP = { id: 7054, animation: 43, style: 0, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.ACCURATE }
-    public static ABYSSAL_BLUDGEON_SLASH = { id: 7054, animation: 43, style: 1, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.AGGRESSIVE }
-    public static ABYSSAL_BLUDGEON_SMASH = { id: 7054, animation: 43, style: 2, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.AGGRESSIVE }
-    public static ABYSSAL_BLUDGEON_BLOCK = { id: 7054, animation: 43, style: 3, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.DEFENSIVE }
-    public static SHORTBOW_ACCURATE = { id: 426, animation: 43, style: 0, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.ACCURATE }
-    public static SHORTBOW_RAPID = { id: 426, animation: 43, style: 1, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.AGGRESSIVE }
-    public static SHORTBOW_LONGRANGE = { id: 426, animation: 43, style: 2, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.DEFENSIVE }
-    public static LONGBOW_ACCURATE = { id: 426, animation: 43, style: 0, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.ACCURATE }
-    public static LONGBOW_RAPID = { id: 426, animation: 43, style: 1, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.AGGRESSIVE }
-    public static LONGBOW_LONGRANGE = { id: 426, animation: 43, style: 2, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.DEFENSIVE }
-    public static DAGGER_STAB = { id: 400, animation: 43, style: 0, bonus: BonusManager.ATTACK_STAB, type: FightStyle.ACCURATE }
-    public static DAGGER_LUNGE = { id: 400, animation: 43, style: 1, bonus: BonusManager.ATTACK_STAB, type: FightStyle.AGGRESSIVE }
-    public static DAGGER_SLASH = { id: 400, animation: 43, style: 2, bonus: BonusManager.ATTACK_STAB, type: FightStyle.AGGRESSIVE }
-    public static DAGGER_BLOCK = { id: 400, animation: 43, style: 3, bonus: BonusManager.ATTACK_STAB, type: FightStyle.DEFENSIVE }
-    public static DRAGON_DAGGER_STAB = { id: 376, animation: 43, style: 0, bonus: BonusManager.ATTACK_STAB, type: FightStyle.ACCURATE }
-    public static DRAGON_DAGGER_LUNGE = { id: 376, animation: 43, style: 1, bonus: BonusManager.ATTACK_STAB, type: FightStyle.AGGRESSIVE }
-    public static DRAGON_DAGGER_SLASH = { id: 377, animation: 43, style: 2, bonus: BonusManager.ATTACK_STAB, type: FightStyle.AGGRESSIVE }
-    public static DRAGON_DAGGER_BLOCK = { id: 376, animation: 43, style: 3, bonus: BonusManager.ATTACK_STAB, type: FightStyle.DEFENSIVE }
-    public static SWORD_STAB = { id: 412, animation: 43, style: 0, bonus: BonusManager.ATTACK_STAB, type: FightStyle.ACCURATE }
-    public static SWORD_LUNGE = { id: 412, animation: 43, style: 1, bonus: BonusManager.ATTACK_STAB, type: FightStyle.AGGRESSIVE }
-    public static SWORD_SLASH = { id: 390, animation: 43, style: 2, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.AGGRESSIVE }
-    public static SWORD_BLOCK = { id: 412, animation: 43, style: 3, bonus: BonusManager.ATTACK_STAB, type: FightStyle.DEFENSIVE }
-    public static SCIMITAR_CHOP = { id: 390, animation: 43, style: 0, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.ACCURATE }
-    public static SCIMITAR_LUNGE = { id: 390, animation: 43, style: 2, bonus: BonusManager.ATTACK_STAB, type: FightStyle.CONTROLLED }
-    public static SCIMITAR_BLOCK = { id: 390, animation: 43, style: 3, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.DEFENSIVE }
-    public static SCIMITAR_SLASH = {id: 390, animation: 43, style :1, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.AGGRESSIVE}
-    public static LONGSWORD_CHOP = { id: 390, animation: 43, style: 0, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.ACCURATE }
-    public static LONGSWORD_SLASH = { id: 390, animation: 43, style: 1, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.AGGRESSIVE }
-    public static LONGSWORD_LUNGE = { id: 412, animation: 43, style: 2, bonus: BonusManager.ATTACK_STAB, type: FightStyle.CONTROLLED }
-    public static LONGSWORD_BLOCK = { id: 390, animation: 43, style: 3, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.DEFENSIVE }
-    public static MACE_POUND = { id: 401, animation: 43, style: 0, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.ACCURATE }
-    public static MACE_PUMMEL = { id: 401, animation: 43, style: 1, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.AGGRESSIVE }
-    public static MACE_SPIKE = { id: 401, animation: 43, style: 2, bonus: BonusManager.ATTACK_STAB, type: FightStyle.CONTROLLED }
-    public static MACE_BLOCK = { id: 401, animation: 43, style: 3, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.DEFENSIVE }
-    public static KNIFE_ACCURATE = { id: 806, animation: 43, style: 0, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.ACCURATE }
-    public static KNIFE_RAPID = { id: 806, animation: 43, style: 1, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.AGGRESSIVE }
-    public static KNIFE_LONGRANGE = { id: 806, animation: 43, style: 2, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.DEFENSIVE }
-    public static OBBY_RING_ACCURATE = { id: 2614, animation: 43, style: 0, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.ACCURATE }
-    public static OBBY_RING_RAPID = { id: 2614, animation: 43, style: 1, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.AGGRESSIVE }
-    public static OBBY_RING_LONGRANGE = { id: 2614, animation: 43, style: 2, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.DEFENSIVE }
-    public static SPEAR_LUNGE = { id: 2080, animation: 43, style: 0, bonus: BonusManager.ATTACK_STAB, type: FightStyle.CONTROLLED }
-    public static SPEAR_SWIPE = { id: 2081, animation: 43, style: 1, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.CONTROLLED }
-    public static SPEAR_POUND = { id: 2082, animation: 43, style: 2, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.CONTROLLED }
-    public static SPEAR_BLOCK = { id: 2080, animation: 43, style: 3, bonus: BonusManager.ATTACK_STAB, type: FightStyle.DEFENSIVE }
-    public static TWOHANDEDSWORD_CHOP = { id: 407, animation: 43, style: 0, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.ACCURATE }
-    public static TWOHANDEDSWORD_SLASH = { id: 407, animation: 43, style: 1, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.AGGRESSIVE }
-    public static TWOHANDEDSWORD_SMASH = { id: 406, animation: 43, style: 2, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.AGGRESSIVE }
-    public static TWOHANDEDSWORD_BLOCK = { id: 407, animation: 43, style: 3, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.DEFENSIVE }
-    public static GODSWORD_CHOP = { id: 7046, animation: 43, style: 0, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.ACCURATE }
-    public static GODSWORD_SLASH = { id: 7045, animation: 43, style: 1, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.AGGRESSIVE }
-    public static GODSWORD_SMASH = { id: 7054, animation: 43, style: 2, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.AGGRESSIVE }
-    public static GODSWORD_BLOCK = { id: 7055, animation: 43, style: 3, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.DEFENSIVE }
-    public static VERACS_FLAIL_POUND = { id: 1658, animation: 43, style: 0, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.ACCURATE }
-    public static VERACS_FLAIL_PUMMEL = { id: 1658, animation: 43, style: 1, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.AGGRESSIVE }
-    public static VERACS_FLAIL_SPIKE = { id: 1658, animation: 43, style: 2, bonus: BonusManager.ATTACK_STAB, type: FightStyle.CONTROLLED }
-    public static VERACS_FLAIL_BLOCK = { id: 1658, animation: 43, style: 3, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.DEFENSIVE }
-    public static PICKAXE_SPIKE = { id: 401, animation: 43, style: 0, bonus: BonusManager.ATTACK_STAB, type: FightStyle.ACCURATE }
-    public static PICKAXE_IMPALE = { id: 401, animation: 43, style: 1, bonus: BonusManager.ATTACK_STAB, type: FightStyle.AGGRESSIVE }
-    public static PICKAXE_SMASH = { id: 401, animation: 43, style: 2, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.AGGRESSIVE }
-    public static PICKAXE_BLOCK = { id: 400, animation: 43, style: 3, bonus: BonusManager.ATTACK_STAB, type: FightStyle.DEFENSIVE }
-    public static CLAWS_CHOP = { id: 393, animation: 43, style: 0, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.ACCURATE }
-    public static CLAWS_SLASH = { id: 393, animation: 43, style: 1, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.AGGRESSIVE }
-    public static CLAWS_LUNGE = { id: 393, animation: 43, style: 2, bonus: BonusManager.ATTACK_STAB, type: FightStyle.CONTROLLED }
-    public static CLAWS_BLOCK = { id: 393, animation: 43, style: 3, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.DEFENSIVE }
-    public static HALBERD_JAB = { id: 440, animation: 43, style: 0, bonus: BonusManager.ATTACK_STAB, type: FightStyle.CONTROLLED }
-    public static HALBERD_SWIPE = { id: 440, animation: 43, style: 1, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.AGGRESSIVE }
-    public static HALBERD_FEND = { id: 440, animation: 43, style: 2, bonus: BonusManager.ATTACK_STAB, type: FightStyle.DEFENSIVE }
-    public static UNARMED_PUNCH = { id: 422, animation: 43, style: 0, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.ACCURATE }
-    public static UNARMED_KICK = { id: 423, animation: 43, style: 1, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.AGGRESSIVE }
-    public static UNARMED_BLOCK = { id: 422, animation: 43, style: 2, bonus: BonusManager.ATTACK_CRUSH, type: FightStyle.DEFENSIVE }
-    public static WHIP_FLICK = { id: 1658, animation: 43, style: 0, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.ACCURATE, sound: Sound.WEAPON_WHIP }
-    public static WHIP_LASH = { id: 1658, animation: 43, style: 1, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.CONTROLLED, sound: Sound.WEAPON_WHIP }
-    public static WHIP_DEFLECT = { id: 1658, animation: 43, style: 2, bonus: BonusManager.ATTACK_SLASH, type: FightStyle.DEFENSIVE, sound: Sound.WEAPON_WHIP }
-    public static THROWNAXE_ACCURATE = { id: 806, animation: 43, style: 0, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.ACCURATE }
-    public static THROWNAXE_RAPID = { id: 806, animation: 43, style: 1, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.AGGRESSIVE }
-    public static THROWNAXE_LONGRANGE = { id: 806, animation: 43, style: 2, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.DEFENSIVE }
-    public static DART_ACCURATE = { id: 806, animation: 43, style: 0, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.ACCURATE }
-    public static DART_RAPID = { id: 806, animation: 43, style: 1, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.AGGRESSIVE }
-    public static DART_LONGRANGE = { id: 806, animation: 43, style: 2, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.DEFENSIVE }
-    public static JAVELIN_ACCURATE = { id: 806, animation: 43, style: 0, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.ACCURATE }
-    public static JAVELIN_RAPID = { id: 806, animation: 43, style: 2, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.AGGRESSIVE }
-    public static JAVELIN_LONGRANGE = { id: 806, animation: 43, style: 3, bonus: BonusManager.ATTACK_RANGE, type: FightStyle.DEFENSIVE }
-    public static GHRAZI_RAPIER_STAB = { id: 8145, animation: 43, style: 0, bonus: BonusManager.ATTACK_STAB, type: FightStyle.ACCURATE }
-    public static GHRAZI_RAPIER_LUNGE = { id: 8145, animation: 43, style: 1, bonus: BonusManager.ATTACK_STAB, type: FightStyle.AGGRESSIVE }
-    public static GHRAZI_RAPIER_SLASH = { id: 390, animation: 43, style: 2, bonus: BonusManager.ATTACK_STAB, type: FightStyle.AGGRESSIVE }
-    public static GHRAZI_RAPIER_BLOCK = { id: 8145, animation: 43, style: 3, bonus: BonusManager.ATTACK_STAB, type: FightStyle.DEFENSIVE }
+    public static STAFF_BASH = new FightType( 401, 43, 0, BonusManager.ATTACK_CRUSH, FightStyle.ACCURATE )
+    public static STAFF_POUND = new FightType( 406, 43, 1, BonusManager.ATTACK_CRUSH, FightStyle.AGGRESSIVE  )
+    public static STAFF_FOCUS = new FightType(406, 43, 2, BonusManager.ATTACK_CRUSH, FightStyle.DEFENSIVE )
+    public static WARHAMMER_POUND = new FightType(401, 43, 0, BonusManager.ATTACK_CRUSH, FightStyle.ACCURATE  )
+    public static WARHAMMER_PUMMEL = new FightType(401, 43, 1, BonusManager.ATTACK_CRUSH, FightStyle.AGGRESSIVE  )
+    public static WARHAMMER_BLOCK = new FightType(401, 43, 2, BonusManager.ATTACK_CRUSH, FightStyle.DEFENSIVE  )
+    public static MAUL_POUND = new FightType( 2661, 43, 0, BonusManager.ATTACK_CRUSH, FightStyle.ACCURATE )
+    public static MAUL_PUMMEL = new FightType(2661, 43, 1, BonusManager.ATTACK_CRUSH, FightStyle.AGGRESSIVE  )
+    public static MAUL_BLOCK = new FightType(661,43, 2, BonusManager.ATTACK_CRUSH, FightStyle.DEFENSIVE  )
+    public static ELDER_MAUL_POUND = new FightType(7516, 43, 0, BonusManager.ATTACK_CRUSH, FightStyle.ACCURATE  )
+    public static ELDER_MAUL_PUMMEL = new FightType(7516, 43, 1, BonusManager.ATTACK_CRUSH, FightStyle.AGGRESSIVE  )
+    public static ELDER_MAUL_BLOCK = new FightType(7516, 43, 2, BonusManager.ATTACK_CRUSH, FightStyle.DEFENSIVE  )
+    public static GRANITE_MAUL_POUND = new FightType(1665, 43, 0, BonusManager.ATTACK_CRUSH, FightStyle.ACCURATE  )
+    public static GRANITE_MAUL_PUMMEL = new FightType(1665, 43, 1, BonusManager.ATTACK_CRUSH, FightStyle.AGGRESSIVE  )
+    public static GRANITE_MAUL_BLOCK = new FightType(1665, 43, 2, BonusManager.ATTACK_CRUSH, FightStyle.DEFENSIVE  )
+    public static SCYTHE_REAP = new FightType(414, 43, 0, BonusManager.ATTACK_SLASH, FightStyle.ACCURATE  )
+    public static SCYTHE_CHOP = new FightType(382, 43, 1, BonusManager.ATTACK_STAB, FightStyle.AGGRESSIVE  )
+    public static SCYTHE_JAB = new FightType(2066, 43, 2, BonusManager.ATTACK_CRUSH, FightStyle.CONTROLLED )
+    public static SCYTHE_BLOCK = new FightType(382, 43, 3, BonusManager.ATTACK_SLASH, FightStyle.DEFENSIVE  )
+    public static BATTLEAXE_CHOP = new FightType(401, 43, 0, BonusManager.ATTACK_SLASH, FightStyle.ACCURATE )
+    public static BATTLEAXE_HACK = new FightType(401, 43, 1, BonusManager.ATTACK_SLASH, FightStyle.AGGRESSIVE  )
+    public static BATTLEAXE_SMASH = new FightType(401, 43, 2, BonusManager.ATTACK_CRUSH, FightStyle.AGGRESSIVE  )
+    public static BATTLEAXE_BLOCK = new FightType(401, 43, 3, BonusManager.ATTACK_SLASH, FightStyle.DEFENSIVE )
+    public static GREATAXE_CHOP = new FightType(2062, 43, 0, BonusManager.ATTACK_SLASH, FightStyle.ACCURATE )
+    public static GREATAXE_HACK = new FightType(2062, 43, 1, BonusManager.ATTACK_SLASH, FightStyle.AGGRESSIVE )
+    public static GREATAXE_SMASH = new FightType(2066,  43, 2, BonusManager.ATTACK_CRUSH, FightStyle.AGGRESSIVE )
+    public static GREATAXE_BLOCK = new FightType(2062, 43,  3, BonusManager.ATTACK_SLASH, FightStyle.DEFENSIVE )
+    public static CROSSBOW_ACCURATE = new FightType(4230, 43, 0, BonusManager.ATTACK_RANGE, FightStyle.ACCURATE)
+    public static CROSSBOW_RAPID = new FightType(4230, 43, 1, BonusManager.ATTACK_RANGE, FightStyle.AGGRESSIVE )
+    public static CROSSBOW_LONGRANGE = new FightType(230, 43, 2, BonusManager.ATTACK_RANGE, FightStyle.DEFENSIVE)
+    public static KARILS_CROSSBOW_ACCURATE = new FightType(2075, 43, 0, BonusManager.ATTACK_RANGE, FightStyle.ACCURATE)
+    public static KARILS_CROSSBOW_RAPID = new FightType(2075, 43, 1, BonusManager.ATTACK_RANGE, FightStyle.AGGRESSIVE )
+    public static KARILS_CROSSBOW_LONGRANGE = new FightType(2075, 43, 2, BonusManager.ATTACK_RANGE, FightStyle.DEFENSIVE )
+    public static BALLISTA_ACCURATE = new FightType(218, 43, 0, BonusManager.ATTACK_RANGE, FightStyle.ACCURATE )
+    public static BALLISTA_RAPID = new FightType(7218, 43, 1, BonusManager.ATTACK_RANGE,  FightStyle.AGGRESSIVE )
+    public static BALLISTA_LONGRANGE = new FightType( 7218, 43, 2, BonusManager.ATTACK_RANGE,  FightStyle.DEFENSIVE )
+    public static BLOWPIPE_ACCURATE = new FightType( 5061, 43, 0, BonusManager.ATTACK_RANGE,  FightStyle.ACCURATE )
+    public static BLOWPIPE_RAPID = new FightType( 5061, 43, 1, BonusManager.ATTACK_RANGE,  FightStyle.AGGRESSIVE)
+    public static BLOWPIPE_LONGRANGE = new FightType( 5061, 43, 2, BonusManager.ATTACK_RANGE,  FightStyle.DEFENSIVE )
+    public static ABYSSAL_BLUDGEON_CHOP = new FightType( 7054, 43, 0, BonusManager.ATTACK_SLASH, FightStyle.ACCURATE )
+    public static ABYSSAL_BLUDGEON_SLASH = new FightType( 7054, 43, 1, BonusManager.ATTACK_SLASH,  FightStyle.AGGRESSIVE )
+    public static ABYSSAL_BLUDGEON_SMASH = new FightType( 7054, 43, 2, BonusManager.ATTACK_CRUSH,  FightStyle.AGGRESSIVE )
+    public static ABYSSAL_BLUDGEON_BLOCK = new FightType( 7054, 43, 3, BonusManager.ATTACK_SLASH,  FightStyle.DEFENSIVE )
+    public static SHORTBOW_ACCURATE = new FightType( 426, 43, 0, BonusManager.ATTACK_RANGE,  FightStyle.ACCURATE )
+    public static SHORTBOW_RAPID = new FightType( 426, 43, 1, BonusManager.ATTACK_RANGE,  FightStyle.AGGRESSIVE )
+    public static SHORTBOW_LONGRANGE = new FightType( 426, 43, 2, BonusManager.ATTACK_RANGE,  FightStyle.DEFENSIVE)
+    public static LONGBOW_ACCURATE = new FightType( 426, 43, 0, BonusManager.ATTACK_RANGE,  FightStyle.ACCURATE )
+    public static LONGBOW_RAPID = new FightType( 426, 43, 1, BonusManager.ATTACK_RANGE,  FightStyle.AGGRESSIVE )
+    public static LONGBOW_LONGRANGE = new FightType( 426, 43, 2, BonusManager.ATTACK_RANGE,  FightStyle.DEFENSIVE )
+    public static DAGGER_STAB = new FightType( 400, 43, 0, BonusManager.ATTACK_STAB,  FightStyle.ACCURATE )
+    public static DAGGER_LUNGE = new FightType( 400, 43, 1, BonusManager.ATTACK_STAB,  FightStyle.AGGRESSIVE )
+    public static DAGGER_SLASH = new FightType( 400, 43, 2, BonusManager.ATTACK_STAB, FightStyle.AGGRESSIVE)
+    public static DAGGER_BLOCK = new FightType( 400, 43, 3, BonusManager.ATTACK_STAB,  FightStyle.DEFENSIVE )
+    public static DRAGON_DAGGER_STAB = new FightType( 376, 43, 0, BonusManager.ATTACK_STAB,  FightStyle.ACCURATE )
+    public static DRAGON_DAGGER_LUNGE = new FightType( 376, 43, 1, BonusManager.ATTACK_STAB, FightStyle.AGGRESSIVE)
+    public static DRAGON_DAGGER_SLASH = new FightType( 377, 43, 2, BonusManager.ATTACK_STAB,  FightStyle.AGGRESSIVE )
+    public static DRAGON_DAGGER_BLOCK = new FightType( 376, 43, 3, BonusManager.ATTACK_STAB,  FightStyle.DEFENSIVE )
+    public static SWORD_STAB = new FightType( 412, 43, 0, BonusManager.ATTACK_STAB,  FightStyle.ACCURATE)
+    public static SWORD_LUNGE = new FightType( 412, 43, 1, BonusManager.ATTACK_STAB,  FightStyle.AGGRESSIVE )
+    public static SWORD_SLASH = new FightType( 390, 43, 2, BonusManager.ATTACK_SLASH,  FightStyle.AGGRESSIVE)
+    public static SWORD_BLOCK = new FightType( 412, 43, 3, BonusManager.ATTACK_STAB,  FightStyle.DEFENSIVE )
+    public static SCIMITAR_CHOP = new FightType( 390, 43, 0, BonusManager.ATTACK_SLASH,  FightStyle.ACCURATE )
+    public static SCIMITAR_LUNGE = new FightType( 390, 43, 2, BonusManager.ATTACK_STAB,  FightStyle.CONTROLLED)
+    public static SCIMITAR_BLOCK = new FightType( 390, 43, 3, BonusManager.ATTACK_SLASH,  FightStyle.DEFENSIVE )
+    public static SCIMITAR_SLASH = new FightType( 390, 43, 1, BonusManager.ATTACK_SLASH,  FightStyle.AGGRESSIVE)
+    public static LONGSWORD_CHOP = new FightType( 390, 43, 0, BonusManager.ATTACK_SLASH,  FightStyle.ACCURATE )
+    public static LONGSWORD_SLASH = new FightType(390, 43, 1, BonusManager.ATTACK_SLASH,  FightStyle.AGGRESSIVE )
+    public static LONGSWORD_LUNGE = new FightType( 412, 43, 2, BonusManager.ATTACK_STAB,  FightStyle.CONTROLLED )
+    public static LONGSWORD_BLOCK = new FightType( 390, 43, 3, BonusManager.ATTACK_SLASH,  FightStyle.DEFENSIVE )
+    public static MACE_POUND = new FightType( 401, 43, 0, BonusManager.ATTACK_CRUSH, FightStyle.ACCURATE )
+    public static MACE_PUMMEL = new FightType( 401, 43, 1, BonusManager.ATTACK_CRUSH,  FightStyle.AGGRESSIVE )
+    public static MACE_SPIKE = new FightType( 401, 43, 2, BonusManager.ATTACK_STAB,  FightStyle.CONTROLLED )
+    public static MACE_BLOCK = new FightType( 401, 43, 3, BonusManager.ATTACK_CRUSH,  FightStyle.DEFENSIVE )
+    public static KNIFE_ACCURATE = new FightType( 806, 43, 0, BonusManager.ATTACK_RANGE,  FightStyle.ACCURATE )
+    public static KNIFE_RAPID = new FightType( 806, 43, 1, BonusManager.ATTACK_RANGE,  FightStyle.AGGRESSIVE )
+    public static KNIFE_LONGRANGE = new FightType( 806, 43, 2, BonusManager.ATTACK_RANGE,  FightStyle.DEFENSIVE )
+    public static OBBY_RING_ACCURATE = new FightType( 2614, 43, 0, BonusManager.ATTACK_RANGE,  FightStyle.ACCURATE)
+    public static OBBY_RING_RAPID = new FightType( 2614, 43, 1, BonusManager.ATTACK_RANGE,  FightStyle.AGGRESSIVE)
+    public static OBBY_RING_LONGRANGE = new FightType( 2614, 43, 2, BonusManager.ATTACK_RANGE,  FightStyle.DEFENSIVE )
+    public static SPEAR_LUNGE = new FightType( 2080, 43, 0, BonusManager.ATTACK_STAB,  FightStyle.CONTROLLED )
+    public static SPEAR_SWIPE = new FightType( 2081, 43, 1, BonusManager.ATTACK_SLASH,  FightStyle.CONTROLLED )
+    public static SPEAR_POUND = new FightType( 2082, 43, 2, BonusManager.ATTACK_CRUSH,  FightStyle.CONTROLLED )
+    public static SPEAR_BLOCK = new FightType( 2080, 43, 3, BonusManager.ATTACK_STAB, FightStyle.DEFENSIVE )
+    public static TWOHANDEDSWORD_CHOP = new FightType( 407, 43, 0,  BonusManager.ATTACK_SLASH,  FightStyle.ACCURATE )
+    public static TWOHANDEDSWORD_SLASH = new FightType( 407, 43, 1,  BonusManager.ATTACK_SLASH,  FightStyle.AGGRESSIVE )
+    public static TWOHANDEDSWORD_SMASH = new FightType( 406, 43,  2,  BonusManager.ATTACK_CRUSH,  FightStyle.AGGRESSIVE )
+    public static TWOHANDEDSWORD_BLOCK = new FightType( 407, 43, 3,  BonusManager.ATTACK_SLASH,  FightStyle.DEFENSIVE )
+    public static GODSWORD_CHOP = new FightType( 7046, 43, 0,  BonusManager.ATTACK_SLASH,  FightStyle.ACCURATE )
+    public static GODSWORD_SLASH = new FightType( 7045, 43, 1,  BonusManager.ATTACK_SLASH,  FightStyle.AGGRESSIVE )
+    public static GODSWORD_SMASH = new FightType( 7054, 43, 2,  BonusManager.ATTACK_CRUSH,  FightStyle.AGGRESSIVE )
+    public static GODSWORD_BLOCK = new FightType( 7055, 43, 3,  BonusManager.ATTACK_SLASH,  FightStyle.DEFENSIVE )
+    public static VERACS_FLAIL_POUND = new FightType( 1658, 43, 0, BonusManager.ATTACK_CRUSH, FightStyle.ACCURATE )
+    public static VERACS_FLAIL_PUMMEL = new FightType( 1658, 43, 1, BonusManager.ATTACK_CRUSH,  FightStyle.AGGRESSIVE)
+    public static VERACS_FLAIL_SPIKE = new FightType( 1658, 43, 2,  BonusManager.ATTACK_STAB,  FightStyle.CONTROLLED )
+    public static VERACS_FLAIL_BLOCK = new FightType( 1658, 43, 3,  BonusManager.ATTACK_CRUSH,  FightStyle.DEFENSIVE )
+    public static PICKAXE_SPIKE = new FightType( 401, 43, 0,  BonusManager.ATTACK_STAB,  FightStyle.ACCURATE )
+    public static PICKAXE_IMPALE = new FightType( 401, 43, 1, BonusManager.ATTACK_STAB,  FightStyle.AGGRESSIVE )
+    public static PICKAXE_SMASH = new FightType( 401, 43, 2,  BonusManager.ATTACK_CRUSH,  FightStyle.AGGRESSIVE )
+    public static PICKAXE_BLOCK = new FightType( 400, 43, 3,  BonusManager.ATTACK_STAB,  FightStyle.DEFENSIVE )
+    public static CLAWS_CHOP = new FightType( 393, 43, 0,  BonusManager.ATTACK_SLASH,  FightStyle.ACCURATE )
+    public static CLAWS_SLASH = new FightType( 393, 43, 1,  BonusManager.ATTACK_SLASH,  FightStyle.AGGRESSIVE )
+    public static CLAWS_LUNGE = new FightType( 393, 43, 2,  BonusManager.ATTACK_STAB,  FightStyle.CONTROLLED )
+    public static CLAWS_BLOCK = new FightType( 393, 43, 3, BonusManager.ATTACK_SLASH,  FightStyle.DEFENSIVE )
+    public static HALBERD_JAB = new FightType( 440, 43, 0, BonusManager.ATTACK_STAB,  FightStyle.CONTROLLED )
+    public static HALBERD_SWIPE = new FightType( 440, 43, 1, BonusManager.ATTACK_SLASH,  FightStyle.AGGRESSIVE )
+    public static HALBERD_FEND = new FightType( 440, 43, 2, BonusManager.ATTACK_STAB,  FightStyle.DEFENSIVE )
+    public static UNARMED_PUNCH = new FightType( 422, 43, 0, BonusManager.ATTACK_CRUSH,  FightStyle.ACCURATE )
+    public static UNARMED_KICK = new FightType( 423, 43, 1, BonusManager.ATTACK_CRUSH,  FightStyle.AGGRESSIVE )
+    public static UNARMED_BLOCK = new FightType( 422, 43, 2, BonusManager.ATTACK_CRUSH,  FightStyle.DEFENSIVE )
+    public static WHIP_FLICK = new FightType( 1658, 43, 0, BonusManager.ATTACK_SLASH,  FightStyle.ACCURATE, Sound.WEAPON_WHIP )
+    public static WHIP_LASH = new FightType( 1658, 43, 1, BonusManager.ATTACK_SLASH,  FightStyle.CONTROLLED,  Sound.WEAPON_WHIP )
+    public static WHIP_DEFLECT = new FightType( 1658, 43, 2, BonusManager.ATTACK_SLASH,  FightStyle.DEFENSIVE,  Sound.WEAPON_WHIP )
+    public static THROWNAXE_ACCURATE = new FightType( 806, 43, 0, BonusManager.ATTACK_RANGE, FightStyle.ACCURATE )
+    public static THROWNAXE_RAPID = new FightType( 806, 43, 1, BonusManager.ATTACK_RANGE,  FightStyle.AGGRESSIVE )
+    public static THROWNAXE_LONGRANGE = new FightType( 806, 43,2, BonusManager.ATTACK_RANGE,  FightStyle.DEFENSIVE )
+    public static DART_ACCURATE = new FightType( 806, 43, 0, BonusManager.ATTACK_RANGE,  FightStyle.ACCURATE )
+    public static DART_RAPID = new FightType( 806, 43, 1, BonusManager.ATTACK_RANGE,  FightStyle.AGGRESSIVE )
+    public static DART_LONGRANGE = new FightType( 806, 43, 2, BonusManager.ATTACK_RANGE,  FightStyle.DEFENSIVE )
+    public static JAVELIN_ACCURATE = new FightType( 806, 43,  0, BonusManager.ATTACK_RANGE, FightStyle.ACCURATE )
+    public static JAVELIN_RAPID = new FightType( 806, 43, 2, BonusManager.ATTACK_RANGE, FightStyle.AGGRESSIVE )
+    public static JAVELIN_LONGRANGE = new FightType( 806, 43, 3,  BonusManager.ATTACK_RANGE,  FightStyle.DEFENSIVE )
+    public static GHRAZI_RAPIER_STAB = new FightType( 8145, 43,0, BonusManager.ATTACK_STAB,  FightStyle.ACCURATE )
+    public static GHRAZI_RAPIER_LUNGE = new FightType( 8145, 43, 1, BonusManager.ATTACK_STAB,  FightStyle.AGGRESSIVE )
+    public static GHRAZI_RAPIER_SLASH = new FightType( 390, 43,2, BonusManager.ATTACK_STAB,  FightStyle.AGGRESSIVE )
+    public static GHRAZI_RAPIER_BLOCK = new FightType( 8145, 43, 3, BonusManager.ATTACK_STAB,  FightStyle.DEFENSIVE )
 
     private static animation: number;
     private static attackSound: Sound;
     private static parentId: number;
     private static childId: number;
     private static bonusType: number;
-    private static style: FightStyle;
+    private static style: FightStyle; 
 
-    private constructor(animation: number, parentId: number, childId: number, bonusType: number, style: FightStyle, sound: Sound) {
+    private constructor(animation: number, parentIAd: number, childId: number, bonusType: number, style: FightStyle, sound?: Sound) {
         FightType.animation = animation;
-        FightType.parentId = parentId;
+        FightType.parentId = parentIAd;
         FightType.childId = childId;
         FightType.bonusType = bonusType;
         FightType.style = style;
@@ -150,19 +150,15 @@ export class FightType {
     }
 
     /**
-     * Gets the parent config id.
-     *
-     * @return the parent id.
-     */
+     * Gets the parent config      *
+     * @return the parent      */
     public static getParentId(): number {
         return this.parentId;
     }
 
     /**
-     * Gets the child config id.
-     *
-     * @return the child id.
-     */
+     * Gets the child config      *
+     * @return the child      */
     public static getChildId(): number {
         return this.childId;
     }

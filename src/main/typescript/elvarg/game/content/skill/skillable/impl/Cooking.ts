@@ -75,7 +75,7 @@ export class Cooking extends ItemCreationSkillable {
 
 }
 
-class Cookable {
+export class Cookable {
       SHRIMP = {
         rawItem: 317,
         cookedItem: 315,

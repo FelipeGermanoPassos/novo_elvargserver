@@ -1,24 +1,25 @@
 import { Dialogue } from "../Dialogue";
 import { Player } from "../../../../entity/impl/player/Player";
-import { LinkedHashMap } from 'linkedHashMap'
-import { DialogueOptionAction } from ''
+import { DialogueOptionsAction } from "../../DialogueOptionsAction";
 
-class OptionsDialogue extends Dialogue {
+export class OptionsDialogue extends Dialogue {
     private static CHATBOX_INTERFACES = [13760, 2461, 2471, 2482, 2494];
     private title: string;
-    private optionsMap: LinkedHashMap<string, DialogueOptionsAction>;
+    private optionsMap: Record<string, DialogueOptionsAction>;
 
-    constructor(index: number, title: string, optionsMap: LinkedHashMap<string, DialogueOptionsAction>);
-    constructor(index: number, optionsMap: LinkedHashMap<string, DialogueOptionsAction>);
-
-    constructor(index: number, titleOrOptionsMap?: string | LinkedHashMap<string, DialogueOptionsAction>, optionsMap?: LinkedHashMap<string, DialogueOptionsAction>) {
+    constructor(
+        index: number,
+        titleOrOptionsMap?: string | Record<string, DialogueOptionsAction>,
+        optionsMap?: Record<string, DialogueOptionsAction>
+    ) {
         super(index);
+
         if (typeof titleOrOptionsMap === "string") {
             this.title = titleOrOptionsMap;
-            this.optionsMap = optionsMap!;
+            this.optionsMap = optionsMap || {};
         } else {
             this.title = "Choose an Option";
-            this.optionsMap = titleOrOptionsMap!;
+            this.optionsMap = titleOrOptionsMap || {};
         }
     }
 
@@ -31,18 +32,21 @@ class OptionsDialogue extends Dialogue {
     }
 
     getDialogueActionByIndex(index: number) {
-        return this.optionsMap.get((this.optionsMap.keySet().toArray())[index]);
+        const keys = Object.keys(this.optionsMap);
+        const key = keys[index];
+        return this.optionsMap[key];
     }
-
-    send(player: Player) {
-        OptionsDialogue.send(player, this.title, this.optionsMap.keySet().toArray(new String[0]));
+      
+      send(player: Player) {
+        const keys = Object.keys(this.optionsMap);
+        OptionsDialogue.send(player, this.title, keys);
     }
 
     static send(player: Player, title: string, options: string[]) {
         let firstChildId = OptionsDialogue.CHATBOX_INTERFACES[options.length - 1];
-        player.getPacketSender().sendString(firstChildId - 1, title);
+        player.getPacketSender().sendString(title, firstChildId - 1,);
         for (let i = 0; i < options.length; i++) {
-            player.getPacketSender().sendString(firstChildId + i, options[i]);
+            player.getPacketSender().sendString(options[i], firstChildId + i);
         }
         player.getPacketSender().sendChatboxInterface(firstChildId - 2);
     }

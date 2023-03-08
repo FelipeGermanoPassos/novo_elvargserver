@@ -4,14 +4,15 @@ import {Mobile} from '../../../../entity/impl/Mobile'
 import {Arrays} from 'collections'
 import {Boundary} from '../../../../model/Boundary';
 import {CastleWars} from '../../../../content/minigames/impl/CastleWars';
-import {obj} from '../../../../../util/ObjectIdentifiers';
-import Misc from 'misc'
+import {ObjectIdentifiers} from '../../../../../util/ObjectIdentifiers';
+import { Misc } from '../../../../../util/Misc';
 import {Area} from '../../../../model/areas/Area';
 import * as from 'random';
 import {Item} from '../../../../model/Item';
 import { TaskManager } from '../../../../task/TaskManager';
 import { Equipment } from '../../../container/impl/Equipment';
 import { Flag } from '../../../Flag';
+import { Location } from '../../../Location';
 
 
 
@@ -31,7 +32,7 @@ export class CastleWarsSaradominWaitingArea extends Area {
             return;
         }
 
-        if (!CastleWars.START_GAME_TASK.isRunning() && CastleWars.ZAMORAK_WAITING_AREA.getPlayers().size > 0) {
+        if (!CastleWars.START_GAME_TASK.isRunning() && CastleWars.ZAMORAK_WAITING_AREA.getPlayers().length > 0) {
             // Ensure the game start timer is active
             TaskManager.submit(CastleWars.START_GAME_TASK);
         }
@@ -56,15 +57,15 @@ export class CastleWarsSaradominWaitingArea extends Area {
             return;
         }
 
-        if (CastleWars.START_GAME_TASK.isRunning() && Area.getPlayers().size === 0
-                && CastleWars.ZAMORAK_WAITING_AREA.getPlayers().size === 0) {
+        if (CastleWars.START_GAME_TASK.isRunning() && this.getPlayers.length === 0
+                && CastleWars.ZAMORAK_WAITING_AREA.getPlayers().length === 0) {
             // Ensure the game start timer is cancelled
             TaskManager.cancelTasks(CastleWars.START_GAME_TASK);
         }
 
         if (logout) {
             // Player has logged out, teleport them to the lobby
-            player.moveTo(new Location());
+            player.moveTo(new Location(2439 + Misc.randoms(4), 3085 + Misc.randoms(5), 0));
         }
 
         if (player.getArea() != CastleWars.GAME_AREA) {
@@ -81,8 +82,9 @@ export class CastleWarsSaradominWaitingArea extends Area {
 
     public handleObjectClick(player: Player, objectId: number, type: number): boolean {
         switch (objectId) {
-            case obj.PORTAL_8:
-                player.moveTo(new Location());
+            case ObjectIdentifiers.PORTAL_8:
+                player.moveTo(new Location(2439 + Misc.randoms(4),
+                3085 + Misc.randoms(5), 0));
                 return true;
         }
 
@@ -96,7 +98,7 @@ export class CastleWarsSaradominWaitingArea extends Area {
         }
 
          // Update the interface
-        player.getPacketSender().sendString(11480, "Waiting for players to join the other team.");
+        player.getPacketSender().sendString( "Waiting for players to join the other team.",11480);
 
         // Send the interface
         player.getPacketSender().sendWalkableInterface(11479);
@@ -122,7 +124,7 @@ export class CastleWarsSaradominWaitingArea extends Area {
 
     public canPlayerBotIdle(playerBot: PlayerBot): boolean {
     // Allow the player bot to wait here if there are players in the other team
-    return CastleWars.ZAMORAK_WAITING_AREA.getPlayers().size > 0;
+    return CastleWars.ZAMORAK_WAITING_AREA.getPlayers().length > 0;
     }
 }
 

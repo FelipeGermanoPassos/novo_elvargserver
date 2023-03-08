@@ -1,8 +1,7 @@
 import { ByteToMessageDecoder, ChannelHandlerContext, ByteBuf } from 'netty'
-import { PlayerSession } from './PlayerSession'
-import { Packet } from './Packet'
-import { IsaacRandom } from './security/IsaacRandom'
-import { NetworkConstants } from './NetworkConstants'
+import { Packet } from '../packet/Packet';
+import { IsaacRandom } from '../security/IsaacRandom'
+import { NetworkConstants } from '../NetworkConstants'
 
 export class PacketDecoder extends ByteToMessageDecoder {
      constructor(random: IsaacRandom) {

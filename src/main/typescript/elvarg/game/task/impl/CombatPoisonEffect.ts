@@ -34,10 +34,9 @@ export class CombatPoisonEffect extends Task {
       return;
     }
 
-    let poisonDamage =
-      this.tick % 5 === 0 ? this.entity.getPoisonDamage() - 1 : this.entity.getPoisonDamage();
+    let poisonDamage = this.tick % 5 === 0 ? this.entity.getPoisonDamage() - 1 : this.entity.getPoisonDamage();
     this, poisonDamage = poisonDamage;
-    this.entity.getCombat().getHitQueue().addPendingDamage(new HitDamage(poisonDamage, HitMask.GREEN));
+    this.entity.getCombat().getHitQueue().addPendingDamage([new HitDamage(poisonDamage, HitMask.GREEN)]);
 
     if (poisonDamage <= 1) {
       this.stop();
@@ -70,7 +69,7 @@ export class CombatPoisonData {
   public static types: number[]
   private static tipos = new Map<number, PoisonType>();
 
-  public static getDemage(id: number): number {
+  public static getDemage(): number {
     return CombatPoisonData.damage;
   }
 
@@ -277,13 +276,8 @@ export class CombatPoisonData {
     CombatPoisonData.types.push(ItemIdentifiers.TOXIC_BLOWPIPE, PoisonType.VENOM);
     CombatPoisonData.types.push(ItemIdentifiers.ABYSSAL_TENTACLE, PoisonType.VENOM);
   }
-}
 
-
-
-export class Poison {
-
-  public static getPoisonType(item: Item): PoisonType | undefined {
+  public static getPoisonType(item?: Item): PoisonType | undefined {
     if (!item || item.getId() < 1 || item.getAmount() < 1) {
       return undefined;
     }
@@ -291,6 +285,9 @@ export class Poison {
     return CombatPoisonData.types[item.getId()];
   }
 }
+
+
+
 
 
 

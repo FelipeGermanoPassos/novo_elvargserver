@@ -1,6 +1,7 @@
 import { DialogueOption } from "../../DialogueOption";
 import { Dialogue } from "../Dialogue";
 import { Player } from "../../../../entity/impl/player/Player";
+import { DialogueOptionAction} from '../../DialogueOptionAction'
 
 export class OptionDialogue extends Dialogue {
     private static readonly CHATBOX_INTERFACES = [13760, 2461, 2471, 2482, 2494];
@@ -26,9 +27,9 @@ export class OptionDialogue extends Dialogue {
 
     public static send(player: Player, title: string, options: string[]): void {
         const firstChildId = OptionDialogue.CHATBOX_INTERFACES[options.length - 1];
-        player.getPacketSender().sendString(firstChildId - 1, title);
+        player.getPacketSender().sendString(title, firstChildId - 1,);
         for (let i = 0; i < options.length; i++) {
-            player.getPacketSender().sendString(firstChildId + i, options[i]);
+            player.getPacketSender().sendString( options[i], firstChildId + i,);
         }
         player.getPacketSender().sendChatboxInterface(firstChildId - 2);
     }

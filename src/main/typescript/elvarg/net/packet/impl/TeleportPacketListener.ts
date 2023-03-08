@@ -21,16 +21,16 @@ export class TeleportPacketListener implements PacketExecutor {
                 `Selected a teleport. Type: ${type}, index: ${index}.`);
         }
 
-        for (let teleport of Teleportable.values()) {
+        for (let teleport of Object.values(Teleportable)) {
             if (teleport.getType() == type && teleport.getIndex() == index) {
-                let teleportPosition = teleport.getPosition();
-                if (TeleportHandler.checkReqs(player, teleportPosition)) {
-                    player.getPreviousTeleports().set(teleport.getTeleportButton(), teleportPosition);
-                    TeleportHandler.teleport(player, teleportPosition, player.getSpellbook().getTeleportType(), true);
-                }
-                break;
+              let teleportPosition = teleport.getPosition();
+              if (TeleportHandler.checkReqs(player, teleportPosition)) {
+                player.getPreviousTeleports().set(teleport.getTeleportButton(), teleportPosition);
+                TeleportHandler.teleport(player, teleportPosition, player.getSpellbook().getTeleportType(), true);
+              }
+              break;
             }
-        }
+          }
     }
 
 }

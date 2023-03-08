@@ -3,7 +3,7 @@ import { Player } from '../../../entity/impl/player/Player';
 import { Misc } from '../../../../util/Misc';
 
 
-class TimePlayed implements Command {
+export class TimePlayed implements Command {
     execute(player: Player, command: string, parts: string[]) {
         player.forceChat(`I've been playing for ${Misc.getFormattedPlayTime(player)}.`);
     }

@@ -1,6 +1,6 @@
 import { GameConstants } from "../GameConstants";
 import { Buffer } from "../collision/Buffer";
-import { FileUtil } from "../../util/FileUtil"
+//import { FileUtil } from "../../util/FileUtil"
 import { ObjectIdentifiers } from "../../util/ObjectIdentifiers";
 import fs from "fs";
 
@@ -310,7 +310,8 @@ export class ObjectDefinition extends ObjectIdentifiers {
                 }
             } else if (opcode === 41) {
                 let len: number = buffer.readUnsignedByte();
-                ObjectDefinition.modifiedModelTexture = new Array<number>(len) = new Array<number>(len);
+                ObjectDefinition.modifiedModelTexture = new Array<number>(len);
+                ObjectDefinition.originalModelTexture = new Array<number>(len);
                 for (let i: number = 0; i < len; i++) {
                     ObjectDefinition.modifiedModelTexture[i] = buffer.readUShort();
                     ObjectDefinition.originalModelTexture[i] = buffer.readUShort();

@@ -7,22 +7,18 @@ import { Task } from '../../../task/Task';
 import { ClanChatManager } from '../../../content/clan/ClanChatManager';
 import { PlayerRights } from '../../rights/PlayerRights';
 
-class UpdateTask extends Task {
-    constructor() {
-        super(() => {
-            let players = Array.from(World.getPlayers());
-            for (let player of players) {
-                if (player) {
-                    player.requestLogout();
-                }
-            }
-            ClanChatManager.save();
-            Server.getLogger().info("Update task finished!");
-        });
+export class UpdateTask extends Task {
+    constructor(p: number, private readonly execFunc) {
+        super(p)
+    }
+
+    execute(): void {
+        this.execFunc();
+        this.stop();
     }
 }
 
-class UpdateServer implements Command {
+export class UpdateServer implements Command {
     execute(player: Player, command: string, parts: string[]) {
         let time = parseInt(parts[1]);
         if (time > 0) {
@@ -33,7 +29,16 @@ class UpdateServer implements Command {
                 }
                 players.getPacketSender().sendSystemUpdate(time);
             }
-            TaskManager.submit(new UpdateTask());
+            TaskManager.submit(new UpdateTask(time, () => {
+                for (const player of World.getPlayers()) {
+                    if (player != null) {
+                        player.requestLogout();
+                    }
+                }
+                ClanChatManager.save();
+                Server.getLogger().info("Update task finished!");
+            })
+            );
         }
     }
     canUse(player: Player) {

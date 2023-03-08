@@ -1,4 +1,4 @@
-import { World } from "../../../../Worlds";
+import { World } from "../../../../World";
 import { PlayerBot } from "../PlayerBot";
 import { CommandType } from "./CommandType";
 import { BotCommand } from "./BotCommand";

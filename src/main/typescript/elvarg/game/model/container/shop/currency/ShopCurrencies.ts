@@ -1,32 +1,24 @@
+ 
+import { ShopCurrency } from "./ShopCurrency";
+import { CoinsCurrency } from "./impl/CoinsCurrency";
+import { BloodMoneyCurrency } from "./impl/BloodMoneyCurrency";
+import { CastleWarsTicketCurrency } from "./impl/CastleWarsTicketCurrency";
+import { PointsCurrency } from './impl/PointsCurrency';
 
-export enum ShopCurrencies {
-    COINS = 'CoinsCurrency',
-    BLOOD_MONEY = 'BloodMoneyCurrency',
-    CASTLE_WARS_TICKET = 'CastleWarsTicketCurrency',
-    POINTS = 'PointsCurrency'
-}
+export class ShopCurrencies {
 
-class ShopCurrency { }
+    public static readonly COINS = (new CoinsCurrency());
+    public static readonly BLOOD_MONEY = (new BloodMoneyCurrency());
+    public static readonly CASTLE_WARS_TICKET = (new CastleWarsTicketCurrency());
+    public static readonly POINTS = (new PointsCurrency());
 
-class CoinsCurrency extends ShopCurrency { }
+    private readonly currency: ShopCurrency;
 
-class BloodMoneyCurrency extends ShopCurrency { }
+    constructor (currency: ShopCurrency) {
+        this.currency = currency;
+    }
 
-class CastleWarsTicketCurrency extends ShopCurrency { }
-
-class PointsCurrency extends ShopCurrency { }
-
-function get(shopCurrencies: ShopCurrencies) {
-    switch (shopCurrencies) {
-        case ShopCurrencies.COINS:
-            return new CoinsCurrency();
-        case ShopCurrencies.BLOOD_MONEY:
-            return new BloodMoneyCurrency();
-        case ShopCurrencies.CASTLE_WARS_TICKET:
-            return new CastleWarsTicketCurrency();
-        case ShopCurrencies.POINTS:
-            return new PointsCurrency();
-        default:
-            throw new Error(`Invalid shop currency: ${shopCurrencies}`);
+    public get(): ShopCurrency{
+        return this.currency;
     }
 }

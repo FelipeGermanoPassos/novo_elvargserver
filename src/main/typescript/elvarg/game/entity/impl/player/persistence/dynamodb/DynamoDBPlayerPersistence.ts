@@ -4,6 +4,7 @@ import { PlayerSave } from "./PlayerSave";
 import * as AWS from "aws-sdk";
 import { DynamoDbTable, DynamoDbEnhancedClient } from "aws-sdk-lib";
 import { PlayerSaveRecord } from "./PlayerSaveRecord";
+import { TableSchema } from 'tableschema'
 
 export class DynamoDBPlayerPersistence extends PlayerPersistence {
     private static dynamoDbClient = new AWS.DynamoDB({ region: "eu-west-1" });

@@ -4,7 +4,7 @@ import { Player } from '../../../entity/impl/player/Player';
 import { GameConstants } from '../../../GameConstants';
 
 
-class Save implements Command {
+export class Save implements Command {
     execute(player: Player, command: string, parts: string[]) {
         GameConstants.PLAYER_PERSISTENCE.save(player);
         player.getPacketSender().sendMessage("Saved player.");

@@ -5,7 +5,7 @@ import { GameConstants } from '../../../GameConstants';
 import {World} from '../../../World';
 import {PlayerPunishment} from '../../../../util/PlayerPunishment';
 
-class BanPlayer implements Command {
+export class BanPlayer implements Command {
     execute(player: Player, command: string, parts: string[]): void {
         let player2 = command.substring(parts[0].length + 1);
         let plr = World.getPlayerByName(player2);

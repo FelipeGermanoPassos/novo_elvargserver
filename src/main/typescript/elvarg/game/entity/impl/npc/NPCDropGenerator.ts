@@ -52,13 +52,13 @@ export class NPCDropGenerator {
         // given.
         // There are 128 slots in the rdt, many empty. When a player is wearing ring of
         // wealth, the empty slots are not counted.
-        if (this.def.getRdtChance() > 0 && random.get().nextInt(this.def.getRdtChance()) == 0) {
+        if (this.def.getRdtChance() > 0 && random.getRandom().nextInt(this.def.getRdtChance()) == 0) {
             let rdtLength = NpcDropDefinition.RDT.values().length;
             let slots = this.wearingRingOfWealth() ? rdtLength : 128;
-            let slot = random.get().nextInt(slots);
+            let slot = random.getRandom().nextInt(slots);
             if (slot < rdtLength) {
                 let rdtDrop = RDT.values()[slot];
-                if (random.get().nextInt(rdtDrop.getChance()) == 0) {
+                if (random.getRandom().nextInt(rdtDrop.getChance()) == 0) {
                     items.push(new Item(rdtDrop.getItemId(), rdtDrop.getAmount()));
                     return items;
                 }
@@ -67,7 +67,7 @@ export class NPCDropGenerator {
         // Handle unique drops..
         // The amount of items the player will receive from the unique drop tables.
         // Note: A player cannot receive multiple drops from the same drop table.
-        const rolls = 1 + random.get().nextInt(3);
+        const rolls = 1 + random.getRandom().nextInt(3);
         for (let i = 0; i < rolls; i++) {
             let table: DropTable | undefined;
 
@@ -121,7 +121,7 @@ export class NPCDropGenerator {
                         continue;
                     }
                     // Get a random drop from the table..
-                    let npcDrop = dropTableItems[random.get().nextInt(dropTableItems.length)];
+                    let npcDrop = dropTableItems[random.getRandom().nextInt(dropTableItems.length)];
 
                     // Add the drop to the drop list.
                     items.push(npcDrop.toItem(random));

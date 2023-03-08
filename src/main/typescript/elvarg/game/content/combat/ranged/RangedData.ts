@@ -22,7 +22,7 @@ export class RangedData {
                 multiplier = 1.15;
                 break;
 
-            case Ammunitions.ENCHANTED_DRAGONSTONE_DRAGON_BOLT:
+            case Ammunition.ENCHANTED_DRAGONSTONE_DRAGON_BOLT:
             case Ammunitions.ENCHANTED_DRAGON_BOLT:
                 let multiply: boolean = true;
                 if (target.isPlayer()) {
@@ -170,11 +170,11 @@ export class RangedData {
     public getDefaultDistance() {
         return defaultDistance;
     }
-        
+
     public getLongRangeDistance() {
         return longRangeDistance;
     }
-    
+
     public getLongRangeFightType(): FightType {
         return longRangeFightType;
     }
@@ -183,48 +183,48 @@ export class RangedData {
         //First try to get a throw weapon as ammo
         let weapon = p.getEquipment().getItems()[Equipment.WEAPON_SLOT].getId();
         let throwWeapon = rangedAmmunition.get(weapon);
-    
+
         //Toxic blowpipe should always fire dragon darts.
         if (weapon == 12926) {
             return Ammunitions.DRAGON_DART;
         }
-    
+
         //Didnt find one. Try arrows
         if (throwWeapon == null) {
             return rangedAmmunition.get(p.getEquipment().getItems()[Equipment.AMMUNITION_SLOT].getId());
         }
-    
+
         return throwWeapon;
     }
 
     public static getFors(item: number): Ammunitions {
         //First try to get a throw weapon as ammo
         let throwWeapon = rangedAmmunition.get(item);
-    
+
         //Didnt find one. Try arrows
         if (throwWeapon == null) {
             return rangedAmmunition.get(item);
         }
-    
+
         return throwWeapon;
     }
-    
+
     public getItemId(): number {
         return this.itemId;
     }
-    
+
     public getStartGraphic(): Graphic {
         return this.startGfx;
     }
-    
+
     public getProjectileId(): number {
         return this.projectileId;
     }
-    
+
     public getStrength(): number {
         return this.strength;
     }
-    
+
     public dropOnFloor(): boolean {
         return !this.NO_GROUND_DROP.has(this);
     }
@@ -373,33 +373,43 @@ export enum RangedWeapon {
     LONGBOW = [839],
     [Ammunition.BRONZE_ARROW],
     RangedWeaponType.LONGBOW,
+
     SHORTBOW = [841],
     [Ammunition.BRONZE_ARROW],
     RangedWeaponType.SHORTBOW,
+
     OAK_LONGBOW = [845],
     [Ammunition.BRONZE_ARROW, Ammunition.IRON_ARROW, Ammunition.STEEL_ARROW],
     RangedWeaponType.LONGBOW,
+
     OAK_SHORTBOW = [843],
     [Ammunition.BRONZE_ARROW, Ammunition.IRON_ARROW, Ammunition.STEEL_ARROW],
     RangedWeaponType.SHORTBOW,
+
     WILLOW_LONGBOW = [847],
     [Ammunition.BRONZE_ARROW, Ammunition.IRON_ARROW, Ammunition.STEEL_ARROW, Ammunition.MITHRIL_ARROW],
     RangedWeaponType.LONGBOW,
+
     WILLOW_SHORTBOW = [849],
     [Ammunition.BRONZE_ARROW, Ammunition.IRON_ARROW, Ammunition.STEEL_ARROW, Ammunition.MITHRIL_ARROW],
     RangedWeaponType.SHORTBOW,
+
     MAPLE_LONGBOW = [851],
     [Ammunition.BRONZE_ARROW, Ammunition.IRON_ARROW, Ammunition.STEEL_ARROW, Ammunition.MITHRIL_ARROW, Ammunition.ADAMANT_ARROW],
     RangedWeaponType.LONGBOW,
+
     MAPLE_SHORTBOW = [853],
     [Ammunition.BRONZE_ARROW, Ammunition.IRON_ARROW, Ammunition.STEEL_ARROW, Ammunition.MITHRIL_ARROW, Ammunition.ADAMANT_ARROW],
     RangedWeaponType.SHORTBOW,
+
     YEW_LONGBOW = [855],
     [Ammunition.BRONZE_ARROW, Ammunition.IRON_ARROW, Ammunition.STEEL_ARROW, Ammunition.MITHRIL_ARROW, Ammunition.ADAMANT_ARROW, Ammunition.RUNE_ARROW, Ammunition.ICE_ARROW],
     RangedWeaponType.LONGBOW,
+
     YEW_SHORTBOW = [857],
     [Ammunition.BRONZE_ARROW, Ammunition.IRON_ARROW, Ammunition.STEEL_ARROW, Ammunition.MITHRIL_ARROW, Ammunition.ADAMANT_ARROW, Ammunition.RUNE_ARROW, Ammunition.ICE_ARROW],
     RangedWeaponType.SHORTBOW,
+    
     MAGIC_LONGBOW = [859],
     [Ammunition.BRONZE_ARROW, Ammunition.IRON_ARROW, Ammunition.STEEL_ARROW, Ammunition.MITHRIL_ARROW, Ammunition.ADAMANT_ARROW, Ammunition.RUNE_ARROW, Ammunition.ICE_ARROW, Ammunition.BROAD_ARROW],
 

@@ -27,11 +27,11 @@ export class BandosGodswordCombatMethod extends MeleeCombatMethod {
                 return;
             let player = hit.getAttacker().getAsPlayer();
             let target = hit.getTarget().getAsPlayer();
-            let skill = Skill.values()[skillDrain];
-            target.getSkillManager().setCurrentLevel(skill, player.getSkillManager().getCurrentLevel(skill) - damageDrain);
+            let skill = Object.values(Skill)[skillDrain];
+            target.getSkillManager().setCurrentLevels(skill, player.getSkillManager().getCurrentLevel(skill) - damageDrain);
             if (target.getSkillManager().getCurrentLevel(skill) < 1)
-                target.getSkillManager().setCurrentLevel(skill, 1);
-            player.getPacketSender().sendMessage("You've drained " + target.getUsername() + "'s " + Misc.formatText(Skill.values()[skillDrain].toString().toLowerCase()) + " level by " + damageDrain + ".");
+                target.getSkillManager().setCurrentLevels(skill, 1);
+            player.getPacketSender().sendMessage("You've drained " + target.getUsername() + "'s " + Misc.formatText(Object.values(Skill)[skillDrain].toString().toLowerCase()) + " level by " + damageDrain + ".");
             target.getPacketSender().sendMessage("Your " + skill.getName() + " level has been drained.");
         }
     }

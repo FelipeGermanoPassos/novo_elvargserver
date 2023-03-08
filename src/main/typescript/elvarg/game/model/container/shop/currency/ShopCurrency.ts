@@ -1,22 +1,28 @@
+import { Player } from "../../../../entity/impl/player/Player";
 export interface ShopCurrency {
+    /**
+    
+    Gets the name of the currency - as displayed in messages and dialogues.
+    */
     getName(): string;
-    getAmountForPlayer(player: any): number;
-    decrementForPlayer(player: any, amount: number): void;
-    incrementForPlayer(player: any, amount: number): void;
-}
-
-export class CoinsCurrency implements ShopCurrency {
-    getName(): string {
-        return "Coins";
+    /**
+    
+    Gets the total amount of currency currently spendable by the Player.
+    @param player
+    */
+    getAmountForPlayer(player: Player): number;
+    /**
+    
+    Decrements the currency by a given amount for the Player.
+    @param player
+    @param amount
+    */
+    decrementForPlayer(player: Player, amount: number): void;
+    /**
+    
+    Increments the currency by a given amount for the Player.
+    @param player
+    @param amount
+    */
+    incrementForPlayer(player: Player, amount: number): void;
     }
-    getAmountForPlayer(player: any): number {
-        // implementation
-        return 0;
-    }
-    decrementForPlayer(player: any, amount: number): void {
-        // implementation
-    }
-    incrementForPlayer(player: any, amount: number): void {
-        // implementation
-    }
-}

@@ -5,6 +5,7 @@ import { Packet } from '../Packet';
 import { PacketExecutor } from '../PacketExecutor';
 import { Task } from '../../../game/task/Task';
 import { PathFinder } from '../../../game/model/movement/path/PathFinder';
+import { Location } from '../../../game/model/Location';
 
 export class FollowPlayerPacketListener implements PacketExecutor {
     execute(player: Player, packet: Packet): void {
@@ -13,7 +14,7 @@ export class FollowPlayerPacketListener implements PacketExecutor {
         }
         TaskManager.cancelTasks(player.getIndex());
         const otherPlayersIndex = packet.readLEShort();
-        if (otherPlayersIndex < 0 || otherPlayersIndex > World.getPlayers().capacity())
+        if (otherPlayersIndex < 0 || otherPlayersIndex > World.getPlayers().capacityReturn())
             return;
         const leader = World.getPlayers().get(otherPlayersIndex);
         if (leader == null) {
@@ -55,16 +56,16 @@ class FollowTask extends Task {
             return;
         }
 
-        if (this.leader.isTeleporting() || !this.leader.getLocation().isWithinDistance(this.player.getLocation(), 15)) {
+        if (this.leader.isTeleportingReturn() || !this.leader.getLocation().isWithinDistance(this.player.getLocation(), 15)) {
             this.player.setPositionToFace(null);
             this.stop();
             return;
         }
         let destX = this.leader.getMovementQueue().followX;
-        let destY = this.leader.followY;
-        if (this.destX == this.player.getLocation().getX() && destY == this.player.getLocation().getY() || destX == -1 && destY == -1) {
+        let destY = this.leader.getMovementQueue().followY;
+        if ((destX === -1 && destY === -1) || this.player.getLocation().equals(new Location(destX, destY))) {
             return;
-        }
+          }
         this.player.getMovementQueue().reset();
         this.player.setPositionToFace(this.leader.getLocation());
         this.player.setMobileInteraction(this.leader);

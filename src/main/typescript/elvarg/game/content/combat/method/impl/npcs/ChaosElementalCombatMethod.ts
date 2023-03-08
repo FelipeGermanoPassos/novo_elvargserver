@@ -36,7 +36,7 @@ export class ChaosElementalCombatMethod extends CombatMethod {
     public start(character: Mobile, target: Mobile) {
         character.performAnimation(new Animation(character.getAttackAnim()));
         const projectile2 = Projectile.createProjectile(character, target, ChaosElementalCombatMethod.currentAttack, 40, 70, 31, 43);
-projectile2.sendProjectile();
+    projectile2.sendProjectile();
     }
 
     public attackDistance(character: Mobile): number {
@@ -95,7 +95,7 @@ projectile2.sendProjectile();
             const toDisarm = player.getEquipment().getItems()[randomSlot];
             if (toDisarm.isValid()) {
                 player.getEquipment().set(randomSlot, new Item(-1, 0));
-                player.getInventory().add(toDisarm.getId());
+                player.getInventory().addItem(toDisarm.clone());
                 player.getPacketSender().sendMessage("You have been disarmed!");
                 WeaponInterfaces.assign(player);
                 BonusManager.update(player);

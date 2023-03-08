@@ -1,17 +1,15 @@
 import { Misc } from 'misc';
 
-enum Chance {
-    ALWAYS = 100,
-    VERY_COMMON = 90,
-    COMMON = 75,
-    SOMETIMES = 50,
-    UNCOMMON = 35,
-    VERY_UNCOMMON = 10,
-    EXTREMELY_RARE = 5,
-    ALMOST_IMPOSSIBLE = 1
-}
+export class Chance {
+    public static readonly ALWAYS = new Chance(100);
+    public static readonly VERY_COMMON = new Chance(90);
+    public static readonly COMMON = new Chance(75);
+    public static readonly SOMETIMES = new Chance(50);
+    public static readonly UNCOMMON = new Chance(35);
+    public static readonly VERY_UNCOMMON = new Chance(10);
+    public static readonly EXTREMELY_RARE = new Chance(5);
+    public static readonly ALMOST_IMPOSSIBLE = new Chance(1);
 
-export class ChanceCalculator {
     private percentage: number;
 
     constructor(percentage: number) {
@@ -26,3 +24,4 @@ export class ChanceCalculator {
         return this.percentage;
     }
 }
+

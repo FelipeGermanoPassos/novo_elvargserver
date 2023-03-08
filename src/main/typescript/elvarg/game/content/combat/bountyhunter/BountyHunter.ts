@@ -145,8 +145,8 @@ export class BountyHunter {
         killed.incrementDeaths();
 
         // Update interfaces for killed player containing the new deaths etc
-        killed.getPacketSender().sendString(52031, "@or1@Deaths: " + killed.getDeaths()).sendString(52033,
-            "@or1@K/D Ratio: " + killed.getKillDeathRatio());
+        killed.getPacketSender().sendString( "@or1@Deaths: " + killed.getDeaths(), 52031).sendString(
+            "@or1@K/D Ratio: " + killed.getKillDeathRatio(), 52033);
 
         // Remove first index if we've killed 1
         if (killer.getRecentKills().length >= 1) {
@@ -209,7 +209,7 @@ export class BountyHunter {
                             }
 
                             // Add the next emblem and notify the player
-                            killer.getInventory().add(inventoryEmblem.id + nextEmblemId);
+                            killer.getInventory().addItem(inventoryEmblem.id + nextEmblemId);
                             killer.getPacketSender().sendMessage("@red@Your mysterious emblem has been upgraded!");
                         }
                     } else {
@@ -247,9 +247,9 @@ export class BountyHunter {
             killer.incrementKillstreak();
 
             // Update interfaces
-            killer.getPacketSender().sendString(52029, "@or1@Killstreak: " + killer.getKillstreak())
-                .sendString(52030, "@or1@Kills: " + killer.getTotalKills())
-                .sendString(52033, "@or1@K/D Ratio: " + killer.getKillDeathRatio());
+            killer.getPacketSender().sendString( "@or1@Killstreak: " + killer.getKillstreak(), 52029)
+                .sendString("@or1@Kills: " + killer.getTotalKills(), 52030)
+                .sendString("@or1@K/D Ratio: " + killer.getKillDeathRatio(), 52033);
 
             if (!(killer instanceof PlayerBot)) {
                 // Reward player for the kill..
@@ -340,7 +340,7 @@ export class BountyHunter {
 
     public static getValueForEmblems(player: Player, performSale: boolean) {
         let list: any[];
-        for (let emblem of Emblem.values()) {
+        for (let emblem of Object.values(Emblem)) {
             if (player.getInventory().contains(emblem.id)) {
                 list.push(emblem);
             }

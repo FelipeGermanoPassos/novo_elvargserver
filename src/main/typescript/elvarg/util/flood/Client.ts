@@ -85,11 +85,11 @@ export class Client {
             this.login.writeByte(255);
             this.login.writeByte(0);
             this.login.writeByteS(this.outgoing.getPosition());
-            cipher = new IsaacRandom();
+            cipher = new IsaacRandom(seed);
             for (let index = 0; index < 4; index++) {
                 seed[index] += 50;
             }
-            this.encryption = new IsaacRandom();
+            this.encryption = new IsaacRandom(seed);
             this.socketStream.queueBytes(this.login.currentPosition, new Uint8Array(this.login.payload));
             response = this.socketStream.read();
         }

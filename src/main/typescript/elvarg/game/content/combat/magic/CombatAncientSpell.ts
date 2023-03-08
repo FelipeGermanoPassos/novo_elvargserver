@@ -3,7 +3,6 @@ import { Player } from "../../../entity/impl/player/Player";
 import { Item } from "../../../model/Item";
 import { MagicSpellbook } from "../../../model/MagicSpellbook"
 import { CombatSpell } from "./CombatSpell";
-import { Optional } from 'optional'
 
 export abstract class CombatAncientSpell extends CombatSpell {
 
@@ -22,11 +21,10 @@ export abstract class CombatAncientSpell extends CombatSpell {
         this.spellEffect(cast, castOn, damage);
     }
 
-    public equipmentRequired(player: Player): Optional<Item[]> {
-
+    public equipmentRequired(player: Player): Item[] {
         // Ancient spells never require any equipment, although the method can
         // still be overridden if by some chance a spell does.
-        return Optional.empty();
+        return [];
     }
 
     /**

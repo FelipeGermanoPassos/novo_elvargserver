@@ -1,17 +1,22 @@
 import { Player } from "../../../entity/impl/player/Player";
 import { SlayerTask } from '../slayer/SlayerTask'
 import { SlayerMaster } from '../slayer/SlayerMaster'
+import { Skill } from "../../../model/Skill";
+import { Misc } from "../../../../util/Misc";
+import { ActiveSlayerTask } from "./ActiveSlayerTask";
+
 export class Slayer {
-    public static assign(player: Player): boolean {
+
+    public static assigns(player: Player): boolean {
         let master: SlayerMaster = SlayerMaster.TURAEL;
-        for (SlayerMaster m : SlayerMaster.MASTERS) {
-            if (!m.canAssign(player)) {
-                continue;
-            }
-            master = m;
+        for (const m of SlayerMaster.MASTERS) {
+          if (!m.canAssign(player)) {
+            continue;
+          }
+          master = m;
         }
         return this.assign(player, master);
-    }
+      }
 
     private static assign(player: Player, master: SlayerMaster): boolean {
         if (player.getSlayerTask() != null) {
@@ -54,7 +59,7 @@ export class Slayer {
         }
 
         // Shuffle them and choose a random one based on the weighting system
-        possibleTasks = Misc.shuffleArray(possibleTasks);
+        possibleTasks = Misc.randomElements(possibleTasks);
         let toAssign: SlayerTask | null = null;
         for (const task of possibleTasks) {
             if (Misc.getRandom(totalWeight) <= task.getWeight()) {
@@ -108,10 +113,10 @@ export class Slayer {
             player.setConsecutiveTasks(player.getConsecutiveTasks() + 1);
 
             // Check for bonus points after completing consecutive tasks
-            for (int[] consecutive : player.getSlayerTask().getMaster().getConsecutiveTaskPoints()) {
-                int requiredTasks = consecutive[0];
-                int bonusPoints = consecutive[1];
-                if (player.getConsecutiveTasks() % requiredTasks == 0) {
+            for (let consecutive of player.getSlayerTask().getMaster().getConsecutiveTaskPoints()) {
+                let requiredTasks: number = consecutive[0];
+                let bonusPoints: number = consecutive[1];
+                if (player.getConsecutiveTasks() % requiredTasks === 0) {
                     rewardPoints = bonusPoints;
                     break;
                 }

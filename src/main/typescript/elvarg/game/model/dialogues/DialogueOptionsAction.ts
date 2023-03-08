@@ -1,5 +1,5 @@
 import { Player } from "../../entity/impl/player/Player";
 
-interface DialogueOptionsAction {
+export interface DialogueOptionsAction {
     execute(player: Player): void;
 }

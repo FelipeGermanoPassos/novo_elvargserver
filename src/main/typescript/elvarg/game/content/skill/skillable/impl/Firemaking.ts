@@ -17,49 +17,43 @@ import { TimedObjectSpawnTask } from '../../../../task/impl/TimedObjectSpawnTask
 import { PetHandler } from "../../../PetHandler";
 import { Cooking } from './Cooking'
 
-class FireMakingTask extends Task{
+class FireMakingTask extends Task {
 
-    constructor(n: number, player: Player, private readonly func: Function){
-        super();
+    constructor(n: number, player: Player, b: boolean, private readonly func: Function) {
+        super(3);
     }
 
     execute(): void {
         this.func();
     }
-    
+
 }
 
-class Firemaking extends DefaultSkillable {
+export class Firemaking extends DefaultSkillable {
     static LIGHT_FIRE = new Animation(733);
     /**
      * The {@link LightableLog} which we will be attempting
      * to light.
      */
-    private log: LightableLog;
-    /**
-     * A log on the ground.
-     * <p>
-     * If present - we will focus on lighting this instead of
-     * a log from the inventory.
-     */
-    private groundLog: ItemOnGround | undefined;
-    /**
-     * Represents a bonfire, which we will be adding logs to
-     * if present.
-     */
-    private bonfire: GameObject | undefined;
-    /**
-     * Represents the amount of logs to add to a bonfire.
-     */
-    private bonfireAmount: number;
+    log: LightableLog;
+    groundLog: ItemOnGround | null = null;
+    bonfire: GameObject | null = null;
+    bonfireAmount: number | null = null;
 
-    constructor(log: LightableLog, bonfire?: GameObject, bonfireAmount?: number) {
+    constructor(log: LightableLog);
+    constructor(log: LightableLog, groundLog: ItemOnGround);
+    constructor(log: LightableLog, bonfire: GameObject, bonfireAmount: number);
+    constructor(log: LightableLog, groundLog?: ItemOnGround, bonfire?: GameObject, bonfireAmount?: number) {
         super();
         this.log = log;
-        this.bonfire = bonfire;
-        this.bonfireAmount = bonfireAmount;
+        if (groundLog !== undefined) {
+            this.groundLog = groundLog;
+        }
+        if (bonfire !== undefined && bonfireAmount !== undefined) {
+            this.bonfire = bonfire;
+            this.bonfireAmount = bonfireAmount;
+        }
     }
-
     /**
      * Checks if we should light a log.
      *
@@ -112,7 +106,7 @@ class Firemaking extends DefaultSkillable {
             player.performAnimation(Firemaking.LIGHT_FIRE);
             return;
         }
-        const animLoop = new Task(3, player, true, () => {
+        const animLoop = new FireMakingTask(3, player, true, () => {
             player.performAnimation(Cooking.ANIMATION); //Cooking anim looks fine for bonfires
         });
         TaskManager.submit(animLoop);
@@ -236,7 +230,7 @@ class Firemaking extends DefaultSkillable {
     }
 }
 
-class LightableLog {
+export class LightableLog {
     NORMAL = { logId: 1511, level: 1, experience: 40, cycles: 7, firemakingRespawnTimer: 60 };
     ACHEY = { logId: 2862, level: 1, experience: 40, cycles: 7, firemakingRespawnTimer: 65 };
     OAK = { logId: 1521, level: 15, experience: 60, cycles: 8, firemakingRespawnTimer: 70 };

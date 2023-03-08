@@ -4,7 +4,6 @@ import { Arrays } from 'collections'
 import { Boundary } from '../../../model/Boundary';
 import { Barrows } from '../../../content/minigames/impl/Barrows'
 import { Area } from '../../../model/areas/Area';
-import { Optional } from 'optional'
 
 export class BarrowsArea extends Area {
     constructor() {
@@ -48,11 +47,11 @@ export class BarrowsArea extends Area {
         return true;
     }
 
-    dropItemsOnDeath(player: Player, killer: Optional<Player>): boolean {
+    dropItemsOnDeath(player: Player, killer: Player): boolean {
         return true;
     }
 
-    handleDeath(player: Player, killer: Optional<Player>): boolean {
+    handleDeath(player: Player, killer: Player): boolean {
         return false;
     }
 

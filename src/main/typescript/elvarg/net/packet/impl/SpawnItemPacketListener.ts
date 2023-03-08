@@ -27,7 +27,7 @@ export class SpawnItemPacketListener {
         }
 
         if (toBank) {
-            player.getBank(Bank.getTabForItem(player, item)).add(item, amount);
+            player.getBank(Bank.getTabForItem(player, item)).adds(item, amount);
         } else {
             if (amount > player.getInventory().getFreeSlots()) {
                 amount = player.getInventory().getFreeSlots();
@@ -38,7 +38,7 @@ export class SpawnItemPacketListener {
                 return;
             }
 
-            player.getInventory().add(item);
+            player.getInventory().adds(item, amount);
         }
 
         player.getPacketSender().sendMessage(`Spawned ${def.getName()} to ${toBank ? "bank" : "inventory"}.`);

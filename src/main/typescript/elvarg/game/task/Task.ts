@@ -15,60 +15,66 @@ export abstract class Task {
     public type: TaskType;
     private running = false;
     private key: object;
-    
-    constructor(delay?: number, immediate?: boolean, type?: TaskType) {
-    this.immediate = immediate !== undefined ? immediate : false;
-    this.delay = delay !== undefined ? delay : 1;
-    this.bind(Task.DEFAULT_KEY);
-    this.type = type !== undefined ? type : TaskType.DEFAULT;
-    }
-    
+
+    constructor();
+    constructor(immediate: boolean);
+    constructor(delay: number);
+    constructor(delay: number, type: TaskType);
+    constructor(delay: number, immediate: boolean);
+    constructor(delay: number, key: any);
+    constructor(delay: number, key: any, immediate: boolean);
+    constructor(
+        delay?: number | boolean,
+        arg2?: boolean | TaskType | any,
+        arg3?: boolean
+    ) {}
+
     private bind(key: object): void {
-    this.key = key;
+        this.key = key;
     }
 
     isImmediate(): boolean {
         return this.immediate;
-        }
-        
-        isRunning(): boolean {
+    }
+
+    isRunning(): boolean {
         return this.running;
-        }
-        
-        isStopped(): boolean {
+    }
+
+    isStopped(): boolean {
         return !this.running;
-        }
-        
-        tick(): boolean {
+    }
+
+    tick(): boolean {
         if (this.running && (this.countdown == 0 || --this.countdown == 0)) {
-        this.execute();
-        this.countdown = this.delay;
+            this.execute();
+            this.countdown = this.delay;
         }
         this.onTick();
         return this.running;
-        }
-        
-        onTick() {}
-        
-        abstract execute(): void;
-        
-        getDelay(): number {
+    }
+
+    onTick() { }
+
+    abstract execute(): void;
+
+    getDelay(): number {
         return this.delay;
-        }
-        
-        getRemainingTicks(): number {
+    }
+
+    getRemainingTicks(): number {
         return this.countdown;
-        }
-        
-        setDelay(delay: number) {
+    }
+
+    setDelay(delay: number) {
         if (delay > 0) this.delay = delay;
-        }
-        
-        setRunning(running: boolean) {
+    }
+
+    setRunning(running: boolean) {
         this.running = running;
-        }
-        
-        stop() {
+    }
+
+    stop() {
         this.running = false;
     }
 }

@@ -1,8 +1,8 @@
 export class Animation {
     public static DEFAULT_RESET_ANIMATION = new Animation(65535);
-    private id: number;
-    private delay: number;
-    private priority: Priority;
+    public id: number;
+    public delay: number;
+    public priority: Priority;
 
     constructor(id: number) {
         this.id = id;

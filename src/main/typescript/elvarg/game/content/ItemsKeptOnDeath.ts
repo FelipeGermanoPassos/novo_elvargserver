@@ -14,7 +14,7 @@ export class ItemsKeptOnDeath {
 
     public static sendInterfaceData(player: Player) {
 
-        player.getPacketSender().sendString(17107, "" + ItemsKeptOnDeath.getAmountToKeep(player));
+        player.getPacketSender().sendString( "" + ItemsKeptOnDeath.getAmountToKeep(player), 17107);
 
         const toKeep = ItemsKeptOnDeath.getItemsToKeep(player);
         for (let i = 0; i < toKeep.length; i++) {
@@ -59,22 +59,20 @@ export class ItemsKeptOnDeath {
 
             items.push(item);
         }
-        items.sort((items, new Comparator<Item>() {
-            public compare(item: Item, item2: Item) {
-                const value1 = item.getDefinition().getValue();
-                const value2 = item2.getDefinition().getValue();
-                if (value1 == value2) {
-                    return 0;
-                } else if (value1 > value2) {
-                    return -1;
-                } else {
-                    return 1;
-                }
+        items.sort((item: Item, item2: Item) => {
+            const value1 = item.getDefinition().getValue();
+            const value2 = item2.getDefinition().getValue();
+            if (value1 == value2) {
+              return 0;
+            } else if (value1 > value2) {
+              return -1;
+            } else {
+              return 1;
             }
-        });
+          });
         let toKeep: Item[];
         const amountToKeep = ItemsKeptOnDeath.getAmountToKeep(player);
-        for (let i = 0; i < amountToKeep && i < items.length(); i++) {
+        for (let i = 0; i < amountToKeep && i < items.length; i++) {
             toKeep.unshift(items[i]);
         }
         return toKeep;
