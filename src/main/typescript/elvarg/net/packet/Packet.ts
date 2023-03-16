@@ -4,10 +4,17 @@ import { ValueType } from './ValueType';
 import { StringBuilder } from 'stringbuilder'
 
 export class Packet {
-    constructor(opcode: number, type: PacketType, buffer: ByteBuf) {
+    constructor(opcode: number, buffer: ByteBuf);
+    constructor(opcode: number, type: PacketType, buffer: ByteBuf);
+    constructor(opcode: number, arg2: PacketType | ByteBuf, arg3?: ByteBuf) {
         this.opcode = opcode;
-        this.type = type;
-        this.buffer = buffer;
+        if (arg3 !== undefined) {
+            this.type = arg2 as PacketType;
+            this.buffer = arg3;
+        } else {
+            this.type = PacketType.FIXED;
+            this.buffer = arg2 as ByteBuf;
+        }
     }
 
     private opcode: number;
@@ -192,5 +199,5 @@ export class Packet {
     }
 }
 
-    
+
 

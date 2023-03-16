@@ -1,5 +1,5 @@
 import { BonusManager } from "../../../model/equipment/BonusManager";
-import { Skills } from "../../../model/Skill";
+import { Skill } from "../../../model/Skill";
 import { PrayerHandler } from "../../PrayerHandler";
 import { CombatEquipment } from "../CombatEquipment";
 import { CombatFactory } from "../CombatFactory";
@@ -10,11 +10,11 @@ import { Player } from "../../../entity/impl/player/Player";
 import { NPC } from "../../../entity/impl/npc/NPC";
 import { Equipment } from "../../../model/container/impl/Equipment";
 import { ItemIdentifiers } from "../../../../util/ItemIdentifiers";
-
+import { FightType } from "../FightType";
 
 export class DamageFormulas {
     private static effectiveStrengthLevel(player: Player): number {
-        let str = player.getSkillManager().getCurrentLevel(Skills.STRENGTH);
+        let str = player.getSkillManager().getCurrentLevel(Skill.STRENGTH);
 
         let prayerBonus = 1;
 
@@ -33,7 +33,7 @@ export class DamageFormulas {
 
         str = (str * prayerBonus);
 
-        let fightStyle = player.getFightType().getStyle();
+        let fightStyle = FightType.getStyle();
         if (fightStyle == FightStyle.AGGRESSIVE)
             str += 3;
         else if (fightStyle == FightStyle.CONTROLLED)
@@ -60,13 +60,13 @@ export class DamageFormulas {
 
             if (CombatFactory.fullDharoks(player)) {
                 let hp = player.getHitpoints();
-                let max = player.getSkillManager().getMaxLevel(Skills.HITPOINTS);
+                let max = player.getSkillManager().getMaxLevel(Skill.HITPOINTS);
                 let mult = Math.max(0, ((max - hp) / max) * 100) + 100;
                 maxHit *= (mult / 100);
             }
 
             if (player.isSpecialActivated()) {
-                maxHit *= player.getCombatSpecial().getStrengthMultiplier();
+                maxHit *= Player.getCombatSpecial().getStrengthMultiplier();
             }
         } else {
             maxHit = entity.getAsNpc().getCurrentDefinition().getMaxHit();
@@ -110,7 +110,7 @@ export class DamageFormulas {
     }
 
     private static effectiveRangedStrength(player: Player): number {
-        let rngStrength = player.getSkillManager().getCurrentLevel(Skills.RANGED);
+        let rngStrength = player.getSkillManager().getCurrentLevel(Skill.RANGED);
         // Prayers
         let prayerMod = 1.0;
         if (PrayerHandler.isActivated(player, PrayerHandler.SHARP_EYE)) {
@@ -124,7 +124,7 @@ export class DamageFormulas {
         }
         rngStrength = (rngStrength * prayerMod);
 
-        let fightStyle = player.getFightType().getStyle();
+        let fightStyle = FightType.getStyle();
         if (fightStyle == FightStyle.ACCURATE)
             rngStrength += 3;
         rngStrength += 8;
@@ -144,8 +144,8 @@ export class DamageFormulas {
         maxHit += 320;
         maxHit /= 640;
 
-        if (player.isSpecialActivated() && player.getCombatSpecial().getCombatMethod().type() == CombatType.RANGED) {
-            maxHit *= player.getCombatSpecial().getStrengthMultiplier();
+        if (player.isSpecialActivated() && Player.getCombatSpecial().getCombatMethod().type() == CombatType.RANGED) {
+            maxHit *= Player.getCombatSpecial().getStrengthMultiplier();
         }
 
         return Math.floor(maxHit);

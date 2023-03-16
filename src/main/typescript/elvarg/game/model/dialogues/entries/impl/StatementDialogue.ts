@@ -20,7 +20,16 @@ export class StatementDialogue extends Dialogue {
         let length = lines.length > 5 ? 5 : lines.length;
         let chatboxInterface = StatementDialogue.CHATBOX_INTERFACES[length - 1];
         for (let i = 0; i < length; i++) {
-            player.getPacketSender().sendString((chatboxInterface + 1) + i, lines[i]);
+            player.getPacketSender().sendString(lines[i], (chatboxInterface + 1) + i);
+        }
+        player.getPacketSender().sendChatboxInterface(chatboxInterface);
+    }
+
+    public static sends(player: Player, lines: string[]): void {
+        const length = lines.length > 5 ? 5 : lines.length;
+        const chatboxInterface = StatementDialogue.CHATBOX_INTERFACES[length - 1];
+        for (let i = 0; i < length; i++) {
+            player.getPacketSender().sendString(lines[i], (chatboxInterface + 1) + i);
         }
         player.getPacketSender().sendChatboxInterface(chatboxInterface);
     }

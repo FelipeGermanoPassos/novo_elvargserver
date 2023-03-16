@@ -15,9 +15,9 @@ export class DropItemPacketListener implements PacketExecutor {
     public static destroyItemInterface(player: Player, item: Item) {
         player.setDestroyItem(item.getId());
         let info: { [key: string]: string }[] = [    { "Are you sure you want to discard this item?": "14174" },    { "Yes.": "14175" },    { "No.": "14176" },    { "": "14177" },    { "This item will vanish once it hits the floor.": "14182" },    { "You cannot get it back if discarded.": "14183" },    { [item.getDefinition().getName()]: "14184" }];
-        player.getPacketSender().sendItemOnInterface(14171, item.getId(),item.getAmount());
+        player.getPacketSender().sendItemOnInterfaces(14171, item.getId(),item.getAmount());
         for (let i = 0; i < info.length; i++)
-            player.getPacketSender().sendString(parseInt(info[i][1]), info[i][0]);
+            player.getPacketSender().sendString( info[i][0], parseInt(info[i][1]));
         player.getPacketSender().sendChatboxInterface(14170);
     }
 
@@ -71,7 +71,7 @@ export class DropItemPacketListener implements PacketExecutor {
             if (player.getArea() instanceof WildernessArea) {
                 ItemOnGroundManager.registerGlobal(player, item);
             } else {
-                ItemOnGroundManager.register(player, item);
+                ItemOnGroundManager.registers(player, item);
             }
 
             player.getInventory().setItem(itemSlot, new Item(-1, 0)).refreshItems();

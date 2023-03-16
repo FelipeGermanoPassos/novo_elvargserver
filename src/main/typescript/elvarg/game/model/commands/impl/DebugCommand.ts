@@ -3,7 +3,7 @@ import { Command } from '../../../model/commands/Command';
 import { Player } from '../../../entity/impl/player/Player';
 import { RegionManager } from '../../../collision/RegionManager';
 
-class DebugCommand implements Command {
+export class DebugCommand implements Command {
     execute(player: Player, command: string, parts: string[]) {
         console.log(RegionManager.wallsExist(player.getLocation().clone(), player.getPrivateArea()));
     }

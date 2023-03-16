@@ -4,8 +4,13 @@ import { PlayerRights } from '../../rights/PlayerRights';
 import { NPC } from '../../../entity/impl/npc/NPC';
 import { World } from '../../../World';
 import { NpcDefinition } from '../../../definition/NpcDefinition';
+import { Location } from '../../Location';
+import { NpcSpawnDefinition } from '../../../definition/NpcSpawnDefinition';
+import { GameConstants } from '../../../GameConstants';
+import { fs } from 'fs'
+import { Direction } from '../../Direction';
 
-class SpawnPermanentNPCCommand implements Command {
+export class SpawnPermanentNPCCommand implements Command {
 
     execute(player: Player, command: string, parts: string[]) {
         try {
@@ -33,29 +38,24 @@ class SpawnPermanentNPCCommand implements Command {
     }
 
     public write(npcId: number, npcLocation: Location, npcRadius: number, description: string): void {
-        const gson = new Gson();
-        const file = new File(GameConstants.DEFINITIONS_DIRECTORY + "npc_spawns.json");
-        const reader = new FileReader(file);
+        const gson = require('gson');
+        const filePath = GameConstants.DEFINITIONS_DIRECTORY + 'npc_spawns.json';
     
-        const builder = new GsonBuilder().setPrettyPrinting().create();
+        const reader = fs.readFileSync(filePath, 'utf8');
+        const definitionArray: NpcSpawnDefinition[] = gson.fromJson(reader, NpcSpawnDefinition);
     
-        let definitionArray = gson.fromJson(reader, NpcSpawnDefinition[]);
-    
-        if (definitionArray == null) {
+        if (!definitionArray) {
             return;
         }
     
-        const writer = new FileWriter(file, false);
+        const writer = fs.createWriteStream(filePath);
     
-        const list = new ArrayList(Arrays.asList(definitionArray));
+        const list = definitionArray.concat([new NpcSpawnDefinition(npcId, npcLocation, Direction.SOUTH, 2, description)]);
     
-        list.add(new NpcSpawnDefinition(npcId, npcLocation, FacingDirection.SOUTH, 2, description));
+        const finalArray: NpcSpawnDefinition[] = list;
     
-        let finalArray = new NpcSpawnDefinition[list.size()];
-        finalArray = list.toArray(finalArray);
-    
+        const builder = gson.newBuilder().setPrettyPrinting().create();
         builder.toJson(finalArray, writer);
-        writer.flush();
         writer.close();
     }
 }

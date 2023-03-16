@@ -3,14 +3,16 @@ import { Player } from '../../../game/entity/impl/player/Player';
 import { Packet } from '../Packet';
 import { PacketExecutor } from '../PacketExecutor';
 import { ItemOnGroundManager } from '../../../game/entity/impl/grounditem/ItemOnGroundManager';
-import { Optional } from 'optional'
+import { Firemaking } from '../../../game/content/skill/skillable/impl/Firemaking';
+import { Location } from '../../../game/model/Location';
+import {LightableLog } from '../../../game/content/skill/skillable/impl/Firemaking'
 
 export class SecondGroundItemOptionPacketListener implements PacketExecutor {
     execute(player: Player, packet: Packet) {
     const y = packet.readLEShort();
     const itemId = packet.readShort();
     const x = packet.readLEShort();
-    const position = new Location();
+    const position = new Location(x, y, player.getLocation().getZ());
     if (!player || player.getHitpoints() <= 0) {
         return;
     }
@@ -27,13 +29,13 @@ export class SecondGroundItemOptionPacketListener implements PacketExecutor {
         return;
     }
     player.getMovementQueue().walkToGroundItem(position, () => {
-            const item = ItemOnGroundManager.getGroundItem(Optional.of(player.getUsername()), itemId, position);
-            if (item.isPresent()) {
-                const log = LightableLog.getForItem(item.get().getItem().getId());
-                if (log.isPresent()) {
-                    player.getSkillManager().startSkillable(new Firemaking());
-                }
-            }
-    });
+        const item = ItemOnGroundManager.getGroundItem(player.getUsername(), itemId, position);
+        if (item) {
+        const log = LightableLog.getForItem(item.getItem().getId());
+        if (log) {
+        player.getSkillManager().startSkillable(new Firemaking(log.get(), item.getItem()));
+        }
+        }
+        });
 }
 }

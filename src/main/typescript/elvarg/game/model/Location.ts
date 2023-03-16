@@ -14,7 +14,7 @@ export class Location {
     /**
      * The height level of the position.
      */
-    private z: number;
+    public z: number;
 
     /**
      * The Position constructor.
@@ -23,9 +23,10 @@ export class Location {
      * @param y The y-type coordinate of the position.
      * @param z The height of the position.
      */
-    constructor(x: number, y: number) {
+    constructor(x: number, y: number, z?: number) {
         this.x = x;
         this.y = y;
+        this.z = z;
     }
 
     /**

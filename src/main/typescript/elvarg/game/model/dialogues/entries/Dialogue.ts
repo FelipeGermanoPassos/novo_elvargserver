@@ -1,4 +1,5 @@
 import { Player } from "../../../entity/impl/player/Player";
+import { DialogueAction } from "../DialogueAction";
 
 export abstract class Dialogue {
     private index: number;

@@ -1,12 +1,12 @@
 import { Location } from "./Location";
 
 export class ForceMovement {
-    private start: Location;
-    private end: Location;
-    private speed: number;
-    private reverseSpeed: number;
-    private direction: number;
-    private animation: number;
+    public start: Location;
+    public end: Location;
+    public speed: number;
+    public reverseSpeed: number;
+    public direction: number;
+    public animation: number;
 
     constructor(start: Location, end: Location, speed: number, reverseSpeed: number, direction: number, animation: number) {
         this.setStart(start);

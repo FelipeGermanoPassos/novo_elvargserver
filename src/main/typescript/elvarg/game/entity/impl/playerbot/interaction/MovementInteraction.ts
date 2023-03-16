@@ -21,11 +21,13 @@ export enum InteractionState {
 export class MovementInteraction {
     // The PlayerBot this interaction belongs to
     private playerBot: PlayerBot;
+    private player: Player
+    private mobile: Mobile
     constructor(_playerBot: PlayerBot) {
-        this.playerBot = _playerBot;
+    this.playerBot = _playerBot;
     }
     public process(): void {
-        if (Mobile.getMovementQueue().getMobility().canMove() || Player.busy()) {
+        if (this.mobile.getMovementQueue().getMobility().canMove() || this.player.busy()) {
             return;
         }
         switch (this.playerBot.getCurrentState()) {
@@ -33,11 +35,11 @@ export class MovementInteraction {
                 // Player Bot is currently busy, do nothing
                 return;
             case InteractionState.IDLE:
-                if (CombatFactory.inCombat(this.playerBot) || Player.getDueling().inDuel()) {
+                if (CombatFactory.inCombat(this.playerBot) || this.player.getDueling().inDuel()) {
                     return;
                 }
                 // Player bot is idle, let it walk somewhere random
-                if (!this.playerBot.getMovementQueue().isMoving()) {
+                if (!this.playerBot.getMovementQueue().isMovings()) {
                     if (Misc.getRandom(9) <= 1) {
                         let pos = this.generateLocalPosition();
                         if (pos != null) {

@@ -4,6 +4,7 @@ import { StackType } from "../StackType";
 import { PlayerStatus } from "../../PlayerStatus";
 import { Misc } from "../../../../util/Misc";
 import { Item } from "../../Item";
+import { Bank } from "./Bank";
 
 export class PriceChecker extends ItemContainer {
 
@@ -16,7 +17,7 @@ export class PriceChecker extends ItemContainer {
         super(player);
     }
 
-    public open(): ItemContainer {
+    public open() {
         this.player.setStatus(PlayerStatus.PRICE_CHECKING);
         this.player.getMovementQueue().reset();
         this.refreshItems();
@@ -34,8 +35,8 @@ export class PriceChecker extends ItemContainer {
     override refreshItems(): ItemContainer {
         const items_ = this.getValidItems();
         if (items_.length > 0) {
-            this.player.getPacketSender().sendString(18355, "").sendString(18351,
-                Misc.insertCommasToNumber(this.getTotalValue())); // TOTAL VALUE
+            this.player.getPacketSender().sendString("", 18355).sendString(
+                Misc.insertCommasToNumber(this.getTotalValue()), 18351); // TOTAL VALUE
         
 
             // Send item prices
@@ -57,18 +58,18 @@ export class PriceChecker extends ItemContainer {
                     itemPrice = "" + Misc.insertCommasToNumber(String(value)) + " x" + String(amount);
                 }
 
-                this.player.getPacketSender().sendString(PriceChecker.TEXT_START_ROW_1 + i, itemPrice);
-                this.player.getPacketSender().sendString(PriceChecker.TEXT_START_ROW_2 + i, totalPrice);
+                this.player.getPacketSender().sendString(itemPrice, PriceChecker.TEXT_START_ROW_1 + i);
+                this.player.getPacketSender().sendString(totalPrice, PriceChecker.TEXT_START_ROW_2 + i);
             }
 
         } else {
-            this.player.getPacketSender().sendString(18355, "Click an item in your inventory to check it's wealth.")
-                .sendString(18351, "0"); // TOTAL VALUE
+            this.player.getPacketSender().sendString( "Click an item in your inventory to check it's wealth.", 18355)
+                .sendString("0", 18351); // TOTAL VALUE
 
             // Reset item prices
             for (let i = 0; i < this.capacity(); i++) {
-                this.player.getPacketSender().sendString(PriceChecker.TEXT_START_ROW_1 + i, "");
-                this.player.getPacketSender().sendString(PriceChecker.TEXT_START_ROW_2 + i, "");
+                this.player.getPacketSender().sendString("", PriceChecker.TEXT_START_ROW_1 + i,);
+                this.player.getPacketSender().sendString("", PriceChecker.TEXT_START_ROW_2 + i,);
             }
         }
 
@@ -78,7 +79,7 @@ export class PriceChecker extends ItemContainer {
         return this;
     }
 
-    override full(): ItemContainer {
+    public full() {
         this.player.getPacketSender().sendMessage("The pricechecker cannot hold any more items.");
         return this;
     }
@@ -86,7 +87,7 @@ export class PriceChecker extends ItemContainer {
     public withdrawAll(): void {
         if (this.player.getStatus() == PlayerStatus.PRICE_CHECKING && this.player.getInterfaceId() == PriceChecker.INTERFACE_ID) {
             for (const item of this.getValidItems()) {
-                this.switchItem(this.player.getInventory(), item.clone(), false, false);
+                this.switchItems(this.player.getInventory(), item.clone(), false, false);
             }
             this.refreshItems();
             this.player.getInventory().refreshItems();
@@ -97,7 +98,7 @@ export class PriceChecker extends ItemContainer {
         if (this.player.getStatus() == PlayerStatus.PRICE_CHECKING && this.player.getInterfaceId() == PriceChecker.INTERFACE_ID) {
             for (const item of this.player.getInventory().getValidItems()) {
                 if (item.getDefinition().getValue() > 0) {
-                    this.player.getInventory().switchItem(this, item.clone(), false, false);
+                    this.switchItems(this, item.clone(), false, false);
                 }
             }
             this.refreshItems();
@@ -125,9 +126,10 @@ export class PriceChecker extends ItemContainer {
                 }
 
                 if (item.getAmount() == 1) {
-                    this.player.getInventory().switchItem(this, item, slot, false, true);
+                    this.player.getInventory().switchItem(this, item, false, slot, true);
                 } else {
-                    this.player.getInventory().switchItem(this, item, false, true);
+                    
+                    this.switchItems(this, item, false, true);
                 }
             }
             return true;
@@ -143,9 +145,9 @@ export class PriceChecker extends ItemContainer {
                 // Perform switch
                 const item = new Item(id, amount);
                 if (item.getAmount() == 1) {
-                    this.switchItem(this.player.getInventory(), item, slot, false, true);
+                    this.switchItem(this.player.getInventory(), item, false, slot, true);
                 } else {
-                    this.switchItem(this.player.getInventory(), item, false, true);
+                    this.switchItems(this.player.getInventory(), item, false, true);
                 }
             }
             return true;

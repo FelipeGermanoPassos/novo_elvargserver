@@ -159,7 +159,7 @@ export class Misc {
         return number.length < 4 ? number : this.insertCommasToNumber(number.substring(0, number.length - 3)) + "," + number.substring(number.length - 3, number.length);
     }
         
-    public static textUnpack(packedData: Uint8Array, size: number): string {
+    public static textUnpack(packedData:number[], size: number): string {
         let decodeBuf: number[] = new Array(4096);
         let idx = 0, highNibble = -1;
         for (let i = 0; i < size * 2; i++) {
@@ -393,6 +393,24 @@ export class Misc {
         }
     }
 
+    public static getFormattedPlayTime(player: Player): string {
+        const now = new Date().getTime();
+        const creationDate = player.getCreationDate().getTime();
+        const elapsed = now - creationDate;
+      
+        const secondsInMilli = 1000;
+        const minutesInMilli = secondsInMilli * 60;
+        const hoursInMilli = minutesInMilli * 60;
+        const daysInMilli = hoursInMilli * 24;
+      
+        const elapsedDays = Math.floor(elapsed / daysInMilli);
+        const elapsedHours = Math.floor((elapsed % daysInMilli) / hoursInMilli);
+        const elapsedMinutes = Math.floor((elapsed % hoursInMilli) / minutesInMilli);
+        const elapsedSeconds = Math.floor((elapsed % minutesInMilli) / secondsInMilli);
+      
+        return `${elapsedDays} day(s) : ${elapsedHours} hour(s) : ${elapsedMinutes} minute(s) : ${elapsedSeconds} second(s)`;
+    }
+    
     public static getTimeLeft = (start: number, timeAmount: number, timeUnit: TimeUnit): number => {
         const duration = moment.duration(Date.now() - start, 'milliseconds');
         const timeUnitDuration = moment.duration(timeAmount, timeUnit);

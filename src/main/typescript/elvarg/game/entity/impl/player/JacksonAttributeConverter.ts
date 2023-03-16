@@ -1,24 +1,30 @@
-export class JacksonAttributeConverter<T> implements AttributeConverter<T>  {
-    private static gson = new GsonBuilder().create();
-    private clazz: new () => T;
+import { AttributeConverter, AttributeValue, AttributeValueType, EnhancedType } from "@aws/dynamodb-data-mapper";
 
-    constructor(clazz: new () => T) {
+import * as Gson from "gson";
+
+export class JacksonAttributeConverter<T> implements AttributeConverter<T> {
+    private static gson = Gson.create();
+    private clazz: { new (...args: any[]): T };
+
+    constructor(clazz: { new (...args: any[]): T }) {
         this.clazz = clazz;
     }
 
-    public transformFrom(input: T): AttributeValue {
-        return { s: gson.toJson(input) };
+    transformFrom(input: T): AttributeValue {
+        return AttributeValue.builder()
+            .s(JacksonAttributeConverter.gson.toJson(input))
+            .build();
     }
 
-    public transformTo(input: AttributeV alue): T {
-        return gson.fromJson(input.s, this.clazz);
+    transformTo(input: AttributeValue): T {
+        return JacksonAttributeConverter.gson.fromJson(input.s(), this.clazz);
     }
 
-    public type(): EnhancedType {
+    type(): EnhancedType<T> {
         return EnhancedType.of(this.clazz);
     }
 
-    public attributeValueType(): AttributeValueType {
-        return AttributeValueType.S;
+    attributeValueType(): AttributeValueType {
+        return AttributeValueType.String;
     }
 }

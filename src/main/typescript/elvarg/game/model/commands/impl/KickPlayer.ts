@@ -3,7 +3,7 @@ import { World } from "../../../World";
 import { Player } from "../../../entity/impl/player/Player";
 import { PlayerRights } from "../../rights/PlayerRights";
 
-class KickPlayer implements Command {
+export class KickPlayer implements Command {
     execute(player: Player, command: string, parts: string[]): void {
         let plr = World.getPlayerByName(command.substring(parts[0].length + 1));
         if (plr) {

@@ -7,7 +7,7 @@ import { Item } from "../../../../model/Item";
 import { AnimationLoop } from "../../../../model/AnimationLoop";
 import { Misc } from "../../../../../util/Misc";
 import { ItemDefinition } from "../../../../definition/ItemDefinition";
-import { ObjectIdentifiers} from "../../../../../util/ObjectIdentifiers";
+import { ObjectIdentifiers } from "../../../../../util/ObjectIdentifiers";
 import { Player } from "../../../../entity/impl/player/Player";
 import { ObjectManager } from "../../../../entity/impl/object/ObjectManager";
 
@@ -56,7 +56,7 @@ export class Cooking extends ItemCreationSkillable {
             player.getInventory().adds(this.cookable.getcookedItem(), 1);
             player.getPacketSender()
                 .sendMessage("You cook the " + ItemDefinition.forId(this.cookable.getrawItem()).getName() + ".");
-            player.getSkillManager().addExperience(Skill.COOKING, this.cookable.getxp());
+            player.getSkillManager().addExperiences(Skill.COOKING, this.cookable.getxp());
         } else {
             player.getInventory().adds(this.cookable.getburntItem(), 1);
             player.getPacketSender()
@@ -75,124 +75,124 @@ export class Cooking extends ItemCreationSkillable {
 
 }
 
-class Cookable {
-      SHRIMP = {
+export class Cookable {
+    SHRIMP = {
         rawItem: 317,
         cookedItem: 315,
-    Item: 7954,
+        Item: 7954,
         Req: 1,
         xp: 30,
         stopBurn: 33,
         name: "shrimp"
-      };
-      ANCHOVIES = {
+    };
+    ANCHOVIES = {
         rawItem: 321,
         cookedItem: 319,
-    Item: 323,
+        Item: 323,
         Req: 1,
         xp: 30,
         stopBurn: 34,
         name: "anchovies"
-      };
-      TROUT = {
+    };
+    TROUT = {
         rawItem: 335,
         cookedItem: 333,
-    Item: 343,
+        Item: 343,
         Req: 15,
         xp: 70,
         stopBurn: 50,
         name: "trout"
-      };
-      COD = {
+    };
+    COD = {
         rawItem: 341,
         cookedItem: 339,
-    Item: 343,
+        Item: 343,
         Req: 18,
         xp: 75,
         stopBurn: 54,
         name: "cod"
-      };
-      SALMON = {
+    };
+    SALMON = {
         rawItem: 331,
         cookedItem: 329,
-    Item: 343,
+        Item: 343,
         Req: 25,
         xp: 90,
         stopBurn: 58,
         name: "salmon"
-      };
-      TUNA = {
+    };
+    TUNA = {
         rawItem: 359,
         cookedItem: 361,
-    Item: 367,
+        Item: 367,
         Req: 30,
         xp: 100,
         stopBurn: 58,
         name: "tuna"
-      };
-      LOBSTER = {
+    };
+    LOBSTER = {
         rawItem: 377,
         cookedItem: 379,
-    Item: 381,
+        Item: 381,
         Req: 40,
         xp: 120,
         stopBurn: 74,
         name: "lobster"
-      };
-      BASS = {
+    };
+    BASS = {
         rawItem: 363,
         cookedItem: 365,
-    Item: 367,
+        Item: 367,
         Req: 40,
         xp: 130,
         stopBurn: 75,
         name: "bass"
-      };
-      SWORDFISH = {
+    };
+    SWORDFISH = {
         rawItem: 371,
         cookedItem: 373,
-    Item: 375,
+        Item: 375,
         Req: 45,
         xp: 140,
         stopBurn: 86,
         name: "swordfish"
-      };
-      MONKFISH = {
+    };
+    MONKFISH = {
         rawItem: 7944,
         cookedItem: 7946,
-    Item: 7948,
+        Item: 7948,
         Req: 62,
         xp: 150,
         stopBurn: 91,
         name: "monkfish"
-      };
-      SHARK = {
+    };
+    SHARK = {
         rawItem: 383,
         cookedItem: 385,
-    Item: 387,
+        Item: 387,
         Req: 80,
         xp: 210,
         stopBurn: 94,
         name: "shark"
-      };
-      SEA_TURTLE = {
+    };
+    SEA_TURTLE = {
         rawItem: 395,
         cookedItem: 397,
-    Item: 399,
+        Item: 399,
         Req: 82,
         xp: 212,
         stopBurn: 105,
         name: "sea turtle"
-      };
-      MANTA_RAY = {
+    };
+    MANTA_RAY = {
         rawItem: 389,
         cookedItem: 391,
         burntItem: 393,
         levelReq: 91,
         xp: 217,
-        stopBurn:99,
+        stopBurn: 99,
         name: "manta ray"
-        };
+    };
 
     private static cookables: { [key: number]: Cookable } = {};
 
@@ -206,11 +206,11 @@ class Cookable {
     //TODO IMPLEMENTAR INTERFACE E O METODO NEXT
 
     static initialize() {
-        for (let c of Cookable) {
-          Cookable.cookables[c[0]] = c;
-          Cookable.cookables[c[1]] = c;
+        for (let c of Object.values(Cookable)) {
+            Cookable.cookables[c[0]] = c;
+            Cookable.cookables[c[1]] = c;
         }
-      }
+    }
 
     public static getForItems(item: number): Cookable | undefined {
         return Cookable.cookables[item];
@@ -226,41 +226,36 @@ class Cookable {
         this.name = name;
     }
 
-    getForItem(item: number) {
-        const cookable = Cookable.cookables.get(item);
-        if (cookable === undefined) {
-            return undefined; // Retorna undefined se o item não estiver no mapa
-        }
-        return cookable;
+    public static getForItem(item: number): Cookable | undefined {
+        return Cookable.cookables[item];
     }
-        
+
     getrawItem(): number {
         return this.rawItem;
     }
-        
+
     getcookedItem(): number {
         return this.cookedItem;
     }
-        
+
     getburntItem(): number {
         return this.burntItem;
     }
-        
+
     getReqReq(): number {
         return this.ReqReq;
     }
-        
+
     getxp(): number {
         return this.xp;
     }
-        
+
     getstopBurn(): number {
         return this.stopBurn;
     }
-        
+
     getname(): string {
         return this.name;
     }
-    }
 }
-       
+

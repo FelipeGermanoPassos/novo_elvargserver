@@ -13,13 +13,45 @@ import { TribridMaxFighterPreset } from "./TribridMaxFighterPreset";
 import { FighterPreset } from "../FighterPreset";
 import { Item } from "../../../../../model/Item";
 import { ItemIdentifiers } from "../../../../../../util/ItemIdentifiers";
+import { MagicSpellbook } from "../../../../../model/MagicSpellbook";
+import { PrayerData } from "../../../../../content/PrayerHandler";
+import { TimerKey } from "../../../../../../util/timers/TimerKey";
+import { MovementQueue } from "../../../../../model/movement/MovementQueue";
 
+class PureCombatSwitch extends CombatSwitch {
+    constructor(switchItemIds: number[], private readonly execFunc: Function, private readonly execShound: Function, prayerData?: PrayerData[]) {
+        super(switchItemIds, prayerData)
+    }
 
+    shouldPerform(): boolean {
+        return this.execFunc();
+    }
+
+    public performAfterSwitch(): void {
+        this.execShound()
+    }
+
+}
+
+class PureCombatAction implements CombatAction {
+    constructor(private readonly execFunc: Function, private readonly execShould: Function){
+    }
+    shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
+        return this.execShould();
+    }
+    perform(playerBot: PlayerBot, enemy: Mobile) {
+        this.execFunc();
+    }
+    stopAfter(): boolean {
+        return false;
+    }
+
+}
 
 export class NHPureFighterPreset implements FighterPreset {
-    getItemPreset;
-    getCombatActions;
-    eatAtPercent;
+    eatAtPercent(): number {
+        return 40;
+    }
     public static readonly BOT_NH_PURE_83 = new Presetable("BOT NH Pure",
         [
             new Item(ItemIdentifiers.RUNE_CROSSBOW), new Item(ItemIdentifiers.BLACK_DHIDE_CHAPS), new Item(ItemIdentifiers.RANGING_POTION_4_), new Item(ItemIdentifiers.SUPER_STRENGTH_4_),
@@ -37,134 +69,79 @@ export class NHPureFighterPreset implements FighterPreset {
         true
     );
     public static readonly COMBAT_ACTIONS: CombatAction[] = [
-        {
-            shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-                return playerBot.getSpecialPercentage() >= 50 && playerBot.getMovementQueue().getMobility().canMove() &&
-                    enemy.getHitpointsAfterPendingDamage() <= 45;
-            },
-            performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void {
-                playerBot.getCombat().attack(enemy);
-                CombatSpecial.activate(playerBot);
-                CombatSpecial.activate(playerBot);
+        new PureCombatSwitch([ItemIdentifiers.GRANITE_MAUL, ItemIdentifiers.BLACK_DHIDE_CHAPS], (playerBot, enemy) => {
+            return playerBot.getSpecialPercentage() >= 50 && playerBot.getMovementQueue().getMobility().canMove() &&
+                enemy.getHitpointsAfterPendingDamage() <= 45;
+        }, (playerBot: PlayerBot, enemy: Mobile) => {
+            playerBot.getCombat().attack(enemy);
+            CombatSpecial.activate(playerBot);
+        }),
+        new PureCombatSwitch([ItemIdentifiers.RING_OF_RECOIL], (playerBot, enemy) => {
+            const hasRing = playerBot.getInventory().contains(ItemIdentifiers.RING_OF_RECOIL);
+            return hasRing && !playerBot.getEquipment().contains(ItemIdentifiers.RING_OF_RECOIL);
+        }, (playerBot: PlayerBot, enemy: Mobile) => { playerBot.getCombat().attack(enemy); }),
+        new PureCombatAction((playerBot: PlayerBot, enemy: Mobile) => {
+            return playerBot.getTimers().has(TimerKey.COMBAT_ATTACK) && playerBot.getTimers().left(TimerKey.COMBAT_ATTACK) > 1
+                && !enemy.getMovementQueue().getMobility().canMove()
+                && playerBot.calculateDistance(enemy) === 1
+                && CombatFactory.canReach(enemy, CombatFactory.getMethod(enemy), playerBot);
+        }, (playerBot: PlayerBot, enemy: Mobile) => {
+            if (playerBot.getMovementQueue().size() > 0) {
+                return;
             }
-        }
+            playerBot.setFollowing(null);
+            MovementQueue.randomClippedStepNotSouth(playerBot, 3);
+        }),
+        new PureCombatSwitch([ItemIdentifiers.ZAMORAK_CAPE, ItemIdentifiers.GHOSTLY_ROBE_2, ItemIdentifiers.GHOSTLY_ROBE], (playerBot: PlayerBot, enemy: Mobile) => {
+            // Freeze the player if they can move
+            return enemy.getMovementQueue().getMobility().canMove() && !enemy.getTimers().has(TimerKey.FREEZE_IMMUNITY)
+                && CombatSpells.ICE_BARRAGE.getSpell().canCast(playerBot, false);
+        }, (playerBot: PlayerBot, enemy: Mobile) => {
+            playerBot.getCombat().setCastSpell(CombatSpells.ICE_BARRAGE.getSpell());
+            playerBot.getCombat().attack(enemy);
+        }),
+        new PureCombatSwitch([ItemIdentifiers.RUNE_CROSSBOW, ItemIdentifiers.DRAGON_BOLTS_E_, ItemIdentifiers.AVAS_ACCUMULATOR, ItemIdentifiers.BLACK_DHIDE_CHAPS], (playerBot, enemy) => {
+            return enemy.getHitpoints() < 40;
+        }, (playerBot: PlayerBot, enemy: Mobile) => { playerBot.getCombat().attack(enemy); }),
+
+        new EnemyDefenseAwareCombatSwitch([
+            new AttackStyleSwitch(
+                CombatType.MAGIC,
+                new PureCombatSwitch([ItemIdentifiers.ZAMORAK_CAPE, ItemIdentifiers.GHOSTLY_ROBE_2, ItemIdentifiers.GHOSTLY_ROBE],
+                    (playerBot: PlayerBot, enemy: Mobile) => {
+                        return CombatSpells.ICE_BARRAGE.getSpell().canCast(playerBot, false);
+                    },
+                    (playerBot: PlayerBot, enemy: Mobile) => {
+                        playerBot.getCombat().setCastSpell(CombatSpells.ICE_BARRAGE.getSpell());
+                        playerBot.getCombat().attack(enemy);
+                    }
+                )
+            ),
+            new AttackStyleSwitch(
+                CombatType.RANGED,
+                new PureCombatSwitch([ItemIdentifiers.MAGIC_SHORTBOW, ItemIdentifiers.RUNE_ARROW, ItemIdentifiers.AVAS_ACCUMULATOR, ItemIdentifiers.BLACK_DHIDE_CHAPS],
+                    (playerBot: PlayerBot, enemy: Mobile) => {
+                        return true;
+                    },
+                    (playerBot: PlayerBot, enemy: Mobile) => {
+                        playerBot.setSpecialActivated(false);
+                        playerBot.getCombat().attack(enemy);
+                    }
+                )
+            ),
+        ],
+            (playerBot: PlayerBot, enemy: Mobile) => {
+                return true;
+            })
     ]
-    class CombatSwitch {
-    constructor(private items: number[]) { }
-    shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-        let hasRing = ItemInSlot.getFromInventory(RING_OF_RECOIL, playerBot.getInventory()) != null;
-        return hasRing && playerBot.getEquipment().getById(RING_OF_RECOIL) == null;
-    }
-    performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void {
-        playerBot.getCombat().attack(enemy);
-    }
-}
-class CombatAction {
-    shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-        let combatMethod = CombatFactory.getMethod(enemy);
-        let distance = playerBot.calculateDistance(enemy);
-        let cantAttack = playerBot.getTimers().has(TimerKey.COMBAT_ATTACK) && playerBot.getTimers().left(TimerKey.COMBAT_ATTACK) > 1;
-        return cantAttack
-            && !enemy.getMovementQueue().getMobility().canMove()
-            && distance == 1
-            && CombatFactory.canReach(enemy, combatMethod, playerBot);
+
+    getItemPreset(): Presetable {
+        return NHPureFighterPreset.BOT_NH_PURE_83;
     }
 
-    perform(playerBot: PlayerBot, enemy: Mobile): void {
-        if (playerBot.getMovementQueue().size() > 0) {
-            return;
-        }
-        playerBot.setFollowing(null);
-        MovementQueue.randomClippedStepNotSouth(playerBot, 3);
+    getCombatActions(): CombatAction[] {
+        return NHPureFighterPreset.COMBAT_ACTIONS;
     }
-}
-const combatSwitch = new CombatSwitch([ZAMORAK_CAPE, GHOSTLY_ROBE_2, GHOSTLY_ROBE]);
-
-class CombatSwitch {
-    constructor(private items: number[]) { }
-
-    shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-        // Freeze the player if they can move
-        return (
-            enemy.getMovementQueue().getMobility().canMove() &&
-            !enemy.getTimers().has(TimerKey.FREEZE_IMMUNITY) &&
-            CombatSpells.ICE_BARRAGE.getSpell().canCast(playerBot, false)
-        );
-    }
-
-    performAfterSwitch(playerBot: PlayerBot, enemy: Mobile) {
-        playerBot.getCombat().setCastSpell(CombatSpells.ICE_BARRAGE.getSpell());
-        playerBot.getCombat().attack(enemy);
-    }
-}
-const combatSwitch = new CombatSwitch([RUNE_CROSSBOW, DRAGON_BOLTS_E_, AVAS_ACCUMULATOR, BLACK_DHIDE_CHAPS]);
-class CombatSwitch {
-    constructor(private items: number[]) { }
-
-    shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-        return enemy.getHitpoints() < 40;
-    }
-
-    performAfterSwitch(playerBot: PlayerBot, enemy: Mobile) {
-        playerBot.getCombat().attack(enemy);
-    }
-}
-class CombatSwitch {
-    constructor(private items: number[]) { }
-
-    shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-        throw new Error("Method not implemented.");
-    }
-
-    performAfterSwitch(playerBot: PlayerBot, enemy: Mobile) {
-        throw new Error("Method not implemented.");
-    }
-}
-
-class AttackStyleSwitch {
-    constructor(private combatType: CombatType, private switch: CombatSwitch) { }
-    }
-
-class EnemyDefenseAwareCombatSwitch {
-    constructor(private attackStyles: AttackStyleSwitch[]) { }
-}
-
-const magicCombatSwitch = new CombatSwitch([ZAMORAK_CAPE, GHOSTLY_ROBE_2, GHOSTLY_ROBE])
-magicCombatSwitch.shouldPerform = (playerBot: PlayerBot, enemy: Mobile) => {
-    return CombatSpells.ICE_BARRAGE.getSpell().canCast(playerBot, false);
-};
-magicCombatSwitch.performAfterSwitch = (playerBot: PlayerBot, enemy: Mobile) => {
-    playerBot.getCombat().setCastSpell(CombatSpells.ICE_BARRAGE.getSpell());
-    playerBot.getCombat().attack(enemy);
-};
-
-const rangedCombatSwitch = new CombatSwitch([MAGIC_SHORTBOW, RUNE_ARROW, AVAS_ACCUMULATOR, BLACK_DHIDE_CHAPS])
-rangedCombatSwitch.shouldPerform = (playerBot: PlayerBot, enemy: Mobile) => {
-    return true;
-};
-rangedCombatSwitch.performAfterSwitch = (playerBot: PlayerBot, enemy: Mobile) => {
-    playerBot.setSpecialActivated(false);
-    playerBot.getCombat().attack(enemy);
-};
-
-const magicAttackStyle = new AttackStyleSwitch(CombatType.MAGIC, magicCombatSwitch);
-const rangedAttackStyle = new AttackStyleSwitch(CombatType.RANGED, rangedCombatSwitch);
-
-const enemyDefenseAwareCombatSwitch = new EnemyDefenseAwareCombatSwitch([
-    magicAttackStyle,
-    rangedAttackStyle
-]); {
-    shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-        return true;
-    },
-},
-    
-    public getItemPreset(): Presetable {
-    return BOT_NH_PURE_83;
-}
-    
-    public getCombatActions(): CombatAction[] {
-    return BotNhPure83.COMBAT_ACTIONS;
 }
     
 

@@ -4,7 +4,7 @@ import { Animation } from '../../Animation';
 import {PlayerRights} from '../../../model/rights/PlayerRights';
 
 
-class AnimationCommand implements Command {
+export class AnimationCommand implements Command {
     execute(player: Player, command: string, parts: string[]): void {
         let anim = parseInt(parts[1]);
         player.performAnimation(new Animation(anim));

@@ -51,7 +51,7 @@ export class WebHandler {
 
         player.performAnimation(itemOnWeb ? ITEM_ON_WEB_ANIMATION : new Animation(player.getAttackAnim()));
 
-        const successfulSlashChance = Misc.random(2);
+        const successfulSlashChance = Misc.randoms(2);
         if (successfulSlashChance < 2) {
             player.sendMessage("You slash the web apart.");
             Sounds.sendSound(player, SLASH_SOUND);

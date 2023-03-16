@@ -8,16 +8,17 @@ import { Skill } from "../model/Skill"
 import { TimerKey } from "../../util/timers/TimerKey"
 
 export class PotionConsumable {
-    public static ANTIFIRE_POTIONS = [2452, 2454, 2456, 2458]
-    public static ANTIPOISON_POTIONS = [2448, 181, 183, 185]
-    public static COMBAT_POTIONS = [9739, 9741, 9743, 9745]
-    public static SUPER_COMBAT_POTIONS = [12695, 12697, 12699, 12701]
-    public static MAGIC_POTIONS = [3040, 3042, 3044, 3046]
-    public static SUPER_MAGIC_POTIONS = [11726, 11727, 11728, 11729]
+    public static ANTIFIRE_POTIONS = new PotionConsumable([2452, 2454, 2456, 2458]);
+    public static ANTIPOISON_POTIONS = new PotionConsumable([2448, 181, 183, 185]);
+    public static COMBAT_POTIONS = new PotionConsumable([9739, 9741, 9743, 9745]);
+    public static SUPER_COMBAT_POTIONS = new PotionConsumable([12695, 12697, 12699, 12701]);
+    public static MAGIC_POTIONS = new PotionConsumable([3040, 3042, 3044, 3046]);
+    public static SUPER_MAGIC_POTIONS = new PotionConsumable([11726, 11727, 11728, 11729]);
+
     private static VIAL: number = 229;
 
 
-    onEffect(player: Player) {
+    onEffects (player: Player) {
         switch (this) {
             case PotionConsumable.ANTIFIRE_POTIONS:
                 PotionConsumable.onAntifireEffect(player, 60 * 6);
@@ -43,15 +44,15 @@ export class PotionConsumable {
         }
     }
 
-    public static DEFENCE_POTIONS = [2432, 133, 135, 137]
-    public static STRENGTH_POTIONS = [113, 115, 117, 119]
-    public static ATTACK_POTIONS = [2428, 121, 123, 125]
-    public static SUPER_DEFENCE_POTIONS = [2442, 163, 165, 167]
-    public static SUPER_ATTACK_POTIONS = [2436, 145, 147, 149]
-    public static SUPER_STRENGTH_POTIONS = [2440, 157, 159, 161]
-    public static RANGE_POTIONS = [2444, 169, 171, 173]
-    public static SUPER_RANGE_POTIONS = [11722, 11723, 11724, 11725]
-    public static ZAMORAK_BREW = [2450, 189, 191, 193]
+    public static DEFENCE_POTIONS = new PotionConsumable([2432, 133, 135, 137]);
+    public static STRENGTH_POTIONS = new PotionConsumable([113, 115, 117, 119]);
+    public static ATTACK_POTIONS = new PotionConsumable([2428, 121, 123, 125]);
+    public static SUPER_DEFENCE_POTIONS = new PotionConsumable([2442, 163, 165, 167]);
+    public static SUPER_ATTACK_POTIONS = new PotionConsumable([2436, 145, 147, 149]);
+    public static SUPER_STRENGTH_POTIONS = new PotionConsumable([2440, 157, 159, 161]);
+    public static RANGE_POTIONS = new PotionConsumable([2444, 169, 171, 173]);
+    public static SUPER_RANGE_POTIONS = new PotionConsumable([11722, 11723, 11724, 11725]);
+    public static ZAMORAK_BREW = new PotionConsumable([2450, 189, 191, 193]);
 
     onEffectAttack(player: Player) {
         switch (this) {
@@ -85,14 +86,14 @@ export class PotionConsumable {
         }
     }
 
-    public static SARADOMIN_BREW = [6685, 6687, 6689, 6691]
-    public static GUTHIX_REST = [4417, 4419, 4421, 4423, 1980]
-    public static SUPER_RESTORE_POTIONS = [3024, 3026, 3028, 3030]
-    public static PRAYER_POTIONS = [2434, 139, 141, 143]
+    public static SARADOMIN_BREW = new PotionConsumable([6685, 6687, 6689, 6691]);
+    public static GUTHIX_REST = new PotionConsumable([4417, 4419, 4421, 4423, 1980]);
+    public static SUPER_RESTORE_POTIONS = new PotionConsumable([3024, 3026, 3028, 3030]);
+    public static PRAYER_POTIONS = new PotionConsumable([2434, 139, 141, 143]);
 
     private ids: number[];
 
-    constructor(...ids: number[]) {
+    constructor(ids: number[]) {
         this.ids = ids;
     }
 
@@ -124,15 +125,15 @@ export class PotionConsumable {
             return true;
         }
 
-        player.getTimers().register(TimerKey.POTION, 3);
-        player.getTimers().register(TimerKey.FOOD, 3);
+        player.getTimers().registers(TimerKey.POTION, 3);
+        player.getTimers().registers(TimerKey.FOOD, 3);
 
         player.getPacketSender().sendInterfaceRemoval();
         player.getCombat().reset();
         player.performAnimation(new Animation(829));
         Sounds.sendSound(player, Sound.DRINK);
         player.getInventory().setItem(slot, this.getReplacementItem(item)).refreshItems();
-        potion.onEffect(player);
+        potion.onEffects(player);
 
         return true;
     }
@@ -268,8 +269,6 @@ export class PotionConsumable {
         player.getPacketSender().sendMessage("You are now immune to poison for another " + seconds + " seconds.");
     }
 
-    abstract onEffect(player: Player);
-
     /**
     
     Gets the identifiers which represent this potion type.
@@ -280,8 +279,10 @@ export class PotionConsumable {
     }
 }
 
-private class BoostType {
-    LOW(0.10), NORMAL(0.13), SUPER(0.19);
+export class BoostType {
+    public static readonly LOW = new BoostType(0.10);
+    public static readonly NORMAL = new BoostType(0.13);
+    public static readonly SUPER = new BoostType(0.19);
     /**
      * The amount this type will boost by.
      */

@@ -100,7 +100,7 @@ export class ButtonClickPacketListener implements PacketExecutor {
     if (player.getQuickPrayers().handleButton(button)) {
       return true;
     }
-    if (player.getDueling().checkRule(button)) {
+    if (player.getDueling().checkRules(button)) {
       return true;
     }
     if (Smithing.handleButton(player, button)) {
@@ -138,7 +138,7 @@ export class ButtonClickPacketListener implements PacketExecutor {
         if (player.busy()) {
           player.getPacketSender().sendInterfaceRemoval();
         }
-        Presetables.open(player);
+        Presetables.opens(player);
         break;
 
       case ButtonClickPacketListener.OPEN_WORLD_MAP:
@@ -237,7 +237,7 @@ export class ButtonClickPacketListener implements PacketExecutor {
         let item = player.getDestroyItem();
         player.getPacketSender().sendInterfaceRemoval();
         if (item != -1) {
-          player.getInventory().delete(item);
+          player.getInventory().deleteNumber(item, player.getInventory().getAmount(item));
         }
         break;
 

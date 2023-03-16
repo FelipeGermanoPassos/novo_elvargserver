@@ -7,6 +7,11 @@ import { ItemDefinition } from "../../../definition/ItemDefinition";
 import { Inventory } from "./Inventory";
 
 export class Equipment extends ItemContainer {
+
+    public full(): ItemContainer {
+        return this;
+    }
+
     public static INVENTORY_INTERFACE_ID = 1688;
     public static EQUIPMENT_SCREEN_INTERFACE_ID = 15106;
     public static HEAD_SLOT = 0;
@@ -27,7 +32,7 @@ export class Equipment extends ItemContainer {
         super(player);
     }
 
-    public getItemCount(p: Player, s: string, inventory: boolean): number {
+    public static getItemCount(p: Player, s: string, inventory: boolean): number {
         let count = 0;
         for (let t of p.getEquipment().getItems()) {
             if (t == null || t.getId() < 1 || t.getAmount() < 1)
@@ -36,7 +41,7 @@ export class Equipment extends ItemContainer {
                 count++;
         }
         if (inventory) {
-            for (let t of p.getInventory().) {
+            for (let t of p.getInventory().getItems()) {
                 if (t == null || t.getId() < 1 || t.getAmount() < 1)
                     continue;
                 if (t.getDefinition().getName().toLowerCase().includes(s.toLowerCase()))
@@ -56,12 +61,7 @@ export class Equipment extends ItemContainer {
     
     public refreshItems(): ItemContainer {
         this.getPlayer().getPacketSender().sendItemContainer(this, Equipment.INVENTORY_INTERFACE_ID);
-        return new ItemContainer(this.getPlayer());
-    }
-
-    public isFull(): boolean {
-        let inventory = new Inventory(this.player);
-        return this.getItemCount(this.getPlayer(), "s", inventory.full) === Equipment.ITEM_COUNT;
+        return this;
     }
     
     public wearingNexAmours(): boolean {
@@ -91,8 +91,8 @@ export class Equipment extends ItemContainer {
     
     public hasStaffEquipped(): boolean {
         const staff = this.get(Equipment.WEAPON_SLOT);
-        return (staff != null && (this.player.getWeapon() == WeaponInterfaces.WeaponInterface.STAFF
-                || this.player.getWeapon() == WeaponInterfaces.WeaponInterface.ANCIENT_STAFF));
+        return (staff != null && (this.player.getWeapon() == WeaponInterfaces.STAFF
+                || this.player.getWeapon() == WeaponInterfaces.ANCIENT_STAFF));
     }
     
     public getWeapon(): Item {

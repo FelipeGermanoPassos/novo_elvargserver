@@ -1,9 +1,11 @@
 import { ItemIdentifiers } from "../../../../../util/ItemIdentifiers";
-import { Skill, Skills} from "../../../../model/Skill";
+import { Skill } from "../../../../model/Skill";
 import { Player } from "../../../../entity/impl/player/Player";
 import { PetHandler } from "../../../PetHandler";
 import { Graphic } from "../../../../model/Graphic";
 import { Animation } from "../../../../model/Animation";
+import { TeleportHandler } from "../../../../model/teleportation/TeleportHandler";
+import { Location } from "../../../../model/Location";
 
 export class Runecrafting {
     private static CRAFT_RUNES_GRAPHIC = new Graphic(186);
@@ -36,19 +38,19 @@ export class Runecrafting {
             }
             player.performGraphic(Runecrafting.CRAFT_RUNES_GRAPHIC);
             player.performAnimation(Runecrafting.CRAFT_RUNES_ANIMATION);
-			let craftAmount: number = this.craftAmount(rune.get(), player);
+            let craftAmount: number = this.craftAmount(Rune.forId(0), player);
             let xpGain: number = 0;
             for (let i = 0; i < 28; i++) {
                 if (!player.getInventory().contains(essence)) {
-                break;
+                    break;
                 }
                 player.getInventory().deleteNumber(essence, 1);
-                player.getInventory().adds(rune.get().getRuneID(), craftAmount);
-                xpGain += rune.get().getXP();
+                player.getInventory().adds(rune.getRuneID(), craftAmount);
+                xpGain += rune.getXP();
             }
 
             // Finally add the total experience they gained..
-            player.getSkillManager().addExperience(Skill.RUNECRAFTING, xpGain);
+            player.getSkillManager().addExperiences(Skill.RUNECRAFTING, xpGain);
 
             // Pets..
             PetHandler.onSkill(player, Skill.RUNECRAFTING);
@@ -56,10 +58,53 @@ export class Runecrafting {
         return false;
     }
 
+    public static handleTalisman(player: Player, itemId: number): boolean {
+        const talisman: Talisman | undefined = Talisman.forId(itemId);
+        if (talisman) {
+            if (player.getSkillManager().getMaxLevel(Skill.RUNECRAFTING) < talisman.getLevelRequirement()) {
+                player.getPacketSender().sendMessage(`You need a Runecrafting level of at least ${talisman.getLevelRequirement()} to use this Talisman's teleport function.`);
+            } else {
+                if (TeleportHandler.checkReqs(player, talisman.getPosition())) {
+                    TeleportHandler.teleport(player, talisman.getPosition(), player.getSpellbook().getTeleportType(), true);
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public static handlePouch(player: Player, itemId: number, actionType: number): boolean {
+        const pouch: Pouch | undefined = Pouch.forItemId(itemId);
+        if (pouch) {
+            let container: PouchContainer | undefined;
+            for (let pC of player.getPouches()) {
+                if (pC.getPouch() == pouch) {
+                    container = pC;
+                    break;
+                }
+            }
+            if (container) {
+                switch (actionType) {
+                    case 1:
+                        container.store(player);
+                        break;
+                    case 2:
+                        container.check(player);
+                        break;
+                    case 3:
+                        container.withdraw(player);
+                        break;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static craftAmount(rune: Rune, player: Player) {
         let amount = 1;
         switch (rune) {
-            case AIR_RUNE:
+            case Rune.AIR_RUNE:
                 if (player.getSkillManager().getMaxLevel(Skill.RUNECRAFTING) >= 11)
                     amount = 2;
                 if (player.getSkillManager().getMaxLevel(Skill.RUNECRAFTING) >= 22)
@@ -158,54 +203,53 @@ export class Runecrafting {
 }
 
 class Talisman {
-
-    AIR_TALISMAN = { id: 1438, level: 1, location: { x: 2841, y: 4828 } };
-    MIND_TALISMAN = { id: 1448, level: 2, location: { x: 2793, y: 4827 } };
-    WATER_TALISMAN = { id: 1444, level: 5, location: { x: 2720, y: 4831 } };
-    EARTH_TALISMAN = { id: 1440, level: 9, location: { x: 2655, y: 4829 } };
-    FIRE_TALISMAN = { id: 1442, level: 14, location: { x: 2576, y: 4846 } };
-    BODY_TALISMAN = { id: 1446, level: 20, location: { x: 2522, y: 4833 } };
-    COSMIC_TALISMAN = { id: 1454, level: 27, location: { x: 2163, y: 4833 } };
-    CHAOS_TALISMAN = { id: 1452, level: 35, location: { x: 2282, y: 4837 } };
-    NATURE_TALISMAN = { id: 1462, level: 44, location: { x: 2400, y: 4834 } };
-    LAW_TALISMAN = { id: 1458, level: 54, location: { x: 2464, y: 4817 } };
-    DEATH_TALISMAN = { id: 1456, level: 65, location: { x: 2208, y: 4829 } };
-    BLOOD_TALISMAN = { id: 1450, level: 77, location: { x: 1722, y: 3826 } };
+    public static readonly AIR_TALISMAN = new Talisman(1438, 1, new Location(2841, 4828));
+    public static readonly MIND_TALISMAN = new Talisman(1448, 2, new Location(2793, 4827));
+    public static readonly WATER_TALISMAN = new Talisman(1444, 5, new Location(2720, 4831));
+    public static readonly EARTH_TALISMAN = new Talisman(1440, 9, new Location(2655, 4829));
+    public static readonly FIRE_TALISMAN = new Talisman(1442, 14, new Location(2576, 4846));
+    public static readonly BODY_TALISMAN = new Talisman(1446, 20, new Location(2522, 4833));
+    public static readonly COSMIC_TALISMAN = new Talisman(1454, 27, new Location(2163, 4833));
+    public static readonly CHAOS_TALISMAN = new Talisman(1452, 35, new Location(2282, 4837));
+    public static readonly NATURE_TALISMAN = new Talisman(1462, 44, new Location(2400, 4834));
+    public static readonly LAW_TALISMAN = new Talisman(1458, 54, new Location(2464, 4817));
+    public static readonly DEATH_TALISMAN = new Talisman(1456, 65, new Location(2208, 4829));
+    public static readonly BLOOD_TALISMAN = new Talisman(1450, 77, new Location(1722, 3826));
 
     private static talismans: Map<number, Talisman> = new Map<number, Talisman>();
 
-    static initialize() {
-        for (let t of Object.values(Talisman)) {
+    constructor(private talismanId: number, private levelReq: number, private location: Location) { }
+
+    public static initialize(): void {
+        Object.values(Talisman).forEach((t: Talisman) => {
             this.talismans.set(t.talismanId, t);
-        }
+        });
     }
 
-    constructor(public talismanId: number, public levelReq: number, public location: Location) { }
-
-    static forId(itemId: number): Talisman | undefined {
+    public static forId(itemId: number): Talisman | undefined {
         return this.talismans.get(itemId);
     }
 
-    getItemId(): number {
+    public getItemId(): number {
         return this.talismanId;
     }
 
-    getLevelRequirement(): number {
+    public getLevelRequirement(): number {
         return this.levelReq;
     }
 
-    getPosition(): Location {
-        return { ...this.location };
+    public getPosition(): Location {
+        return  this.location.clone();
     }
 }
 
-export class Pouch  {
+export class Pouch {
     private static pouches: Map<number, Pouch> = new Map<number, Pouch>();
 
-    public static SMALL_POUCH = { id: 5509, level: 1, capacity: 3, time: -1 };
-    public static MEDIUM_POUCH = { id: 5510, level: 25, capacity: 6, time: 45 };
-    public static LARGE_POUCH = { id: 5512, level: 50, capacity: 9, time: 29 };
-    public static GIANT_POUCH = { id: 5514, level: 75, capacity: 12, time: 10 };
+    public static SMALL_POUCH = new Pouch(5509, 1, 3, -1);
+    public static MEDIUM_POUCH = new Pouch(5510, 25, 6, 45);
+    public static LARGE_POUCH = new Pouch(5512, 50, 9, 29);
+    public static GIANT_POUCH = new Pouch(5514, 75, 12, 10);
 
     public static initialize() {
         for (let p of Object.values(Pouch)) {
@@ -219,7 +263,7 @@ export class Pouch  {
         return Pouch.pouches.get(itemId);
     }
 
-    public  getitemId(): number {
+    public getitemId(): number {
         return this.itemId;
     }
 
@@ -296,7 +340,7 @@ export class PouchContainer {
                 player.getPacketSender().sendMessage("You don't have any more essence to withdraw.");
                 break;
             }
-            }
+        }
     }
 
     public check(player: Player) {
@@ -330,19 +374,19 @@ export class PouchContainer {
 }
 
 export class Rune {
-    public static readonly AIR_RUNE = new Rune(556, 1, 5, 14897, false );
-    public static readonly MIND_RUNE = new Rune(558, 2, 6, 14898, false );
-    public static readonly WATER_RUNE = new Rune(555, 5, 7, 14899, false );
-    public static readonly EARTH_RUNE = new Rune(557, 9, 8, 14900, false );
-    public static readonly FIRE_RUNE = new Rune(554, 14, 9, 14901, false );
-    public static readonly BODY_RUNE = new Rune(559, 20, 10, 14902, false );
-    public static readonly COSMIC_RUNE = new Rune(564, 27, 11,  14903, true );
-    public static readonly CHAOS_RUNE = new Rune(562, 35, 12, 14906, true );
-    public static readonly ASTRAL_RUNE = new Rune(9075, 40, 13, 14911, true );
-    public static readonly NATURE_RUNE = new Rune(561, 44, 14, 14905, true );
-    public static readonly LAW_RUNE = new Rune(563, 54, 15, 14904, true );
-    public static readonly DEATH_RUNE = new Rune(560, 65, 16, 14907, true );
-    public static readonly BLOOD_RUNE = new Rune(565,  75, 27, 27978, true );
+    public static readonly AIR_RUNE = new Rune(556, 1, 5, 14897, false);
+    public static readonly MIND_RUNE = new Rune(558, 2, 6, 14898, false);
+    public static readonly WATER_RUNE = new Rune(555, 5, 7, 14899, false);
+    public static readonly EARTH_RUNE = new Rune(557, 9, 8, 14900, false);
+    public static readonly FIRE_RUNE = new Rune(554, 14, 9, 14901, false);
+    public static readonly BODY_RUNE = new Rune(559, 20, 10, 14902, false);
+    public static readonly COSMIC_RUNE = new Rune(564, 27, 11, 14903, true);
+    public static readonly CHAOS_RUNE = new Rune(562, 35, 12, 14906, true);
+    public static readonly ASTRAL_RUNE = new Rune(9075, 40, 13, 14911, true);
+    public static readonly NATURE_RUNE = new Rune(561, 44, 14, 14905, true);
+    public static readonly LAW_RUNE = new Rune(563, 54, 15, 14904, true);
+    public static readonly DEATH_RUNE = new Rune(560, 65, 16, 14907, true);
+    public static readonly BLOOD_RUNE = new Rune(565, 75, 27, 27978, true);
 
     static runes: Map<number, Rune> = new Map<number, Rune>();
 

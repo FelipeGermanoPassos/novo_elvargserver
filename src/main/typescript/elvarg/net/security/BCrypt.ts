@@ -541,11 +541,11 @@ export class BCrypt {
 
     private key(key: Uint8Array) {
         let i;
-        let koffp = [0];
+        let koffp = 0;
         let lr = [0, 0];
         let plen = this.P.length, slen = this.S.length;
         for (i = 0; i < plen; i++)
-        this.P[i] = this.P[i] ^ BCrypt.streamtoword(key, koffp);
+        this.P[i] = this.P[i] ^ BCrypt.streamtoword(key, [koffp]);
 
         for (i = 0; i < plen; i += 2) {
             this.encipher(lr, 0);
@@ -571,7 +571,7 @@ export class BCrypt {
     private ekskey(data: Uint8Array, key: Uint8Array) {
         let i;
         let koffp = 0, doffp = 0;
-        let lr = new Uint32Array([0, 0]);
+        let lr = ([0, 0]);
         let plen = this.P.length, slen = this.S.length;
       
         for (i = 0; i < plen; i++)
@@ -580,7 +580,7 @@ export class BCrypt {
         for (i = 0; i < plen; i += 2) {
           lr[0] ^= BCrypt.streamtoword(data, [doffp]);
           lr[1] ^= BCrypt.streamtoword(data, [doffp]);
-          BCrypt.encipher(lr, 0);
+          this.encipher(lr, 0);
           this.P[i] = lr[0];
           this.P[i + 1] = lr[1];
         }

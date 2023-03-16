@@ -35,7 +35,7 @@ export class Prayer {
                 player.getInventory().deleteNumber(itemId, 1);
                 setTimeout(() => {
                     player.getPacketSender().sendMessage("..and bury the " + ItemDefinition.forId(itemId).getName() + ".");
-                    player.getSkillManager().addExperience(Skill.PRAYER, b.getXp());
+                    player.getSkillManager().addExperiences(Skill.PRAYER, b.getXp());
                 }, 1000);
                 player.getClickDelay().reset();
             }
@@ -73,7 +73,7 @@ export class AltarOffering extends DefaultSkillable {
         }
         this.altar.performGraphic(AltarOffering.ALTAR_OFFERING_GRAPHIC);
         player.getInventory().deleteNumber(this.bone.getBoneID(), 1);
-        player.getSkillManager().addExperience(Skill.PRAYER, this.bone.getXp() * Prayer.GILDED_ALTAR_EXPERIENCE_MULTIPLIER);
+        player.getSkillManager().addExperiences(Skill.PRAYER, this.bone.getXp() * Prayer.GILDED_ALTAR_EXPERIENCE_MULTIPLIER);
         player.getPacketSender().sendMessage("The gods are pleased with your offering.");
         }
 

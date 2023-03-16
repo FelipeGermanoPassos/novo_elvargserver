@@ -6,10 +6,20 @@ import { CombatAction } from "../CombatAction";
 import { CombatSwitch } from "../CombatSwitch";
 import { FighterPreset } from "../FighterPreset";
 import { Item } from "../../../../../model/Item";
-import { MagicSpellbook, MagicSpellbooks } from "../../../../../model/MagicSpellbook";
+import { MagicSpellbook } from "../../../../../model/MagicSpellbook";
 import { ItemIdentifiers } from "../../../../../../util/ItemIdentifiers";
+import { PrayerData } from "../../../../../content/PrayerHandler";
 
+class DragonDaggerCombatSwitch extends CombatSwitch {
+    constructor(switchItemIds: number[], private readonly execFunc: Function) {
+        super(switchItemIds);
+    }
 
+    public performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void {
+        this.execFunc();
+    }
+
+}
 
 export class DDSPureRFighterPreset implements FighterPreset {
 
@@ -56,40 +66,30 @@ export class DDSPureRFighterPreset implements FighterPreset {
             new Item(ItemIdentifiers.RUNE_ARROW, 75)
         ],
         [60, 1, 99, 85, 99, 1, 1],
-        MagicSpellbooks.NORMAL,
+        MagicSpellbook.NORMAL,
         true
     )
 
     public COMBAT_ACTIONS: CombatAction[] = [
-        new CombatSwitch([ItemIdentifiers.DRAGON_DAGGER_P_PLUS_PLUS_]), {
-            shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-                return playerBot.getSpecialPercentage() >= 25 &&
-                    enemy.getHitpoints() < 45;
-            },
-            performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void {
+        new DragonDaggerCombatSwitch([ItemIdentifiers.DRAGON_DAGGER_P_PLUS_PLUS_], (playerBot: PlayerBot, enemy: Mobile) => {
+            const shouldPerform = playerBot.getSpecialPercentage() >= 25 && enemy.getHitpoints() < 45;
+            if (shouldPerform) {
                 if (!playerBot.isSpecialActivated()) {
                     CombatSpecial.activate(playerBot);
                 }
                 playerBot.getCombat().attack(enemy);
             }
-        },
-        new CombatSwitch([ItemIdentifiers.RUNE_CROSSBOW, ItemIdentifiers.DRAGON_BOLTS_E_]), {
-            shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-                return enemy.getHitpoints() < 40;
-            },
-            performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void {
+        }),
+        new DragonDaggerCombatSwitch([ItemIdentifiers.RUNE_CROSSBOW, ItemIdentifiers.DRAGON_BOLTS_E_], (playerBot: PlayerBot, enemy: Mobile) => {
+            const shouldPerform = enemy.getHitpoints() < 40;
+            if (shouldPerform) {
                 playerBot.getCombat().attack(enemy);
             }
-        },
-        new CombatSwitch([ItemIdentifiers.MAGIC_SHORTBOW, ItemIdentifiers.RUNE_ARROW]), {
-            shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-                return true;
-            },
-            performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void {
-                playerBot.setSpecialActivated(false);
-                playerBot.getCombat().attack(enemy);
-            }
-        },
+        }),
+        new DragonDaggerCombatSwitch([ItemIdentifiers.MAGIC_SHORTBOW, ItemIdentifiers.RUNE_ARROW], (playerBot: PlayerBot, enemy: Mobile) => {
+            playerBot.setSpecialActivated(false);
+            playerBot.getCombat().attack(enemy);
+        }),
     ];
 
     getItemPreset(): Presetable {

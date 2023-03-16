@@ -1,15 +1,9 @@
 import { Mobile } from './Mobile';
 
 export class MobileList<E extends Mobile> implements Iterable<E> {
-    find(arg0: (p: any) => boolean): import("./player/Player").Player {
-        throw new Error('Method not implemented.');
-    }
-    filter(arg0: (p: any) => any) {
-        throw new Error('Method not implemented.');
-    }
-    private slotQueue: Queue<number> = new ArrayDeque<number>();
+    private slotQueue: number[] = [];
     private capacity: number;
-    private characters: E[];
+    public characters: E[];
     private size: number;
 
     constructor(capacity: number) {
@@ -17,14 +11,9 @@ export class MobileList<E extends Mobile> implements Iterable<E> {
         this.characters = new Array(capacity);
         this.size = 0;
         for (let i = 1; i <= (capacity - 1); i++) {
-            this.slotQueue.add(i);
+            this.slotQueue.push(i);
         }
     }
-    [Symbol.iterator](): Iterator<E, any, undefined> {
-        throw new Error('Method not implemented.');
-    }
-
-    
 
     public add(e: E): boolean {
         if (e === null) {
@@ -36,18 +25,20 @@ export class MobileList<E extends Mobile> implements Iterable<E> {
         }
 
         if (!e.isRegistered()) {
-            let slot = this.slotQueue.remove();
-            e.setRegistered(true);
-            e.setIndex(slot);
-            this.characters[slot] = e;
-            e.onAdd();
-            this.size++;
-            return true;
-        }
+            let index = this.slotQueue.shift();
+            if (index !== undefined) {
+              e.setRegistered(true);
+              e.setIndex(index);
+              this.characters[index] = e;
+              e.onAdd();
+              this.size++;
+              return true;
+            }
+          }
         return false;
     }
 
-    public remove(e: E): boolean {
+    public removes(e: E): boolean {
         if (e === null) {
             return false;
         }
@@ -55,7 +46,7 @@ export class MobileList<E extends Mobile> implements Iterable<E> {
         if (e.isRegistered() && this.characters[e.getIndex()] != null) {
             e.setRegistered(false);
             this.characters[e.getIndex()] = null;
-            this.slotQueue.add(e.getIndex());
+            this.slotQueue.push(e.getIndex());
             e.onRemove();
             this.size--;
             return true;
@@ -70,27 +61,32 @@ export class MobileList<E extends Mobile> implements Iterable<E> {
         return this.characters[e.getIndex()] != null;
     }
 
-    public forEach(action: Consumer<E>): void {
+    public forEach(action: (e: E) => void): void {
         for (let e of this.characters) {
             if (e === null) {
                 continue;
             }
-            action.accept(e);
+            action(e);
         }
     }
 
-    public search(filter: Predicate<E>): Optional<E> {
+    public search(filter: (e: E) => boolean): E | null {
         for (let e of this.characters) {
             if (e === null)
                 continue;
-            if (filter.test(e))
-                return Optional.of(e);
+            if (filter(e))
+                return e;
         }
-        return Optional.empty();
+        return null;
     }
 
-    public iterator(): Iterator<E> {
-        return new CharacterListIterator<E>(this);
+    public * [Symbol.iterator](): IterableIterator<E> {
+        for (let e of this.characters) {
+            if (e === null) {
+                continue;
+            }
+            yield e;
+        }
     }
 
     public get(slot: number): E {
@@ -123,7 +119,7 @@ export class MobileList<E extends Mobile> implements Iterable<E> {
         this.size = 0;
     }
 
-    private remove(item: E): void {
+    public remove(item: E): void {
         // implementation of remove method
     }
 }
@@ -138,16 +134,16 @@ export class CharacterListIterator<E extends Mobile> implements Iterator<E> {
     }
 
     public hasNext(): boolean {
-        return !(this.index + 1 > this.list.capacity);
+        return !(this.index + 1 > this.list.capacityReturn());
     }
 
-    public next(): E {
-        if (this.index >= this.list.capacity) {
-            throw new ArrayIndexOutOfBoundsException("There are no " + "elements left to iterate over!");
+    public next(): IteratorResult<E> {
+        if (this.index >= this.list.capacityReturn()) {
+            throw new Error("There are no elements left to iterate over!");
         }
         this.lastIndex = this.index;
         this.index++;
-        return this.list.characters[this.lastIndex];
+        return { done: false, value: this.list.characters[this.lastIndex] };
     }
 
     public remove(): void {

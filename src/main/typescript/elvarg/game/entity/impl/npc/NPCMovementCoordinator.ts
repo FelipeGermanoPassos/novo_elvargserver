@@ -34,7 +34,7 @@ export class NPCMovementCoordinator {
                 if (CombatFactory.inCombat(this.npc)) {
                     return;
                 }
-                if (!this.npc.getMovementQueue().isMoving()) {
+                if (!this.npc.getMovementQueue().isMovings()) {
                     if (Misc.getRandom(9) <= 1) {
                         let pos = this.generateLocalPosition();
                         if (pos != null) {

@@ -26,7 +26,7 @@ export class ShopManager extends ShopIdentifiers {
         player.packetSender.sendItemContainer(player.inventory, Shop.INVENTORY_INTERFACE_ID);
         player.packetSender.sendInterfaceItems(Shop.ITEM_CHILD_ID, shop.getCurrentStockList());
     
-        player.packetSender.sendString(Shop.NAME_INTERFACE_CHILD_ID, shop.name);
+        player.packetSender.sendString(shop.name, Shop.NAME_INTERFACE_CHILD_ID,);
     
         if (!player.enteredAmountAction) {
             player.packetSender.sendInterfaceSet(Shop.INTERFACE_ID, Shop.INVENTORY_INTERFACE_ID - 1);
@@ -86,7 +86,7 @@ export class ShopManager extends ShopIdentifiers {
         
         let itemValue = this.getItemValue(player, def, shop.id);
         
-        const currency = shop.currency.name;
+        const currency = shop.currency.getName();
         
         if (!shopItem) {
         if (!def.isSellable()) {
@@ -104,7 +104,7 @@ export class ShopManager extends ShopIdentifiers {
         return;
         }
         
-        const message = @dre@${def.name}@bla@ ${!shopItem ? ": shop will buy for " : " currently costs "} @dre@${Misc.insertCommasToNumber(itemValue.toString())} x ${currency}.;
+        let message = `@dre@${def.getName()}@bla@${!shopItem ? ": shop will buy for " : " currently costs "}@dre@${Misc.insertCommasToNumber(itemValue.toString())} x ${currency}.`;
         player.packetSender.sendMessage(message);
     }
 
@@ -148,7 +148,7 @@ export class ShopManager extends ShopIdentifiers {
             }
             
             if (player.inventory.isFull()) {
-                if (!(itemDef.isStackable() && player.inventory.contains(itemId))) {
+                if (!(itemDef.isStackable() && player.inventory.containsNumber(itemId))) {
                     player.inventory.full();
                     break;
                 }
@@ -163,7 +163,7 @@ export class ShopManager extends ShopIdentifiers {
                 shop.currency.decrementForPlayer(player, itemValue);
                 shop.removeItem(itemId, 1);
                 if (item) {
-                    player.getInventory().add(item);
+                    player.getInventory().addItem(item);
                 }
                 bought = true;
             } else {
@@ -180,7 +180,7 @@ export class ShopManager extends ShopIdentifiers {
                 shop.currency.decrementForPlayer(player, itemValue * canBeBought);
                 shop.removeItem(itemId, canBeBought);
                 if (item) {
-                    player.getInventory().add(item);
+                    player.getInventory().addItem(item);
                 }
                 bought = true;
                 break;
@@ -259,7 +259,7 @@ export class ShopManager extends ShopIdentifiers {
             }
     
             // Check if player still has the item..
-            if (!player.getInventory().contains(itemId)) {
+            if (!player.getInventory().containsNumber(itemId)) {
                 break;
             }
     
@@ -276,7 +276,7 @@ export class ShopManager extends ShopIdentifiers {
     
                 // If their inventory has the coins..
                 if (shop.getCurrency().getName().toLowerCase() == "coins") {
-                    if (player.getInventory().contains(ItemIdentifiers.COINS)) {
+                    if (player.getInventory().containsNumber(ItemIdentifiers.COINS)) {
                         allow = true;
                     }
                 }
@@ -291,7 +291,7 @@ export class ShopManager extends ShopIdentifiers {
                 // Remove item from player's inventory..
                 
                 if (item) {
-                    player.getInventory().delete(item);
+                    player.getInventory().deletes(item);
                 }
                 // Add player currency..
                 shop.getCurrency().incrementForPlayer(player, itemValue);
@@ -304,7 +304,7 @@ export class ShopManager extends ShopIdentifiers {
                 
                     // Remove item from player's inventory..
                     if (item) {
-                        player.getInventory().delete(item);
+                        player.getInventory().deletes(item);
                     }
         
                     // Add player currency..
@@ -420,6 +420,6 @@ export class ShopManager extends ShopIdentifiers {
      * @return {number} shopId
      */
     public static generateUnusedId(): number {
-        return Misc.getRandomExlcuding(1, MAX_SHOPS, new ArrayList<>(ShopManager.shops.keySet()));
+        return Misc.getRandomExlcuding(1, Shop.MAX_SHOPS, new Array(...ShopManager.shops.keys()));
     }
 }

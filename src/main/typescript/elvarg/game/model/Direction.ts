@@ -1,18 +1,20 @@
 import { Misc } from "../../util/Misc";
 
 export enum Directions {
-    NORTH = 1,
-    NORTH_EAST = 2,
-    EAST = 4,
-    SOUTH_EAST = 7,
-    SOUTH = 6,
-    SOUTH_WEST = 5,
-    WEST = 3,
-    NORTH_WEST = 0,
-    NONE = -1,
+    
 }
 
 export class Direction {
+    public static readonly NORTH = new Direction(1, 0, 1, 6)
+    public static readonly NORTH_EAST = new Direction(2, 1, 1, 5)
+    public static readonly EAST = new Direction(4, 1, 0, 3)
+    public static readonly SOUTH_EAST = new Direction(7, 1, -1, 0)
+    public static readonly SOUTH = new Direction(6, 0, -1, 1)
+    public static readonly SOUTH_WEST = new Direction(5, -1, -1, 2)
+    public static readonly WEST = new Direction(3, -1, 0, 4)
+    public static readonly NORTH_WEST = new Direction(0, -1, 1, 7)
+    public static readonly NONE = new Direction(-1, 0, 0, -1)
+
     public id: number;
     public x: number;
     public y: number;
@@ -49,46 +51,46 @@ export class Direction {
 
     public static valueOf(id: number) {
         switch (id) {
-            case 0: return Directions.NORTH_WEST;
-            case 1: return Directions.NORTH;
-            case 2: return Directions.NORTH_EAST;
-            case 3: return Directions.WEST;
-            case 4: return Directions.EAST;
-            case 5: return Directions.SOUTH_WEST;
-            case 6: return Directions.SOUTH;
-            case 7: return Directions.SOUTH_EAST;
-            default: return Directions.NONE;
+            case 0: return Direction.NORTH_WEST;
+            case 1: return Direction.NORTH;
+            case 2: return Direction.NORTH_EAST;
+            case 3: return Direction.WEST;
+            case 4: return Direction.EAST;
+            case 5: return Direction.SOUTH_WEST;
+            case 6: return Direction.SOUTH;
+            case 7: return Direction.SOUTH_EAST;
+            default: return Direction.NONE;
         }
     }
 
     public static random(): Direction {
-        return this.valueOf(Misc.inclusive(0, 7));
+        return this.valueOf(Misc.randomInclusive(0, 7));
     }
 
-    fromDeltas(dx: number, dy: number): Directions {
+    public static fromDeltas(dx: number, dy: number): Direction {
         if (dx < 0) {
             if (dy < 0) {
-                return Directions.SOUTH_WEST;
+                return Direction.SOUTH_WEST;
             } else if (dy > 0) {
-                return Directions.NORTH_WEST;
+                return Direction.NORTH_WEST;
             } else {
-                return Directions.WEST;
+                return Direction.WEST;
             }
         } else if (dx > 0) {
             if (dy < 0) {
-                return Directions.SOUTH_EAST;
+                return Direction.SOUTH_EAST;
             } else if (dy > 0) {
-                return Directions.NORTH_EAST;
+                return Direction.NORTH_EAST;
             } else {
-                return Directions.EAST;
+                return Direction.EAST;
             }
         } else {
             if (dy < 0) {
-                return Directions.SOUTH;
+                return Direction.SOUTH;
             } else if (dy > 0) {
-                return Directions.NORTH;
+                return Direction.NORTH;
             } else {
-                return Directions.NONE;
+                return Direction.NONE;
             }
         }
     }

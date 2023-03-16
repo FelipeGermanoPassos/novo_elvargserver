@@ -2,7 +2,7 @@ import { PlayerRights } from '../../../model/rights/PlayerRights';
 import { Command } from '../../../model/commands/Command';
 import { Player } from '../../../entity/impl/player/Player';
 
-class CWarInterfaceCommand implements Command {
+export class CWarInterfaceCommand implements Command {
     execute(player: Player, command: string, parts: string[]) {
         try {
             player.getPacketSender().sendInterface(11169);

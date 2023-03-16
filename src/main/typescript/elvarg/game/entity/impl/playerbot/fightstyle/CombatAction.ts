@@ -6,8 +6,3 @@ export interface CombatAction {
     perform(playerBot: PlayerBot, enemy: Mobile);
     stopAfter(): boolean
 }
-export class CombatAction{
-    stopAfter(): boolean{
-        return true;
-    }
-}

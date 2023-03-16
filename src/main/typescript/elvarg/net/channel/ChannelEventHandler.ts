@@ -1,5 +1,5 @@
 import { ChannelHandlerContext } from 'netty';
-import { NetworkConstants } from './network';
+import { NetworkConstants } from '../NetworkConstants';
 import { World } from '../../game/World';
 
 export class ChannelEventHandler {

@@ -1,9 +1,8 @@
-import { Location } from '../model/Location';
-import { MovementQueue } from '../model/movement/MovementQueue';
-import { PathFinder } from '../model/movement/path/PathFinder';
-import { Packet } from '../net/packet/Packet';
-import { PacketExecutor } from '../net/packet/PacketExecutor';
-import { Player } from '../entity/impl/player/Player';
+import { Location } from '../../../game/model/Location';
+import { PathFinder } from '../../../game/model/movement/path/PathFinder';
+import { PacketExecutor } from '../PacketExecutor';
+import { Player } from '../../../game/entity/impl/player/Player';
+import { Packet } from '../Packet';
 
 export class MovementPacketListener implements PacketExecutor {
 

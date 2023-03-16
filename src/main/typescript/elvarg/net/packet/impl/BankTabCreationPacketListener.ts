@@ -34,7 +34,7 @@ export class BankTabCreationPacketListener implements PacketExecutor {
                 player.setNoteWithdrawal(false);
 
                 //Make the item switch
-                player.getBank(fromBankTab).switchItem(player.getBank(to_tab), item, slot, false, false);
+                player.getBank(fromBankTab).switchItem(player.getBank(to_tab), item, false, slot, false);
 
                 //Re-set the note var
                 player.setNoteWithdrawal(note);

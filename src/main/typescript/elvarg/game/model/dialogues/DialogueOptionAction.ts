@@ -1,5 +1,5 @@
 import { DialogueOption } from "./DialogueOption";
 
-interface DialogueOptionAction {
+export interface DialogueOptionAction {
     executeOption(option: DialogueOption): void;
 }

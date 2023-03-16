@@ -4,14 +4,14 @@ import { ByteOrder } from './ByteOrder';
 import { Packet } from './Packet';
 
 
-enum ValueType {
+export enum ValueType {
     A,
     C,
     S,
     STANDARD
 }
 
-enum AccessType {
+export enum AccessType {
     BIT,
     BYTE,
 }
@@ -450,8 +450,4 @@ export class PacketBuilder {
     public getType(): PacketType {
         return this.type;
     }
-}
-
-
-    
 }

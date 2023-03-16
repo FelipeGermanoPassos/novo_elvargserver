@@ -1,8 +1,5 @@
 
-interface TimerKey {
-    id: string;
-    name: string;
-}
+import { TimerKey } from "./TimerKey";
 
 export class Timer {
     private Key: TimerKey;

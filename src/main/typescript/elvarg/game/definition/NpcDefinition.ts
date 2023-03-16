@@ -85,6 +85,10 @@ export class NpcDefinition {
     public getHitpoints(): number {
         return this.hitpoints;
     }
+
+    public setMaxHitpoints(hitpoints: number):void {
+        this.hitpoints = hitpoints;
+    }
     
     public getAttackSpeed(): number {
         return this.attackSpeed;

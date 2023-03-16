@@ -9,11 +9,34 @@ import { Ids } from "../../../../model/Ids"
 import { Item } from "../../../../model/Item"
 import { Task } from "../../../../task/Task";
 import { TaskManager } from "../../../../task/TaskManager";
-import { NpcIdentifiers, NPCIdentifiers } from "../../../../../util/NpcIdentifiers"
+import { NpcIdentifiers } from "../../../../../util/NpcIdentifiers"
 import { ItemIdentifiers } from "../../../../../util/ItemIdentifiers"
 
+class SheepTask extends Task{
+    constructor(n: NPC, private readonly execFunc: Function){
+        super(3, false)
+    }
 
-export class Sheep implements NPCInteraction extends Task {
+    execute(): void {
+       this.execFunc();
+    }
+
+}
+
+class TaskSheep extends Task{
+    constructor(n: NPC, private readonly execFunc: Function){
+        super(13, false)
+    }
+
+    execute(): void {
+       this.execFunc();
+       this.stop()
+    }
+
+}
+
+
+export class Sheep implements NPCInteraction extends NPC {
     private static readonly SHEARING = new Animation(893);
     private static readonly SHEEP_EATING = new Animation(5335);
     private static readonly ITEM_WOOL = new Item(ItemIdentifiers.WOOL);
@@ -39,52 +62,38 @@ export class Sheep implements NPCInteraction extends Task {
         this.shear(player, npc);
     }
 
-    onExecute() {
-
-    }
-
-
-    public execute() {
-        NPC.performAnimation(Sheep.SHEEP_EATING);
-        NPC.setNpcTransformationId(NPC.getRealId());
-        this.stop();
-    }
-
     /**
      * Function to handle shearing of sheep.
      *
      * @param player
      */
     public shear(player: Player, npc: NPC) {
-        if (!Player.getInventory().contains(ItemIdentifiers.SHEARS)) {
-            Player.getPacketSender().sendMessage("You need a set of shears to do this.");
+        if (!player.getInventory().contains(ItemIdentifiers.SHEARS)) {
+            player.getPacketSender().sendMessage("You need a set of shears to do this.");
             return;
         }
 
         player.performAnimation(Sheep.SHEARING);
-        Sounds.sendSound(Player, Sound.CUTTING);
+        Sounds.sendSound(player, Sound.CUTTING);
 
 
 
-        TaskManager.submit(new Task(3, npc, false, () => {
+        TaskManager.submit(new SheepTask(npc, () => {
             npc.setNpcTransformationId(this.getSheepTransformId(npc));
             npc.forceChat("Baa!");
 
             if (player.getInventory().getFreeSlots() > 0) {
-                player.getInventory().add(Sheep.ITEM_WOOL);
+                player.getInventory().addItem(Sheep.ITEM_WOOL);
             } else {
-                ItemOnGroundManager.register(player, Sheep.ITEM_WOOL);
+                ItemOnGroundManager.registers(player, Sheep.ITEM_WOOL);
                 player.getPacketSender().sendMessage("You did not have enough inventory space so the Wool was dropped on the ground.");
             }
         }));
 
-        TaskManager.submit(new Task(13, npc, false) {
-            protected execute() {
-                npc.performAnimation(Sheep.SHEEP_EATING);
-                npc.setNpcTransformationId(npc.getRealId());
-                this.stop();
-            }
-        })
+        TaskManager.submit(new TaskSheep(npc, () => {npc.performAnimation(Sheep.SHEEP_EATING);
+            npc.setNpcTransformationId(npc.getRealId());
+            })
+        )
     }
 
     private getSheepTransformId(npc: NPC): number {

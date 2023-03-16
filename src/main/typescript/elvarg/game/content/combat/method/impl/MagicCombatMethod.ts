@@ -3,7 +3,7 @@ import { Graphic } from "../../../../model/Graphic";
 import { Sounds } from "../../../../Sounds";
 import { Sound } from "../../../../Sound";
 import { World } from "../../../../World";
-import { CombatFactory } from "../../CombatFactory";;
+import { CanAttackResponse } from "../../CombatFactory";;
 import { CombatType } from "../../CombatType";
 import { PendingHit } from "../../hit/PendingHit";
 import { CombatAncientSpell } from "../../magic/CombatAncientSpell";
@@ -46,13 +46,13 @@ export class MagicCombatMethod extends CombatMethod {
             } else if (character.isPlayer() && target.isNpc()) {
                 it = (character as Player).getLocalNpcs().values();
             } else if (character.isNpc() && target.isNpc()) {
-                it = World.getNpcs().values();
+                let npcs = Object.values(World.getNpcs());
             } else if (character.isNpc() && target.isPlayer()) {
-                it = World.getPlayers().values();
+                let npcsValues = Object.values(World.getNpcs());
             }
 
             for (let next of it) {
-                if (!next || (next.isNpc() && !(next as unknown as NPC).getCurrentDefinition().isAttackable()) || (next.isPlayer() && AreaManager.canAttack(character, next as Player) != CombatFactory.CanAttackResponse.CAN_ATTACK) || !AreaManager.inMulti(next as Player) || !next.getLocation().isWithinDistance(target.getLocation(), spell.spellRadius()) || next == character || next == target || next.getHitpoints() <= 0) {
+                if (!next || (next.isNpc() && !(next as unknown as NPC).getCurrentDefinition().isAttackable()) || (next.isPlayer() && AreaManager.canAttack(character, next as Player) != CanAttackResponse.CAN_ATTACK) || !AreaManager.inMulti(next as Player) || !next.getLocation().isWithinDistance(target.getLocation(), spell.spellRadius()) || next == character || next == target || next.getHitpoints() <= 0) {
                     continue;
                 }
                 let pendingHit: PendingHit = new PendingHit(character, next, this, 3, false);
@@ -132,10 +132,10 @@ export class MagicCombatMethod extends CombatMethod {
 
         if (previousSpell) {
             if (accurate) {
-                // Send proper end graphics for the spell because it was accurate
-                previousSpell.endGraphic().ifPresent(graphic => target.performGraphic(graphic));
+                const endGraphic = previousSpell.endGraphic();
+                target.performGraphic(endGraphic);
                 Sounds.sendSound(target.getAsPlayer(), previousSpell.impactSound());
-            } else {
+              } else {
                 // Send splash graphics for the spell because it wasn't accurate
                 target.performGraphic(MagicCombatMethod.SPLASH_GRAPHIC);
                 Sounds.sendSound(attacker.getAsPlayer(), Sound.SPELL_FAIL_SPLASH);

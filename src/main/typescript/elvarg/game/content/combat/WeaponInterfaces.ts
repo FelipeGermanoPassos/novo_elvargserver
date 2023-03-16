@@ -25,12 +25,12 @@ export class WeaponInterfaces {
 
         if (weapon == WeaponInterfaces.UNARMED) {
             player.getPacketSender().sendTabInterface(0, weapon.getInterfaceId());
-            player.getPacketSender().sendString(weapon.getNameLineId(), "Unarmed");
+            player.getPacketSender().sendString("Unarmed", weapon.getNameLineId());
             player.setWeapon(WeaponInterfaces.UNARMED);
         } else if (weapon == WeaponInterfaces.CROSSBOW) {
-            player.getPacketSender().sendString(weapon.getNameLineId() - 1, "Weapon: ");
+            player.getPacketSender().sendString("Weapon: ", weapon.getNameLineId() - 1,);
         } else if (weapon == WeaponInterfaces.WHIP) {
-            player.getPacketSender().sendString(weapon.getNameLineId() - 1, "Weapon: ");
+            player.getPacketSender().sendString("Weapon: ", weapon.getNameLineId() - 1);
         }
 
         //player.getPacketSender().sendItemOnInterface(weapon.getInterfaceId() + 1, 200, item);
@@ -38,8 +38,8 @@ export class WeaponInterfaces {
 
         player.getPacketSender().sendTabInterface(0,
             weapon.getInterfaceId());
-        player.getPacketSender().sendString(weapon.getNameLineId(),
-            (weapon == WeaponInterfaces.UNARMED ? "Unarmed" : equippedWeapon.getDefinition().getName()));
+        player.getPacketSender().sendString(
+(weapon == WeaponInterfaces.UNARMED ? "Unarmed" : equippedWeapon.getDefinition().getName()), weapon.getNameLineId());
         player.setWeapon(weapon);
         CombatSpecial.assign(player);
         CombatSpecial.updateBar(player);
@@ -54,11 +54,13 @@ export class WeaponInterfaces {
             }*/
 
         //Set default attack style to aggressive!
-        for (const type of weapon.getFightType()) {
-            if (type.getStyle() == FightStyle.AGGRESSIVE) {
-                player.setFightType(type);
-                player.getPacketSender().sendConfig(FightType.getParentId(), FightType.getChildId());
-                return;
+        for (const type of Object.values(weapon.getFightType())) {
+            if (type instanceof FightType) {
+                if (FightType.getStyle() == FightStyle.AGGRESSIVE) {
+                    player.setFightType(type);
+                    player.getPacketSender().sendConfig(FightType.getParentId(), FightType.getChildId());
+                    return;
+                }
             }
         }
 
@@ -869,7 +871,7 @@ export class WeaponInterfaces {
         return this.speed;
     }
 
-    public getFightType(): {} {
+    public getFightType(){
         return this.fightType;
     }
 

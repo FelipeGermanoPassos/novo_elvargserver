@@ -7,93 +7,95 @@ import { CombatAction } from "../CombatAction";
 import { CombatSwitch } from "../CombatSwitch";
 import { FighterPreset } from "../FighterPreset";
 import { Item } from "../../../../../model/Item";
-import { MagicSpellbook } from "../../../../../model/MagicSpellbook";
+import { TimerKey } from "../../../../../../util/timers/TimerKey";
 import { ItemIdentifiers } from "../../../../../../util/ItemIdentifiers";
+import { MagicSpellbook } from "../../../../../model/MagicSpellbook";
+
+class GRangerCombatSwitch extends CombatSwitch {
+  constructor(switchItemIds: number[], private readonly execFunc: Function) {
+    super(switchItemIds);
+  }
+
+  public performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void {
+    this.execFunc();
+  }
+
+}
+
 export class GRangerFighterPreset implements FighterPreset {
-    eatAtPercent
-    const BOT_G_MAULER_70 = {
-        name: "G Mauler (R)",
-        items: [
-            new Item(ItemIdentifiers.RUNE_CROSSBOW), new Item(ItemIdentifiers.DRAGON_BOLTS_E_, 75), new Item(ItemIdentifiers.RANGING_POTION_4_), new Item(ItemIdentifiers.SUPER_STRENGTH_4_),
-            new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.GRANITE_MAUL), new Item(ItemIdentifiers.SUPER_RESTORE_4_), new Item(ItemIdentifiers.SUPER_ATTACK_4_),
-            new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.SARADOMIN_BREW_4_), new Item(ItemIdentifiers.MONKFISH),
-            new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY),
-            new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY),
-            new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY),
-            new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.RING_OF_RECOIL), new Item(ItemIdentifiers.ANGLERFISH),
-        ],
-        equipment: [
-            new Item(ItemIdentifiers.COIF),
-            new Item(ItemIdentifiers.AVAS_ACCUMULATOR),
-            new Item(ItemIdentifiers.MAGIC_SHORTBOW),
-            new Item(ItemIdentifiers.AMULET_OF_GLORY),
-            new Item(ItemIdentifiers.LEATHER_BODY),
-            null,
-            new Item(ItemIdentifiers.BLACK_DHIDE_CHAPS),
-            new Item(ItemIdentifiers.MITHRIL_GLOVES),
-            new Item(ItemIdentifiers.CLIMBING_BOOTS),
-            new Item(ItemIdentifiers.RING_OF_RECOIL),
-            new Item(ItemIdentifiers.RUNE_ARROW, 75),
-        ],
-        stats: {
-            atk: 50,
-            def: 1,
-            str: 99,
-            hp: 85,
-            range: 99,
-            pray: 1,
-            mage: 1
+  public static BOT_G_MAULER_70 = new Presetable(
+    "G Mauler (R)",
+    [
+      new Item(ItemIdentifiers.RUNE_CROSSBOW), new Item(ItemIdentifiers.DRAGON_BOLTS_E_, 75), new Item(ItemIdentifiers.RANGING_POTION_4_), new Item(ItemIdentifiers.SUPER_STRENGTH_4_),
+      new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.GRANITE_MAUL), new Item(ItemIdentifiers.SUPER_RESTORE_4_), new Item(ItemIdentifiers.SUPER_ATTACK_4_),
+      new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.SARADOMIN_BREW_4_), new Item(ItemIdentifiers.MONKFISH),
+      new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY),
+      new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY),
+      new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.MANTA_RAY),
+      new Item(ItemIdentifiers.COOKED_KARAMBWAN), new Item(ItemIdentifiers.MANTA_RAY), new Item(ItemIdentifiers.RING_OF_RECOIL), new Item(ItemIdentifiers.ANGLERFISH),
+    ],
+    [
+      new Item(ItemIdentifiers.COIF),
+      new Item(ItemIdentifiers.AVAS_ACCUMULATOR),
+      new Item(ItemIdentifiers.MAGIC_SHORTBOW),
+      new Item(ItemIdentifiers.AMULET_OF_GLORY),
+      new Item(ItemIdentifiers.LEATHER_BODY),
+      null,
+      new Item(ItemIdentifiers.BLACK_DHIDE_CHAPS),
+      new Item(ItemIdentifiers.MITHRIL_GLOVES),
+      new Item(ItemIdentifiers.CLIMBING_BOOTS),
+      new Item(ItemIdentifiers.RING_OF_RECOIL),
+      new Item(ItemIdentifiers.RUNE_ARROW, 75),
+    ],
+    [40, 1, 90, 58, 84, 1, 1],
+    MagicSpellbook.NORMAL,
+    true
+  );
+
+  public static COMBAT_ACTIONS: CombatAction[] = [
+    new GRangerCombatSwitch([ItemIdentifiers.DRAGON_DAGGER_P_PLUS_PLUS_], (playerBot: PlayerBot, enemy: Mobile) => {
+      return {
+        shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
+          const canAttackNextTick = playerBot.getTimers().getTicks(TimerKey.COMBAT_ATTACK) <= 1;
+          return canAttackNextTick && playerBot.getSpecialPercentage() >= 25 &&
+            enemy.getHitpoints() < 46;
         },
-        spellbook: "NORMAL",
-        specialAttack: true
-    };
+        performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void {
+          if (!playerBot.isSpecialActivated()) {
+            CombatSpecial.activate(playerBot);
+          }
+          playerBot.getCombat().attack(enemy);
+        }
+      };
+    }),
+    new GRangerCombatSwitch([ItemIdentifiers.DRAGON_SCIMITAR], (playerBot: PlayerBot, enemy: Mobile) => {
+      return {
+        shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
+          return true;
+        },
+        performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void {
+          playerBot.setSpecialActivated(false);
+          playerBot.getCombat().attack(enemy);
+        }
+      };
+    })
+  ];
 
-    const COMBAT_ACTIONS: CombatAction[] = [
-        new CombatSwitch([ItemIdentifiers.GRANITE_MAUL], {
-            shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-                return playerBot.getSpecialPercentage() >= 50 &&
-                    // Don't switch to Melee if we're frozen
-                    playerBot.getMovementQueue().getMobility().canMove() &&
-                    // Switch if the enemy has enabled protect from missles or has lowish health
-                    (!enemy.getPrayerActive()[PrayerHandler.PROTECT_FROM_MELEE] && enemy.getHitpointsAfterPendingDamage() < 45);
-            },
-            performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void {
-                playerBot.getCombat().attack(enemy);
-                CombatSpecial.activate(playerBot);
-                CombatSpecial.activate(playerBot);
-            },
-        }),
-        new CombatSwitch([ItemIdentifiers.RUNE_CROSSBOW, ItemIdentifiers.DRAGON_BOLTS_E_], {
-            shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-                return enemy.getHitpoints() < 40;
-            },
-            performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void {
-                playerBot.getCombat().attack(enemy);
-            },
-        }),
-        new CombatSwitch([ItemIdentifiers.MAGIC_SHORTBOW, ItemIdentifiers.RUNE_ARROW], {
-            shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-                return true;
-            },
-            performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void {
-                playerBot.setSpecialActivated(false);
-                playerBot.getCombat().attack(enemy);
-            },
-        }),
-    ];
+  getItemPreset(): Presetable {
+    return GRangerFighterPreset.BOT_G_MAULER_70;
+  }
 
-    getItemPreset(): Presetable {
-        return this.BOT_G_MAULER_70;
-    }
+  getCombatActions(): CombatAction[] {
+    return GRangerFighterPreset.COMBAT_ACTIONS;
+  }
 
-    getCombatActions(): CombatAction[] {
-        return this.COMBAT_ACTIONS;
-    }
-}    
-    
-    
-    
-    
-            
+  eatAtPercent(): number {
+    return 40;
+  }
+}
 
-]
+
+
+
+
+

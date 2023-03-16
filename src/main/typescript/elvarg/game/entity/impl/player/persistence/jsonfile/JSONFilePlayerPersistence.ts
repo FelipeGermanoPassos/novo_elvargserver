@@ -8,7 +8,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { GsonBuilder } from 'gson';
 
-class JSONFilePlayerPersistence {
+export class JSONFilePlayerPersistence {
   private static PATH = './data/saves/characters/';
   private static BUILDER = new JsonConvert(OperationMode.ENABLE, ValueCheckingMode.DISALLOW_NULL);
 

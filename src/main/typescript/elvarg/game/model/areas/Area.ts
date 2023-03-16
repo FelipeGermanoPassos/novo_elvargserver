@@ -6,6 +6,7 @@ import { Mobile } from '../../entity/impl/Mobile'
 import { Item } from '../../../game/model/Item'
 import { CombatFactory } from '../../content/combat/CombatFactory'
 import { CanAttackResponse } from '../../content/combat/CombatFactory'
+import { GameObject } from '../../entity/impl/object/GameObject';
 
 
 export abstract class Area {
@@ -14,7 +15,7 @@ export abstract class Area {
     private players: { [key: number]: Player } = {};
     private playerBots: { [key: number]: PlayerBot } = {};
 
-    constructor(boundaries: Boundary[]) {
+    constructor(boundaries?: Boundary[]) {
         this.boundaries = boundaries;
     }
 
@@ -107,7 +108,7 @@ export abstract class Area {
         // By default, players will have the default right click in Areas.
     }
 
-    public handleObjectClick(player: Player, objectId: number, type: number): boolean {
+    public handleObjectClick(player: Player, objectId: GameObject, type: number): boolean {
         // By default, Areas don't need to handle any specific object clicking.
         return false;
     }
@@ -136,15 +137,15 @@ export abstract class Area {
     }
 
     public getNpcs(): NPC[] {
-        return Array.from(this.npcs.values());
+        return Object.values(this.npcs);
     }
 
     public getPlayers(): Player[] {
-        return Array.from(this.players.values());
-    }
-
-    public getPlayerBots(): PlayerBot[] {
-        return Array.from(this.playerBots.values());
-    }
+        return Object.values(this.players);
+      }
+      
+      public getPlayerBots(): PlayerBot[] {
+        return Object.values(this.playerBots);
+      }
 }
 

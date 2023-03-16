@@ -44,14 +44,14 @@ export class PlayerBot extends Player {
     }
 
     private movementInteraction: MovementInteraction;
-    private chatInteraction: ChatInteraction;
+    public chatInteraction: ChatInteraction;
     private tradingInteraction: TradingInteraction;
     private combatInteraction: CombatInteraction;
 
     constructor(definition: PlayerBotDefinition) {
         super(new PlayerBotSession(), definition.getSpawnLocation());
 
-        Player.setUsername(definition.getUsername()).setLongUsername(Misc.stringToLong(definition.getUsername()))
+        this.interactingWith.setUsername(definition.getUsername()).setLongUsername(Misc.stringToLong(definition.getUsername()))
             .setPasswordHashWithSalt(GameConstants.PLAYER_BOT_PASSWORD).setHostAddress("127.0.0.1");
 
         this.definition = definition;
@@ -60,9 +60,9 @@ export class PlayerBot extends Player {
         this.movementInteraction = new MovementInteraction(this);
         this.combatInteraction = new CombatInteraction(this);
 
-        Player.setRigourUnlocked(true);
-        Player.setAuguryUnlocked(true);
-        Player.setAutoRetaliate(true);
+        this.interactingWith.setRigourUnlocked(true);
+        this.interactingWith.setAuguryUnlocked(true);
+        this.interactingWith.setAutoRetaliate(true);
 
         if (!World.getAddPlayerQueue().contains(this)) {
             World.getAddPlayerQueue().add(this);
@@ -83,10 +83,6 @@ export class PlayerBot extends Player {
 
     public setCurrentState(interactionState: InteractionState): void {
         this.currentState = interactionState;
-    }
-
-    public manipulateHit(){
-
     }
 
     public getChatCommands(): BotCommand[] {
@@ -138,15 +134,15 @@ export class PlayerBot extends Player {
     }
 
     public sendChat(message: string): void {
-        Player.getChatMessageQueue().add(new ChatMessage(0, 0, Misc.textPack(message)));
+        this.interactingWith.getChatMessageQueue().push(new ChatMessage(0, 0, Misc.textPack(message)));
     }
 
     public updateLocalPlayers(): void {
-        if (Player.getLocalPlayers().length == 0) {
+        if (this.interactingWith.getLocalPlayers().length == 0) {
             return;
         }
 
-        for (let localPlayer of Player.getLocalPlayers()) {
+        for (let localPlayer of this.interactingWith.getLocalPlayers()) {
             PlayerUpdating.update(localPlayer);
         }
     }
@@ -159,7 +155,7 @@ export class PlayerBot extends Player {
     public onLogin(): void {
         super.onLogin();
 
-        Presetables.load(this, this.getDefinition().getFighterPreset().getItemPreset());
+        Presetables.load(this.interactingWith, this.getDefinition().getFighterPreset().getItemPreset());
     }
 
     public resetAttributes(): void {

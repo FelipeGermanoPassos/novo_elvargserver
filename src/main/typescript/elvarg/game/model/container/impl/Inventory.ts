@@ -21,15 +21,11 @@ export class Inventory extends ItemContainer {
     
     public refreshItems(): ItemContainer {
         this.getPlayer().getPacketSender().sendItemContainer(this, Inventory.INTERFACE_ID);
-        return super.refreshItems();
+        return this.refreshItems();
     }
     
     public full(itemId?: number): ItemContainer {
-        if (itemId !== undefined) {
-            return false;
-        } else {
-            this.getPlayer().getPacketSender().sendMessage("Not enough space in your inventory.");
-            return this;
-        }
+        this.getPlayer().getPacketSender().sendMessage("Not enough space in your inventory.");
+        return this;
     }
 }

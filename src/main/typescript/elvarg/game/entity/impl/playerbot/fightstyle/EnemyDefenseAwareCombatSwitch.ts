@@ -7,15 +7,21 @@ import { PlayerBot } from "../PlayerBot";
 import { BonusManager } from "../../../../model/equipment/BonusManager";
 import { CombatAction } from "./CombatAction";
 import { AttackStyleSwitch } from "./AttackStyleSwitch";
+import { TimerKey } from "../../../../../util/timers/TimerKey";
 
 export class EnemyDefenseAwareCombatSwitch implements CombatAction {
     private styleSwitches: AttackStyleSwitch[];
 
-    constructor(styleSwitches: AttackStyleSwitch[]) {
+    constructor(styleSwitches: AttackStyleSwitch[], private readonly execFunc: Function) {
         this.styleSwitches = styleSwitches;
     }
-    shouldPerform
-    stopAfter
+    shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
+        return this.execFunc();
+    }
+
+    stopAfter(): boolean {
+        return false;
+    }
 
     perform(playerBot: PlayerBot, enemy: Mobile) {
         let bestSwitch: AttackStyleSwitch = null;

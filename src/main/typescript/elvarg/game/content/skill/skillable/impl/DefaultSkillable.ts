@@ -15,7 +15,7 @@ class DefaultSkillableTask extends Task{
 export abstract class DefaultSkillable implements Skillable {
     public tasks: Task[] = [];
   
-    cancel(player: Player): void {
+    public cancel(player: Player): void {
         // Stop all tasks..
         const i = this.tasks.values();
         for (const task of i) {
@@ -54,11 +54,11 @@ export abstract class DefaultSkillable implements Skillable {
   
     finishedCycle(player: Player): void {}
   
-    getTasks(): Array<Task> {
+    public getTasks(): Array<Task> {
       return Array.from(this.tasks);
     }
   
-    start(player: Player) {
+    public start(player: Player) {
       this.startAnimationLoop(player);
   
       // Start main process task..

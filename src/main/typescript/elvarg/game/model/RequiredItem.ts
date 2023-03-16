@@ -3,7 +3,7 @@ export class RequiredItem {
     private item: Item;
     private delete: boolean;
 
-    constructor(item: Item, Delete: boolean) {
+    constructor(item: Item, Delete?: boolean) {
         this.item = item;
         this.delete = Delete;
     }

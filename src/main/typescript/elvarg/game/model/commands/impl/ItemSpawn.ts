@@ -9,7 +9,7 @@ class ItemSpawn implements Command {
         if (parts.length > 2) {
             amount = parseInt(parts[2]);
         }
-        player.getInventory().add(new Item(parseInt(parts[1]), amount));
+        player.getInventory().addItem(new Item(parseInt(parts[1]), amount));
     }
     canUse(player: Player): boolean {
         let rights = player.getRights();

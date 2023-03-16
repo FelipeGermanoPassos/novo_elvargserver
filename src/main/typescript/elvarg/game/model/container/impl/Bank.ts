@@ -14,8 +14,16 @@ import { Flag } from "../../Flag";
 import { BonusManager } from "../../equipment/BonusManager";
 import { GameObject } from "../../../entity/impl/object/GameObject";
 import { DialogueOption } from "../../dialogues/DialogueOption";
+import { EnteredSyntaxAction } from "../../EnteredSyntaxAction";
+import { DialogueOptionAction } from "../../dialogues/DialogueOptionAction";
+import { exec } from "child_process";
 
 export class Bank extends ItemContainer {
+    full(): ItemContainer;
+    full(itemId: number): boolean;
+    full(itemId?: unknown): boolean | ItemContainer {
+        throw new Error("Method not implemented.");
+    }
     public static readonly TOTAL_BANK_TABS = 11;
     public static readonly CONTAINER_START = 50300;
     public static readonly BANK_SEARCH_TAB_INDEX = this.TOTAL_BANK_TABS - 1;
@@ -49,7 +57,7 @@ export class Bank extends ItemContainer {
                 return;
             }
             slot = player.getBank(itemTab).getSlotForItemId(item);
-            player.getBank(itemTab).switchItem(player.getInventory(), new Item(item, amount),
+            player.getBank(itemTab).switchsItem(player.getInventory(), new Item(item, amount),
             player.getBank(itemTab).getSlotForItemId(item), false, false);
             if (slot === 0) {
                 Bank.reconfigureTabs(player);
@@ -77,7 +85,7 @@ export class Bank extends ItemContainer {
             }
             
             // Perform the switch
-            player.getBank(itemTab).switchItem(player.getInventory(), new Item(item, amount), slot, false, false);
+            player.getBank(itemTab).switchItem(player.getInventory(), new Item(item, amount), false, slot, false);
             
             // Update all tabs if we removed an item from the first item slot
             if (slot === 0) {
@@ -109,16 +117,16 @@ export class Bank extends ItemContainer {
         const builder = new DialogueChainBuilder();
 
         if (player.getInventory().getAmount(item.getId()) <= 5) {
-            builder.add(new OptionDialogue(0, (option) => {
+            builder.add(new OptionDialogue(0, new bankAction((option) => {
                 if (option === DialogueOption.FIRST_OPTION) {
                     Bank.deposit(player, item.getId(), slot, 1, true);
                 } else {
                     Bank.deposit(player, item.getId(), slot, 5, true);
                 }
                 player.getPacketSender().sendInterfaceRemoval();
-            }, "One", "Five"));
+            }), "One", "Five"));
         } else if (player.getInventory().getAmount(item.getId()) <= 10) {
-            builder.add(new OptionDialogue(0, (option) => {
+            builder.add(new OptionDialogue(0, new bankAction((option) => {
                 if (option === DialogueOption.FIRST_OPTION) {
                     Bank.deposit(player, item.getId(), slot, 1, true);
                 } else if (option === DialogueOption.SECOND_OPTION) {
@@ -127,9 +135,9 @@ export class Bank extends ItemContainer {
                     Bank.deposit(player, item.getId(), slot, 10, true);
                 }
                 player.getPacketSender().sendInterfaceRemoval();
-            }, "One", "Five", "Ten"));
+            }), "One", "Five", "Ten"));
         } else {
-            builder.add(new OptionDialogue(0, (option) => {
+            builder.add(new OptionDialogue(0, new bankAction((option) => {
                 if (option === DialogueOption.FIRST_OPTION) {
                     Bank.deposit(player, item.getId(), slot, 1, true);
                 } else if (option === DialogueOption.SECOND_OPTION) {
@@ -140,7 +148,7 @@ export class Bank extends ItemContainer {
                     Bank.deposit(player, item.getId(), slot, player.getInventory().getAmount(item.getId()), true);
                 }
                 player.getPacketSender().sendInterfaceRemoval();
-            }, "One", "Five", "Ten", "All"));
+            }), "One", "Five", "Ten", "All"));
         }
 
         player.getDialogueManager().startDialogues(builder);
@@ -181,8 +189,7 @@ export class Bank extends ItemContainer {
                 player.setCurrentBankTab(tab);
             }
     
-            player.getInventory().switchItem(player.getBank(tab), new Item(item, amount), ignore, false,
-                );
+            player.getInventory().switchItem(player.getBank(tab), new Item(item, amount),false , slot, !player.isSearchingBank());
             if (player.isSearchingBank()) {
                 player.getBank(this.BANK_SEARCH_TAB_INDEX).refreshItems();
             }
@@ -359,7 +366,7 @@ export class Bank extends ItemContainer {
                             let noteWithdrawal: boolean = player.withdrawAsNote();
                             player.setNoteWithdrawal(false);
                             for (let item of items) {
-                                player.getBank(bankId).switchItem(player.getInventory(), item.clone(), player.getBank(bankId).getSlotForItemId(item.getId()), false, false);
+                                player.getBank(bankId).switchsItem(player.getInventory(), item.clone(), player.getBank(bankId).getSlotForItemId(item.getId()), false, false);
                             }
                             player.setNoteWithdrawal(noteWithdrawal);
                             this.reconfigureTabs(player);
@@ -401,7 +408,7 @@ export class Bank extends ItemContainer {
                         this.depositItems(player, player.getInventory(), false);
                         break;
                     case 50007:
-                        this.depositItems(player, player.getEquipment(), false);
+                        this.depositItems(player, player.getInventory(), false);
                         break;
                     case 5384:
                     case 50001:
@@ -412,9 +419,7 @@ export class Bank extends ItemContainer {
                             this.exitSearch(player, true);
                             return true;
                         }
-                        player.setEnteredSyntaxAction((input: string) => {
-                            Bank.search(player, input);
-                        });
+                        player.setEnteredSyntaxAction(new bankEntered((input) => {Bank.search(player, input)}));
                         player.getPacketSender().sendEnterInputPrompt("What do you wish to search for?");
                         break;
                 }
@@ -430,8 +435,7 @@ export class Bank extends ItemContainer {
             }
         }
         for (let item of from.getValidItems()) {
-            from.switchItem(from, item.clone(),
-                false, false);
+            from.switchItems(player.getBank(Bank.getTabForItem(player, item.getId())), item.clone(),false, false);
         }
         from.refreshItems();
         if (player.isSearchingBank()) {
@@ -574,8 +578,8 @@ export class Bank extends ItemContainer {
         }
 
         // Send capacity information about the current bank we're in
-        this.getPlayer().getPacketSender().sendString(50053, "" + this.getValidItems().length);
-        this.getPlayer().getPacketSender().sendString(50054, "" + this.capacity());
+        this.getPlayer().getPacketSender().sendString("" + this.getValidItems().length, 50053);
+        this.getPlayer().getPacketSender().sendString("" +this.capacity(), 50054);
 
         // Send all bank tabs and their contents
         for (let i = 0; i < Bank.TOTAL_BANK_TABS; i++) {
@@ -587,10 +591,10 @@ export class Bank extends ItemContainer {
 
         // Update bank title
         if (this.getPlayer().isSearchingBank()) {
-            this.getPlayer().getPacketSender().sendString(5383, "Results for " + this.getPlayer().getSearchSyntax() + "..")
+            this.getPlayer().getPacketSender().sendString("Results for " + this.getPlayer().getSearchSyntax() + "..", 5383)
                     .sendConfig(117, 1);
         } else {
-            this.getPlayer().getPacketSender().sendString(5383, "Bank of " + GameConstants.NAME).sendConfig(117, 0);
+            this.getPlayer().getPacketSender().sendString("Bank of " + GameConstants.NAME, 5383).sendConfig(117, 0);
         }
 
         // Send current bank tab being viewed and total tabs!
@@ -600,13 +604,13 @@ export class Bank extends ItemContainer {
         return this;
     }
 
-    public full(): ItemContainer | boolean {
+    public fulls(): ItemContainer | boolean {
         this.getPlayer().getPacketSender().sendMessage("Not enough space in bank.");
         return this;
     }
 
     
-    public switchItem(to: Inventory, item: Item, slot: number, sort: boolean, refresh: boolean): Bank {
+    public switchsItem(to: ItemContainer, item: Item, slot: number, sort: boolean, refresh: boolean): Bank {
     // Make sure we're actually banking!
     if (this.getPlayer().getStatus() != PlayerStatus.BANKING || this.getPlayer().getInterfaceId() != 5292) {
     return this;
@@ -666,7 +670,9 @@ export class Bank extends ItemContainer {
             return this;
         }
 
-        delete(item: Item, slot: number, refresh: boolean, to: ItemContainer):
+        this.deleteItemContainer(item, slot, refresh, to);
+      
+
         // Check if we can actually withdraw the item as a note.
         if (this.getPlayer().withdrawAsNote()) {
             let def = ItemDefinition.forId(item.getId() + 1);
@@ -697,6 +703,25 @@ export class Bank extends ItemContainer {
         }
     
         return this;
+    }
+    
+}
+
+class bankAction implements DialogueOptionAction{
+    constructor(private readonly execFunc: Function){
+        
+    }
+    executeOption(option: DialogueOption): void {
+        this.execFunc();
+    }
+
+}
+
+class bankEntered implements EnteredSyntaxAction{
+    constructor(private readonly execFunc: Function){}
+
+    execute(syntax: string): void {
+        this.execFunc();
     }
     
 }

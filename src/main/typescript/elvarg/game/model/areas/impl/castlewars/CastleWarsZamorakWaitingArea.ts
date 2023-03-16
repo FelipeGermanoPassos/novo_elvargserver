@@ -5,12 +5,14 @@ import { Arrays } from 'collections'
 import { Boundary } from '../../../../model/Boundary';
 import { CastleWars } from '../../../../content/minigames/impl/CastleWars';
 import { Item } from '../../../../model/Item';
-import { obj } from '../../../../../util/ObjectIdentifiers';
-import Misc from 'misc'
+import { ObjectIdentifiers } from '../../../../../util/ObjectIdentifiers';
+import { Misc } from '../../../../../util/Misc';
 import { Area } from '../../../../model/areas/Area'
 import { TaskManager } from '../../../../task/TaskManager';
 import { Equipment } from '../../../container/impl/Equipment';
 import { ItemContainer } from '../../../container/ItemContainer';
+import { Location } from '../../../Location';
+import { Flag } from '../../../Flag';
 
 export class CastleWarsZamorakWaitingArea extends Area {
     constructor() {
@@ -27,7 +29,7 @@ export class CastleWarsZamorakWaitingArea extends Area {
             return;
         }
 
-        if (!CastleWars.START_GAME_TASK.isRunning() && CastleWars.SARADOMIN_WAITING_AREA.getPlayers().size > 0) {
+        if (!CastleWars.START_GAME_TASK.isRunning() && CastleWars.SARADOMIN_WAITING_AREA.getPlayers().length > 0) {
             // Ensure the game start timer is active
             TaskManager.submit(CastleWars.START_GAME_TASK);
         }
@@ -50,15 +52,15 @@ export class CastleWarsZamorakWaitingArea extends Area {
             return;
         }
 
-        if (CastleWars.START_GAME_TASK.isRunning() && Area.getPlayers().size === 0
-            && CastleWars.SARADOMIN_WAITING_AREA.getPlayers().size === 0) {
+        if (CastleWars.START_GAME_TASK.isRunning() && this.getPlayers().length === 0
+            && CastleWars.SARADOMIN_WAITING_AREA.getPlayers().length === 0) {
             // Ensure the game start timer is cancelled
             TaskManager.cancelTasks(CastleWars.START_GAME_TASK);
         }
 
         if (logout) {
             // Player has logged out, teleport them to the lobby
-            player.moveTo(new Location());
+            player.moveTo(new Location(2439 + Misc.randoms(4), 3085 + Misc.randoms(5), 0));
         }
 
         if (player.getArea() !== CastleWars.GAME_AREA) {
@@ -75,8 +77,9 @@ export class CastleWarsZamorakWaitingArea extends Area {
 
     handleObjectClick(player: Player, objectId: number, type: number): boolean {
         switch (objectId) {
-            case obj.PORTAL_9:
-                player.moveTo(new Location());
+            case ObjectIdentifiers.PORTAL_9:
+                player.moveTo(new Location(2439 + Misc.randoms(4),
+                3085 + Misc.randoms(5), 0));
                 return true;
         }
 
@@ -118,6 +121,6 @@ export class CastleWarsZamorakWaitingArea extends Area {
 
     canPlayerBotIdle(playerBot: PlayerBot): boolean {
         // Allow the player bot to wait here if there are players in the other team
-        return CastleWars.SARADOMIN_WAITING_AREA.getPlayers().size() > 0;
+        return CastleWars.SARADOMIN_WAITING_AREA.getPlayers().length > 0;
     }
 }

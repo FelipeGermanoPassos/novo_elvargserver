@@ -1,4 +1,3 @@
-import { HashMap } from 'hashmap'
 import { Server } from '../../../Server';
 import { Claim } from '../../model/commands/impl/Claim'
 import { ChangePassword } from '../../model/commands/impl/ChangePassword'

@@ -68,24 +68,13 @@ export class EquipPacketListener implements PacketExecutor {
 			case Inventory.INTERFACE_ID:
 				// Check if player can wield the item..
 				if (item.getDefinition().getRequirements() != null) {
-					for (Skill skill : Skill.values()) {
-						if (item.getDefinition().getRequirements()[skill.ordinal()] > player.getSkillManager()
-							.getMaxLevel(skill)) {
-							StringBuilder vowel = new StringBuilder();
-							if (skill.getName().startsWith("a") || skill.getName().startsWith("e")
-								|| skill.getName().startsWith("i") || skill.getName().startsWith("o")
-								|| skill.getName().startsWith("u")) {
-								vowel.append("an ");
-							} else {
-								vowel.append("a ");
-							}
-							player.getPacketSender()
-								.sendMessage("You need " + vowel.toString() + Misc.formatText(skill.getName())
-									+ " level of at least "
-									+ item.getDefinition().getRequirements()[skill.ordinal()] + " to wear this.");
-							return;
+					for (const skill of Object.values(Skill)) {
+						if (item.getDefinition().getRequirements()[skill] > player.getSkillManager().getMaxLevel(skill)) {
+						  const vowel = skill.getName().match(/^[aeiou]/i) ? 'an' : 'a';
+						  player.getPacketSender().sendMessage(`You need ${vowel} ${Misc.formatText(skill.getName())} level of at least ${item.getDefinition().getRequirements()[skill]} to wear this.`);
+						  return;
 						}
-					}
+					  }
 				}
 
 				// Check if the item has a proper equipment slot..
@@ -105,16 +94,15 @@ export class EquipPacketListener implements PacketExecutor {
 				if (player.getDueling().inDuel()) {
 					for (let i: number = 11; i < player.getDueling().getRules().length; i++) {
 						if (player.getDueling().getRules()[i]) {
-							DuelRule duelRule = DuelRule.forId(i);
-							if (equipmentSlot == duelRule.getEquipmentSlot()
-								|| duelRule == DuelRule.NO_SHIELD && item.getDefinition().isDoubleHanded()) {
-								///DialogueManager.sendStatement(player, "The rules that were set do not allow this item to be equipped.");
-								return;
+							const duelRule = DuelRule.forId(i);
+							if (equipmentSlot === duelRule.getEquipmentSlot() || (duelRule === DuelRule.NO_SHIELD && item.getDefinition().isDoubleHanded())) {
+							  // DialogueManager.sendStatement(player, "The rules that were set do not allow this item to be equipped.");
+							  return;
 							}
-						}
+						  }
 					}
 					if (equipmentSlot == Equipment.WEAPON_SLOT || item.getDefinition().isDoubleHanded()) {
-						if (player.getDueling().getRules()[DuelRule.LOCK_WEAPON.ordinal()]) {
+						if (player.getDueling().getRules()[DuelRule.forId(0)]) {
 							////DialogueManager.sendStatement(player, "Weapons have been locked in this duel!");
 							return;
 						}
@@ -126,7 +114,7 @@ export class EquipPacketListener implements PacketExecutor {
 					let amount: number = equipItem.getAmount() + item.getAmount() <= Number.MAX_VALUE
 						? equipItem.getAmount() + item.getAmount()
 						: Number.MAX_VALUE;
-					player.getInventory().delete(amount);
+					player.getInventory().deleteBoolean(item, false);
 					player.getEquipment().getItems()[equipmentSlot].setAmount(amount);
 					equipItem.setAmount(amount);
 				} else {
@@ -148,10 +136,10 @@ export class EquipPacketListener implements PacketExecutor {
 						if (weapon.getId() != -1) {
 							player.getInventory().setItem(slot, weapon);
 						} else
-							player.getInventory().delete(item.amount);
+							player.getInventory().deletes(item);
 
 						if (shield.getId() != -1) {
-							player.getInventory().add(shield.amount);
+							player.getInventory().addItem(shield);
 						}
 
 					} else if (equipmentSlot == Equipment.SHIELD_SLOT
@@ -164,8 +152,8 @@ export class EquipPacketListener implements PacketExecutor {
 						if (equipmentSlot == equipItem.getDefinition().getEquipmentType().getSlot()
 							&& equipItem.getId() != -1) {
 							if (player.getInventory().contains(equipItem.getId())) {
-								player.getInventory().delete(item.amount);
-								player.getInventory().add(equipItem.amount);
+								player.getInventory().deleteBoolean(item, false);
+								player.getInventory().add(equipItem, false);
 							} else {
 								player.getInventory().setItem(slot, equipItem);
 							}

@@ -9,6 +9,30 @@ import { StackType } from "../model/container/StackType";
 import { Inventory } from "../model/container/impl/Inventory";
 import { Misc } from "../../util/Misc";
 
+class PlayerItemContainer extends ItemContainer {
+    constructor(player, private readonly execFunc: Function) {
+      super(player);
+    }
+  
+    stackType() {
+      return StackType.DEFAULT;
+    }
+  
+    refreshItems(): ItemContainer {
+      this.execFunc();
+      return this;
+    }
+  
+    full(): ItemContainer {
+      this.player.getPacketSender().sendMessage("You cannot trade more items.");
+      return this;
+    }
+  
+    capacity() {
+      return 28;
+    }
+  }
+
 export class Trading {
     public static readonly CONTAINER_INTERFACE_ID: number = 3415;
     public static readonly CONTAINER_INVENTORY_INTERFACE: number = 3321;
@@ -38,26 +62,14 @@ export class Trading {
 
     constructor(player: Player) {
         this.player = player;
-        this.container = new ItemContainer(player); {
-            public function stackType(): StackType {
-                return StackType.DEFAULT;
-            }
-            public function refreshItems(): ItemContainer {
+        this.container = new PlayerItemContainer(player, ()=> {
                 player.getPacketSender().sendInterfaceSet(Trading.INTERFACE, Trading.CONTAINER_INVENTORY_INTERFACE);
                 player.getPacketSender().sendItemContainer(this.container, Trading.CONTAINER_INTERFACE_ID);
                 player.getPacketSender().sendItemContainer(player.getInventory(), Trading.INVENTORY_CONTAINER_INTERFACE);
                 player.getPacketSender().sendItemContainer(this.interact.getTrading().getContainer(), Trading.CONTAINER_INTERFACE_ID_2);
                 this.interact.getPacketSender().sendItemContainer(player.getTrading().getContainer(), Trading.CONTAINER_INTERFACE_ID_2);
                 return this;
-            }
-            public function full(): ItemContainer {
-                player.getPacketSender().sendMessage("You cannot trade more items.");
-                return this;
-            }
-            public function capacity(): number {
-                return 28;
-            }
-        };
+        });
     }
 
     static listItems(items: ItemContainer): string {
@@ -175,10 +187,10 @@ export class Trading {
     public initiateTrade() {
         this.player.setStatus(PlayerStatus.TRADING);
         this.setState(TradeState.TRADE_SCREEN);
-        this.player.getPacketSender().sendString(Trading.TRADING_WITH_FRAME, "Trading with: @whi@" + this.interact.getUsername());
-        this.player.getPacketSender().sendString(Trading.STATUS_FRAME_1, "")
-            .sendString(Trading.STATUS_FRAME_2, "Are you sure you want to make this trade?")
-            .sendString(Trading.ITEM_VALUE_1_FRAME, "0 bm").sendString(Trading.ITEM_VALUE_2_FRAME, "0 bm");
+        this.player.getPacketSender().sendString("Trading with: @whi@" + this.interact.getUsername(), Trading.TRADING_WITH_FRAME,);
+        this.player.getPacketSender().sendString("", Trading.STATUS_FRAME_1,)
+            .sendString( "Are you sure you want to make this trade?", Trading.STATUS_FRAME_2)
+            .sendString("0 bm", Trading.ITEM_VALUE_1_FRAME).sendString( "0 bm", Trading.ITEM_VALUE_2_FRAME);
         this.container.resetItems();
         this.container.refreshItems();
         if (this.player instanceof PlayerBot) {
@@ -190,7 +202,7 @@ export class Trading {
         if (this.state != TradeState.NONE) {
             let interact_ = this.interact;
             for (let t of this.container.getValidItems()) {
-                this.container.switchItem(player.getInventory(), t.clone(), false, false);
+                this.container.switchItems(this.player.getInventory(), t.clone(), false, false);
             }
             this.player.getInventory().refreshItems();
             this.resetAttributes();
@@ -235,36 +247,36 @@ export class Trading {
             }
             this.state = (TradeState.ACCEPTED_TRADE_SCREEN);
 
-            this.player.getPacketSender().sendString(Trading.STATUS_FRAME_1, "Waiting for other player..");
-            this.interact.getPacketSender().sendString(Trading.STATUS_FRAME_1, "" + player.getUsername() + " has accepted.");
+            this.player.getPacketSender().sendString( "Waiting for other player..", Trading.STATUS_FRAME_1);
+            this.interact.getPacketSender().sendString( "" + this.player.getUsername() + " has accepted.", Trading.STATUS_FRAME_1,);
             if (this.state == TradeState.ACCEPTED_TRADE_SCREEN && t_state == TradeState.ACCEPTED_TRADE_SCREEN) {
                 this.player.getTrading().confirmScreen();
                 interact_.getTrading().confirmScreen();
             } else {
                 if (interact_ instanceof PlayerBot) {
-                    ((PlayerBot) interact_).getTradingInteraction().acceptTrade();
+                    interact_.getTradingInteraction().acceptTrade();
                 }
             }
         } else if (this.state === TradeState.CONFIRM_SCREEN) {
             // Both are in the same state. Do the second-stage accept.
             this.state = (TradeState.ACCEPTED_CONFIRM_SCREEN);
             // Update status...
-            this.player.getPacketSender().sendString(Trading.STATUS_FRAME_2,
-                "Waiting for " + interact_.getUsername() + 's confirmation..');
-            interact_.getPacketSender().sendString(Trading.STATUS_FRAME_2,
-                "" + this.player.getUsername() + " has accepted.Do you wish to do the same ?");
+            this.player.getPacketSender().sendString(
+                "Waiting for " + interact_.getUsername() + 's confirmation..', Trading.STATUS_FRAME_2,);
+            interact_.getPacketSender().sendString(
+                "" + this.player.getUsername() + " has accepted.Do you wish to do the same ?", Trading.STATUS_FRAME_2);
             if (this.state === TradeState.ACCEPTED_CONFIRM_SCREEN && t_state === TradeState.ACCEPTED_CONFIRM_SCREEN) {
                 // Give items to both players...
                 const receivingItems = interact_.getTrading().getContainer().getValidItems();
                 for (const item of receivingItems) {
-                    this.player.getInventory().add(item);
+                    this.player.getInventory().addItem(item);
                 }
                 const givingItems = this.player.getTrading().getContainer().getValidItems();
                 for (const item of givingItems) {
-                    interact_.getInventory().add(item);
+                    interact_.getInventory().addItem(item);
                 }
                 if (this.player instanceof PlayerBot && receivingItems.length > 0) {
-                    ((this.player as PlayerBot).getTradingInteraction().receivedItems(receivingItems, interact_);
+                    (this.player as PlayerBot).getTradingInteraction().receivedItems(receivingItems, interact_);
                 }
                 // Reset attributes for both players...
                 this.resetAttributes();
@@ -293,10 +305,10 @@ export class Trading {
         this.player.getPacketSender().sendItemContainer(this.player.getInventory(), Trading.INVENTORY_CONTAINER_INTERFACE);
 
         // Send new interface frames
-        let thisItems = this.listItems(this.container);
-        let interactItems = this.listItems(this.interact.getTrading().getContainer());
-        this.player.getPacketSender().sendString(Trading.ITEM_LIST_1_FRAME, thisItems);
-        this.player.getPacketSender().sendString(Trading.ITEM_LIST_2_FRAME, interactItems);
+        let thisItems = Trading.listItems(this.container);
+        let interactItems = Trading.listItems(this.interact.getTrading().getContainer());
+        this.player.getPacketSender().sendString(thisItems, Trading.ITEM_LIST_1_FRAME,);
+        this.player.getPacketSender().sendString(interactItems, Trading.ITEM_LIST_2_FRAME);
     }
 
     handleItem(id: number, amount: number, slot: number, from: ItemContainer, to: ItemContainer) {
@@ -319,8 +331,8 @@ export class Trading {
                 modified = true;
             }
             if (modified) {
-                this.player.getPacketSender().sendString(Trading.STATUS_FRAME_1, "@red@TRADE MODIFIED!");
-                this.interact.getPacketSender().sendString(Trading.STATUS_FRAME_1, "@red@TRADE MODIFIED!");
+                this.player.getPacketSender().sendString("@red@TRADE MODIFIED!", Trading.STATUS_FRAME_1);
+                this.interact.getPacketSender().sendString( "@red@TRADE MODIFIED!", Trading.STATUS_FRAME_1);
             }
             if (this.state === TradeState.TRADE_SCREEN && this.interact.getTrading().getState() === TradeState.TRADE_SCREEN) {
 
@@ -344,23 +356,18 @@ export class Trading {
 
                     // Do the switch!
                     if (item.getAmount() === 1) {
-                        from.switchItem(to, item, slot, false, true);
+                        from.switchItem(to, item,  false, slot, true);
                     } else {
-                        from.switchItem(to, item, false, true);
+                        from.switchItems(to, item, false, true);
                     }
 
                     // Update value frames for both players
                     const plr_value = this.container.getTotalValue();
-                    const other_plr_value = interact.getTrading().getContainer().getTotalValue();
-                    this.player.getPacketSender().sendString(Trading.ITEM_VALUE_1_FRAME,
-                        Misc.insertCommasToNumber(plr_value) + " bm");
-                    this.player.getPacketSender().sendString(Trading.ITEM_VALUE_2_FRAME,
-                        Misc.insertCommasToNumber(other_plr_value) + " bm");
-                    this.interact.getPacketSender().sendString(Trading.ITEM_VALUE_1_FRAME,
-                        Misc.insertCommasToNumber(other_plr_value) + " bm");
-                    this.interact.getPacketSender().sendString(Trading.ITEM_VALUE_2_FRAME,
-                        Misc.insertCommasToNumber(plr_value) + " bm");
-
+                    const other_plr_value = this.interact.getTrading().getContainer().getTotalValue();
+                    this.player.getPacketSender().sendString(Misc.insertCommasToNumber(plr_value) + " bm", Trading.ITEM_VALUE_1_FRAME,);
+                    this.player.getPacketSender().sendString(Misc.insertCommasToNumber(other_plr_value) + " bm", Trading.ITEM_VALUE_2_FRAME);
+                    this.interact.getPacketSender().sendString(Misc.insertCommasToNumber(other_plr_value) + " bm", Trading.ITEM_VALUE_1_FRAME,);
+                    this.interact.getPacketSender().sendString(Misc.insertCommasToNumber(plr_value) + " bm", Trading.ITEM_VALUE_2_FRAME);
                     if (this.interact instanceof PlayerBot) {
                         // Automatically accept the trade whenever an item is added by the player
                         this.interact.getTrading().acceptTrade();
@@ -415,6 +422,6 @@ export class Trading {
     }
 }
 
-private enum TradeState {
-    NONE, REQUESTED_TRADE, TRADE_SCREEN, ACCEPTED_TRADE_SCREEN, CONFIRM_SCREEN, ACCEPTED_CONFIRM_SCREEN;
+enum TradeState {
+    NONE, REQUESTED_TRADE, TRADE_SCREEN, ACCEPTED_TRADE_SCREEN, CONFIRM_SCREEN, ACCEPTED_CONFIRM_SCREEN
 }

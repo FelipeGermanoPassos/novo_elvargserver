@@ -1,7 +1,7 @@
 import { Player } from "../../entity/impl/player/Player";
 import { GameConstants } from "../../GameConstants";
 import { Presetable } from "./Presetable";
-import { Skill, Skills } from "../../model/Skill";
+import { Skill } from "../../model/Skill";
 import { WildernessArea } from "../../model/areas/impl/WildernessArea";
 import { CombatFactory } from "../combat/CombatFactory";
 import { PredefinedPresets } from './PredefinedPresets'
@@ -14,10 +14,20 @@ import { Autocasting } from "../combat/magic/Autocasting";
 import { SkillManager } from "../skill/SkillManager";
 import { BountyHunter } from "../combat/bountyhunter/BountyHunter";
 import { Misc } from "../../../util/Misc";
-import { PrayerHandler } from "../PrayerHandler";
+import { PrayerHandler, PrayerData } from "../PrayerHandler";
 import { CombatSpecial } from "../combat/CombatSpecial";
 import { Flag } from "../../model/Flag";
 import { EnteredSyntaxAction } from "../../model/EnteredSyntaxAction";
+
+class PreseEntered implements EnteredSyntaxAction{
+    constructor(private readonly execFunc: Function){
+
+    }
+    execute(syntax: string): void {
+    this.execFunc();
+    }
+
+}
 
 export class Presetables {
     /**
@@ -58,32 +68,32 @@ export class Presetables {
     public static open(player: Player, preset: Presetable) {
         if (preset) {
             // Send name
-            player.getPacketSender().sendString(45002, "Presets - " + preset.getName());
+            player.getPacketSender().sendString("Presets - " + preset.getName(), 45002);
 
             // Send stats
-            player.getPacketSender().sendString(45007, preset.getStats()[3].toString()); // Hitpoints
-            player.getPacketSender().sendString(45008, preset.getStats()[0].toString()); // Attack
-            player.getPacketSender().sendString(45009, preset.getStats()[2].toString()); // Strength
-            player.getPacketSender().sendString(45010, preset.getStats()[1].toString()); // Defence
-            player.getPacketSender().sendString(45011, preset.getStats()[4].toString()); // Ranged
-            player.getPacketSender().sendString(45012, preset.getStats()[5].toString()); // Prayer
-            player.getPacketSender().sendString(45013, preset.getStats()[6].toString()); // Magic
+            player.getPacketSender().sendString(preset.getStats()[3].toString(), 45007); // Hitpoints
+            player.getPacketSender().sendString(preset.getStats()[0].toString(), 45008); // Attack
+            player.getPacketSender().sendString(preset.getStats()[2].toString(), 45009); // Strength
+            player.getPacketSender().sendString(preset.getStats()[1].toString(), 45010); // Defence
+            player.getPacketSender().sendString(preset.getStats()[4].toString(), 45011); // Ranged
+            player.getPacketSender().sendString(preset.getStats()[5].toString(), 45012); // Prayer
+            player.getPacketSender().sendString(preset.getStats()[6].toString(), 45013); // Magic
 
             // Send spellbook
-            player.getPacketSender().sendString(45014,
-                "@yel@" + preset.getSpellbook().toString().toLowerCase());
+            player.getPacketSender().sendString(
+                "@yel@" + preset.getSpellbook().toString().toLowerCase(), 45014);
 
         } else {
             // Reset name
-            player.getPacketSender().sendString(45002, "Presets");
+            player.getPacketSender().sendString("Presets", 45002);
 
             // Reset stats
             for (let i = 0; i <= 6; i++) {
-                player.getPacketSender().sendString(45007 + i, "");
+                player.getPacketSender().sendString( "", 45007 + i);
             }
 
             // Reset spellbook
-            player.getPacketSender().sendString(45014, "");
+            player.getPacketSender().sendString("", 45014);
 
         }
 
@@ -116,14 +126,14 @@ export class Presetables {
 
         // Send all available global presets
         for (let i = 0; i < Presetables.MAX_PRESETS; i++) {
-            player.getPacketSender().sendString(45070 + i,
-                Presetables.GLOBAL_PRESETS[i] == null ? "Empty" : Presetables.GLOBAL_PRESETS[i].getName());
+            player.getPacketSender().sendString(
+                Presetables.GLOBAL_PRESETS[i] == null ? "Empty" : Presetables.GLOBAL_PRESETS[i].getName(), 45070 + i);
         }
 
         // Send all available player presets
         for (let i = 0; i < Presetables.MAX_PRESETS; i++) {
-            player.getPacketSender().sendString(45082 + i,
-                player.getPresets()[i] == null ? "Empty" : player.getPresets()[i].getName());
+            player.getPacketSender().sendString(
+                player.getPresets()[i] == null ? "Empty" : player.getPresets()[i].getName(), 45082 + i);
         }
 
         // Send on death toggle
@@ -243,17 +253,17 @@ export class Presetables {
             // Delete valuable items from the proper place
             // Not from inventory/equipment, they will be reset anyway.
             for (let item of nonSpawnables) {
-                if (player.getInventory().contains(item)) {
-                    player.getInventory().delete(item);
-                } else if (player.getEquipment().contains(item)) {
-                    player.getEquipment().delete(item);
+                if (player.getInventory().containsItem(item)) {
+                    player.getInventory().deletes(item);
+                } else if (player.getEquipment().containsItem(item)) {
+                    player.getEquipment().deletes(item);
                 } else {
-                    player.getBank(Bank.getTabForItem(player, item.getId())).delete(item);
+                    player.getBank(Bank.getTabForItem(player, item.getId())).deletes(item);
                 }
             }
 
             Misc.concat(preset.getInventory(), preset.getEquipment()).filter(t => t != null && t.isValid())
-            .forEach(t => player.getInventory().add(t))
+            .forEach(t => player.getInventory().addItem(t))
 
             Misc.concat(preset.getEquipment(), preset.getEquipment()).filter(t => t != null && t.isValid())
             .forEach(t => player.getEquipment().setItem(t.getDefinition().getEquipmentType().getSlot(), t.clone()))
@@ -266,24 +276,24 @@ export class Presetables {
                 let skill = Skill[i];
                 let level = preset.getStats()[i]
                 let exp = SkillManager.getExperienceForLevel(level)
-                player.getSkillManager().setCurrentLevel(skill, level).setMaxLevel(skill, level).setExperience(skill, exp)
+                player.getSkillManager().setCurrentLevels(skill, level).setMaxLevel(skill, level).setExperience(skill, exp)
                 totalExp += exp
             }
 
-            player.getPacketSender().sendString(687, player.getSkillManager().getCurrentLevel(Skill.PRAYER) + "/" + player.getSkillManager().getMaxLevel(Skill.PRAYER))
+            player.getPacketSender().sendString( player.getSkillManager().getCurrentLevel(Skill.PRAYER) + "/" + player.getSkillManager().getMaxLevel(Skill.PRAYER),687)
 
             let newCbLevel = player.getSkillManager().getCombatLevel()
             let combatLevel = "Combat level: " + newCbLevel
-            player.getPacketSender().sendString(19000, combatLevel).sendString(5858, combatLevel)
+            player.getPacketSender().sendString(combatLevel, 19000).sendString(combatLevel, 5858)
 
             if (newCbLevel != oldCbLevel) {
                 BountyHunter.unassign(player)
             }
 
             player.getPacketSender().sendTabInterface(6, player.getSpellbook().getInterfaceId())
-            player.getPacketSender().sendConfig(709, PrayerHandler.canUse(player, PrayerHandler.PrayerDataList.PRESERVE, false) ? 1 : 0)
-            player.getPacketSender().sendConfig(711, PrayerHandler.canUse(player, PrayerHandler.PrayerDataList.RIGOUR, false) ? 1 : 0);
-            player.getPacketSender().sendConfig(713, PrayerHandler.canUse(player, PrayerHandler.PrayerDataList.AUGURY, false) ? 1 : 0);
+            player.getPacketSender().sendConfig(709, PrayerHandler.canUse(player, PrayerData.PRESERVE, false) ? 1 : 0)
+            player.getPacketSender().sendConfig(711, PrayerHandler.canUse(player, PrayerData.RIGOUR, false) ? 1 : 0);
+            player.getPacketSender().sendConfig(713, PrayerHandler.canUse(player, PrayerData.AUGURY, false) ? 1 : 0);
             player.resetAttributes();
             player.getPacketSender().sendMessage("Preset loaded!");
             player.getPacketSender().sendTotalExp(totalExp);
@@ -313,7 +323,7 @@ export class Presetables {
                     player.getPacketSender().sendMessage("You can't edit this preset!");
                 }
 
-                player.setEnteredSyntaxAction((input) => {
+                player.setEnteredSyntaxAction(new PreseEntered((input) => {
                     input = Misc.formatText(input);
  
                     if (!Misc.isValidName(input)) {
@@ -340,7 +350,7 @@ export class Presetables {
                     player.getPresets()[changeIndex] = preset;
                     player.setCurrentPreset(player.getPresets()[changeIndex]);
                     this.load(player, player.getCurrentPreset());
-                });
+                }));
                 player.getPacketSender().sendEnterInputPrompt("How would you like to call your preset?");
                 return true;
 

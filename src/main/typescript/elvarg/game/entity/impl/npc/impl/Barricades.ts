@@ -1,6 +1,6 @@
 import { Sound } from "../../../../Sound";
 import { Sounds } from "../../../../Sounds";
-import { World } from "../../../../Worlds";
+import { World } from "../../../../World";
 import { RegionManager } from "../../../../collision/RegionManager";
 import { Firemaking } from "../../../../content/skill/skillable/impl/Firemaking"
 import { NPC } from "../NPC";
@@ -11,6 +11,17 @@ import { Location } from "../../../../model/Location"
 import { Skill } from "../../../../model/Skill"
 import { Task } from "../../../../task/Task";
 import { TaskManager } from "../../../../task/TaskManager";
+
+class BarricadesTask extends Task{
+    constructor(p: Player, private readonly execFunc: Function){
+        super(3, false)
+    }
+    execute(): void {
+        this.execFunc();
+        this.stop();
+    }
+
+}
 
 
 export class Barricades {
@@ -63,15 +74,11 @@ export class Barricades {
         player.performAnimation(Firemaking.LIGHT_FIRE);
         Sounds.sendSound(player, Sound.FIRE_FIRST_ATTEMPT);
 
-        TaskManager.submit(new Task(3, player, false) {
-            protected execute() {
-                npc.setNpcTransformationId(this.NPC_ID_BURNING);
-                npc.barricadeOnFire = true;
-                player.getSkillManager().addExperience(Skill.FIREMAKING, FIREMAKING_EXPERIENCE);
-                player.performAnimation(Animation.DEFAULT_RESET_ANIMATION);
-                this.stop();
-            }
-        });
+        TaskManager.submit(new BarricadesTask(player, ()=>{npc.setNpcTransformationId(this.NPC_ID_BURNING);
+            npc.barricadeOnFire = true;
+            player.getSkillManager().addExperiences(Skill.FIREMAKING, Barricades.FIREMAKING_EXPERIENCE);
+            player.performAnimation(Animation.DEFAULT_RESET_ANIMATION);})
+        );
     }
 
     private static handleBucketOfWater(player: Player, npc: NPC) {
@@ -83,8 +90,8 @@ export class Barricades {
             player.getPacketSender().sendMessage("You need a bucket of water to extinguish the fire.");
             return;
         }
-        player.getInventory().delete(new Item(1929, 1));
-        player.getInventory().add(new Item(1925, 1));
+        player.getInventory().deletes(new Item(1929, 1));
+        player.getInventory().addItem(new Item(1925, 1));
         npc.setNpcTransformationId(this.NPC_ID);
         npc.barricadeOnFire = false;
         player.getPacketSender().sendMessage("You put out the fire!");
@@ -97,7 +104,7 @@ export class Barricades {
     private static deploy(player: Player) {
         let tile = player.getLocation();
         RegionManager.addClipping(tile.getX(), tile.getY(), tile.getZ(), 0x200000, player.getPrivateArea());
-        player.getInventory().delete(this.ITEM_ID, 1);
+        player.getInventory().deleteNumber(this.ITEM_ID, 1);
         this.barricades.push(tile);
         World.getAddNPCQueue().add(new NPC(this.NPC_ID, tile.clone()));
         Sounds.sendSound(player, Sound.PICK_UP_ITEM);

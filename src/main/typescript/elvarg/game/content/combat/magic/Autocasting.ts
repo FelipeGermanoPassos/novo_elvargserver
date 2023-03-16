@@ -3,7 +3,7 @@ import { CombatSpells } from "./CombatSpells";
 import { Player } from "../../../entity/impl/player/Player";
 import { MagicSpellbook } from "../../../model/MagicSpellbook";
 import { FightType } from "../FightType";
-import { Skills } from "../../../model/Skill";
+import { Skill } from "../../../model/Skill";
 import { ItemIdentifiers } from "../../../../util/ItemIdentifiers";
 import { BonusManager } from "../../../model/equipment/BonusManager";
 import { WeaponInterfaces } from "../WeaponInterfaces";
@@ -92,7 +92,7 @@ export class Autocasting {
 
         switch (player.getSpellbook()) {
             case MagicSpellbook.ANCIENT:
-                if (!Autocasting.ANCIENT_SPELL_AUTOCAST_STAFFS.has(player.getEquipment().getWeapon().getId()) && player.getEquipment().getWeapon().getId() != AHRIMS_STAFF) {
+                if (!Autocasting.ANCIENT_SPELL_AUTOCAST_STAFFS.has(player.getEquipment().getWeapon().getId()) && player.getEquipment().getWeapon().getId() != ItemIdentifiers.AHRIMS_STAFF) {
                     // Ensure this is a staff capable of casting ancients. Ahrims staff can cast both regular and ancients.
                     player.getPacketSender().sendMessage("You can only autocast regular offensive spells with this staff.");
                     return true;
@@ -119,7 +119,7 @@ export class Autocasting {
         if (!cbSpell) {
             return false;
         }
-        if (cbSpell.levelRequired() > player.getSkillManager().getCurrentLevel(Skills.MAGIC)) {
+        if (cbSpell.levelRequired() > player.getSkillManager().getCurrentLevel(Skill.MAGIC)) {
             player.getPacketSender().sendMessage("You need a Magic level of at least " + cbSpell.levelRequired() + " to cast this spell.");
             Autocasting.setAutocast(player, null);
             return true;

@@ -7,7 +7,7 @@ import { FightStyle } from '../FightStyle';
 import { Misc } from "../../../../util/Misc";
 import { Mobile } from "../../../entity/impl/Mobile";
 import { BonusManager } from "../../../model/equipment/BonusManager";
-import { Skills } from "../../../model/Skill";
+import { Skill } from "../../../model/Skill";
 import { CombatEquipment } from "../../combat/CombatEquipment";
 import { FightType } from '../FightType';
 import { Player } from '../../../entity/impl/player/Player';
@@ -65,7 +65,7 @@ export class AccuracyFormulasDpsCalc {
 
         let player = entity.getAsPlayer();
 
-        att += player.getSkillManager().getCurrentLevel(Skills.ATTACK);
+        att += player.getSkillManager().getCurrentLevel(Skill.ATTACK);
 
         let prayerBonus = 1;
 
@@ -142,7 +142,7 @@ export class AccuracyFormulasDpsCalc {
         }
 
         let player = enemy.getAsPlayer();
-        def = player.getSkillManager().getCurrentLevel(Skills.DEFENCE);
+        def = player.getSkillManager().getCurrentLevel(Skill.DEFENCE);
 
 
         let prayerBonus = 1;
@@ -235,7 +235,7 @@ export class AccuracyFormulasDpsCalc {
         }
 
         let player = entity.getAsPlayer();
-        rngStrength += player.getSkillManager().getCurrentLevel(Skills.RANGED);
+        rngStrength += player.getSkillManager().getCurrentLevel(Skill.RANGED);
 
         // Prayers
         let prayerMod = 1.0;
@@ -283,7 +283,7 @@ export class AccuracyFormulasDpsCalc {
         }
 
         let player = entity.getAsPlayer();
-        mag += player.getSkillManager().getCurrentLevel(Skills.MAGIC);
+        mag += player.getSkillManager().getCurrentLevel(Skill.MAGIC);
 
         let prayerBonus = 1;
 

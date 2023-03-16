@@ -1,7 +1,6 @@
 import { Area } from '../../../model/areas/Area';
 import { Boundary } from '../../../model/Boundary';
 import { Player } from '../../../entity/impl/player/Player'
-import { Optional } from 'optional'
 import { Mobile } from '../../../entity/impl/Mobile';
 
 export class KingBlackDragonArea extends Area {
@@ -29,11 +28,11 @@ export class KingBlackDragonArea extends Area {
         return true;
     }
 
-    dropItemsOnDeath(player: Player, killer: Optional<Player>) {
+    dropItemsOnDeath(player: Player, killer: Player) {
         return true;
     }
 
-    handleDeath(player: Player, killer: Optional<Player>) {
+    handleDeath(player: Player, killer: Player) {
         return false;
     }
 

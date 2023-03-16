@@ -12,7 +12,7 @@ export class MagicOnPlayerPacketListener implements PacketExecutor {
             return;
         }
 
-        if (playerIndex < 0 || playerIndex > World.getPlayers().capacity)
+        if (playerIndex < 0 || playerIndex > World.getPlayers().capacityReturn())
             return;
         let spellId = packet.readLEShort();
         if (spellId < 0) {

@@ -86,9 +86,9 @@ export class BrokenItem {
                 if (amt > 0) {
                     const cost = Math.floor(ItemDefinition.forId(b.originalItem).getBloodMoneyValue() * BrokenItem.REPAIR_COST_MULTIPLIER * amt);
                     if (player.getInventory().getAmount(ItemIdentifiers.BLOOD_MONEY) >= cost) {
-                        player.getInventory().delete(b.getBrokenItem());
-                        player.getInventory().delete(b.getBrokenItem());
-                        player.getInventory().add(b.brokenItem);
+                        player.getInventory().deleteNumber(b.getBrokenItem(), cost);
+                        player.getInventory().deleteNumber(b.getBrokenItem(), amt);
+                        player.getInventory().adds(b.brokenItem, amt);
                     } else {
                         return false;
                     }

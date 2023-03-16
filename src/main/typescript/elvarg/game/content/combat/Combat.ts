@@ -14,8 +14,6 @@ import { Stopwatch } from "../../../util/Stopwatch";
 import { TimerKey } from "../../../util/timers/TimerKey";
 import { CombatFactory, CanAttackResponse } from "./CombatFactory";
 import { CombatSpecial } from "./CombatSpecial";
-import {  Optional } from 'optional'
-
 export class Combat {
     private character: Mobile;
     private hitQueue: HitQueue;
@@ -124,7 +122,7 @@ export class Combat {
                 // Reset attack timer
                 if (!graniteMaulSpecial) {
                     let speed = this.method.attackSpeed(this.character);
-                    this.character.getTimers().register(TimerKey.COMBAT_ATTACK, speed);
+                    this.character.getTimers().registers(TimerKey.COMBAT_ATTACK, speed);
                 }
                 instant = false;
                 if (this.character.isSpecialActivated()) {
@@ -190,8 +188,8 @@ export class Combat {
             }
             case CanAttackResponse.TARGET_IS_IMMUNE: {
                 if (this.character.isPlayer()) {
-                    ((Player)this.character).getPacketSender().sendMessage("This npc is currently immune to attacks.");
-                }
+    (this.character as Player).getPacketSender().sendMessage("This npc is currently immune to attacks.");
+}
                 this.character.getCombat().reset();
             }
             case CanAttackResponse.INVALID_TARGET: {
@@ -234,7 +232,7 @@ export class Combat {
 
         // The damage and killer placeholders.
         let damage = 0;
-        let killer = Optional.empty();
+        let killer: any | null | undefined = null;
 
         for (let entry of this.damageMap.entries()) {
 
@@ -244,7 +242,7 @@ export class Combat {
             }
 
             // Check if the cached time is valid.
-            let timeout = entry[1].getStopwatch().elapsed();
+            let timeout = entry[1].getStopwatch().valueOf();
             if (timeout > CombatConstants.DAMAGE_CACHE_TIMEOUT) {
                 continue;
             }
@@ -259,7 +257,7 @@ export class Combat {
             // new 'placeholder'.
             if (entry[1].getDamage() > damage) {
                 damage = entry[1].getDamage();
-                killer = Optional.of(entry[0]);
+                killer = entry[0];
             }
         }
 
@@ -272,11 +270,11 @@ export class Combat {
     }
 
     public damageMapContains(player: Player): boolean {
-        let damageCache = this.damageMap.get(player);
+        let damageCache:HitDamageCache = this.damageMap.get(player);
         if (damageCache == null) {
             return false;
         }
-        return damageCache.getStopwatch().elapsed() < CombatConstants.DAMAGE_CACHE_TIMEOUT;
+        return damageCache.getStopwatch() < CombatConstants.DAMAGE_CACHE_TIMEOUT;
     }
 
     public getCharacter(): Mobile {

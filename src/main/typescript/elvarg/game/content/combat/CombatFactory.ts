@@ -26,8 +26,8 @@ import { Graphic } from "../../model/Graphic";
 import { GraphicHeight } from "../../model/GraphicHeight";
 import { Item } from "../../model/Item";
 import { Location } from "../../model/Location";
-import { Skill, Skills } from "../../model/Skill";
-import { SkullTypes } from "../../model/SkullType"
+import { Skill } from "../../model/Skill";
+import { SkullType } from "../../model/SkullType"
 import { AreaManager } from "../../model/areas/AreaManager";
 import { WildernessArea } from "../../model/areas/impl/WildernessArea";
 import { Equipment } from "../../model/container/impl/Equipment";
@@ -45,7 +45,7 @@ import { TimerKey } from "../../../util/timers/TimerKey";
 import { CombatType } from "./CombatType";
 import { CombatSpecial } from "./CombatSpecial";
 import { CombatPoisonData } from "../../task/impl/CombatPoisonEffect";
-import { DuelRuleEnum } from "../Duelling";
+import { DuelRule } from "../Duelling";
 import { PoisonType } from "../../task/impl/CombatPoisonEffect";
 
 
@@ -234,7 +234,7 @@ export class CombatFactory {
         if (attackerPosition.equals(targetPosition)) {
             if (!attacker.getTimers().has(TimerKey.STEPPING_OUT)) {
                 MovementQueue.clippedStep(attacker);
-                attacker.getTimers().register(TimerKey.STEPPING_OUT, 2);
+                attacker.getTimers().registers(TimerKey.STEPPING_OUT, 2);
             }
             return false;
         }
@@ -246,7 +246,7 @@ export class CombatFactory {
             if (attacker.isPlayer()) {
                 return false;
             }
-            if (attacker.isNpc() && attacker.size() == 0) {
+            if (attacker.isNpc() && attacker.getSize() == 0) {
                 return false;
             }
         }
@@ -262,7 +262,7 @@ export class CombatFactory {
         }
 
         // Don't allow diagonal attacks for smaller entities
-        if (method.type() == CombatType.MELEE && attacker.size() == 1 && target.size() == 1 && !isMoving && !target.getMovementQueue().isMovings()) {
+        if (method.type() == CombatType.MELEE && attacker.getSize() == 1 && target.getSize() == 1 && !isMoving && !target.getMovementQueue().isMovings()) {
             if (PathFinder.isDiagonalLocation(attacker, target)) {
                 CombatFactory.stepOut(attacker, target);
                 return false;
@@ -279,7 +279,7 @@ export class CombatFactory {
 
     public static fullVeracs(entity: Mobile): boolean {
         return entity.isNpc() ? entity.getAsNpc().getId() == NpcIdentifiers.VERAC_THE_DEFILED
-            : entity.getAsPlayer().getEquipment().containsAll(4753, 4757, 4759, 4755);
+            : entity.getAsPlayer().getEquipment().containsAllAny([4753, 4757, 4759, 4755]);
     }
 
     /**
@@ -290,7 +290,7 @@ export class CombatFactory {
     */
     public static fullDharoks(entity: Mobile): boolean {
         return entity.isNpc() ? entity.getAsNpc().getId() == NpcIdentifiers.DHAROK_THE_WRETCHED
-            : entity.getAsPlayer().getEquipment().containsAll(4716, 4720, 4722, 4718);
+            : entity.getAsPlayer().getEquipment().containsAllAny([4716, 4720, 4722, 4718]);
     }
 
     /**
@@ -301,7 +301,7 @@ export class CombatFactory {
     */
     public static fullKarils(entity: Mobile): boolean {
         return entity.isNpc() ? entity.getAsNpc().getId() == NpcIdentifiers.KARIL_THE_TAINTED
-            : entity.getAsPlayer().getEquipment().containsAll(4732, 4736, 4738, 4734);
+            : entity.getAsPlayer().getEquipment().containsAllAny([4732, 4736, 4738, 4734]);
     }
 
     /**
@@ -312,12 +312,12 @@ export class CombatFactory {
     */
     public static fullAhrims(entity: Mobile): boolean {
         return entity.isNpc() ? entity.getAsNpc().getId() == NpcIdentifiers.AHRIM_THE_BLIGHTED
-            : entity.getAsPlayer().getEquipment().containsAll(4708, 4712, 4714, 4710);
+            : entity.getAsPlayer().getEquipment().containsAllAny([4708, 4712, 4714, 4710]);
     }
 
     public static fullTorags(entity: Mobile): boolean {
         return entity.isNpc() ? entity.getAsNpc().getDefinition().getName() === "Torag the Corrupted"
-            : entity.getAsPlayer().getEquipment().containsAll(4745, 4749, 4751, 4747);
+            : entity.getAsPlayer().getEquipment().containsAllAny([4745, 4749, 4751, 4747]);
     }
 
     /**
@@ -328,7 +328,7 @@ export class CombatFactory {
      */
     public static fullGuthans(entity: Mobile): boolean {
         return entity.isNpc() ? entity.getAsNpc().getDefinition().getName() === "Guthan the Infested"
-            : entity.getAsPlayer().getEquipment().containsAll(4724, 4728, 4730, 4726);
+            : entity.getAsPlayer().getEquipment().containsAllAny([4724, 4728, 4730, 4726]);
     }
 
     /**
@@ -339,7 +339,7 @@ export class CombatFactory {
      * @param otherCombatLevel the combat level of the other person.
      * @return the combat level difference.
      */
-    public combatLevelDifference(combatLevel: number, otherCombatLevel: number): number {
+    public static combatLevelDifference(combatLevel: number, otherCombatLevel: number): number {
         if (combatLevel > otherCombatLevel) {
             return (combatLevel - otherCombatLevel);
         } else if (otherCombatLevel > combatLevel) {
@@ -412,11 +412,11 @@ export class CombatFactory {
 
             // Duel rules
             if (p.getDueling().inDuel()) {
-                if (method.type() == CombatType.MELEE && p.getDueling().getRules()[DuelRuleEnum.NO_MELEE.ordinal()]) {
+                if (method.type() == CombatType.MELEE && p.getDueling().getRules()[DuelRule.NO_MELEE.getButtonId()]) {
                     return CanAttackResponse.DUEL_MELEE_DISABLED;
-                } else if (method.type() == CombatType.RANGED && p.getDueling().getRules()[DuelRuleEnum.NO_RANGED.ordinal()]) {
+                } else if (method.type() == CombatType.RANGED && p.getDueling().getRules()[DuelRule.NO_RANGED.getButtonId()]) {
                     return CanAttackResponse.DUEL_RANGED_DISABLED;
-                } else if (method.type() == CombatType.MAGIC && p.getDueling().getRules()[DuelRuleEnum.NO_MAGIC.ordinal()]) {
+                } else if (method.type() == CombatType.MAGIC && p.getDueling().getRules()[DuelRule.NO_MAGIC.getButtonId()]) {
                     return CanAttackResponse.DUEL_MAGIC_DISABLED;
                 }
             }
@@ -539,8 +539,8 @@ export class CombatFactory {
                     poison = CombatPoisonData.getPoisonType(p_.getEquipment().get(Equipment.AMMUNITION_SLOT));
                 }
 
-                if (poison.isPresent() && (!isRanged || Math.floor(Math.random() * 10) <= 5)) { // Range 1/8
-                    CombatFactory.poisonEntity(target, poison.get());
+                if (poison && (!isRanged || Math.floor(Math.random() * 10) <= 5)) { // Range 1/8
+                    CombatFactory.poisonEntity(target, CombatPoisonData.getPoisonType());
                 }
             }
 
@@ -598,7 +598,7 @@ export class CombatFactory {
         if (hit.getCombatType() === CombatType.MAGIC) {
             if (player.getCombat().getPreviousCast() != null) {
                 if (hit.isAccurate()) {
-                    player.getSkillManager().addExperience(Skill.MAGIC,
+                    player.getSkillManager().addExperiences(Skill.MAGIC,
                         (hit.getTotalDamage())/* + player.getCombat().getPreviousCast().baseExperience() */);
                 } else {
                     // Splash should only give 52 exp..
@@ -613,7 +613,7 @@ export class CombatFactory {
         }
 
         // Add hp xp
-        player.getSkillManager().addExperience(Skill.HITPOINTS, (hit.getTotalDamage() * .70));
+        player.getSkillManager().addExperiences(Skill.HITPOINTS, (hit.getTotalDamage() * .70));
 
         // Magic xp was already added
         if (hit.getCombatType() === CombatType.MAGIC) {
@@ -623,8 +623,8 @@ export class CombatFactory {
         // Add all other skills xp
         let exp = hit.getSkills();
         for (let i of exp) {
-            let skill = Skill.values()[i];
-            player.getSkillManager().addExperience(skill, (hit.getTotalDamage() / exp.length));
+            let skill = Object.values(Skill)[i];
+            player.getSkillManager().addExperiences(skill, (hit.getTotalDamage() / exp.length));
         }
     }
 
@@ -640,7 +640,7 @@ export class CombatFactory {
         return CombatFactory.isAttacking(character) || CombatFactory.isBeingAttacked(character);
     }
 
-    public static poisonEntity(entity: Mobile, poisonType: PoisonType) {
+    public static poisonEntity(entity: Mobile, poisonType: CombatPoisonData) {
         // We are already poisoned or the poison type is invalid, do nothing.
         if (entity.isPoisoned()) {
             return;
@@ -662,7 +662,7 @@ export class CombatFactory {
             }
         }
 
-        entity.setPoisonDamage(poisonType.getDamage());
+        entity.setPoisonDamage(CombatPoisonData.getDemage());
         TaskManager.submit(new CombatPoisonEffect(entity));
     }
 
@@ -681,13 +681,13 @@ export class CombatFactory {
             return;
         }
         const RECOIL_DMG_MULTIPLIER = 0.1;
-        let returnDmg = Math.floor(Math.random()(3 - 1 + 1) + 1) == 2 ? 0 : (damage * RECOIL_DMG_MULTIPLIER) + 1;
+        let returnDmg = Math.floor(Math.random() * 3) + 1 === 2 ? 0 : (damage * RECOIL_DMG_MULTIPLIER) + 1;
 
         // Increase recoil damage for a player.
         player.setRecoilDamage(player.getRecoilDamage() + returnDmg);
 
         // Deal damage back to attacker
-        attacker.getCombat().getHitQueue().addPendingDamage(new HitDamage(returnDmg, HitMask.RED));
+        attacker.getCombat().getHitQueue().addPendingDamage([new HitDamage(returnDmg, HitMask.RED)]);
 
         // Degrading ring of recoil for a player.
         if (player.getRecoilDamage() >= 40) {
@@ -703,7 +703,7 @@ export class CombatFactory {
         if (returnDmg <= 0) {
             return;
         }
-        attacker.getCombat().getHitQueue().addPendingDamage(new HitDamage(returnDmg, HitMask.RED));
+        attacker.getCombat().getHitQueue().addPendingDamage([new HitDamage(returnDmg, HitMask.RED)]);
         character.forceChat("Taste Vengeance!");
         character.setHasVengeance(false);
     }
@@ -754,7 +754,7 @@ export class CombatFactory {
             player.getPacketSender().sendMessage(
                 "@bla@You have received a @red@red skull@bla@! You can no longer use the Protect item prayer!");
             PrayerHandler.deactivatePrayer(player, PrayerHandler.PROTECT_ITEM);
-        } else if (type == SkullTypes.WHITE_SKULL) {
+        } else if (type == SkullType.WHITE_SKULL) {
             player.getPacketSender().sendMessage("You've been skulled!");
         }
     }
@@ -766,7 +766,7 @@ export class CombatFactory {
             }
         }
 
-        character.getTimers().register(TimerKey.STUN, Misc.getTicks(seconds));
+        character.getTimers().registers(TimerKey.STUN, Misc.getTicks(seconds));
         character.getCombat().reset();
         character.getMovementQueue().reset();
         character.performGraphic(new Graphic(348, GraphicHeight.HIGH));
@@ -780,7 +780,7 @@ export class CombatFactory {
         if (!CombatFactory.isAttacking(target)) {
             let auto_ret = false;
             if (target.isPlayer()) {
-                auto_ret = target.getAsPlayer().autoRetaliateReturn() && !target.getMovementQueue().isMoving();
+                auto_ret = target.getAsPlayer().autoRetaliateReturn() && !target.getMovementQueue().isMovings();
             } else if (target.isNpc()) {
                 auto_ret = target.getAsNpc().getMovementCoordinator().getCoordinateState() == CoordinateState.HOME;
             }
@@ -789,10 +789,9 @@ export class CombatFactory {
                 return;
             }
 
-            TaskManager.submit(new Task(1, target, false, () => {
+            TaskManager.submit(new CombatFactoryTask(1, target, false, () => {
                 target.getCombat().attack(attacker);
-                this.stop();
-            });
+            }));
         }
     }
 
@@ -801,13 +800,13 @@ export class CombatFactory {
             return;
         }
 
-        if (character.size() > 2) {
+        if (character.getSize() > 2) {
             return;
         }
 
         const ticks = Misc.getTicks(seconds);
-        character.getTimers().register(TimerKey.FREEZE, ticks);
-        character.getTimers().register(TimerKey.FREEZE_IMMUNITY, ticks + Misc.getTicks(3));
+        character.getTimers().registers(TimerKey.FREEZE, ticks);
+        character.getTimers().registers(TimerKey.FREEZE_IMMUNITY, ticks + Misc.getTicks(3));
         character.getMovementQueue().reset();
 
         if (character.isPlayer()) {
@@ -819,22 +818,22 @@ export class CombatFactory {
         if ((victim.getHitpoints() - damage) <= (victim.getSkillManager().getMaxLevel(Skill.HITPOINTS) / 10)) {
             const amountToHeal = (victim.getSkillManager().getMaxLevel(Skill.PRAYER) * .25);
             victim.performGraphic(new Graphic(436));
-            victim.getSkillManager().setCurrentLevel(Skills.PRAYER, 0);
-            victim.getSkillManager().setCurrentLevel(Skills.HITPOINTS, victim.getHitpoints() + amountToHeal);
+            victim.getSkillManager().setCurrentLevels(Skill.PRAYER, 0);
+            victim.getSkillManager().setCurrentLevels(Skill.HITPOINTS, victim.getHitpoints() + amountToHeal);
             victim.getPacketSender().sendMessage("You've run out of prayer points!");
             PrayerHandler.deactivatePrayers(victim);
         }
     }
 
     private static handleSmite(attacker: Mobile, victim: Player, damage: number) {
-        victim.getSkillManager().decreaseCurrentLevel(Skills.PRAYER, (damage / 4), 0);
+        victim.getSkillManager().decreaseCurrentLevel(Skill.PRAYER, (damage / 4), 0);
     }
 
     static handleRetribution(killed: Player, killer: Player) {
         killed.performGraphic(new Graphic(437));
         if (killer.getLocation().isWithinDistance(killer.getLocation(), CombatConstants.RETRIBUTION_RADIUS)) {
-            killer.getCombat().getHitQueue().addPendingDamage(
-                new HitDamage(Misc.getRandom(CombatConstants.MAXIMUM_RETRIBUTION_DAMAGE), HitMask.RED));
+            killer.getCombat().getHitQueue().addPendingDamage([
+                new HitDamage(Misc.getRandom(CombatConstants.MAXIMUM_RETRIBUTION_DAMAGE), HitMask.RED)]);
         }
     }
 
@@ -976,4 +975,17 @@ export enum CanAttackResponse {
     DUEL_WRONG_OPPONENT,
     TARGET_IS_IMMUNE,
     CAN_ATTACK,
+}
+
+
+class CombatFactoryTask extends Task{
+    constructor(n1: number, target: Mobile, bool: boolean, private readonly execFunc: Function){
+        super(n1, target, bool)
+    }
+
+    execute(): void {
+        this.execFunc();
+        this.stop();
+    }
+    
 }

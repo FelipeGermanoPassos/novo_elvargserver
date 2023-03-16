@@ -17,7 +17,7 @@ export abstract class CombatSpell extends Spell {
       
         const npc = cast.isNpc() ? (cast as NPC) : null;
       
-        if (this.castAnimation().isPresent() && castAnimation == -1) {
+        if (this.castAnimation() && castAnimation == -1) {
           this.castAnimation().ifPresent(animation => animation.perform(cast));
         } else {
           cast.performAnimation(new Animation(castAnimation));

@@ -3,7 +3,7 @@ import { Player } from '../../../entity/impl/player/Player';
 import { PlayerRights } from '../../rights/PlayerRights';
 import { World } from '../../../World';
 
-class TeleToPlayer implements Command {
+export class TeleToPlayer implements Command {
     execute(player: Player, command: string, parts: string[]) {
         let plr = World.getPlayerByName(command.substring(parts[0].length + 1));
         if (plr) {

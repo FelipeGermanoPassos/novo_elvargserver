@@ -17,12 +17,14 @@ import { Location } from './model/Location';
 import { Players } from './model/commands/impl/Players';
 import { TaskManager } from './task/TaskManager';
 import { GameConstants } from '../game/GameConstants'
-import { Queue} from 'queue'
+import { Queue } from 'queue'
 import { Misc } from '../util/Misc';
 import { produce } from 'immer';
 import { List } from 'list'
 import { TreeMap } from 'treemap'
-import { LinkedHashSet} from 'langx-js'
+import { LinkedHashSet } from 'langx-js'
+import { Task } from './task/Task';
+import { GameSyncTask } from './entity/updating/sync/GameSyncTask';
 
 interface GameSyncTaskInterface {
     isParallel: boolean;
@@ -60,7 +62,7 @@ export class World {
     /**
      * The collection of {@link Players}s waiting to be added to the game.
      */
-    private static addNPCQueue = new Array<NPC>();
+    public static addNPCQueue = new Array<NPC>();
 
     /**
      * The collection of {@link Players}s waiting to be removed from the game.
@@ -83,10 +85,10 @@ export class World {
     public addNPCQueue = new Array<NPC>();
     public removeNPCQueue = new Array<NPC>();
 
-    
+
     public static getPlayerByName(username: string): Player | undefined {
-        return this.players.find(p => p !== null && p.getUsername().equals(Misc.formatText(username)));
-      }
+        return this.players.search(p => p !== null && p.getUsername() === Misc.formatText(username));
+    }
 
     /**
     * Broadcasts a message to all players in the game.
@@ -120,43 +122,43 @@ export class World {
     public static savePlayers() {
         this.players.forEach(player => GameConstants.PLAYER_PERSISTENCE.save(player));
     }
-    
+
     public static getPlayers(): MobileList<Player> {
         return this.players;
     }
-    
+
     public static getNpcs(): MobileList<NPC> {
         return this.npcs;
     }
-    
-    public static getPlayerBots(): TreeMap<string, PlayerBot> { 
-        return this.playerBots; 
+
+    public static getPlayerBots(): TreeMap<string, PlayerBot> {
+        return this.playerBots;
     }
-    
+
     public static getItems(): List<ItemOnGround> {
         return this.items;
     }
-    
+
     public static getObjects(): List<GameObject> {
         return this.objects;
     }
-    
+
     public static getRemovedObjects(): LinkedHashSet<GameObject> {
         return this.removedObjects;
     }
-    
+
     public static getAddPlayerQueue(): Queue<Player> {
         return this.addPlayerQueue
-    Queue;
-    }   
+        Queue;
+    }
     public static getRemovePlayerQueue(): Queue<Player> {
         return this.removePlayerQueue;
     }
-    
+
     public static getAddNPCQueue(): Queue<NPC> {
         return this.addNPCQueue;
     }
-    
+
     public static getRemoveNPCQueue(): Queue<NPC> {
         return this.removeNPCQueue;
     }
@@ -171,14 +173,14 @@ export class World {
 
     public static sendLocalGraphics(id: number, position: Location): void {
         for (const player of World.players) {
-          if (player && player.getLocation().isWithinDistance(position, 32)) {
-            player.getPacketSender().sendGraphic(new Graphic(id), position);
-          }
+            if (player && player.getLocation().isWithinDistance(position, 32)) {
+                player.getPacketSender().sendGraphic(new Graphic(id), position);
+            }
         }
     }
 
     public getPlayerByName(username: string): Player | undefined {
-        return World.players.find(p => p != null && p.getUsername().toLowerCase() === username.toLowerCase());
+        return World.players.search(p => p != null && p.getUsername().toLowerCase() === username.toLowerCase());
     }
 
     public sendMessage(message: string) {
@@ -198,9 +200,9 @@ export class World {
     }
 
     public static process() {
-    // Process all active {@link Task}s..
+        // Process all active {@link Task}s..
         TaskManager.process();
-            
+
         // Process all minigames
         MinigameHandler.process();
 
@@ -223,15 +225,15 @@ export class World {
         // Deregister queued players.
         let amount = 0;
         World.removePlayerQueue.forEach((player, index) => {
-        if (!player || amount >= GameConstants.QUEUED_LOOP_THRESHOLD) {
-            return;
-        }
-        if (player.canLogout() || player.forcedLogoutTimer.finished() || Server.isUpdating()) {
-            World.players.remove(player);
-            World.removePlayerQueue.splice(index, 1);
-        }
-    amount++;
-});
+            if (!player || amount >= GameConstants.QUEUED_LOOP_THRESHOLD) {
+                return;
+            }
+            if (player.canLogout() || player.forcedLogoutTimer.finished() || Server.isUpdating()) {
+                World.players.remove(player);
+                World.removePlayerQueue.splice(index, 1);
+            }
+            amount++;
+        });
         // Add pending Npcs..
         for (let i = 0; i < GameConstants.QUEUED_LOOP_THRESHOLD; i++) {
             let npc = World.addNPCQueue.shift();
@@ -249,7 +251,7 @@ export class World {
         }
 
         // Handle synchronization tasks.
-        World.executor.sync((index: number) => {
+        World.executor.sync(new GameTask(true, (index: number) => {
             let player = World.players.get(index);
             try {
                 player.process();
@@ -257,18 +259,18 @@ export class World {
                 console.error(e);
                 player.requestLogout();
             }
-        });
+        }, false));
 
-        World.executor.sync((index: number) => {
+        World.executor.sync(new GameTask(false, (index: number) => {
             let npc = World.npcs.get(index);
             try {
                 npc.process();
             } catch (e) {
                 console.error(e);
             }
-        });
+        }, false));
 
-        World.executor.sync((index: number) => {
+        World.executor.sync(new GameTask( true, (index: number) => {
             let player = World.players.get(index);
             try {
                 PlayerUpdating.update(player);
@@ -277,9 +279,9 @@ export class World {
                 console.error(e);
                 player.requestLogout();
             }
-        });
+        }));
 
-        World.executor.sync(new GameSyncTask(true, (index: number) => {
+        World.executor.sync(new GameTask(true, (index: number) => {
             let player = World.players.get(index);
             produce(player, draft => {
                 try {
@@ -293,7 +295,7 @@ export class World {
             });
         }));
 
-        World.executor.sync(new GameSyncTask(false, (index: number) => {
+        World.executor.sync(new GameTask(false, (index: number) => {
             let npc = World.npcs.get(index);
             produce(npc, draft => {
                 try {
@@ -348,7 +350,13 @@ class PlayerSyncTask implements GameSyncTaskInterface {
     }
 }
 
-class GameSyncTask {
-    constructor(private isPlayer: boolean, private execute: (index: number) => void) { }
+export class GameTask extends GameSyncTask{
+    constructor(b: boolean, private readonly execFunc: Function, c?:boolean){
+        super(b, c)
+    }
+    execute(): void {
+       this.execFunc();
+    }
+   
 }
 

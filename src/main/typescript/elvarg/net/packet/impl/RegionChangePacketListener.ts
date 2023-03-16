@@ -16,7 +16,7 @@ export class RegionChangePacketListener implements PacketExecutor {
             player.getPacketSender().deleteRegionalSpawns();
             ItemOnGroundManager.onRegionChange(player);
             ObjectManager.onRegionChange(player);
-            Barrows.brotherSpawn(player);
+            Barrows.brotherDespawn(player);
             player.getAggressionTolerance().start(NpcAggression.NPC_TOLERANCE_SECONDS);
             player.setAllowRegionChangePacket(false);
         }

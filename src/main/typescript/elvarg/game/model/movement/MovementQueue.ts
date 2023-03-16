@@ -1,7 +1,7 @@
 import { RegionManager } from "../../collision/RegionManager";
 import { Mobile } from "../../entity/impl/Mobile";
 import { World } from "../../World";
-import { Dueling } from "../../content/Duelling";
+import { Dueling, DuelRule } from "../../content/Duelling";
 import { CombatFactory } from "../../content/combat/CombatFactory";
 import { ObjectDefinition } from "../../definition/ObjectDefinition";
 import { NPC } from "../../entity/impl/npc/NPC";
@@ -19,6 +19,7 @@ import { Misc } from "../../../util/Misc";
 import { NpcIdentifiers } from "../../../util/NpcIdentifiers";
 import { RandomGen } from "../../../util/RandomGen";
 import { TimerKey } from "../../../util/timers/TimerKey";
+import { Action } from "../Action";
 export class MovementQueue {
 
     private static RANDOM: RandomGen = new RandomGen();
@@ -90,7 +91,7 @@ export class MovementQueue {
         if (this.character.getLocation().getZ() == -1) {
             return true;
         }
-        return RegionManager.canMove(this.character.getLocation(), this.character.getLocation().transform(deltaX, deltaY), this.character.size(), this.character.size(), this.character.getPrivateArea());
+        return RegionManager.canMovestart(this.character.getLocation(), this.character.getLocation().transform(deltaX, deltaY), this.character.getSize(), this.character.getSize(), this.character.getPrivateArea());
     }
 
     /**
@@ -178,8 +179,8 @@ export class MovementQueue {
         const deltaX = x - last.position.getX();
         const deltaY = y - last.position.getY();
         const direction = Direction.fromDeltas(deltaX, deltaY);
-        if (direction != Directions.NONE)
-            this.points.add(new Point(new Location(x, y), direction));
+        if (direction != Direction.NONE)
+            this.points.push(new Point(new Location(x, y), direction));
     }
 
     /**
@@ -237,7 +238,7 @@ export class MovementQueue {
                 return Mobility.BUSY;
             }
 
-            if (playerDueling.inDuel() && playerDueling.getRules()[Dueling.DuelRule.NO_MOVEMENT.ordinal()]) {
+            if (playerDueling.inDuel() && playerDueling.getRules()[DuelRule.NO_MOVEMENT.getButtonId()]) {
                 return Mobility.DUEL_MOVEMENT_DISABLED;
             }
         }
@@ -273,9 +274,9 @@ export class MovementQueue {
     }
 
     private getLast(): Point {
-        let last = this.points.peekLast();
+        let last = this.points.slice(-1)[0];
         if (!last)
-            return new Point(this.character.getLocation(), Directions.NONE);
+            return new Point(this.character.getLocation(), Direction.NONE);
         return last;
     }
 
@@ -302,16 +303,16 @@ export class MovementQueue {
         let walkPoint: Point = null;
         let runPoint: Point = null;
 
-        walkPoint = this.points.poll();
+        walkPoint = this.points.shift();
 
         if (this.isRunToggled()) {
-            runPoint = this.points.poll();
+            runPoint = this.points.shift();
         }
 
         let oldPosition: Location = this.character.getLocation();
         let moved: boolean = false;
 
-        if (walkPoint != null && walkPoint.direction != Directions.NONE) {
+        if (walkPoint != null && walkPoint.direction != Direction.NONE) {
             let next: Location = walkPoint.position;
             if (this.canWalkTo(next)) {
                 this.followX = oldPosition.getX();
@@ -325,7 +326,7 @@ export class MovementQueue {
             }
         }
 
-        if (runPoint != null && runPoint.direction != Directions.NONE) {
+        if (runPoint != null && runPoint.direction != Direction.NONE) {
             let next: Location = runPoint.position;
             if (this.canWalkTo(next)) {
                 this.followX = oldPosition.getX();
@@ -387,7 +388,7 @@ export class MovementQueue {
 
     private drainRunEnergy() {
         const player = (this.character as Player);
-        if (player.isRunning()) {
+        if (player.isRunningReturn()) {
             player.setRunEnergy(player.getRunEnergy() - 1);
             if (player.getRunEnergy() <= 0) {
                 player.setRunEnergy(0);
@@ -403,7 +404,7 @@ export class MovementQueue {
     }
 
     public reset(): MovementQueue {
-        this.points.clear();
+        this.points = [];
         this.followX = -1;
         this.followY = -1;
         this.isMoving = false;
@@ -419,8 +420,8 @@ export class MovementQueue {
 
     public processCombatFollowing() {
         const following = this.character.getCombatFollowing();
-        const size = this.character.size();
-        const followingSize = following.size();
+        const size = this.character.getSize();
+        const followingSize = following.getSize();
 
         // Update interaction
         this.character.setMobileInteraction(following);
@@ -433,7 +434,7 @@ export class MovementQueue {
             return;
         }
 
-        let combatFollow = this.character.getCombat().getTarget().equals(following);
+        let combatFollow = this.character.getCombat().getTarget() === following;
         const method = CombatFactory.getMethod(this.character);
 
         if (combatFollow && CombatFactory.canReach(this.character, method, following)) {
@@ -480,29 +481,30 @@ export class MovementQueue {
                     this.character.sendMessage(`Unable to find ${following.getAsPlayer().getUsername()}.`);
                     if (this.character.getAsPlayer().getRights() === PlayerRights.DEVELOPER) {
                         const p = Misc.delta(this.character.getLocation(), following.getLocation());
-                        character.sendMessage("Delta: " + p.getX() + ", " + p.getZ());
+                        this.character.sendMessage("Delta: " + p.x + ", " + p.y);
                     }
                 }
                 if (combatFollow) {
-                    character.getCombat().reset();
+                    this.character.getCombat().reset();
                 }
-                character.getMovementQueue().reset();
-                character.setCombatFollowing(null);
-                character.setMobileInteraction(null);
+                this.character.getMovementQueue().reset();
+                this.character.setCombatFollowing(null);
+                this.character.setMobileInteraction(null);
                 return;
             }
         }
 
-        let dancing = (!combatFollow && character.isPlayer() && following.isPlayer() && following.getCombatFollowing() == character);
-        let basicPathing = (combatFollow && character.isNpc() && !((character as NPC).canUsePathFinding()));
-        let current = character.getLocation();
+        let dancing = (!combatFollow && this.character.isPlayer() && following.isPlayer() && following.getCombatFollowing() == this.character);
+        let basicPathing = (combatFollow && this.character.isNpc() && !((this.character as NPC).canUsePathFinding()));
+        let current = this.character.getLocation();
         let destination = following.getLocation();
+
         if (dancing) {
             destination = following.getAsPlayer().getOldPosition();
         }
 
         if (!dancing) {
-            if (!combatFollow && character.calculateDistance(following) == 1 && !RS317PathFinder.isInDiagonalBlock(current, destination)) {
+            if (!combatFollow && this.character.calculateDistance(following) == 1 && !RS317PathFinder.isInDiagonalBlock(current, destination)) {
                 return;
             }
 
@@ -510,22 +512,22 @@ export class MovementQueue {
             if (basicPathing) {
 
                 // Same spot, step away.
-                if (destination.equals(current) && !following.getMovementQueue().isMoving()
-                    && character.size() == 1 && following.size() == 1) {
+                if (destination.equals(current) && !following.getMovementQueue().isMovings()
+                    && this.character.getSize() == 1 && following.getSize() == 1) {
                     let tiles = new Array<Location>();
                     for (let tile of following.outterTiles()) {
-                        if (!RegionManager.canMove(character.getLocation(), tile, size, size, character.getPrivateArea())
-                            || RegionManager.blocked(tile, character.getPrivateArea())) {
+                        if (!RegionManager.canMovestart(this.character.getLocation(), tile, size, size, this.character.getPrivateArea())
+                            || RegionManager.blocked(tile, this.character.getPrivateArea())) {
                             continue;
                         }
                         // Projectile attack
-                        if (character.useProjectileClipping() && !RegionManager.canProjectileAttack(tile, following.getLocation(), character.size(), character.getPrivateArea())) {
+                        if (this.character.useProjectileClipping() && !RegionManager.canProjectileAttackReturn(tile, following.getLocation(), this.character.getSize(), this.character.getPrivateArea())) {
                             continue;
                         }
                         tiles.push(tile);
                     }
                     if (tiles.length > 0) {
-                        addFirstStep(tiles[Misc.getRandom(tiles.length - 1)]);
+                        this.addFirstStep(tiles[Misc.getRandom(tiles.length - 1)]);
                     }
                     return;
                 }
@@ -545,66 +547,66 @@ export class MovementQueue {
                 let direction: Direction = Direction.fromDeltas(deltaX, deltaY);
 
                 switch (direction) {
-                    case Directions.NORTH_WEST:
-                        if (RegionManager.canMove(current, Directions.WEST, size, character.getPrivateArea())) {
-                            direction = Directions.WEST;
-                        } else if (RegionManager.canMove(current, Directions.NORTH, size, character.getPrivateArea())) {
-                            direction = Directions.NORTH;
-                        } else {
-                            direction = Directions.NONE;
-                        }
-                        break;
-                    case Directions.NORTH_EAST:
-                        if (RegionManager.canMove(current, Directions.NORTH, size, character.getPrivateArea())) {
+                    case Direction.NORTH_WEST:
+                        if (RegionManager.canMoveposition(current, Direction.WEST, size, this.character.getPrivateArea())) {
+                            direction = Direction.WEST;
+                        } else if (RegionManager.canMoveposition(current, Direction.NORTH, size, this.character.getPrivateArea())) {
                             direction = Direction.NORTH;
-                        } else if (RegionManager.canMove(current, Directions.EAST, size, character.getPrivateArea())) {
-                            direction = Directions.EAST;
                         } else {
-                            direction = Directions.NONE;
+                            direction = Direction.NONE;
                         }
                         break;
-                    case Directions.SOUTH_WEST:
-                        if (RegionManager.canMove(current, Directions.WEST, size, character.getPrivateArea())) {
-                            direction = Directions.WEST;
-                        } else if (RegionManager.canMove(current, Directions.SOUTH, size, character.getPrivateArea())) {
-                            direction = Directions.SOUTH;
+                    case Direction.NORTH_EAST:
+                        if (RegionManager.canMoveposition(current, Direction.NORTH, size, this.character.getPrivateArea())) {
+                            direction = Direction.NORTH;
+                        } else if (RegionManager.canMoveposition(current, Direction.EAST, size, this.character.getPrivateArea())) {
+                            direction = Direction.EAST;
                         } else {
-                            direction = Directions.NONE;
+                            direction = Direction.NONE;
+                        }
+                        break;
+                    case Direction.SOUTH_WEST:
+                        if (RegionManager.canMoveposition(current, Direction.WEST, size, this.character.getPrivateArea())) {
+                            direction = Direction.WEST;
+                        } else if (RegionManager.canMoveposition(current, Direction.SOUTH, size, this.character.getPrivateArea())) {
+                            direction = Direction.SOUTH;
+                        } else {
+                            direction = Direction.NONE;
                         }
                         break;
                     case Direction.SOUTH_EAST:
-                        if (RegionManager.canMove(current, Directions.EAST, size, character.getPrivateArea())) {
-                            direction = Directions.EAST;
-                        } else if (RegionManager.canMove(current, Directions.SOUTH, size, character.getPrivateArea())) {
-                            direction = Directions.SOUTH;
+                        if (RegionManager.canMoveposition(current, Direction.EAST, size, this.character.getPrivateArea())) {
+                            direction = Direction.EAST;
+                        } else if (RegionManager.canMoveposition(current, Direction.SOUTH, size, this.character.getPrivateArea())) {
+                            direction = Direction.SOUTH;
                         } else {
-                            direction = Directions.NONE;
+                            direction = Direction.NONE;
                         }
                         break;
                     default:
                         break;
                 }
 
-                if (direction == Directions.NONE) {
+                if (direction == Direction.NONE) {
                     return;
                 }
 
                 let next = current.transform(direction.getX(), direction.getY());
-                if (RegionManager.canMove(current, next, size, size, character.getPrivateArea())) {
-                    this.addStep(next);
+                if (RegionManager.canMovestart(current, next, size, size, this.character.getPrivateArea())) {
+                    this.addSteps(next);
                 }
                 return;
             }
-            let attackDistance = CombatFactory.getMethod(character).attackDistance(character);
+            let attackDistance = CombatFactory.getMethod(this.character).attackDistance(this.character);
 
             // Find the nearest tile surrounding the target
-            let destination = PathFinder.getClosestAttackableTile(character, following, attackDistance);
+            let destinations = PathFinder.getClosestAttackableTile(this.character, following, attackDistance);
             if (destination == null) {
                 return;
             }
         }
 
-        PathFinder.calculateWalkRoute(character, destination.getX(), destination.getY());
+        PathFinder.calculateWalkRoute(this.character, destination.getX(), destination.getY());
     }
 
     // Gets the size of the queue.
@@ -650,7 +652,7 @@ export class MovementQueue {
         return this.foundRoute;
     }
 
-    public pointsReturn(): Deque < Point > {
+    public pointsReturn() {
         return this.points;
     }
 
@@ -682,35 +684,32 @@ export class MovementQueue {
 
         PathFinder.calculateWalkRoute(this.player, destX, destY);
 
-        TaskManager.submit(new Task(0, this.player.getIndex(), true), function () {
-
+        TaskManager.submit(new MovementTask(this.player.getIndex(), () => {
             let stage = 0;
+            if (stage !== 0) {
+                this.player.getMovementQueue().reset();
+                TaskManager.cancelTasks(this.player);
+                this.player.getPacketSender().sendMessage("You can't reach that!");
+                return;
+            }
 
-            protected execute(): void {
+            if (this.player.getMovementQueue().points.length) {
+                return;
+            }
 
-            if(stage != 0) {
+            const currentLoc = this.player.getLocation();
+            if (!this.player.getMovementQueue().hasRoute() || currentLoc.getX() !== destX || currentLoc.getY() !== destY) {
+                stage = -1;
+                return;
+            }
+
+            if (action !== null) {
+                action();
+            }
+
             this.player.getMovementQueue().reset();
-            this.stop();
-            this.player.getPacketSender().sendMessage("You can't reach that!");
-            return;
-        }
-
-        if (!this.player.getMovementQueue().points.isEmpty()) {
-            return;
-        }
-
-        if (!this.player.getMovementQueue().hasRoute() || this.player.getLocation().getX() != destX || this.player.getLocation().getY() != destY) {
-            stage = -1;
-            return;
-        }
-
-        if (action != null) {
-            action();
-        }
-        this.player.getMovementQueue().reset();
-        this.stop();
-    }
-        });
+            stop();
+        }));
     }
 
     public walkToReset() {
@@ -725,7 +724,7 @@ export class MovementQueue {
         this.resetFollow();
     }
 
-    public walkToEntity(entity: Mobile, runnable ?: () => void) {
+    public walkToEntity(entity: Mobile, runnable?: () => void) {
         let destX = entity.getLocation().getX();
         let destY = entity.getLocation().getY();
 
@@ -756,127 +755,120 @@ export class MovementQueue {
         let finalDestinationX = this.player.getMovementQueue().pathX;
         let finalDestinationY = this.player.getMovementQueue().pathY;
 
-        TaskManager.submit(new Task(0, this.player.getIndex(), true), function () => {
+        TaskManager.submit(new MovementTask(this.player.getIndex(), () => {
             let currentX = entity.getLocation().getX();
             let currentY = entity.getLocation().getY();
             let reachStage = 0;
-            protected execute() {
-                this.player.setMobileInteraction(entity);
-                if (currentX != entity.getLocation().getX() || currentY != entity.getLocation().getY()) {
-                    this.reset();
-                    currentX = entity.getLocation().getX();
-                    currentY = entity.getLocation().getY();
-                    PathFinder.calculateEntityRoute(this.player, currentX, currentY);
-                }
+            this.player.setMobileInteraction(entity);
+            if (currentX != entity.getLocation().getX() || currentY != entity.getLocation().getY()) {
+                this.reset();
+                currentX = entity.getLocation().getX();
+                currentY = entity.getLocation().getY();
+                PathFinder.calculateEntityRoute(this.player, currentX, currentY);
+            }
 
-                if (runnable && this.player.getMovementQueue().isWithinEntityInteractionDistance(entity.getLocation())) {
-                    // Executes the runnable and stops the task. However, It will still path to the destination.
-                    runnable();
-                    return;
-                }
-
-                if (reachStage !== 0) {
-                    if (reachStage === 1) {
-                        player.getMovementQueue().reset();
-                        stop();
-                        return;
-                    }
-                    player.getMovementQueue().reset();
-                    stop();
-                    player.getPacketSender().sendMessage("I can't reach that!");
-                    return;
-                }
-
-                if (!player.getMovementQueue().points.isEmpty()) {
-                    return;
-                }
-
-                if (!player.getMovementQueue().hasRoute() || player.getLocation().getX() !== finalDestinationX || player.getLocation().getY() !== finalDestinationY) {
-                    // Player hasn't got a route or they're not already at destination
-                    reachStage = -1;
-                    return;
-                }
-
-                reachStage = 1;
+            if (runnable && this.player.getMovementQueue().isWithinEntityInteractionDistance(entity.getLocation())) {
+                // Executes the runnable and stops the task. However, It will still path to the destination.
+                runnable();
                 return;
             }
-        });
+
+            if (reachStage !== 0) {
+                if (reachStage === 1) {
+                    this.player.getMovementQueue().reset();
+                    stop();
+                    return;
+                }
+                this.player.getMovementQueue().reset();
+                stop();
+                this.player.getPacketSender().sendMessage("I can't reach that!");
+                return;
+            }
+
+            if (!this.player.getMovementQueue().points.length) {
+                return;
+            }
+
+            if (!this.player.getMovementQueue().hasRoute() || this.player.getLocation().getX() !== finalDestinationX || this.player.getLocation().getY() !== finalDestinationY) {
+                // Player hasn't got a route or they're not already at destination
+                reachStage = -1;
+                return;
+            }
+
+            reachStage = 1;
+            return;
+        }));
     }
 
-    public walkToObject(object: GameObject, action: Action), {
+    public walkToObject(object: GameObject, action: Action) {
         let mobility = this.getMobility();
-        if(!mobility.canMove()) {
-        mobility.sendMessage(this.player);
+        if (!mobility.canMove()) {
+            mobility.sendMessage(this.player);
+            this.reset();
+            return;
+        }
+
+        if (!this.checkDestination(object.getLocation())) {
+            this.reset();
+            return;
+        }
+
         this.reset();
-        return;
-    }
-        
-        Copy code
-    if (!this.checkDestination(object.getLocation())) {
-        this.reset();
-        return;
-    }
 
-    this.reset();
+        this.walkToReset();
 
-    this.walkToReset();
+        let objectX = object.getLocation().getX();
+        let objectY = object.getLocation().getY();
+        let type = object.getType();
+        let id = object.getId();
+        let direction = object.getFace();
 
-    let objectX = object.getLocation().getX();
-    let objectY = object.getLocation().getY();
-    let type = object.getType();
-    let id = object.getId();
-    let direction = object.getFace();
+        if (type == 10 || type == 11 || type == 22) {
+            let xLength, yLength;
+            let def = ObjectDefinition.forId(id);
+            if (direction == 0 || direction == 2) {
+                yLength = ObjectDefinition.objectSizeX;
+                xLength = ObjectDefinition.objectSizeY;
+            } else {
+                yLength = ObjectDefinition.objectSizeY;
+                xLength = ObjectDefinition.objectSizeX;
+            }
+            let blockingMask = ObjectDefinition.blockingMask;
 
-    if (type == 10 || type == 11 || type == 22) {
-        let xLength, yLength;
-        let def = ObjectDefinition.forId(id);
-        if (direction == 0 || direction == 2) {
-            yLength = def.objectSizeX;
-            xLength = def.objectSizeY;
+            if (direction != 0) {
+                blockingMask = (blockingMask << direction & 0xf) + (blockingMask >> 4 - direction);
+            }
+            PathFinder.calculateObjectRoute(this.player, 0, objectX, objectY, xLength, yLength, 0, blockingMask);
         } else {
-            yLength = def.objectSizeY;
-            xLength = def.objectSizeX;
+            PathFinder.calculateObjectRoute(this.player, type + 1, objectX, objectY, 0, 0, direction, 0);
         }
-        let blockingMask = def.blockingMask;
 
-        if (direction != 0) {
-            blockingMask = (blockingMask << direction & 0xf) + (blockingMask >> 4 - direction);
-        }
-        PathFinder.calculateObjectRoute(player, 0, objectX, objectY, xLength, yLength, 0, blockingMask);
-    } else {
-        PathFinder.calculateObjectRoute(player, type + 1, objectX, objectY, 0, 0, direction, 0);
-    }
+        const finalDestinationX = this.player.getMovementQueue().pathX;
 
-    const finalDestinationX = player.getMovementQueue().pathX;
+        const finalDestinationY = this.player.getMovementQueue().pathY;
 
-    const finalDestinationY = player.getMovementQueue().pathY;
+        //System.err.println("RequestedX=" + objectX + " requestedY=" + objectY + " givenX=" + finalDestinationX + " givenY=" + finalDestinationY);
 
-    //System.err.println("RequestedX=" + objectX + " requestedY=" + objectY + " givenX=" + finalDestinationX + " givenY=" + finalDestinationY);
+        let finalObjectY = objectY;
 
-    let finalObjectY = objectY;
+        this.player.setPositionToFace(new Location(objectX, objectY));
+        TaskManager.submit(new MovementeTaskFunc(this.player.getIndex(), () => {
+        let walkStage = 0;
+        if (walkStage != 0) {
 
-    player.setPositionToFace(new Location(objectX, objectY));
-    TaskManager.submit(new Task(1, player.getIndex(), true), {
-
-        let, walkStage = 0,
-
-        execute() {
-
-            if (walkStage != 0) {
-
-                if (objectX == player.getLocation().getX() && finalObjectY == player.getLocation().getY()) {
+                if (objectX == this.player.getLocation().getX() && finalObjectY == this.player.getLocation().getY()) {
                     if (direction == 0)
-                        player.setDirection(Direction.WEST);
+                        this.player.setDirection(Direction.WEST);
                     else if (direction === 1) {
-                        player.setDirection(Direction.NORTH);
+                        this.player.setDirection(Direction.NORTH);
                     } else if (direction === 2) {
-                        player.setDirection(Direction.EAST);
+                        this.player.setDirection(Direction.EAST);
                     } else if (direction === 3) {
-                        player.setDirection(Direction.SOUTH);
+                        this.player.setDirection(Direction.SOUTH);
                     }
                 }
-                pathX = player.getLocation().getX();
-                pathY = player.getLocation().getY();
+                this.pathX = this.player.getLocation().getX();
+                this.pathY = this.player.getLocation().getY();
                 if (walkStage === 1) {
                     if (action !== null) {
                         action.execute();
@@ -887,45 +879,43 @@ export class MovementQueue {
                 stop();
                 return;
             }
-            if (points.isEmpty()) {
+            if (this.points.length) {
                 return;
             }
-                                
-                                Copy code
-            if (!player.getMovementQueue().hasRoute() || player.getLocation().getX() !== finalDestinationX || player.getLocation().getY() !== finalDestinationY) {
+
+            if (!this.player.getMovementQueue().hasRoute() || this.player.getLocation().getX() !== finalDestinationX || this.player.getLocation().getY() !== finalDestinationY) {
                 walkStage = -1;
                 /** When no destination is set = no possible route to requested tiles **/
-                player.getPacketSender().sendMessage("You can't reach that!");
+                this.player.getPacketSender().sendMessage("You can't reach that!");
                 return;
             }
             walkStage = 1;
-        }
-    });
+        }));
     }
 
     private isAtPointOfFocus(destX: number, destY: number): boolean {
         return this.character.getLocation().getX() === destX && this.character.getLocation().getY() === destY;
     }
-        
-        public isAtDestination(): boolean {
-        return this.points.isEmpty();
+
+    public isAtDestination(): boolean {
+        return this.points.length === 0;
     }
 
     public isWithinEntityInteractionDistance(entityLocation: Location): boolean {
-        return this.points.size() <= NPC_INTERACT_RADIUS &&
-            this.player.getLocation().getDistance(entityLocation) <= NPC_INTERACT_RADIUS;
+        return this.points.length <= MovementQueue.NPC_INTERACT_RADIUS &&
+            this.player.getLocation().getDistance(entityLocation) <= MovementQueue.NPC_INTERACT_RADIUS;
     }
 
     canMove(): boolean {
         return this == Mobility.MOBILE;
-    },
+    }
 
     /**
      * Sends the appropriate message to the player about their (lack of) mobility.
      *
      * @param player The player to send the message to.
      */
-     sendMessage(player: Player) {
+    sendMessage(player: Player) {
         if (player == null) {
             return;
         }
@@ -954,20 +944,59 @@ export class MovementQueue {
     }
 }
 
-enum Mobility {
-    INVALID,
-    BUSY,
-    FROZEN_SPELL,
-    STUNNED,
-    DUEL_MOVEMENT_DISABLED,
-    MOBILE,
+class Mobility {
+    public static readonly INVALID = new Mobility();
+    public static readonly BUSY = new Mobility();
+    public static readonly FROZEN_SPELL = new Mobility();
+    public static readonly STUNNED = new Mobility();
+    public static readonly DUEL_MOVEMENT_DISABLED = new Mobility();
+    public static readonly MOBILE = new Mobility();
 
     /**
      * Determines whether the player is able to move.
      *
      * @return {boolean} canMove
      */
+
+    constructor() { }
+    public canMove(): boolean {
+        return this === Mobility.MOBILE;
+    }
+
+    /**
+     * Sends the appropriate message to the player about their (lack of) mobility.
+     *
+     * @param player The player to send the message to.
+     */
+    public sendMessage(player: Player): void {
+        if (!player) {
+            return;
+        }
+
+        let message: string;
+
+        switch (this) {
+            case Mobility.FROZEN_SPELL:
+                message = "A magical spell has made you unable to move.";
+                break;
+            case Mobility.STUNNED:
+                message = "You're stunned!";
+                break;
+            case Mobility.BUSY:
+                message = "You cannot do that right now.";
+                break;
+            case Mobility.DUEL_MOVEMENT_DISABLED:
+                message = "Movement has been disabled in this duel!";
+                break;
+            default:
+                // No message associated with this Mobility
+                return;
+        }
+
+        player.getPacketSender().sendMessage(message);
+    }
 }
+
 
 class Point {
     position: Location;
@@ -983,6 +1012,26 @@ class Point {
     }
 }
 
+
+class MovementTask extends Task {
+    constructor(n1: number, private readonly execFunc: Function) {
+        super(0, n1, true);
+    }
+    execute(): void {
+        this.execFunc();
+    }
+
+}
+
+class MovementeTaskFunc extends Task {
+    constructor(n1: number, private readonly execFunc: Function) {
+        super(1, n1, true);
+    }
+    execute(): void {
+        this.execFunc();
+    }
+
+}
 
 
 

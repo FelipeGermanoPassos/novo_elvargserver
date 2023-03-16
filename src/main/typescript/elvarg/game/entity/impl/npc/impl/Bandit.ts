@@ -1,12 +1,12 @@
 import { CombatMethod } from "../../../../content/combat/method/CombatMethod"
-import { BanditCombatMethod } from "../../../../content/combat/method/impl/npcs/BanditCombtMethod"
+import { BanditCombtMethod } from "../../../../content/combat/method/impl/npcs/BanditCombtMethod"
 import { NPC } from "../NPC";
 import { Player } from "../../player/Player";
 import { Location } from "../../../../model/Location"
 import { Equipment } from "../../../../model/container/impl/Equipment"
 
 export class Bandit extends NPC {
-    private static COMBAT_METHOD: CombatMethod = new BanditCombatMethod();
+    private static COMBAT_METHOD: CombatMethod = new BanditCombtMethod();
 
     constructor(id: number, position: Location) {
         super(id, position);
@@ -24,7 +24,4 @@ export class Bandit extends NPC {
         return Bandit.COMBAT_METHOD;
     }
 
-    getSize(): void {
-
-    }
 }

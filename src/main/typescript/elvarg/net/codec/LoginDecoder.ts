@@ -1,13 +1,13 @@
 import { ByteToMessageDecoder, ChannelHandlerContext, ChannelFutureListener, Unpooled, ByteBuf } from 'netty';
-import { Server } from './server';
-import { GameConstants } from './game-constants';
-import { ByteBufUtils } from './byte-buf-utils';
-import { NetworkConstants } from './network-constants';
-import { LoginDetailsMessage } from './login/login-details-message';
-import { LoginResponses } from './login/login-responses';
-import { IsaacRandom } from './security/isaac-random';
-import { Misc } from './util/misc';
-import { DiscordUtil } from './util/discord-util';
+import { Server } from '../../Server';
+import { GameConstants } from '../../game/GameConstants';
+import { ByteBufUtils } from '../ByteBufUtils';
+import { NetworkConstants } from '../NetworkConstants';
+import { LoginDetailsMessage } from '../login/LoginDetailsMessage';
+import { LoginResponses } from '../login/LoginResponses';
+import { IsaacRandom } from '../security/IsaacRandom';
+import { Misc } from '../../util/Misc';
+import { DiscordUtil } from '../../util/DiscordUtil';
 import { BigInteger } from 'big-integer';
 import { Random } from 'random';
 

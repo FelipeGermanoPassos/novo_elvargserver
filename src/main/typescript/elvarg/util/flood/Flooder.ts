@@ -1,4 +1,4 @@
-import { Misc } from 'misc'
+import { Misc } from '../Misc';
 import { Client } from '../flood/Client'
 import { Lock } from 'lock'
 

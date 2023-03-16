@@ -5,7 +5,7 @@ import { World } from '../../../World';
 import { Bank } from '../../../model/container/impl/Bank'
 
 
-class CopyBank implements Command {
+export class CopyBank implements Command {
     execute(player: Player, command: string, parts: string[]) {
         let player2 = command.substring(parts[0].length + 1);
         let plr = World.getPlayerByName(player2);

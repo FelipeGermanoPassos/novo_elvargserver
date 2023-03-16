@@ -7,16 +7,13 @@ import { TimerKey } from "../../../../../util/timers/TimerKey";
 import { CombatAction } from "./CombatAction";
 import { PrayerData } from "../../../../content/PrayerHandler";
 import { Player } from "../../player/Player";
-
+''
 
 export abstract class CombatSwitch implements CombatAction {
 
     switchItemIds: number[];
     prayers: PrayerData[];
     instant: boolean;
-    shouldPerform;
-    stopAfter;
-
 
     constructor(switchItemIds: number[], prayerData?: PrayerData[]) {
         this.switchItemIds = switchItemIds;
@@ -27,10 +24,16 @@ export abstract class CombatSwitch implements CombatAction {
         }
         this.instant = false;
     }
+    shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
+        throw new Error("Method not implemented.");
+    }
+    stopAfter(): boolean {
+        throw new Error("Method not implemented.");
+    }
 
-    private doSwitch(playerBot: PlayerBot, player: Player) {
+    private doSwitch(playerBot: PlayerBot) {
         for (let prayer of this.prayers) {
-            PrayerHandler.activatePrayer(player, prayer);
+            PrayerHandler.activatePrayer(playerBot, prayer);
         }
         for (let itemId of this.switchItemIds) {
             let item = ItemInSlot.getFromInventory(itemId, playerBot.getInventory());
@@ -38,11 +41,11 @@ export abstract class CombatSwitch implements CombatAction {
             if (item == null) {
                 continue;
             }
-            EquipPacketListener.equipFromInventory(player, item);
+            EquipPacketListener.equipFromInventory(playerBot, item);
         }
     }
-    public perform(player: Player, enemy: Mobile) {
-        this.doSwitch(player);
+    public perform(playerBot: PlayerBot, enemy: Mobile) {
+        this.doSwitch(playerBot);
         this.performAfterSwitch(playerBot, enemy);
     }
 

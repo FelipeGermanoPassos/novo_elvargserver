@@ -43,10 +43,10 @@ export class Barrows {
                 player.setBarrowsCrypt(Barrows.getRandomCrypt());
             }
 
-            if (player.getCurrentBrother() != null || player.getKilledBrothers().includes(true, brother as number)) {
+            if (player.getCurrentBrother() !== null || player.getKilledBrothers()[brother.getCoffinId()]) {
                 player.getPacketSender().sendMessage("The sarcophagus appears to be empty.");
                 return false;
-              }
+            }
 
             if (player.getBarrowsCrypt() == object) {
                 /*player.setDialogueOptions(new DialogueOptions() {
@@ -68,12 +68,12 @@ export class Barrows {
                 DialogueManager.start(player, TUNNEL_DIALOGUE_ID);*/
                 return true;
             }
-            if (player.getCurrentBrother() != null || player.getKilledBrothers()[brother.get().ordinal()]) {
+            if (player.getCurrentBrother() != null || player.getKilledBrothers()[brother.getCoffinId()]) {
                 player.getPacketSender().sendMessage("The sarcophagus appears to be empty.");
                 return false;
             }
 
-            Barrows.brotherSpawn(player, brother.get(), brother.get().getSpawn());
+            Barrows.brotherSpawn(player, brother, brother.getSpawn());
             return true;
         }
 
@@ -166,8 +166,7 @@ export class Barrows {
     }
     
     public static updateInterface(player: Player) {
-        player.getPacketSender().sendString(Barrows.KILLCOUNTER_FRAME_ID,
-            "Killcount: " + Barrows.getKillcount(player));
+        player.getPacketSender().sendString("Killcount: " + Barrows.getKillcount(player), Barrows.KILLCOUNTER_FRAME_ID);
     }
         
     private static getKillcount(player: Player) {
@@ -181,36 +180,35 @@ export class Barrows {
     }
     
     private static getBrotherForCrypt(crypt: number) {
-        return Brother.values().filter(x => x.getCoffinId() == crypt)[0];
+        return Object.values(Brother).filter(x => x.getCoffinId() == crypt)[0];
     }
     
     private static getBrotherForNpcId(npcId: number) {
-        return Brother.values().filter(x => x.getNpcId() == npcId)[0];
+        return Object.values(Brother).filter(x => x.getNpcId() == npcId)[0];
     }
     
     private static getStairs(object: number) {
-        return Brother.values().filter(x => x.getStairs() == object)[0];
+        return Object.values(Brother).filter(x => x.getStairs() == object)[0];
     }
     
     private static getDiggingLocation(player: Player) {
-        return Brother.values().filter(x => x.getBoundary().inside(player.getLocation()))[0];
+        return Object.values(Brother).filter(x => x.getBoundary().inside(player.getLocation()))[0];
     }
     
     private static getRandomCrypt() {
-        return Brother.values()[Misc.getRandom(Brother.values().length - 1)].getCoffinId();
+        return Object.values(Brother)[Misc.getRandom(Object.values(Brother).length - 1)].getCoffinId();
     }
 
     public static brotherSpawn(player: Player, brother: Brother, pos: Location) {
-        const npc = new NPC(brother.npcId, pos) {
-            onAdd() {
-                this.setOwner(player);
-                this.forceChat("You dare disturb my rest!");
-                this.getTimers().extendOrRegister(TimerKey.COMBAT_ATTACK, 3);
-                this.getCombat().attack(player);
-                player.getPacketSender().sendEntityHint(this);
-            }
-    };
-    World.getAddNPCQueue().add(npc);
+        const npc = new NPC(brother.npcId, pos);
+        npc.onAdd = () => {
+            npc.setOwner(player);
+            npc.forceChat("You dare disturb my rest!");
+            npc.getTimers().extendOrRegister(TimerKey.COMBAT_ATTACK, 3);
+            npc.getCombat().attack(player);
+            player.getPacketSender().sendEntityHint(npc);
+        };
+        World.getAddNPCQueue().add(npc);
         player.setCurrentBrother(npc);
     }
     
@@ -225,7 +223,7 @@ export class Brother {
         digSpawn: new Location(3557, 9703),
         stairs: 20667,
         stairSpawn: new Location(3565, 3288)
-    },
+    };
     DHAROK_THE_WRETCHED = {
         npcId: 1673,
         coffinId: 20720,
@@ -234,7 +232,7 @@ export class Brother {
         digSpawn: new Location(3556, 9718),
         stairs: 20668,
         stairSpawn: new Location(3574, 3297)
-    },
+    };
     GUTHAN_THE_INFESTED = {
         npcId: 1674,
         coffinId: 20722,
@@ -243,7 +241,7 @@ export class Brother {
         digSpawn: new Location(3534, 9704),
         stairs: 20669,
         stairSpawn: new Location(3577, 3282)
-    },
+    };
     KARIL_THE_TAINTED = {
         npcId: 1675,
         coffinId: 20771,
@@ -252,22 +250,24 @@ export class Brother {
         digSpawn: new Location(3546, 9684),
         stairs: 20670,
         stairSpawn: new Location(3566, 3275)
-    },
+    };
     TORAG_THE_CORRUPTED = {
         npcId: 1676,
         coffinId: 20721,
         spawn: new Location(3568, 9688),
-        boundary: new Boundary((3550, 3556, 3280, 3284),
-        new Location(3568, 9683, 3), 20671,
-        new Location(3554, 3282, 0))
-    },
+        boundary: new Boundary(3550, 3556, 3280, 3284),
+        digSpawn: new Location(3568, 9683, 3),
+        stairs: 20671,
+        stairSpawn:new Location(3554, 3282, 0)
+    };
     VERAC_THE_DEFILED = {
         npcId: 1677,
         coffinId: 20772,
         spawn: new Location(3575, 9708),
-        boundary: new Boundary((3553, 3560, 3294, 3301),
-        new Location(3578, 9706, 3), 20672,
-        new Location(3557, 3297, 0))
+        boundary: new Boundary(3553, 3560, 3294, 3301),
+        digSpawn: new Location(3578, 9706, 3),
+        stairs: 20672,
+        stairSpawn: new Location(3557, 3297, 0)
     }
 
     public npcId: number;

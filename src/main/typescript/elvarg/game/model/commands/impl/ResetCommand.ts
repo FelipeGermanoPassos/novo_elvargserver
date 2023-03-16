@@ -9,7 +9,7 @@ export class ResetCommand implements Command {
     execute(player: Player, command: string, parts: string[]) {
         for (const skill of Object.values(Skill)) {
             const level = skill === Skill.HITPOINTS ? 10 : 1;
-            player.getSkillManager().setCurrentLevel(skill, level).setMaxLevel(skill, level).setExperience(skill,
+            player.getSkillManager().setCurrentLevels(skill, level).setMaxLevel(skill, level).setExperience(skill,
             SkillManager.getExperienceForLevel(level));
         }
         WeaponInterfaces.assign(player);

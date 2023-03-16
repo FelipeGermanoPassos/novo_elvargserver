@@ -8,7 +8,7 @@ export class TradeRequestPacketListener implements PacketExecutor {
     execute(player: Player, packet: Packet) {
         let index = packet.readLEShort();
 
-        if (index > World.getPlayers().length || index < 0) {
+        if (index > World.getPlayers().sizeReturn() || index < 0) {
             return;
         }
 

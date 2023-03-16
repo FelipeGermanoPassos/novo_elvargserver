@@ -11,7 +11,7 @@ export class Emotes {
     public static doEmote(player: Player, button: number) {
         const data = EmoteData.forId(button);
         if (data) {
-            animation(player, data.animation, data.graphic);
+            Emotes.handleAnimation(player, data.animation, data.graphic);
             return true;
         }
 
@@ -19,8 +19,8 @@ export class Emotes {
             const cape = Skillcape.forId(player.getEquipment().getItems()[Equipment.CAPE_SLOT].getId());
             if (cape) {
                 if (cape !== Skillcape.QUEST_POINT) {
-                    if (cape.ordinal() < Object.values(Skill).length) {
-                        const skill = Object.values(Skill)[cape.ordinal()] as Skill;
+                    if (cape.getDelay() < Object.values(Skill).length) {
+                        const skill = Object.values(Skill)[cape.getDelay()] as Skill;
                         const level = SkillManager.getMaxAchievingLevel(skill);
                         if (player.getSkillManager().getMaxLevel(skill) < level) {
                             player.getPacketSender().sendMessage(`You need ${skill.getName()} level of at least ${level} to do this emote.`);
@@ -30,14 +30,14 @@ export class Emotes {
                         // custom capes
                     }
                 }
-                handleAnimation(player, cape.getAnimation(), cape.getGraphic());
+                Emotes.handleAnimation(player, cape.getAnimation(), cape.getGraphic());
             }
             return true;
         }
         return false;
     }
 
-    handleAnimation(player: Player, anim: Animation, graphic: Graphic) {
+    public static handleAnimation(player: Player, anim: Animation, graphic: Graphic) {
         if (CombatFactory.inCombat(player)) {
             player.getPacketSender().sendMessage("You cannot do this right now.");
             return;
@@ -120,7 +120,7 @@ enum EmoteDatas {
 		SAFETY_FIRST(6540, new Animation(8770), new Graphic(1553)),
 		AIR_GUITAR(11101, new Animation(2414), new Graphic(1537)),
 		SNOWMAN_DANCE(11102, new Animation(7531), null),
-		FREEZE(11103, new Animation(11044), new Graphic(1973))*/;
+		FREEZE(11103, new Animation(11044), new Graphic(1973))*/
 }
 
 

@@ -9,13 +9,17 @@ import { GameConstants } from "../../game/GameConstants";
 import { PlayerBot } from "../../game/entity/impl/playerbot/PlayerBot";
 import { PlayerStatus } from "../../game/model/PlayerStatus";
 import { Bank } from "../../game/model/container/impl/Bank";
-import { ItemContainer } from "../../game/model/container/ItemContainer";
-import { PlayerInteractingOption } from "../../game/model/PlayerInteractingOption";
+import { PlayerInteractingOptions, PlayerInteractingOption } from "../../game/model/PlayerInteractingOption";
 import { GameObject } from "../../game/entity/impl/object/GameObject";
 import { ItemOnGround } from "../../game/entity/impl/grounditem/ItemOnGround";
 import { Graphic } from "../../game/model/Graphic";
 import { Inventory } from "../../game/model/container/impl/Inventory";
 import { Location } from "../../game/model/Location";
+import { Animation } from "../../game/model/Animation";
+import { Item } from "../../game/model/Item";
+import { Mobile } from "../../game/entity/impl/Mobile";
+import { EffectTimer } from "../../game/model/EffectTimer";
+import { DonatorRights } from "../../game/model/rights/DonatorRights";
 
 export class PacketSender {
     private player: Player;
@@ -70,7 +74,7 @@ export class PacketSender {
     }
     sendCreationMenu(menu: CreationMenu): this {
         this.player.setCreationMenu(menu);
-        this.sendString(31104, menu.getTitle());
+        this.sendString( menu.getTitle(), 31104);
         const out = new PacketBuilder(167);
         out.put(menu.getItems().length);
         for (const itemId of menu.getItems()) {
@@ -159,8 +163,8 @@ export class PacketSender {
 
     sendSkill(skill: Skill): this {
         const out = new PacketBuilder(134);
-        out.put(skill;ordinal());
-        out.putInt(this.player.getSkillManager().getCurrentLevel(skill));
+        out.put(skill.getButton());
+        out.putInt(this.player.getSkillManager().getCurrentLevel(Skill.AGILITY));
         out.putInt(this.player.getSkillManager().getMaxLevel(skill));
         out.putInt(this.player.getSkillManager().getExperience(skill));
         this.player.getSession().write(out);
@@ -169,7 +173,7 @@ export class PacketSender {
 
     sendExpDrop(skill: Skill, exp: number): this {
         const out = new PacketBuilder(116);
-        out.put(skill.ordinal());
+        out.put(skill.getButton());
         out.putInt(exp);
         this.player.getSession().write(out);
         return this;
@@ -561,7 +565,7 @@ export class PacketSender {
     }
 
 
-    public sendInterfaceItems(interfaceId: number, items: Array<Item>) {
+    public sendInterfaceItems(interfaceId: number, items: Item[]) {
         if (this.player.isPlayerBot()) {
             return this;
         }
@@ -621,11 +625,11 @@ export class PacketSender {
 
     public sendInteractionOption(option: string, slot: number, top: boolean): PacketSender {
         const out = new PacketBuilder(104, PacketType.VARIABLE);
-        out.put(slot, ValueType.C);
-        out.put(top ? 1 : 0, ValueType.A);
+        out.puts(slot, ValueType.C);
+        out.puts(top ? 1 : 0, ValueType.A);
         out.putString(option);
         this.player.getSession().write(out);
-        const interactingOption = PlayerInteractingOption.forName(option);
+        const interactingOption: PlayerInteractingOption = PlayerInteractingOption.forName(option);
         if (option != null)
         this.player.setPlayerInteractingOption(interactingOption);
         return this;
@@ -664,8 +668,8 @@ export class PacketSender {
 
     public sendRights() {
         const out = new PacketBuilder(127);
-        out.put(this.player.getRights().ordinal());
-        out.put(this.player.getDonatorRights().ordinal());
+        out.put(this.player.getRights().getSpriteId());
+        out.put(DonatorRights.getSpriteId(0));
         this.player.getSession().write(out);
         return this;
     }
@@ -685,7 +689,7 @@ export class PacketSender {
         const out = new PacketBuilder(254);
         out.put(type);
         out.putShort(mobile.getIndex());
-        out.putInt(0, ByteOrder.TRIPLE_INT);
+        out.putShorts(0, ByteOrder.TRIPLE_INT);
         this.player.getSession().write(out);
         return this;
     }
@@ -694,7 +698,7 @@ export class PacketSender {
         let type = playerHintRemoval ? 10 : 1;
         let out = new PacketBuilder(254);
         out.put(type).putShort(-1);
-        out.putInt(0, ByteOrder.TRIPLE_INT);
+        out.putShorts(0, ByteOrder.TRIPLE_INT);
         this.player.getSession().write(out);
         return this;
     }
@@ -708,16 +712,17 @@ export class PacketSender {
     }
 
     public sendPrivateMessage(target: Player, message: Uint8Array, size: number): PacketSender {
+        const messageArray = Array.from(message);
         if (this.player instanceof PlayerBot) {
-            (this.player as PlayerBot).getChatInteraction().receivedPrivateMessage(message, target);
+            (this.player as PlayerBot).getChatInteraction().receivedPrivateMessage(messageArray, target);
             return this;
         }
         let out = new PacketBuilder(196, PacketType.VARIABLE);
         out.putLong(target.getLongUsername());
         out.putInt(target.getRelations().getPrivateMessageId());
-        out.put(target.getRights().ordinal());
-        out.put(target.getDonatorRights().ordinal());
-        out.putBytes(message, size);
+        out.put(target.getRights().getSpriteId());
+        out.put(DonatorRights.getSpriteId(0));
+        out.writePutBytes(message, size);
         this.player.getSession().write(out);
         return this;
     }
