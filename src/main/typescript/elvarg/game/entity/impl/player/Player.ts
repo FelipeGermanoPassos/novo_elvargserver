@@ -1627,4 +1627,13 @@ export class Player extends Mobile {
     getSize() {
 
     }
+
+    public castlewarsKills: number;
+    public castlewarsDeaths: number;
+    public castlewarsIdleTime: number;
+
+
+    public resetCastlewarsIdleTime() {
+        this.castlewarsIdleTime = 200;
+    }
 }

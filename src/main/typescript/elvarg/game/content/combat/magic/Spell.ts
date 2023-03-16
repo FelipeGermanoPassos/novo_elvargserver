@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 export class Spell {
     public canCast(player: Player, delete: boolean): boolean {
     if (player.skillManager.getCurrentLevel(Skill.MAGIC) < levelRequired()) {
@@ -5,62 +6,95 @@ export class Spell {
             `You need a Magic level of ${levelRequired()} to cast this spell.`);
         player.combat.reset();
         return false;
+=======
+import { Misc } from "../../../../util/Misc";
+import { Mobile } from "../../../entity/impl/Mobile";
+import { Player } from "../../../entity/impl/player/Player";
+import { Equipment } from "../../../model/container/impl/Equipment";
+import { Item } from "../../../model/Item";
+import { MagicSpellbook } from "../../../model/MagicSpellbook";
+import { Skill } from "../../../model/Skill";
+import { Autocasting } from "./Autocasting";
+import { CombatSpells } from "./CombatSpells";
+import { PlayerMagicStaff } from "./PlayerMagicStaff";
+
+export abstract class Spell {
+
+    abstract spellId(): number;
+    abstract levelRequired(): number;
+    abstract itemsRequired(player: Player): Item[];
+    abstract equipmentRequired(player: Player): Item[];
+    abstract startCast(cast: Mobile, castOn: Mobile): void
+    abstract baseExperience();
+
+    public getSpellbook(): MagicSpellbook {
+        return MagicSpellbook.NORMAL;
+>>>>>>> Stashed changes
     }
 
-    if (!player.spellbook.equals(getSpellbook())) {
-        Autocasting.setAutocast(player, null);
-        player.combat.setCastSpell(null);
-        player.combat.reset();
-        return false;
-    }
-    if (itemsRequired(player).isPresent()) {
-        // Suppress the runes based on the staff, we then use the new array
-        // of items that don't include suppressed runes.
-        const items = PlayerMagicStaff.suppressRunes(player,
-            itemsRequired(player).get());
-
-        // Now check if we have all of the runes.
-        if (!player.inventory.containsAll(items)) {
-
-            // We don't, so we can't cast.
-            player.packetSender.sendMessage(
-                "You do not have the required items to cast this spell.");
-            player.combat.setCastSpell(null);
-            player.combat.reset();
+    canCast(player: Player, del: boolean): boolean {
+        if (player.getSkillManager().getCurrentLevel(Skill.MAGIC) < this.levelRequired()) {
+            player.getPacketSender().sendMessage(`You need a Magic level of ${this.levelRequired()} to cast this spell.`);
+            player.getCombat().reset();
             return false;
         }
 
-        // Finally, we check the equipment required.
-        if (equipmentRequired(player).isPresent()) {
-            if (!player.equipment.containsAll(
-                equipmentRequired(player).get())) {
-                player.packetSender.sendMessage(
-                    "You do not have the required equipment to cast this spell.");
-                player.combat.setCastSpell(null);
-                player.combat.reset();
+        if (player.getArea() != null) {
+            if (player.getArea().isSpellDisabled(player, this.getSpellbook(), this.spellId())) {
+                player.getCombat().setCastSpell(null);
+                player.getCombat().reset();
                 return false;
             }
         }
 
-        //Check staff of the dead and don't delete runes at a rate of 1/8
-        if (player.equipment.items[Equipment.WEAPON_SLOT].id === 11791) {
-            if (Misc.getRandom(7) === 1) {
-                player.packetSender.sendMessage("Your Staff of the dead negated your runes for this cast.");
-                delete = false;
+        if (player.getSpellbook() === this.getSpellbook()) {
+            Autocasting.setAutocast(player, null);
+            player.getCombat().setCastSpell(null);
+            player.getCombat().reset();
+            return false;
+        }
+
+        const items = this.itemsRequired(player);
+        if (items !== null) {
+            const suppressedItems = PlayerMagicStaff.suppressRunes(player, items);
+
+            if (!player.getInventory().containsAllItem(suppressedItems)) {
+                player.getPacketSender().sendMessage("You do not have the required items to cast this spell.");
+                player.getCombat().setCastSpell(null);
+                player.getCombat().reset();
+                return false;
+            }
+
+            const equipment = this.equipmentRequired(player);
+            if (equipment !== null && !player.getEquipment().containsAllItem(equipment)) {
+                player.getPacketSender().sendMessage("You do not have the required equipment to cast this spell.");
+                player.getCombat().setCastSpell(null);
+                player.getCombat().reset();
+                return false;
+            }
+
+            if (player.getEquipment().getItems()[Equipment.WEAPON_SLOT].getId() == 11791) {
+                if (Misc.getRandom(7) == 1) {
+                    player.getPacketSender().sendMessage("Your Staff of the dead negated your runes for this cast.");
+                    del = false;
+                }
+            }
+
+            if (del) {
+                let item: Item
+                for (item of suppressedItems) {
+                    if (item !== null) {
+                        player.getInventory().deletes(item);
+                    }
+                }
             }
         }
 
-        // We've made it through the checks, so we have the items and can
-        // remove them now
-        if (delete) {
-            for (Item it : Arrays.asList(items)) {
-                if (it != null)
-                    player.getInventory().delete(it);
-            }
-        }
+        return true;
     }
-    return true;
+
 }
+<<<<<<< Updated upstream
 getSpellbook(): MagicSpellbook {
     return MagicSpellbook.NORMAL;
 }
@@ -76,3 +110,8 @@ interface Spells {
     startCast(cast: Mobile, castOn: Mobile): void;
 }
 
+=======
+
+
+
+>>>>>>> Stashed changes

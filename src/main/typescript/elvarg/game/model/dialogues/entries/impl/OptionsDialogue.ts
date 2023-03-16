@@ -1,4 +1,13 @@
+<<<<<<< Updated upstream
 class OptionsDialogue extends Dialogue {
+=======
+import { Dialogue } from "../Dialogue";
+import { Player } from "../../../../entity/impl/player/Player";
+import { LinkedHashMap } from 'linkedHashMap'
+import { DialogueOptionAction } from ''
+
+export class OptionsDialogue extends Dialogue {
+>>>>>>> Stashed changes
     private static CHATBOX_INTERFACES = [13760, 2461, 2471, 2482, 2494];
     private title: string;
     private optionsMap: LinkedHashMap<string, DialogueOptionsAction>;

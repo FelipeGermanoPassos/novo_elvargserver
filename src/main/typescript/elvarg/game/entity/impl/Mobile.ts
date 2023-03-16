@@ -17,7 +17,10 @@ import { MovementQueue } from "../../model/movement/MovementQueue";
 import { Task } from "../../task/Task";
 import { TaskManager } from "../../task/TaskManager";
 import { Stopwatch } from "../../../util/Stopwatch";
-import {TimerRepository} from "../../../util/timers/TimerRepository";
+import { TimerRepository } from "../../../util/timers/TimerRepository";
+import { RegionManager } from "../../collision/RegionManager";
+import { Misc } from "../../../util/Misc";
+import { Boundary } from "../../model/Boundary";
 
 export class Mobile extends Entity {
     private index: number;
@@ -34,8 +37,12 @@ export class Mobile extends Entity {
     private animation: Animation;
     private graphic: Graphic;
     private following: Mobile;
-    
+
     private attributes = new Map<Object, Object>();
+
+    getSize() {
+
+    }
 
     public getAttribute(name: Object) {
         return this.attributes.get(name);
@@ -555,4 +562,54 @@ export class Mobile extends Entity {
 
         this.getAsPlayer()?.getPacketSender()?.sendMessage(message);
     }
+
+    public smartMove(location: Location, radius: number): Mobile {
+        let chosen: Location | null = null;
+        const requestedX: number = location.getX();
+        const requestedY: number = location.getY();
+        const height: number = location.getZ();
+        while (true) {
+            const randomX: number = Misc.random(requestedX - radius, requestedX + radius);
+            const randomY: number = Misc.random(requestedY - radius, requestedY + radius);
+            const randomLocation: Location = new Location(randomX, randomY, height);
+            if (!RegionManager.blocked(randomLocation, null)) {
+                chosen = randomLocation;
+                break;
+            }
+        }
+        this.getMovementQueue().reset();
+        this.setLocation(chosen.clone());
+        this.setNeedsPlacement(true);
+        this.setResetMovementQueue(true);
+        this.setMobileInteraction(null);
+        if (this instanceof Player) {
+            this.getMovementQueue().handleRegionChange();
+        }
+        return this;
+    }
+
+    public smartMoveBounds(bounds: Boundary): Mobile {
+        let chosen: Location | null = null;
+        const height: number = bounds.height;
+        while (true) {
+            const randomX: number = Misc.random(bounds.getX(), bounds.getX2());
+            const randomY: number = Misc.random(bounds.getY(), bounds.getY2());
+            const randomLocation: Location = new Location(randomX, randomY, height);
+            if (!RegionManager.blocked(randomLocation, null)) {
+                chosen = randomLocation;
+                break;
+            }
+        }
+        this.getMovementQueue().reset();
+        this.setLocation(chosen.clone());
+        this.setNeedsPlacement(true);
+        this.setResetMovementQueue(true);
+        this.setMobileInteraction(null);
+        if (this instanceof Player) {
+            this.getMovementQueue().handleRegionChange();
+        }
+        return this;
+    }
+
+
 }

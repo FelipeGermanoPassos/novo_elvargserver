@@ -993,7 +993,7 @@ export class ItemIdentifiers {
     static MUDDY_KEY_2 = 992;
     static SINISTER_KEY = 993;
     static SINISTER_KEY_2 = 994;
-    static COINS = 995;
+    public static COINS = 995;
     static NULL_61 = 996;
     static NULL_62 = 997;
     static NULL_63 = 998;

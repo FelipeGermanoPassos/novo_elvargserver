@@ -27,11 +27,11 @@ export class PlayerMagicStaff {
         [PlayerMagicStaffEnum.LAVA]: { staves: [3053, 3054], runes: [554, 557] },
     }
 
-    suppressRunes(player: Player, runesRequired: Item[]) {
+    public static suppressRunes(player: Player, runesRequired: Item[]) {
         if (player.weapon === WeaponInterfaces.STAFF) {
             for (const magicStaff of Object.values(PlayerMagicStaff)) {
-                if (player.equipment.containsAny(this.playerMagicStaff[magicStaff].staves)) {
-                    for (const runeId of this.playerMagicStaff[magicStaff].runes) {
+                if (player.equipment.containsAny(PlayerMagicStaff[magicStaff].staves)) {
+                    for (const runeId of PlayerMagicStaff[magicStaff].runes) {
                         for (let i = 0; i < runesRequired.length; i++) {
                             if (runesRequired[i] && runesRequired[i].id === runeId) {
                                 runesRequired[i] = null;

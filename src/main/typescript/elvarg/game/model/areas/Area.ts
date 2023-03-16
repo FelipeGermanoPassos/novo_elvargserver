@@ -6,6 +6,7 @@ import { Mobile } from '../../entity/impl/Mobile'
 import { Item } from '../../../game/model/Item'
 import { CombatFactory } from '../../content/combat/CombatFactory'
 import { CanAttackResponse } from '../../content/combat/CombatFactory'
+import { MagicSpellbook } from '../MagicSpellbook';
 
 
 export abstract class Area {
@@ -16,6 +17,11 @@ export abstract class Area {
 
     constructor(boundaries: Boundary[]) {
         this.boundaries = boundaries;
+    }
+
+
+    public isSpellDisabled(player: Player, spellbook: MagicSpellbook, spellId: number): boolean {
+        return false;
     }
 
     enter(character: Mobile) {

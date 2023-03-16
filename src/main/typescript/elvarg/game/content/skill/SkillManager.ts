@@ -1,5 +1,34 @@
 import { Skill } from "../../model/Skill";
 import { Player } from "../../entity/impl/player/Player";
+<<<<<<< Updated upstream
+=======
+import { Graphic } from "../../model/Graphic";
+import { GameConstants } from "../../GameConstants";
+import { PlayerRights } from "../../model/rights/PlayerRights";
+import { Flag } from "../../model/Flag";
+import { World } from "../../World";
+import { WildernessArea } from "../../model/areas/impl/WildernessArea";
+import { Runecrafting } from "./skillable/impl/Runecrafting";
+import { PrayerData, PrayerHandler } from "../PrayerHandler";
+import { Skillable } from "./skillable/Skillable";
+import { WeaponInterfaces } from "../combat/WeaponInterfaces";
+import { BonusManager } from "../../model/equipment/BonusManager";
+import { BountyHunter } from "../combat/bountyhunter/BountyHunter";
+import { Woodcutting } from '../../../game/content/skill/skillable/impl/woodcutting/Woodcutting'
+import { Mining, Rock } from '../../content/skill/skillable/impl/Mining'
+import { GameObject } from "../../entity/impl/object/GameObject";
+import { EnteredAmountAction } from "../../model/EnteredAmountAction";
+
+class SkillEntered implements EnteredAmountAction {
+    constructor(private readonly execFunc: Function) {
+
+    }
+    execute(amount: number): void {
+        this.execFunc();
+    }
+
+}
+>>>>>>> Stashed changes
 
 export class SkillManager {
     public static readonly AMOUNT_OF_SKILLS: number = Skill.values().length;
@@ -28,8 +57,13 @@ export class SkillManager {
             this.skills.level[i] = this.skills.maxLevel[i] = 1;
             this.skills.experience[i] = 0;
         }
+<<<<<<< Updated upstream
         this.skills.level[Skill.HITPOINTS.ordinal()] = this.skills.maxLevel[Skill.HITPOINTS.ordinal()] = 10;
         this.skills.experience[Skill.HITPOINTS.ordinal()] = 1184;
+=======
+        this.skills.level[Skill.HITPOINTS.getButton()] = this.skills.maxLevel[Skill.HITPOINTS.getButton()] = 10;
+        this.skills.experience[Skill.HITPOINTS.getButton()] = 1184;
+>>>>>>> Stashed changes
     }
 
     static getExperienceForLevel(level: number): number {
@@ -96,6 +130,7 @@ export class SkillManager {
             return this;
 
         // If we already have max exp, don't add any more.
+<<<<<<< Updated upstream
         if (this.skills.experience[skill.ordinal()] >= MAX_EXPERIENCE)
             return this;
 
@@ -109,11 +144,27 @@ export class SkillManager {
 
         // Get the skill's new level after experience has been added..
         let newLevel = this.getLevelForExperience(this.skills.experience[skill.ordinal()]);
+=======
+        if (this.skills.experience[skill.getButton()] >= SkillManager.MAX_EXPERIENCE)
+            return this;
+
+        // The skill's level before any experience is added
+        const startingLevel = this.skills.maxLevel[skill.getButton()];
+
+        // Add experience to the selected skill..
+        this.skills.experience[skill.getName()] = this.skills.experience[skill.getName()] + experience > SkillManager.MAX_EXPERIENCE
+            ? SkillManager.MAX_EXPERIENCE
+            : this.skills.experience[skill.getName()] + experience;
+
+        // Get the skill's new level after experience has been added..
+        let newLevel = SkillManager.getLevelForExperience(this.skills.experience[skill.getName()]);
+>>>>>>> Stashed changes
 
         // Handle level up..
         if (newLevel > startingLevel) {
             let level = newLevel - startingLevel;
             let skillName = skill.toString().toLowerCase().charAt(0).toUpperCase() + skill.toString().toLowerCase().slice(1);
+<<<<<<< Updated upstream
             skills.maxLevel[skill.ordinal()] += level;
             stopSkillable(); // Stop skilling on level up like osrs
             setCurrentLevel(skill, skills.maxLevel[skill.ordinal()]);
@@ -127,6 +178,21 @@ export class SkillManager {
             if (skills.maxLevel[skill.ordinal()] == getMaxAchievingLevel(skill)) {
                 player.getPacketSender().sendMessage("Well done! You've achieved the highest possible level in this skill!");
                 World.sendMessage("<shad=15536940>News: " + player.getUsername()
+=======
+            this.skills.maxLevel[skill.getButton()] += level;
+            this.stopSkillable(); // Stop skilling on level up like osrs
+            this.setCurrentLevels(skill, this.skills.maxLevel[skill.getButton()]);
+            this.player.getPacketSender().sendInterfaceRemoval();
+            this.player.getPacketSender().sendString("Congratulations! You have achieved a " + skillName + " level!", 4268);
+            this.player.getPacketSender().sendString("Well done. You are now level " + newLevel + ".", 4269);
+            this.player.getPacketSender().sendString("Click here to continue.", 358);
+            this.player.getPacketSender().sendChatboxInterface(skill.getChatboxInterface());
+            this.player.performGraphic(SkillManager.LEVEL_UP_GRAPHIC);
+            this.player.getPacketSender().sendMessage("You've just advanced " + skillName + " level! You have reached level " + newLevel);
+            if (this.skills.maxLevel[skill.getButton()] == SkillManager.getMaxAchievingLevel(skill)) {
+                this.player.getPacketSender().sendMessage("Well done! You've achieved the highest possible level in this skill!");
+                World.sendMessage("<shad=15536940>News: " + this.player.getUsername()
+>>>>>>> Stashed changes
                     + " has just achieved the highest possible level in " + skillName + "!");
             }
             player.getUpdateFlag().flag(Flag.APPEARANCE);
@@ -139,6 +205,7 @@ export class SkillManager {
         let skill = Skill.forButton(button);
         if (skill != null) {
             if (!skill.canSetLevel()) {
+<<<<<<< Updated upstream
                 if (player.getRights() != PlayerRights.ADMINISTRATOR && player.getRights() != PlayerRights.DEVELOPER
                     && player.getRights() != PlayerRights.OWNER) {
                     player.getPacketSender().sendMessage("You can currently not set that level.");
@@ -147,6 +214,16 @@ export class SkillManager {
             }
             player.getPacketSender().sendInterfaceRemoval();
             player.setEnteredAmountAction((amount: number) => {
+=======
+                if (this.player.getRights() != PlayerRights.ADMINISTRATOR && this.player.getRights() != PlayerRights.DEVELOPER
+                    && this.player.getRights() != PlayerRights.OWNER) {
+                    this.player.getPacketSender().sendMessage("You can currently not set that level.");
+                    return true;
+                }
+            }
+            this.player.getPacketSender().sendInterfaceRemoval();
+            this.player.setEnteredAmountAction(new SkillEntered((amount: number) => {
+>>>>>>> Stashed changes
                 let max = 99;
                 if (player.getRights() == PlayerRights.OWNER
                     || player.getRights() == PlayerRights.DEVELOPER) {
@@ -156,9 +233,15 @@ export class SkillManager {
                     player.getPacketSender().sendMessage("Invalid syntax. Please enter a level in the range of 1-99.");
                     return;
                 }
+<<<<<<< Updated upstream
                 player.getSkillManager().setLevel(skill, amount);
             });
             player.getPacketSender()
+=======
+                this.player.getSkillManager().setLevel(skill, amount);
+            }));
+            this.player.getPacketSender()
+>>>>>>> Stashed changes
                 .sendEnterAmountPrompt("Please enter your desired " + skill.getName() + " level below.");
 
             return true;
@@ -169,10 +252,17 @@ export class SkillManager {
     setLevel(skill: Skill, level: number) {
 
         // Make sure they aren't in wild
+<<<<<<< Updated upstream
         if (player.getArea() instanceof WildernessArea) {
             if (player.getRights() != PlayerRights.ADMINISTRATOR && player.getRights() != PlayerRights.DEVELOPER
                 && player.getRights() != PlayerRights.OWNER) {
                 player.getPacketSender().sendMessage("You cannot do this in the Wilderness!");
+=======
+        if (this.player.getArea() instanceof WildernessArea) {
+            if (this.player.getRights() != PlayerRights.ADMINISTRATOR && this.player.getRights() != PlayerRights.DEVELOPER
+                && this.player.getRights() != PlayerRights.OWNER) {
+                this.player.getPacketSender().sendMessage("You cannot do this in the Wilderness!");
+>>>>>>> Stashed changes
                 return;
             }
         }
@@ -185,8 +275,13 @@ export class SkillManager {
                     continue;
                 }
                 if (item.getDefinition().getRequirements() != null) {
+<<<<<<< Updated upstream
                     if (item.getDefinition().getRequirements()[skill.ordinal()] > level) {
                         player.getPacketSender().sendMessage(
+=======
+                    if (item.getDefinition().getRequirements()[skill.getButton()] > level) {
+                        this.player.getPacketSender().sendMessage(
+>>>>>>> Stashed changes
                             "Please unequip your " + item.getDefinition().getName() + " before doing that.");
                         return;
                     }
@@ -202,6 +297,7 @@ export class SkillManager {
         }
 
         // Set skill level
+<<<<<<< Updated upstream
         player.getSkillManager().setCurrentLevel(skill, level, false).setMaxLevel(skill, level, false)
             .setExperience(skill, SkillManager.getExperienceForLevel(level));
         updateSkill(skill);
@@ -210,6 +306,16 @@ export class SkillManager {
             player.getPacketSender().sendConfig(709, PrayerHandler.canUse(player, PrayerData.PRESERVE, false) ? 1 : 0);
             player.getPacketSender().sendConfig(711, PrayerHandler.canUse(player, PrayerData.RIGOUR, false) ? 1 : 0);
             player.getPacketSender().sendConfig(713, PrayerHandler.canUse(player, PrayerData.AUGURY, false) ? 1 : 0);
+=======
+        this.player.getSkillManager().setCurrentLevel(skill, level, false).setMaxLevels(skill, level, false)
+            .setExperience(skill, SkillManager.getExperienceForLevel(level));
+        this.updateSkill(skill);
+
+        if (skill == Skill.PRAYER) {
+            this.player.getPacketSender().sendConfig(709, PrayerHandler.canUse(this.player, PrayerData.PRESERVE, false) ? 1 : 0);
+            this.player.getPacketSender().sendConfig(711, PrayerHandler.canUse(this.player, PrayerData.RIGOUR, false) ? 1 : 0);
+            this.player.getPacketSender().sendConfig(713, PrayerHandler.canUse(this.player, PrayerData.AUGURY, false) ? 1 : 0);
+>>>>>>> Stashed changes
         }
 
         // Update weapon tab to send combat level etc.
@@ -223,19 +329,19 @@ export class SkillManager {
 
     public updateSkill(skill: Skill) {
         const maxLevel = this.getMaxLevel(skill);
-        const currentLevel = this.getCurrentLevel(skill);
+        const currentLevel = this.getMaxLevel(skill);
 
         // Update prayer tab if it's the prayer skill.
         if (skill === Skill.PRAYER) {
-            this.player.getPacketSender().sendString(687, currentLevel + "/" + maxLevel);
+            this.player.getPacketSender().sendString(currentLevel + "/" + maxLevel, 687);
         }
 
         // Send total level
-        this.player.getPacketSender().sendString(31200, "" + this.getTotalLevel());
+        this.player.getPacketSender().sendString("" + this.getTotalLevel(), 31200);
 
         // Send combat level
         const combatLevel = "Combat level: " + this.getCombatLevel();
-        this.player.getPacketSender().sendString(19000, combatLevel).sendString(5858, combatLevel);
+        this.player.getPacketSender().sendString(combatLevel, 19000).sendString(combatLevel, 5858);
 
         // Send the skill
         this.player.getPacketSender().sendSkill(skill);
@@ -249,13 +355,13 @@ export class SkillManager {
      * @return The average of the player's combat skills.
      */
     public getCombatLevel(): number {
-        const attack = this.skills.maxLevel[Skill.ATTACK.ordinal()];
-        const defence = this.skills.maxLevel[Skill.DEFENCE.ordinal()];
-        const strength = this.skills.maxLevel[Skill.STRENGTH.ordinal()];
-        const hp = (this.skills.maxLevel[Skill.HITPOINTS.ordinal()]);
-        const prayer = (this.skills.maxLevel[Skill.PRAYER.ordinal()]);
-        const ranged = this.skills.maxLevel[Skill.RANGED.ordinal()];
-        const magic = this.skills.maxLevel[Skill.MAGIC.ordinal()];
+        const attack = this.skills.maxLevel[Skill.ATTACK.getButton()];
+        const defence = this.skills.maxLevel[Skill.DEFENCE.getButton()];
+        const strength = this.skills.maxLevel[Skill.STRENGTH.getButton()];
+        const hp = this.skills.maxLevel[Skill.HITPOINTS.getButton()];
+        const prayer = this.skills.maxLevel[Skill.PRAYER.getButton()];
+        const ranged = this.skills.maxLevel[Skill.RANGED.getButton()];
+        const magic = this.skills.maxLevel[Skill.MAGIC.getButton()];
         let combatLevel = 3;
         combatLevel = (defence + hp + Math.floor(prayer / 2)) * 0.2535 + 1;
         const melee = (attack + strength) * 0.325;
@@ -305,7 +411,11 @@ export class SkillManager {
      * @return The skill's level.
      */
     public getCurrentLevel(skill: Skill): number {
+<<<<<<< Updated upstream
         return this.skills.level[skill];
+=======
+        return this.skills.level[skill.getButton()];
+>>>>>>> Stashed changes
     }
 
     /**
@@ -315,7 +425,7 @@ export class SkillManager {
      * @return The skill's maximum level.
      */
     public getMaxLevel(skill: Skill): number {
-        return this.skills.maxLevel[skill];
+        return this.skills.maxLevel[skill.getButton()];
     }
 
     /**
@@ -324,7 +434,7 @@ export class SkillManager {
      * @param skill The skill to get max level for.
      * @return The skill's maximum level.
      */
-    public getMaxLevel(skill: number): number {
+    public getMaxLevels(skill: number): number {
         return this.skills.maxLevel[skill];
     }
 
@@ -335,7 +445,7 @@ export class SkillManager {
      * @return The experience in said skill.
      */
     public getExperience(skill: Skill): number {
-        return this.skills.experience[skill];
+        return this.skills.experience[skill.getButton()];
     }
 
     /**
@@ -347,31 +457,46 @@ export class SkillManager {
      * @return The Skills instance.
      */
     public setCurrentLevel(skill: Skill, level: number, refresh: boolean): SkillManager {
-        this.skills.level[skill] = level < 0 ? 0 : level;
+        this.skills.level[skill.getButton()] = level < 0 ? 0 : level;
         if (refresh) {
             this.updateSkill(skill);
         }
         return this;
     }
 
+<<<<<<< Updated upstream
     setMaxLevel(skill: Skill, level: number, refresh = true) {
         this.skills.maxLevel[skill.ordinal()] = level;
+=======
+    setMaxLevels(skill: Skill, level: number, refresh = true) {
+        this.skills.maxLevel[skill.getButton()] = level;
+>>>>>>> Stashed changes
         if (refresh) {
             this.updateSkill(skill);
         }
         return this;
     }
 
+<<<<<<< Updated upstream
     setExperience(skill: Skill, experience: number, refresh = true) {
         this.skills.experience[skill.ordinal()] = experience < 0 ? 0 : experience;
+=======
+    setExperiences(skill: Skill, experience: number, refresh = true) {
+        this.skills.experience[skill.getButton()] = experience < 0 ? 0 : experience;
+>>>>>>> Stashed changes
         if (refresh) {
             this.updateSkill(skill);
         }
         return this;
     }
 
+<<<<<<< Updated upstream
     setCurrentLevel(skill: Skill, level: number, refresh = true) {
         this.skills.maxLevel[skill.ordinal()] = level;
+=======
+    setCurrentLevels(skill: Skill, level: number, refresh = true) {
+        this.skills.maxLevel[skill.getButton()] = level;
+>>>>>>> Stashed changes
         if (refresh) {
             this.updateSkill(skill);
         }
@@ -379,11 +504,11 @@ export class SkillManager {
     }
 
     setMaxLevel(skill: Skill, level: number) {
-        return this.setMaxLevel(skill, level, true);
+        return this.setMaxLevels(skill, level, true);
     }
 
     setExperience(skill: Skill, experience: number) {
-        return this.setExperience(skill, experience, true);
+        return this.setExperiences(skill, experience, true);
     }
 
     increaseCurrentLevelMax(skill: Skill, amount: number) {
@@ -393,19 +518,19 @@ export class SkillManager {
     increaseCurrentLevel(skill: Skill, amount: number, max: number) {
         const curr = this.getCurrentLevel(skill);
         if ((curr + amount) > max) {
-            this.setCurrentLevel(skill, max);
+            this.setCurrentLevels(skill, max);
             return;
         }
-        this.setCurrentLevel(skill, curr + amount);
+        this.setCurrentLevels(skill, curr + amount);
     }
 
     public decreaseCurrentLevel(skill: Skill, amount: number, minimum: number) {
         let curr: number = this.getCurrentLevel(skill);
         if ((curr - amount) < minimum) {
-            this.setCurrentLevel(skill, minimum);
+            this.setCurrentLevels(skill, minimum);
             return;
         }
-        this.setCurrentLevel(skill, curr - amount);
+        this.setCurrentLevels(skill, curr - amount);
     }
 
     decreaseLevelMax(skill: Skill, amount: number) {
@@ -416,6 +541,7 @@ export class SkillManager {
         return this.getCurrentLevel(skill) > this.getMaxLevel(skill);
     }
 
+<<<<<<< Updated upstream
     startSkillable(object: GameObject) {
         // Check woodcutting..
         const tree = Tree.forObjectId(object.getId());
@@ -424,8 +550,12 @@ export class SkillManager {
             return true;
         }
 
+=======
+    startSkillables(object: GameObject): boolean {
+>>>>>>> Stashed changes
         // Check mining..
-        const rock = Rock.forObjectId(object.getId());
+        let rock: Rock
+        rock.forObjectId(object.getId());
         if (rock) {
             this.startSkillable(new Mining(object, rock));
             return true;
@@ -478,9 +608,9 @@ export class Skills {
     private maxLevel: number[];
     private experience: number[];
     constructor() {
-        this.level = new Array(AMOUNT_OF_SKILLS);
-        this.maxLevel = new Array(AMOUNT_OF_SKILLS);
-        this.experience = new Array(AMOUNT_OF_SKILLS);
+        this.level = new Array(SkillManager.AMOUNT_OF_SKILLS);
+        this.maxLevel = new Array(SkillManager.AMOUNT_OF_SKILLS);
+        this.experience = new Array(SkillManager.AMOUNT_OF_SKILLS);
     }
 
     getLevels() {

@@ -1,3 +1,5 @@
+import { CastleWars } from "../content/minigames/impl/CastleWars";
+
 export class Animation {
     public static DEFAULT_RESET_ANIMATION = new Animation(65535);
     private id: number;

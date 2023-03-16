@@ -1,6 +1,6 @@
 import { Task } from "../Task";
 
-class CountdownTask extends Task {
+export class CountdownTask extends Task {
   onTick: () => void;
   onComplete: () => void;
 

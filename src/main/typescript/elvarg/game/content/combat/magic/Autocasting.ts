@@ -1,6 +1,26 @@
+<<<<<<< Updated upstream
 
 import { CombatSpells } "./CombatSpells";
+=======
+import { CombatAncientSpellExtend, CombatSpells } from "./CombatSpells";
+import { Player } from "../../../entity/impl/player/Player";
+import { MagicSpellbook } from "../../../model/MagicSpellbook";
+import { FightType } from "../FightType";
+import { Skill } from "../../../model/Skill";
+import { ItemIdentifiers } from "../../../../util/ItemIdentifiers";
+import { BonusManager } from "../../../model/equipment/BonusManager";
+import { WeaponInterfaces } from "../WeaponInterfaces";
+import { CombatSpell } from "./CombatSpell";
+import { Spell } from "./Spell";
+
+
+
+type Spells = CombatSpell | CombatAncientSpellExtend;
+
+>>>>>>> Stashed changes
 export class Autocasting {
+
+
 
     // Autocast buttons
     private static readonly REGULAR_AUTOCAST_BUTTON = 349;
@@ -10,10 +30,16 @@ export class Autocasting {
     private static readonly REGULAR_AUTOCAST_TAB = 1829;
     private static readonly ANCIENT_AUTOCAST_TAB = 1689;
     private static readonly IBANS_AUTOCAST_TAB = 12050;
+<<<<<<< Updated upstream
     public static readonly ANCIENT_SPELL_AUTOCAST_STAFFS = new Set<number>([KODAI_WAND, MASTER_WAND,
         ANCIENT_STAFF, NIGHTMARE_STAFF, VOLATILE_NIGHTMARE_STAFF, ELDRITCH_NIGHTMARE_STAFF, TOXIC_STAFF_OF_THE_DEAD, ELDER_WAND, STAFF_OF_THE_DEAD, STAFF_OF_LIGHT]);
+=======
+    public static readonly ANCIENT_SPELL_AUTOCAST_STAFFS = new Set<number>([ItemIdentifiers.KODAI_WAND, ItemIdentifiers.MASTER_WAND,
+    ItemIdentifiers.ANCIENT_STAFF, ItemIdentifiers.NIGHTMARE_STAFF, ItemIdentifiers.VOLATILE_NIGHTMARE_STAFF, ItemIdentifiers.ELDRITCH_NIGHTMARE_STAFF, ItemIdentifiers.TOXIC_STAFF_OF_THE_DEAD, ItemIdentifiers.ELDER_WAND, ItemIdentifiers.STAFF_OF_THE_DEAD, ItemIdentifiers.STAFF_OF_LIGHT]);
 
-    public static readonly AUTOCAST_SPELLS = new Map<number, CombatSpells>();
+    public static readonly AUTOCAST_SPELLS = new Map<number, CombatSpell>();
+>>>>>>> Stashed changes
+
 
     static {
         // Modern
@@ -50,6 +76,8 @@ export class Autocasting {
         Autocasting.AUTOCAST_SPELLS.set(13280, CombatSpells.SHADOW_BARRAGE);
         Autocasting.AUTOCAST_SPELLS.set(13178, CombatSpells.BLOOD_BARRAGE);
         Autocasting.AUTOCAST_SPELLS.set(13136, CombatSpells.ICE_BARRAGE);
+        
+
     }
 
     public static handleAutocastTab(player: Player, actionButtonId: number) {
@@ -84,7 +112,7 @@ export class Autocasting {
 
         switch (player.getSpellbook()) {
             case MagicSpellbook.ANCIENT:
-                if (!Autocasting.ANCIENT_SPELL_AUTOCAST_STAFFS.has(player.getEquipment().getWeapon().getId()) && player.getEquipment().getWeapon().getId() != AHRIMS_STAFF) {
+                if (!Autocasting.ANCIENT_SPELL_AUTOCAST_STAFFS.has(player.getEquipment().getWeapon().getId()) && player.getEquipment().getWeapon().getId() != ItemIdentifiers.AHRIMS_STAFF) {
                     // Ensure this is a staff capable of casting ancients. Ahrims staff can cast both regular and ancients.
                     player.getPacketSender().sendMessage("You can only autocast regular offensive spells with this staff.");
                     return true;
@@ -163,5 +191,8 @@ export class Autocasting {
             }
         }
     }
+
+
+
 
 }

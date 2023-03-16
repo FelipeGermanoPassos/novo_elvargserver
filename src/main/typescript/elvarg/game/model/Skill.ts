@@ -1,5 +1,6 @@
 import { Misc } from '../../util/Misc';
 
+<<<<<<< Updated upstream
 export class Skills {
     public static ATTACK: 6247 & 8654
     public static DEFENCE: [number, number] = [6253, 8660]
@@ -25,16 +26,45 @@ export class Skills {
     public static CONSTRUCTION: [7267, 18801]
     public static HUNTER: [8267, 18829]
 }
+=======
+
+>>>>>>> Stashed changes
 
 export class Skill {
-    private static readonly ALLOWED_TO_SET_LEVELS = [Skills.ATTACK, Skills.DEFENCE, Skills.STRENGTH, Skills.HITPOINTS, Skills.RANGED, Skills.PRAYER, Skills.MAGIC];
+
+    public static readonly ATTACK = new Skill(6247, 8654)
+    public static readonly DEFENCE = new Skill(6253, 8660)
+    public static readonly STRENGTH = new Skill(6206, 8657)
+    public static readonly HITPOINTS = new Skill(6216, 8655)
+    public static readonly RANGED = new Skill(4443, 8663)
+    public static readonly PRAYER = new Skill(6242, 8666)
+    public static readonly MAGIC = new Skill(6211, 8669)
+    public static readonly COOKING = new Skill(6226, 8665)
+    public static readonly WOODCUTTING = new Skill(4272, 8671)
+    public static readonly FLETCHING = new Skill(6231, 8670)
+    public static readonly FISHING = new Skill(6258, 8662)
+    public static readonly FIREMAKING = new Skill(4282, 8668)
+    public static readonly CRAFTING = new Skill(6263, 8667)
+    public static readonly SMITHING = new Skill(6221, 8659)
+    public static readonly MINING = new Skill(4416, 8656)
+    public static readonly HERBLORE = new Skill(6237, 8661)
+    public static readonly AGILITY = new Skill(4277, 8658)
+    public static readonly THIEVING = new Skill(4261, 8664)
+    public static readonly SLAYER = new Skill(12122, 12162)
+    public static readonly FARMING = new Skill(5267, 13928)
+    public static readonly RUNECRAFTING = new Skill(4267, 8672)
+    public static readonly CONSTRUCTION = new Skill(7267, 18801)
+    public static readonly HUNTER = new Skill(8267, 18829)
+
+    private static readonly ALLOWED_TO_SET_LEVELS = [this.ATTACK, Skill.DEFENCE, Skill.STRENGTH, Skill.HITPOINTS, Skill.RANGED, Skill.PRAYER, Skill.MAGIC];
     private static skillMap = new Map<number, Skill>();
     static {
-        for (const skill of Skills) {
+        for (const skill of Skill) {
             Skill.skillMap.set(skill.button, skill);
         }
     }
 
+<<<<<<< Updated upstream
     public static ATTACK: [6247, 8654]
     public static DEFENCE: [6253, 8660]
     public static STRENGTH: [6206, 8657]
@@ -62,6 +92,8 @@ export class Skill {
 
 
 
+=======
+>>>>>>> Stashed changes
 
     /**
      * The {@link Skill}'s chatbox interface
@@ -81,7 +113,7 @@ export class Skill {
      * @param chatboxInterface
      * @param button
      */
-    private constructor(chatboxInterface: number, button: number) {
+    public constructor(chatboxInterface: number, button: number) {
         this.chatboxInterface = chatboxInterface;
         this.button = button;
     }
@@ -124,4 +156,25 @@ export class Skill {
     public getName(): string {
         return Misc.FORMATTER(this.toString().toLowerCase());
     }
-}    
+
+    static values(): Skill[] {
+        const valuesArray = Object.values(Skill);
+        const skillValuesArray = valuesArray.filter((value) => value instanceof Skill);
+        return skillValuesArray as Skill[];
+    }
+
+
+     static [Symbol.iterator]() {
+        let index = 0;
+        const skills = Object.values(this);
+
+        return {
+            next: () => {
+                const done = index >= skills.length;
+                const value = !done ? skills[index++] : undefined;
+
+                return { done, value };
+            }
+        };
+    }
+}

@@ -2,16 +2,146 @@ import { Mobile } from "../../../entity/impl/Mobile";
 import { Player } from "../../../entity/impl/player/Player";
 import { UpdateFlag } from "../../../model/UpdateFlag"
 import { Spell } from "./Spell";
+<<<<<<< Updated upstream
+=======
+import { Skill } from "../../../model/Skill";
+import { Item } from "../../../model/Item";
+import { MagicSpellbook } from "../../../model/MagicSpellbook";
+import { Graphic } from "../../../model/Graphic";
+import { GraphicHeight } from "../../../model/GraphicHeight";
+import { EffectTimer } from "../../../model/EffectTimer";
+import { Animation } from "../../../model/Animation";
+
+class EffectSpellSpell implements Spell {
+
+    constructor(private readonly spellIdFunction: Function, private readonly levelRequiredFunction: Function, private readonly baseExperienceFunction: Function, private readonly itemsRequiredFunction: Function, private readonly equipmentRequiredFunction: Function, private readonly startCastFunction: Function, getSpellbookFunction?: Function) {
+
+    }
+
+    baseExperience(): number {
+        return this.baseExperienceFunction();
+    }
+
+    spellId(): number {
+        return this.spellIdFunction();
+    }
+    levelRequired(): number {
+        return this.levelRequiredFunction();
+    }
+    itemsRequired(player: Player): Item[] {
+        return this.itemsRequiredFunction();
+    }
+    equipmentRequired(player: Player): Item[] {
+        return this.equipmentRequiredFunction();
+    }
+    startCast(cast: Mobile, castOn: Mobile): void {
+        return this.startCastFunction();
+    }
+    public getSpellbook(): MagicSpellbook {
+        return this.spellIdFunction();
+    }
+    canCast(player: Player, del: boolean): boolean {
+        throw new Error("Method not implemented.");
+    }
+    private spell: EffectSpells;
+
+
+
+    public static forSpellId(spellId: number): EffectSpells {
+        const spell = EffectSpells.map.get(spellId);
+        return spell;
+    }
+
+    private static spell: Spell;
+
+    private static getSpell(): Spell {
+        return this.spell;
+    }
+
+}
+>>>>>>> Stashed changes
 
 export class EffectSpells {
+
+
+
+
     public static handleSpell(player: Player, button: number) {
-        const spell: Optional<EffectSpell> = EffectSpell.forSpellId(button);
-        if (!spell.isPresent()) {
-            return false;
-        }
-        if (!spell.get().getSpell().canCast(player, false)) {
+
+        const spell = EffectSpellSpell.forSpellId(button);
+        if (spell instanceof EffectSpellSpell) {
+            if (spell !== null) {
+                return false;
+            }
+            if (EffectSpells.getSpell()?.canCast(player, false)) {
+                return true;
+            }
+
+            switch (spell) {
+                case EffectSpells.BONES_TO_PEACHES:
+                case EffectSpells.BONES_TO_BANANAS:
+
+                    const spells = EffectSpells.forSpellId(button);
+
+                    if (!player.getClickDelay().elapsedTime(500)) {
+                        return true;
+                    }
+                    if (!player.getInventory().contains(526)) {
+                        player.getPacketSender().sendMessage("You do not have any bones in your inventory.");
+                        return true;
+                    }
+                    player.getInventory().deleteItemSet(EffectSpells.getSpell()?.itemsRequired(player));
+                    let i = 0;
+                    player.getInventory().getValidItems().forEach(invItem => {
+                        if (invItem.getId() == 526) {
+                            if (spells === EffectSpells.BONES_TO_PEACHES) {
+                                player.getInventory().deleteNumber(526, 1).adds(6883, 1);
+                            } else {
+                                player.getInventory().deleteNumber(526, 1).adds(1963, 1);
+                            }
+
+                            i++;
+                        }
+                    });
+                    player.performGraphic(new Graphic(141, GraphicHeight.MIDDLE));
+                    player.performAnimation(new Animation(722));
+                    player.getSkillManager().addExperiences(Skill.MAGIC, EffectSpells.getSpell()?.baseExperience() * i);
+                    player.getClickDelay().reset();
+                    break;
+                case EffectSpells.VENGEANCE:
+                    if (player.getDueling().inDuel()) {
+                        player.getPacketSender().sendMessage("You cannot cast Vengeance during a duel!");
+                        return true;
+                    }
+                    if (player.getSkillManager().getMaxLevel(Skill.DEFENCE) < 40) {
+                        player.getPacketSender().sendMessage("You need at least level 40 Defence to cast this spell.");
+                        return true;
+                    }
+                    if (player.hasVengeanceReturn()) {
+                        player.getPacketSender().sendMessage("You already have Vengeance's effect.");
+                        return true;
+                    }
+
+
+                    if (!player.getVengeanceTimer().finished()) {
+                        player.getPacketSender().sendMessage("You must wait another " + player.getVengeanceTimer().secondsRemaining() + " seconds before you can cast that again.");
+                        return true;
+                    }
+
+                    //Send message and effect timer to client
+
+                    player.setHasVengeance(true);
+                    player.getVengeanceTimer().start(30);
+                    player.getPacketSender().sendEffectTimer(30, EffectSpells.VENGEANCE)
+                        .sendMessage("You now have Vengeance's effect.");
+                    player.getInventory().deleteItemSet(EffectSpells.getSpell().itemsRequired(player));
+                    player.performAnimation(new Animation(4410));
+                    player.performGraphic(new Graphic(726, GraphicHeight.HIGH));
+                    break;
+            }
             return true;
         }
+<<<<<<< Updated upstream
         switch (spell.get()) {
             case this.BONES_TO_PEACHES:
             case this.BONES_TO_BANANAS:
@@ -65,228 +195,146 @@ export class EffectSpells {
                 player.performAnimation(new Animation(4410));
                 player.performGraphic(new Graphic(726, GraphicHeight.HIGH));
                 break;
+=======
+        else {
+            throw new Error("Error in spell casting!");
+>>>>>>> Stashed changes
         }
-        return true;
+
     }
 
-    BONES_TO_BANANAS = new Spell() {
-        
-    spellId(): number {
-        return 1159;
+    public static readonly BONES_TO_BANANAS = new EffectSpells(
+        null,
+        () => { return 1159; },
+        () => { return 15; },
+        () => { return 650; },
+        () => { return [new Item(561), new Item(555, 2), new Item(557, 2)]; },
+        () => { return null; },
+        () => { }
+    )
+
+    public static LOW_ALCHEMY = new EffectSpells(
+        null,
+        () => { return 1162; },
+        () => { return 21; },
+        () => { return 4000; },
+        () => { return [new Item(554, 3), new Item(561)]; },
+        () => { return null; },
+        () => { }
+    )
+
+    public static TELEKINETIC_GRAB = new EffectSpells(
+        null,
+        () => { return 1168; },
+        () => { return 33; },
+        () => { return 3988; },
+        () => { return [new Item(563), new Item(556)]; },
+        () => { return null; },
+        () => { }
+    )
+    public static SUPERHEAT_ITEM = new EffectSpells(
+        null,
+        () => { return 1173; },
+        () => { return 43; },
+        () => { return 6544; },
+        () => { return [new Item(554, 4), new Item(561)]; },
+        () => { return null; },
+        () => { }
+    )
+    public static HIGH_ALCHEMY = new EffectSpells(
+        null,
+        () => { return 1178; },
+        () => { return 55; },
+        () => { return 20000; },
+        () => { return [new Item(554, 5), new Item(561)]; },
+        () => { return null; },
+        () => { }
+    )
+    public static BONES_TO_PEACHES = new EffectSpells(
+        null,
+        () => { return 15877; },
+        () => { return 60; },
+        () => { return 4121; },
+        () => { return [new Item(561, 2), new Item(555, 4), new Item(577, 4)]; },
+        () => { return null; },
+        () => { }
+    )
+    public static BAKE_PIE = new EffectSpells(
+        null,
+        () => { return 30017; },
+        () => { return 65; },
+        () => { return 5121; },
+        () => { return [new Item(9075, 1), new Item(554, 5), new Item(555, 4)]; },
+        () => { return null; },
+        () => { }
+    )
+
+    public static VENGEANCE_OTHER = new EffectSpells(
+        null,
+        () => { return 30298; },
+        () => { return 93; },
+        () => { return 10000; },
+        () => { return [new Item(9075, 3), new Item(557, 10), new Item(560, 2)]; },
+        () => { return null; },
+        () => { },
+        () => { return MagicSpellbook.LUNAR; }
+    )
+
+    public static VENGEANCE = new EffectSpells(
+        null,
+        () => { return 30298; },
+        () => { return 93; },
+        () => { return 10000; },
+        () => { return [new Item(9075, 3), new Item(557, 10), new Item(560, 2)]; },
+        () => { return null; },
+        () => { },
+        () => { return MagicSpellbook.LUNAR;; }
+    )
+
+    public static readonly map: Map<number, EffectSpells> = new Map<number, EffectSpells>();
+
+    private static spell: Spell;
+    constructor(private readonly spell: Spell, private readonly spellIdFunction?: Function, private readonly levelRequiredFunction?: Function, private readonly baseExperienceFunction?: Function, private readonly itemsRequiredFunction?: Function, private readonly equipmentRequiredFunction?: Function, private readonly startCastFunction?: Function, getSpellbookFunction?: Function) {
+        this.spell = spell;
     }
 
-    levelRequired(): number {
-        return 15;
+    public static forSpellId(spellId: number): EffectSpells {
+        const spell = EffectSpells.map.get(spellId);
+        if (spell != null) {
+            return spell;
+        }
+        return null;
     }
+
+    public static getSpell(): Spell {
+        return this.spell;
+    }
+
 
     baseExperience(): number {
-        return 650;
+        return this.baseExperienceFunction();
     }
 
-    itemsRequired(player: Player): Optional < Item[] > {
-        return Optional.of([new Item(561), new Item(555, 2), new Item(557, 2)]);
-    }
-
-    equipmentRequired(player: Player): Optional < Item[] > {
-        return Optional.empty();
-    }
-
-    startCast(cast: Mobile, castOn: Mobile) { }
-}
-
-LOW_ALCHEMY = new Spell() {
     spellId(): number {
-        return 1162;
+        return this.spellIdFunction();
     }
-
     levelRequired(): number {
-        return 21;
+        return this.levelRequiredFunction();
+    }
+    itemsRequired(player: Player): Item[] {
+        return this.itemsRequiredFunction();
+    }
+    equipmentRequired(player: Player): Item[] {
+        return this.equipmentRequiredFunction();
+    }
+    startCast(cast: Mobile, castOn: Mobile): void {
+        return this.startCastFunction();
+    }
+    public getSpellbook(): MagicSpellbook {
+        return this.spellIdFunction();
+    }
+    canCast(player: Player, del: boolean): boolean {
+        throw new Error("Method not implemented.");
     }
 
-    baseExperience(): number {
-        return 4000;
-    }
-
-    itemsRequired(player: Player): Optional < Item[] > {
-        return Optional.of([new Item(554, 3), new Item(561)]);
-    }
-
-    equipmentRequired(player: Player): Optional < Item[] > {
-        return Optional.empty();
-    }
-
-    startCast(cast: Mobile, castOn: Mobile) {
-
-
-    }
-}
-
-class TelekineticGrab implements Spell {
-    spellId() {
-        return 1168;
-    }
-    levelRequired() {
-        return 33;
-    }
-    baseExperience() {
-        return 3988;
-    }
-    itemsRequired(player: Player) {
-        return Optional.of(new Item[]{ new Item(563), new Item(556) });
-    }
-    equipmentRequired(player: Player) {
-        return Optional.empty();
-    }
-    startCast(cast: Mobile, castOn: Mobile) {
-    }
-}
-
-class SuperheatItem implements Spell {
-    spellId() {
-        return 1173;
-    }
-    levelRequired() {
-        return 43;
-    }
-    baseExperience() {
-        return 6544;
-    }
-    itemsRequired(player: Player) {
-        return Optional.of(new Item[]{ new Item(554, 4), new Item(561) });
-    }
-    equipmentRequired(player: Player) {
-        return Optional.empty();
-    }
-    startCast(cast: Mobile, castOn: Mobile) {
-    }
-}
-
-TELEKINETIC_GRAB(new TelekineticGrab()),
-    SUPERHEAT_ITEM(new SuperheatItem()),
-
-
-    class HighAlchemy implements Spell {
-        spellId() {
-            return 1178;
-        }
-        levelRequired() {
-            return 55;
-        }
-        baseExperience() {
-            return 20000;
-        }
-        itemsRequired(player: Player) {
-            return Optional.of(new Item[]{ new Item(554, 5), new Item(561) });
-        }
-        equipmentRequired(player: Player) {
-            return Optional.empty();
-        }
-        startCast(cast: Mobile, castOn: Mobile) {
-        }
-    }
-
-  BONES_TO_PEACHES  {
-    spellId() {
-        return 15877;
-    }
-    levelRequired() {
-        return 60;
-    }
-    baseExperience() {
-        return 4121;
-    }
-    itemsRequired(player: Player) {
-        return Optional.of(new Item[]{ new Item(561, 2), new Item(555, 4), new Item(557, 4) });
-    }
-    equipmentRequired(player: Player) {
-        return Optional.empty();
-    }
-    startCast(cast: Mobile, castOn: Mobile) {
-    }
-}
-
-HIGH_ALCHEMY(new HighAlchemy()),
-    BONES_TO_PEACHES(new BonesToPeaches()),
-
-    class BakePie implements Spell {
-        spellId() {
-            return 30017;
-        }
-        levelRequired() {
-            return 65;
-        }
-        baseExperience() {
-            return 5121;
-        }
-        itemsRequired(player: Player) {
-            return Optional.of(new Item[]{ new Item(9075, 1), new Item(554, 5), new Item(555, 4) });
-        }
-        equipmentRequired(player: Player) {
-            return Optional.empty();
-        }
-        startCast(cast: Mobile, castOn: Mobile) {
-        }
-        getSpellbook() {
-            return MagicSpellbook.LUNAR;
-        }
-    }
-
-class VengeanceOther implements Spell {
-    spellId() {
-        return 30298;
-    }
-    levelRequired() {
-        return 93;
-    }
-    baseExperience() {
-        return 10000;
-    }
-    itemsRequired(player: Player) {
-        return Optional.of(new Item[]{ new Item(9075, 3), new Item(557, 10), new Item(560, 2) });
-    }
-    equipmentRequired(player: Player) {
-        return Optional.empty();
-    }
-    startCast(cast: Mobile, castOn: Mobile) {
-    }
-    getSpellbook() {
-        return MagicSpellbook.LUNAR;
-    }
-}
-
-BAKE_PIE(new BakePie()),
-    VENGEANCE_OTHER(new VengeanceOther()),
-
-    VENGEANCE = 'VENGEANCE',
-
-
-    class Vengeance implements Spell {
-        spellId() {
-            return 30306;
-        }
-        levelRequired() {
-            return 94;
-        }
-        baseExperience() {
-            return 14000;
-        }
-        itemsRequired(player: Player) {
-            return Optional.of(new Item[]{ new Item(9075, 4), new Item(557, 10), new Item(560, 2) });
-        }
-        equipmentRequired(player: Player) {
-            return Optional.empty();
-        }
-        startCast(cast: Mobile, castOn: Mobile) {
-        }
-        getSpellbook() {
-            return MagicSpellbook.LUNAR;
-        }
-    }
-
-let spells: Map<number, EffectSpell> = new Map<number, EffectSpell>();
-spells.set(30306, EffectSpell.VENGEANCE);
-
-function forSpellId(spellId: number): EffectSpell | undefined {
-    return spells.get(spellId);
-}
 }

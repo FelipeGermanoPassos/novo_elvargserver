@@ -3,10 +3,40 @@ import { Player } from "../../../entity/impl/player/Player";
 import { Item } from "../../../model/Item";
 import { MagicSpellbook } from "../../../model/MagicSpellbook"
 import { CombatSpell } from "./CombatSpell";
+<<<<<<< Updated upstream
 
 export abstract class CombatAncientSpell extends CombatSpell {
 
     public getSpellbook(): MagicSpellbook {
+=======
+import { Graphic } from "../../../model/Graphic";
+import { Projectile } from "../../../model/Projectile";
+
+interface CombatAncientSpellInterface {
+    spellEffectOnHitCalc(cast: Mobile, castOn: Mobile, damage: number): void;
+    spellRadius(): number;
+    castAnimation?(): Animation;
+    castProjectile?(cast: Mobile, castOn: Mobile): Projectile;
+    endGraphic?(): Graphic;
+    maximumHit(): number;
+    startGraphic?(): Graphic;
+    baseExperience(): number;
+    itemsRequired?(player: Player): Item[];
+    levelRequired(): number;
+    spellId(): number;
+}
+
+
+
+export abstract class CombatAncientSpell extends CombatSpell {
+
+    constructor(options: CombatAncientSpellInterface){
+        super();
+    }
+
+
+    public getSpellbook() {
+>>>>>>> Stashed changes
         return MagicSpellbook.ANCIENT;
     }
 
@@ -21,11 +51,11 @@ export abstract class CombatAncientSpell extends CombatSpell {
         this.spellEffect(cast, castOn, damage);
     }
 
-    public equipmentRequired(player: Player): Optional<Item[]> {
+    public equipmentRequired(player: Player): Item[] {
 
         // Ancient spells never require any equipment, although the method can
         // still be overridden if by some chance a spell does.
-        return Optional.empty();
+        return null;
     }
 
     /**

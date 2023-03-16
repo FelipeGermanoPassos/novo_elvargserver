@@ -1,335 +1,325 @@
+<<<<<<< Updated upstream
 class Thieving {
     private static readonly THIEVING_ANIMATION = new Animation(881);
     private static readonly STUNNED_GFX = new Graphic(254, GraphicHeight.HIGH);
     private static readonly NPC_ATTACK_ANIMATION = new Animation(401);
     private static readonly PLAYER_BLOCK_ANIMATION = new Animation(404);
+=======
+import { PetHandler } from "../../../PetHandler";
+import { CombatFactory } from "../../../combat/CombatFactory";
+import { HitDamage } from "../../../combat/hit/HitDamage";
+import { HitMask } from "../../../combat/hit/HitMask";
+import { NPC } from "../../../../entity/impl/npc/NPC";
+import { GameObject } from "../../../../entity/impl/object/GameObject";
+import { Player } from "../../../../entity/impl/player/Player";
+import { Animation } from "../../../../model/Animation";
+import { Graphic } from "../../../../model/Graphic";
+import { GraphicHeight } from "../../../../model/GraphicHeight";
+import { Item } from "../../../../model/Item";
+import { Skill } from "../../../../model/Skill";
+import { Task } from "../../../../task/Task";
+import { TaskManager } from "../../../../task/TaskManager";
+import { TimedObjectReplacementTask } from "../../../../task/impl/TimedObjectReplacementTask";
+import { ItemIdentifiers } from "../../../../../util/ItemIdentifiers";
+import { Misc } from "../../../../../util/Misc";
+import { TimerKey } from "../../../../../util/timers/TimerKey";
+>>>>>>> Stashed changes
 
-    class Pickpocketing {
-    public static init(player: Player, npc: NPC): {
-            let pickpocket: Optional<Pickpocketable> = Pickpocketable.get(npc.getId());
-if (pickpocket.isPresent()) {
-    if (hasRequirements(player, npc, pickpocket.get())) {
-        // Stop movement..
-        player.getMovementQueue().reset();
+
+class ThievingTask extends Task {
+    constructor(private readonly execFunction: Function, player: Player) {
+        super(2, false, undefined, player);
+    }
+
+
+    execute(): void {
+        this.execFunction();
     }
 }
-// Start animation..
-player.performAnimation(THIEVING_ANIMATION);
 
-// Send message..
-let name = npc.getCurrentDefinition().getName().toLowerCase();
-if (!name.endsWith("s")) {
-    name += "'s";
-}
-player.getPacketSender().sendMessage("You attempt to pick the " + name + " pocket..");
 
-// Face npc..
-player.setPositionToFace(npc.getLocation());
 
-// Reset click delay..
-player.getClickDelay().reset();
 
-// Mark npc as immune for 5 seconds..
-// This makes it so other players can't attack it.
-npc.getTimers().register(TimerKey.ATTACK_IMMUNITY, Misc.getTicks(5));
-public execute(): void {
-    if(isSuccessful(this.player, this.pickpocket.get())) {
-    // Get the loot..
-    let loot = this.pickpocket.get().getRewards()[Misc.getRandom(this.pickpocket.get().getRewards().length - 1)].clone();
+/**
 
-    // If we're pickpocketing the Master farmer and the required chance
-    // isn't hit, make sure to reward the default item.
-    // This is to make sure the other seeds remain semi-rare.
-    if (this.pickpocket.get() == Pickpocketable.MASTER_FARMER) {
-        if (Misc.getRandom(100) > 18) {
-            loot = this.pickpocket.get().getRewards()[0];
-        }
+The {@link Animation} a player will perform when thieving.
+*/
+const THIEVING_ANIMATION = new Animation(881);
+/**
 
-        // Mix up loot amounts aswell for seeds..
-        if (loot.getAmount() > 1) {
-            loot.setAmount(1 + Misc.getRandom(loot.getAmount()));
-        }
-    }
+The {@link Graphic} a player will perform when being stunned.
+*/
+const STUNNED_GFX = new Graphic(254, GraphicHeight.HIGH);
+/**
 
-    // Reward loot
-    if (!this.player.getInventory().isFull()) {
-        this.player.getInventory().add(loot);
-    }
+The {@link Animation} an npc will perform when attacking a pickpocket.
+*/
+const NPC_ATTACK_ANIMATION = new Animation(401);
+/**
 
-    // Send second item loot message..
-    let name = loot.getDefinition().getName().toLowerCase();
-    if (!name.endsWith("s") && loot.getAmount() > 1) {
-        name += "s";
-    }
-    this.player.getPacketSender().sendMessage("You steal "
-        + (loot.getAmount() > 1 ? loot.getAmount().toString() : Misc.anOrA(name))
-        + " " + name + ".");
+The {@link Animation} the player will perform when blocking an attacking
+{@link NPC}.
+*/
+const PLAYER_BLOCK_ANIMATION = new Animation(404);
+/**
 
-    // Add experience..
-    this.player.getSkillManager().addExperience(Skill.THIEVING, (this.pickpocket.get().getExp()));
-} else {
-    // Make npc hit the player..
-    npc.setPositionToFace(this.player.getLocation());
-    npc.forceChat((this.pickpocket.get() == Pickpocketable.MASTER_FARMER
-        ? "Cor blimey, mate! What are ye doing in me pockets?"
-        : "What do you think you're doing?"));
-    npc.performAnimation(NPC_ATTACK_ANIMATION);
-    this.player.getPacketSender().sendMessage("You fail to pick the pocket.");
-    CombatFactory.stun(this.player, this.pickpocket.get().getStunTime(), true);
-    this.player.getCombat().getHitQueue()
-        .addPendingDamage(new HitDamage(this.pickpocket.get().getStunDamage(), HitMask.RED));
-    this.player.getMovementQueue().reset();
-}
-PetHandler.onSkill(player, Skill.THIEVING);
+Handles Pickpocketing.
+*/
+export default class Thieving extends ItemIdentifiers {
+    /**
+    
+    Attempts to pickpocket an npc.
+    */
+    public static Pickpocketing = class {
+        /**
+        scss
+        Copy code
+         * Attempts to pickpocket an npc.
+         *
+         * @param player
+         * @param npc
+         * @return
+         */
+        public static init(player: Player, npc: NPC): boolean {
+            const pickpocket: Pickpocketable = Pickpocketable.get(npc.getId());
+            if (pickpocket) {
+                if (this.hasRequirements(player, npc, Pickpocketable.get(npc.getId()))) {
+                    // Stop movement..
+                    player.getMovementQueue().reset();
 
-// Stop task..
-stop();
-}
-});
-}
-return true;
-}
-return false;
-}
+                    // Start animation..
+                    player.performAnimation(THIEVING_ANIMATION);
 
-const hasRequirements = (player: Player, npc: NPC, p: Pickpocketable) => {
-    // Make sure they aren't spam clicking..
-    if (!player.getClickDelay().elapsed(1500)) {
-        return false;
-    }
-    // Check thieving level..
-    if (player.getSkillManager().getCurrentLevel(Skill.THIEVING) < p.getLevel()) {
-        // DialogueManager.sendStatement(player, "You need a Thieving level of at least " + Integer.toString(p.getLevel()) + " to do this.");
-        return false;
-    }
+                    // Send message..
+                    let name: string = npc.getCurrentDefinition().getName().toLowerCase();
+                    if (!name.endsWith("s")) {
+                        name += "'s";
+                    }
+                    player.getPacketSender().sendMessage(`You attempt to pick the ${name} pocket..`);
 
-    // Check stun..
-    if (player.getTimers().has(TimerKey.STUN)) {
-        return false;
-    }
+                    // Face npc..
+                    player.setPositionToFace(npc.getLocation());
 
-    // Make sure we aren't in combat..
-    if (CombatFactory.inCombat(player)) {
-        player.getPacketSender().sendMessage("You must wait a few seconds after being in combat to do this.");
-        return false;
-    }
+                    // Reset click delay..
+                    player.getClickDelay().reset();
 
-    // Make sure they aren't in combat..
-    if (CombatFactory.inCombat(npc)) {
-        player.getPacketSender().sendMessage("That npc is currently in combat and cannot be pickpocketed.");
-        return false;
-    }
+                    // Mark npc as immune for 5 seconds..
+                    // This makes it so other players can't attack it.
+                    npc.getTimers().register(TimerKey.ATTACK_IMMUNITY, Misc.getTicks(5));
 
-    // Make sure we have inventory space..
-    if (player.getInventory().isFull()) {
-        player.getInventory().full();
-        return false;
-    }
 
-    return true;
-}
+                    // Submit new task..
+                    TaskManager.submit(new ThievingTask(() => {
+                        if (this.isSuccessful(player, Pickpocketable.get(npc.getId()))) {
+                            // Get the loot..
+                            const loot: Item = Pickpocketable.get(npc.getId()).getRewards()[Misc.getRandom(Pickpocketable.get(npc.getId()).getRewards().length - 1)].clone();
 
-const isSuccessful = (player: Player, p: Pickpocketable) => {
-    let base = 4;
-    if (p == Pickpocketable.FEMALE_HAM_MEMBER || p == Pickpocketable.MALE_HAM_MEMBER) {
-        // TODO: Handle ham clothing bonus chance of success
-    }
-    let factor = Misc.getRandom(player.getSkillManager().getCurrentLevel(Skill.THIEVING) + base);
-    let fluke = Misc.getRandom(p.getLevel());
-    return factor > fluke;
-}
+                            // If we're pickpocketing the Master farmer and the required chance
+                            // isn't hit, make sure to reward the default item.
+                            // This is to make sure the other seeds remain semi-rare.
+                            if (Pickpocketable.get(npc.getId()) === Pickpocketable.MASTER_FARMER) {
+                                if (Misc.getRandom(100) > 18) {
+                                    let loot = Pickpocketable.get(npc.getId()).getRewards()[0];
+                                }
 
-//TODO: Converter amanhã com paciência
-// public enum Pickpocketable {
-//     MAN_WOMAN(1, 8, 5, 1, new Item[] { new Item(COINS, 3) }, 3014, 3015, 3078, 3079, 3080, 3081, 3082, 3083,
-//             3084, 3085, 3267, 3268, 3260, 3264, 3265, 3266, 3267, 3268), FARMER(10, 15, 5, 1,
-//                     new Item[] { new Item(COINS, 9), new Item(POTATO_SEED) }, 3086, 3087, 3088, 3089, 3090,
-//                     3091), FEMALE_HAM_MEMBER(15, 19, 4, 3, new Item[] { new Item(BUTTONS),
-//                             new Item(RUSTY_SWORD), new Item(DAMAGED_ARMOUR), new Item(FEATHER, 5),
-//                             new Item(BRONZE_ARROW), new Item(BRONZE_AXE), new Item(BRONZE_DAGGER),
-//                             new Item(BRONZE_PICKAXE), new Item(COWHIDE), new Item(IRON_AXE),
-//                             new Item(IRON_PICKAXE), new Item(LEATHER_BOOTS), new Item(LEATHER_GLOVES),
-//                             new Item(LEATHER_BODY), new Item(LOGS), new Item(THREAD), new Item(RAW_ANCHOVIES),
-//                             new Item(LOGS), new Item(RAW_CHICKEN), new Item(IRON_ORE), new Item(COAL),
-//                             new Item(STEEL_ARROW, 2), new Item(STEEL_AXE), new Item(STEEL_PICKAXE),
-//                             new Item(KNIFE), new Item(NEEDLE), new Item(STEEL_DAGGER), new Item(TINDERBOX),
-//                             new Item(UNCUT_JADE), new Item(UNCUT_OPAL), new Item(COINS, 25),
-//                             new Item(HAM_GLOVES), new Item(HAM_CLOAK), new Item(HAM_BOOTS), new Item(HAM_SHIRT),
-//                             new Item(HAM_ROBE), new Item(HAM_LOGO), new Item(HAM_HOOD),
-//                             new Item(GRIMY_GUAM_LEAF), new Item(GRIMY_MARRENTILL), new Item(GRIMY_TARROMIN),
-//                             new Item(GRIMY_HARRALANDER) }, 2540,
-//                             2541), MALE_HAM_MEMBER(20, 23, 4, 3, new Item[] { new Item(BUTTONS),
-//                                     new Item(RUSTY_SWORD), new Item(DAMAGED_ARMOUR), new Item(FEATHER, 5),
-//                                     new Item(BRONZE_ARROW), new Item(BRONZE_AXE), new Item(BRONZE_DAGGER),
-//                                     new Item(BRONZE_PICKAXE), new Item(COWHIDE), new Item(IRON_AXE),
-//                                     new Item(IRON_PICKAXE), new Item(LEATHER_BOOTS), new Item(LEATHER_GLOVES),
-//                                     new Item(LEATHER_BODY), new Item(LOGS), new Item(THREAD),
-//                                     new Item(RAW_ANCHOVIES), new Item(LOGS), new Item(RAW_CHICKEN),
-//                                     new Item(IRON_ORE), new Item(COAL), new Item(STEEL_ARROW, 2),
-//                                     new Item(STEEL_AXE), new Item(STEEL_PICKAXE), new Item(KNIFE),
-//                                     new Item(NEEDLE), new Item(STEEL_DAGGER), new Item(TINDERBOX),
-//                                     new Item(UNCUT_JADE), new Item(UNCUT_OPAL), new Item(COINS, 25),
-//                                     new Item(HAM_GLOVES), new Item(HAM_CLOAK), new Item(HAM_BOOTS),
-//                                     new Item(HAM_SHIRT), new Item(HAM_ROBE), new Item(HAM_LOGO),
-//                                     new Item(HAM_HOOD), new Item(GRIMY_GUAM_LEAF), new Item(GRIMY_MARRENTILL),
-//                                     new Item(GRIMY_TARROMIN), new Item(GRIMY_HARRALANDER) }), AL_KHARID_WARRIOR(
-//                                             25, 26, 5, 2, new Item[] { new Item(COINS, 18) }, 3100), ROGUE(32,
-//                                                     36, 5, 2,
-//                                                     new Item[] { new Item(COINS, 34), new Item(
-//                                                             LOCKPICK), new Item(IRON_DAGGER_P_),
-//                                                             new Item(JUG_OF_WINE), new Item(AIR_RUNE, 8) },
-//                                                     2884), CAVE_GOBLIN(36, 40, 5, 1, new Item[] {
-//                                                             new Item(COINS, 10), new Item(IRON_ORE),
-//                                                             new Item(TINDERBOX), new Item(SWAMP_TAR),
-//                                                             new Item(OIL_LANTERN), new Item(TORCH),
-//                                                             new Item(GREEN_GLOOP_SOUP),
-//                                                             new Item(FROGSPAWN_GUMBO), new Item(FROGBURGER),
-//                                                             new Item(COATED_FROGS_LEGS), new Item(BAT_SHISH),
-//                                                             new Item(FINGERS), new Item(BULLSEYE_LANTERN),
-//                                                             new Item(CAVE_GOBLIN_WIRE) }, 2268, 2269, 2270,
-//                                                             2271, 2272, 2273, 2274, 2275, 2276, 2277, 2278,
-//                                                             2279, 2280, 2281, 2282, 2283, 2284,
-//                                                             2285), MASTER_FARMER(38, 43, 5, 3,
-//                                                                     new Item[] { new Item(POTATO_SEED, 12),
-//                                                                             new Item(ONION_SEED, 8),
-//                                                                             new Item(CABBAGE_SEED, 5),
-//                                                                             new Item(TOMATO_SEED, 4),
-//                                                                             new Item(HAMMERSTONE_SEED, 4),
-//                                                                             new Item(BARLEY_SEED, 4),
-//                                                                             new Item(MARIGOLD_SEED, 4),
-//                                                                             new Item(ASGARNIAN_SEED, 4),
-//                                                                             new Item(JUTE_SEED, 4),
-//                                                                             new Item(REDBERRY_SEED, 4),
-//                                                                             new Item(NASTURTIUM_SEED, 4),
-//                                                                             new Item(YANILLIAN_SEED, 4),
-//                                                                             new Item(CADAVABERRY_SEED, 4),
-//                                                                             new Item(SWEETCORN_SEED, 4),
-//                                                                             new Item(ROSEMARY_SEED, 4),
-//                                                                             new Item(DWELLBERRY_SEED, 3),
-//                                                                             new Item(GUAM_SEED, 3),
-//                                                                             new Item(WOAD_SEED, 3),
-//                                                                             new Item(KRANDORIAN_SEED, 3),
-//                                                                             new Item(STRAWBERRY_SEED, 3),
-//                                                                             new Item(LIMPWURT_SEED, 3),
-//                                                                             new Item(MARRENTILL_SEED, 3),
-//                                                                             new Item(JANGERBERRY_SEED, 3),
-//                                                                             new Item(TARROMIN_SEED, 2),
-//                                                                             new Item(WILDBLOOD_SEED, 2),
-//                                                                             new Item(WATERMELON_SEED, 2),
-//                                                                             new Item(HARRALANDER_SEED, 2),
-//                                                                             new Item(RANARR_SEED, 1),
-//                                                                             new Item(WHITEBERRY_SEED, 2),
-//                                                                             new Item(TOADFLAX_SEED, 2),
-//                                                                             new Item(MUSHROOM_SPORE, 2),
-//                                                                             new Item(IRIT_SEED, 2),
-//                                                                             new Item(BELLADONNA_SEED, 2),
-//                                                                             new Item(POISON_IVY_SEED, 2),
-//                                                                             new Item(AVANTOE_SEED, 1),
-//                                                                             new Item(CACTUS_SEED, 1),
-//                                                                             new Item(KWUARM_SEED, 1),
-//                                                                             new Item(SNAPDRAGON_SEED, 1),
-//                                                                             new Item(CADANTINE_SEED, 1),
-//                                                                             new Item(LANTADYME_SEED, 1),
-//                                                                             new Item(DWARF_WEED_SEED, 1),
-//                                                                             new Item(TORSTOL_SEED, 1), },
-//                                                                     3257, 3258, 5832), GUARD(40, 47, 5, 2,
-//                                                                             new Item[] { new Item(COINS, 30) },
-//                                                                             1546, 1547, 1548, 1549, 1550, 3010,
-//                                                                             3011, 3094, 3245, 3267, 3268, 3269,
-//                                                                             3270, 3271, 3272, 3273, 3274,
-//                                                                             3283), FREMENNIK_CITIZEN(45, 65, 5,
-//                                                                                     2,
-//                                                                                     new Item[] { new Item(COINS,
-//                                                                                             40) },
-//                                                                                     2462), BEARDED_POLLNIVNIAN_BANDIT(
-//                                                                                             45, 65, 5, 5,
-//                                                                                             new Item[] {
-//                                                                                                     new Item(
-//                                                                                                             COINS,
-//                                                                                                             40) },
-//                                                                                             1880),
-//     // DESERT_BANDIT(53, 80, 5, 3, new Item[]{new Item(COINS, 30), new
-//     // Item(ANTIPOISON_4_), new Item(LOCKPICK)}),
-//     // KNIGHT(55, 84, 5, 3, new Item[]{new Item(COINS, 50)}),
-//     // POLLNIVIAN_BANDIT(55, 84, 5, 5, new Item[]{new Item(COINS, 50)}),
-//     YANILLE_WATCHMAN(65, 137, 5, 3, new Item[] { new Item(COINS, 60), new Item(BREAD) }, 3251), MENAPHITE_THUG(
-//             65, 137, 5, 5, new Item[] { new Item(COINS, 60) }, 3549, 3550), PALADIN(70, 152, 5, 3,
-//                     new Item[] { new Item(COINS, 80), new Item(CHAOS_RUNE, 2) }, 3104, 3105), GNOME(75, 199, 5,
-//                             1,
-//                             new Item[] { new Item(COINS, 300), new Item(EARTH_RUNE), new Item(GOLD_ORE),
-//                                     new Item(FIRE_ORB), new Item(SWAMP_TOAD), new Item(KING_WORM) },
-//                             6086, 6087, 6094, 6095, 6096),
-//     // HERO(80, 275, 6, 4, new Item[]{new Item(COINS, 280), new Item(BLOOD_RUNE),
-//     // new Item(DIAMOND), new Item(JUG_OF_WINE), new Item(DEATH_RUNE, 2), new
-//     // Item(FIRE_ORB), new Item(GOLD_ORE)}),
-//     // ELF(85, 353, 6, 5, new Item[]{new Item(COINS, 325), new Item(NATURE_RUNE, 3),
-//     // new Item(DIAMOND), new Item(JUG_OF_WINE), new Item(DEATH_RUNE, 2), new
-//     // Item(FIRE_ORB), new Item(GOLD_ORE)}),
+                                // Mix up loot amounts aswell for seeds..
+                                if (loot.getAmount() > 1) {
+                                    loot.setAmount(1 + Misc.getRandom(loot.getAmount()));
+                                }
+                            }
 
-class Pickpocketable {
-    static pickpockets: { [key: number]: Pickpocketable } = {};
-    static initialize() {
-        for (const p of Object.values(Pickpocketable)) {
-            for (const i of p.getNpcs()) {
-                pickpockets[i] = p;
+                            // Reward loot
+                            if (!player.getInventory().isFull()) {
+                                player.getInventory().addItem(loot);
+                            }
+
+                            // Send second item loot message..
+                            let name: string = loot.getDefinition().getName().toLowerCase();
+                            if (!name.endsWith("s") && loot.getAmount() > 1) {
+                                name += "s";
+                            }
+                            player.getPacketSender().sendMessage(`You steal ${loot.getAmount() > 1 ? loot.getAmount().toString() : Misc.anOrA(name)} ${name}.`);
+
+                            // Add experience..
+                            player.getSkillManager().addExperience(Skill.THIEVING, Math.floor(Pickpocketable.get(npc.getId()).getExp()));
+                        } else {
+                            // Make npc hit the player..
+                            npc.setPositionToFace(player.getLocation());
+                            npc.forceChat((Pickpocketable.get(npc.getId()) === Pickpocketable.MASTER_FARMER ? "Cor blimey, mate! What are ye doing in me pockets?" : "What do you think you're doing?"));
+                            npc.performAnimation(NPC_ATTACK_ANIMATION);
+                            player.getPacketSender().sendMessage("You fail to pick the pocket.");
+                            CombatFactory.stun(player, Pickpocketable.get(npc.getId()).getStunTime(), true);
+                            player.getCombat().getHitQueue().addPendingDamage([new HitDamage(Pickpocketable.get(npc.getId()).getStunDamage(), HitMask.RED)]);
+                            player.getMovementQueue().reset();
+                        }
+                        // Add pet..
+                        PetHandler.onSkill(player, Skill.THIEVING);
+
+                    }, player));
+                    return true;
+                }
             }
         }
+        /**
+ * Checks if a player has the requirements to thieve the given
+ * {@link Pickpocketable}.
+ *
+ * @param player
+ * @param npc
+ * @param pickpocketable
+ * @return
+ */
+        private static hasRequirements(player: Player, npc: NPC, pickpocketable: Pickpocketable): boolean {
+            // Make sure they aren't spam clicking..
+            if (!player.getClickDelay().elapsedTime(1500)) {
+                return false;
+            }
+
+            // Check thieving level..
+            if (player.getSkillManager().getCurrentLevel([Skill.THIEVING]) < pickpocketable.getLevel()) {
+                // DialogueManager.sendStatement(player, "You need a Thieving level of at least " + Integer.toString(pickpocketable.getLevel()) + " to do this.");
+                return false;
+            }
+
+            // Check stun..
+            if (player.getTimers().has(TimerKey.STUN)) {
+                return false;
+            }
+
+            // Make sure we aren't in combat..
+            if (CombatFactory.inCombat(player)) {
+                player.getPacketSender().sendMessage("You must wait a few seconds after being in combat to do this.");
+                return false;
+            }
+
+            // Make sure they aren't in combat..
+            if (CombatFactory.inCombat(npc)) {
+                player.getPacketSender().sendMessage("That npc is currently in combat and cannot be pickpocketed.");
+                return false;
+            }
+
+            // Make sure we have inventory space..
+            if (player.getInventory().isFull()) {
+                player.getInventory().full();
+                return false;
+            }
+
+            return true;
+        }
+        /**
+         * Determines the chance of failure. method.
+         *
+         * @param player The entity who is urging to reach for the pocket.
+         * @return the result of chance.
+         */
+        private static isSuccessful(player: Player, p: Pickpocketable): boolean {
+            let base = 4;
+            if (p === Pickpocketable.FEMALE_HAM_MEMBER || p === Pickpocketable.MALE_HAM_MEMBER) {
+                // TODO: Handle ham clothing bonus chance of success
+            }
+            let factor: number = Misc.getRandom(player.getSkillManager().getCurrentLevel([Skill.THIEVING]) + base);
+            let fluke: number = Misc.getRandom(p.getLevel());
+            return factor > fluke;
+        }
     }
 
-    private level: number;
-    private exp: number;
-    private stunTime: number;
-    private stunDamage: number;
-    private rewards: Item[];
-    private npcs: number[];
+}
+export class Pickpocketable {
 
-    constructor(level: number, exp: number, stunTime: number, stunDamage: number, rewards: Item[], npcs: number[]) {
-        this.level = level;
-        this.exp = exp;
-        this.stunTime = stunTime;
-        this.stunDamage = stunDamage;
-        this.rewards = rewards;
-        this.npcs = npcs;
+    public static readonly MAN_WOMAN = new Pickpocketable(1, 8, 5, 1, [new Item(ItemIdentifiers.COINS, 3)], [3014, 3015, 3078, 3079, 3080, 3081, 3082, 3083, 3084, 3085, 3267, 3268, 3260, 3264, 3265, 3266, 3267, 3268])
+    public static readonly FARMER = new Pickpocketable(10, 15, 5, 1, [new Item(ItemIdentifiers.COINS, 9), new Item(ItemIdentifiers.POTATO_SEED)], [3086, 3087, 3088, 3089, 3090, 3091])
+    public static readonly FEMALE_HAM_MEMBER = new Pickpocketable(15, 19, 4, 3, [new Item(ItemIdentifiers.BUTTONS), new Item(ItemIdentifiers.RUSTY_SWORD), new Item(ItemIdentifiers.DAMAGED_ARMOUR), new Item(ItemIdentifiers.FEATHER, 5), new Item(ItemIdentifiers.BRONZE_ARROW), new Item(ItemIdentifiers.BRONZE_AXE), new Item(ItemIdentifiers.BRONZE_DAGGER), new Item(ItemIdentifiers.BRONZE_PICKAXE), new Item(ItemIdentifiers.COWHIDE), new Item(ItemIdentifiers.IRON_AXE), new Item(ItemIdentifiers.IRON_PICKAXE), new Item(ItemIdentifiers.LEATHER_BOOTS), new Item(ItemIdentifiers.LEATHER_GLOVES), new Item(ItemIdentifiers.LEATHER_BODY), new Item(ItemIdentifiers.LOGS), new Item(ItemIdentifiers.THREAD), new Item(ItemIdentifiers.RAW_ANCHOVIES), new Item(ItemIdentifiers.LOGS), new Item(ItemIdentifiers.RAW_CHICKEN), new Item(ItemIdentifiers.IRON_ORE), new Item(ItemIdentifiers.COAL), new Item(ItemIdentifiers.STEEL_ARROW, 2), new Item(ItemIdentifiers.STEEL_AXE), new Item(ItemIdentifiers.STEEL_PICKAXE), new Item(ItemIdentifiers.KNIFE), new Item(ItemIdentifiers.NEEDLE), new Item(ItemIdentifiers.STEEL_DAGGER), new Item(ItemIdentifiers.TINDERBOX), new Item(ItemIdentifiers.UNCUT_JADE), new Item(ItemIdentifiers.UNCUT_OPAL), new Item(ItemIdentifiers.COINS, 25), new Item(ItemIdentifiers.HAM_GLOVES), new Item(ItemIdentifiers.HAM_CLOAK), new Item(ItemIdentifiers.HAM_BOOTS), new Item(ItemIdentifiers.HAM_SHIRT), new Item(ItemIdentifiers.HAM_ROBE), new Item(ItemIdentifiers.HAM_LOGO), new Item(ItemIdentifiers.HAM_HOOD), new Item(ItemIdentifiers.GRIMY_GUAM_LEAF), new Item(ItemIdentifiers.GRIMY_MARRENTILL), new Item(ItemIdentifiers.GRIMY_TARROMIN), new Item(ItemIdentifiers.GRIMY_HARRALANDER)], [2540, 2541])
+    public static readonly MALE_HAM_MEMBER = new Pickpocketable(20, 23, 4, 3, [new Item(ItemIdentifiers.BUTTONS), new Item(ItemIdentifiers.RUSTY_SWORD), new Item(ItemIdentifiers.DAMAGED_ARMOUR), new Item(ItemIdentifiers.FEATHER, 5), new Item(ItemIdentifiers.BRONZE_ARROW), new Item(ItemIdentifiers.BRONZE_AXE), new Item(ItemIdentifiers.BRONZE_DAGGER), new Item(ItemIdentifiers.BRONZE_PICKAXE), new Item(ItemIdentifiers.COWHIDE), new Item(ItemIdentifiers.IRON_AXE), new Item(ItemIdentifiers.IRON_PICKAXE), new Item(ItemIdentifiers.LEATHER_BOOTS), new Item(ItemIdentifiers.LEATHER_GLOVES), new Item(ItemIdentifiers.LEATHER_BODY), new Item(ItemIdentifiers.LOGS), new Item(ItemIdentifiers.THREAD), new Item(ItemIdentifiers.RAW_ANCHOVIES), new Item(ItemIdentifiers.LOGS), new Item(ItemIdentifiers.RAW_CHICKEN), new Item(ItemIdentifiers.IRON_ORE), new Item(ItemIdentifiers.COAL), new Item(ItemIdentifiers.STEEL_ARROW, 2), new Item(ItemIdentifiers.STEEL_AXE), new Item(ItemIdentifiers.STEEL_PICKAXE), new Item(ItemIdentifiers.KNIFE), new Item(ItemIdentifiers.NEEDLE), new Item(ItemIdentifiers.STEEL_DAGGER), new Item(ItemIdentifiers.TINDERBOX), new Item(ItemIdentifiers.UNCUT_JADE), new Item(ItemIdentifiers.UNCUT_OPAL), new Item(ItemIdentifiers.COINS, 25), new Item(ItemIdentifiers.HAM_GLOVES), new Item(ItemIdentifiers.HAM_CLOAK), new Item(ItemIdentifiers.HAM_BOOTS), new Item(ItemIdentifiers.HAM_SHIRT), new Item(ItemIdentifiers.HAM_ROBE), new Item(ItemIdentifiers.HAM_LOGO), new Item(ItemIdentifiers.HAM_HOOD), new Item(ItemIdentifiers.GRIMY_GUAM_LEAF), new Item(ItemIdentifiers.GRIMY_MARRENTILL), new Item(ItemIdentifiers.GRIMY_TARROMIN), new Item(ItemIdentifiers.GRIMY_HARRALANDER)])
+    public static readonly AL_KHARID_WARRIOR = new Pickpocketable(25, 26, 5, 2, [new Item(ItemIdentifiers.COINS, 18)], [3100])
+    public static readonly ROGUE = new Pickpocketable(32, 36, 5, 2, [new Item(ItemIdentifiers.COINS, 34), new Item(ItemIdentifiers.LOCKPICK), new Item(ItemIdentifiers.IRON_DAGGER_P_), new Item(ItemIdentifiers.JUG_OF_WINE), new Item(ItemIdentifiers.AIR_RUNE, 8)], [2884])
+    public static readonly CAVE_GOBLIN = new Pickpocketable(36, 40, 5, 1, [new Item(ItemIdentifiers.COINS, 10), new Item(ItemIdentifiers.IRON_ORE), new Item(ItemIdentifiers.TINDERBOX), new Item(ItemIdentifiers.SWAMP_TAR), new Item(ItemIdentifiers.OIL_LANTERN), new Item(ItemIdentifiers.TORCH), new Item(ItemIdentifiers.GREEN_GLOOP_SOUP), new Item(ItemIdentifiers.FROGSPAWN_GUMBO), new Item(ItemIdentifiers.FROGBURGER), new Item(ItemIdentifiers.COATED_FROGS_LEGS), new Item(ItemIdentifiers.BAT_SHISH), new Item(ItemIdentifiers.FINGERS), new Item(ItemIdentifiers.BULLSEYE_LANTERN), new Item(ItemIdentifiers.CAVE_GOBLIN_WIRE)], [2268, 2269, 2270, 2271, 2272, 2273, 2274, 2275, 2276, 2277, 2278, 2279, 2280, 2281, 2282, 2283, 2284, 2285])
+    public static readonly MASTER_FARMER = new Pickpocketable(38, 43, 5, 3, [new Item(ItemIdentifiers.POTATO_SEED, 12), new Item(ItemIdentifiers.ONION_SEED, 8), new Item(ItemIdentifiers.CABBAGE_SEED, 5), new Item(ItemIdentifiers.TOMATO_SEED, 4), new Item(ItemIdentifiers.HAMMERSTONE_SEED, 4), new Item(ItemIdentifiers.BARLEY_SEED, 4), new Item(ItemIdentifiers.MARIGOLD_SEED, 4), new Item(ItemIdentifiers.ASGARNIAN_SEED, 4), new Item(ItemIdentifiers.JUTE_SEED, 4), new Item(ItemIdentifiers.REDBERRY_SEED, 4), new Item(ItemIdentifiers.NASTURTIUM_SEED, 4), new Item(ItemIdentifiers.YANILLIAN_SEED, 4), new Item(ItemIdentifiers.CADAVABERRY_SEED, 4), new Item(ItemIdentifiers.SWEETCORN_SEED, 4), new Item(ItemIdentifiers.ROSEMARY_SEED, 4), new Item(ItemIdentifiers.DWELLBERRY_SEED, 3), new Item(ItemIdentifiers.GUAM_SEED, 3), new Item(ItemIdentifiers.WOAD_SEED, 3), new Item(ItemIdentifiers.KRANDORIAN_SEED, 3), new Item(ItemIdentifiers.STRAWBERRY_SEED, 3), new Item(ItemIdentifiers.LIMPWURT_SEED, 3), new Item(ItemIdentifiers.MARRENTILL_SEED, 3), new Item(ItemIdentifiers.JANGERBERRY_SEED, 3), new Item(ItemIdentifiers.TARROMIN_SEED, 2), new Item(ItemIdentifiers.WILDBLOOD_SEED, 2), new Item(ItemIdentifiers.WATERMELON_SEED, 2), new Item(ItemIdentifiers.HARRALANDER_SEED, 2), new Item(ItemIdentifiers.RANARR_SEED, 1), new Item(ItemIdentifiers.WHITEBERRY_SEED, 2), new Item(ItemIdentifiers.TOADFLAX_SEED, 2), new Item(ItemIdentifiers.MUSHROOM_SPORE, 2), new Item(ItemIdentifiers.IRIT_SEED, 2), new Item(ItemIdentifiers.BELLADONNA_SEED, 2), new Item(ItemIdentifiers.POISON_IVY_SEED, 2), new Item(ItemIdentifiers.AVANTOE_SEED, 1), new Item(ItemIdentifiers.CACTUS_SEED, 1), new Item(ItemIdentifiers.KWUARM_SEED, 1), new Item(ItemIdentifiers.SNAPDRAGON_SEED, 1), new Item(ItemIdentifiers.CADANTINE_SEED, 1), new Item(ItemIdentifiers.LANTADYME_SEED, 1), new Item(ItemIdentifiers.DWARF_WEED_SEED, 1), new Item(ItemIdentifiers.TORSTOL_SEED, 1),], [3257, 3258, 5832])
+    public static readonly GUARD = new Pickpocketable(40, 47, 5, 2, [new Item(ItemIdentifiers.COINS, 30)], [1546, 1547, 1548, 1549, 1550, 3010, 3011, 3094, 3245, 3267, 3268, 3269, 3270, 3271, 3272, 3273, 3274, 3283])
+    public static readonly FREMENNIK_CITIZEN = new Pickpocketable(45, 65, 5, 2, [new Item(ItemIdentifiers.COINS, 40)], [2462])
+    public static readonly BEARDED_POLLNIVNIAN_BANDIT = new Pickpocketable(45, 65, 5, 5, [new Item(ItemIdentifiers.COINS, 40)], [1880])
+    public static readonly YANILLE_WATCHMAN = new Pickpocketable(65, 137, 5, 3, [new Item(ItemIdentifiers.COINS, 60), new Item(ItemIdentifiers.BREAD)], [3251])
+    public static readonly MENAPHITE_THUG = new Pickpocketable(65, 137, 5, 5, [new Item(ItemIdentifiers.COINS, 60)], [3549, 3550])
+    public static readonly PALADIN = new Pickpocketable(70, 152, 5, 3, [new Item(ItemIdentifiers.COINS, 80), new Item(ItemIdentifiers.CHAOS_RUNE, 2)], [3104, 3105])
+    public static readonly GNOME = new Pickpocketable(75, 199, 5, 1, [new Item(ItemIdentifiers.COINS, 300), new Item(ItemIdentifiers.EARTH_RUNE), new Item(ItemIdentifiers.GOLD_ORE), new Item(ItemIdentifiers.FIRE_ORB), new Item(ItemIdentifiers.SWAMP_TOAD), new Item(ItemIdentifiers.KING_WORM)], [6086, 6087, 6094, 6095, 6096])
+
+
+
+
+
+
+    constructor(level: number, exp: number, stunTime: number, stunDamage: number, rewards: Item[], npcs?: number[]) {
+        level = level;
+        exp = exp;
+        stunTime = stunTime;
+        stunDamage = stunDamage;
+        rewards = rewards;
+        npcs = npcs;
     }
 
-    static get(npcId: number): Pickpocketable | undefined {
-        return pickpockets[npcId];
+    public static get(npcId: number): Pickpocketable {
+        return Pickpocketable.pickpockets.get(npcId);
     }
 
-    getLevel(): number {
-        return this.level;
+    public getLevel(): number {
+        return Pickpocketable.level;
     }
 
-    getExp(): number {
-        return this.exp;
-    }
-    //getters and setters of other variables also
-
-    getStunTime(): number {
-        return this.stunTime;
+    public getExp(): number {
+        return Pickpocketable.exp;
     }
 
-    getStunDamage(): number {
-        return this.stunDamage;
+    public getStunTime(): number {
+        return Pickpocketable.stunTime;
     }
 
-    getRewards(): Item[] {
-        return this.rewards;
+    public getStunDamage(): number {
+        return Pickpocketable.stunDamage;
     }
 
-    getNpcs(): number[] {
-        return this.npcs;
+    public getRewards(): Item[] {
+        return Pickpocketable.rewards;
     }
 
-    class StallThieving {
+    public getNpcs(): number[] {
+        return Pickpocketable.npcs;
+    }
+
+
+    static {
+        for (const p of Object.values(Pickpocketable)) {
+            for (const i of p.getNpcs()) {
+                Pickpocketable.pickpockets.set(i, p);
+            }
+        }
+
+    }
+
+    private static level: number;
+    private static exp: number;
+    private static stunTime: number;
+    private static stunDamage: number;
+    private static rewards: Item[];
+    private static npcs: number[];
+    private static pickpockets: Map<number, Pickpocketable> = new Map<number, Pickpocketable>();
+}
+
+export class StallThieving {
+    /**
+ * Checks if we're attempting to steal from a stall based on the clicked object.
+ *
+ * @param player
+ * @param object
+ * @return
+ */
     public static init(player: Player, object: GameObject): boolean {
         const stall = Stall.get(object.getId());
         if (stall) {
+
             // Make sure we have the required thieving level..
-            if (player.getSkillManager().getCurrentLevel(Skill.THIEVING) >= stall.getReqLevel()) {
+            if (player.getSkillManager().getCurrentLevel([Skill.THIEVING]) >= Stall.get(object.getId()).getReqLevel()) {
 
                 // Make sure we aren't spam clicking..
-                if (player.getClickDelay().elapsed(1000)) {
+                if (player.getClickDelay().elapsedTime(1000)) {
 
                     // Reset click delay..
                     player.getClickDelay().reset();
@@ -341,24 +331,30 @@ class Pickpocketable {
                     player.performAnimation(THIEVING_ANIMATION);
 
                     // Add items..
-                    const item = stall.getRewards()[Misc.getRandom(stall.getRewards().length - 1)];
-                    player.getInventory().add(item.getId(),
+                    const item = Stall.get(object.getId()).getRewards()[Misc.getRandom(Stall.get(object.getId()).getRewards().length - 1)];
+                    player.getInventory().adds(item.getId(),
                         item.getAmount() > 1 ? Misc.getRandom(item.getAmount()) : 1);
+
 
                     // Add pet..
                     PetHandler.onSkill(player, Skill.THIEVING);
 
                     // Respawn stall..
-                    for (const stallDef of stall.getStalls()) {
+                    for (const stallDef of Stall.get(object.getId()).getStalls()) {
                         if (stallDef.getObjectId() == object.getId()) {
-                            if (stallDef.getReplacement().isPresent()) {
+                            const replacementId = stallDef.getReplacement();
+                            if (replacementId) {
                                 TaskManager.submit(new TimedObjectReplacementTask(object,
-                                    new GameObject(stallDef.getReplacement().get(), object.getLocation(),
+                                    new GameObject(replacementId, object.getLocation(),
                                         object.getType(), object.getFace(), player.getPrivateArea()),
-                                    stall.get().getRespawnTicks()));
+                                    Stall.get(object.getId()).getRespawnTicks()));
                             }
+
+
                             break;
                         }
+
+
                     }
                 }
             } else {
@@ -370,255 +366,105 @@ class Pickpocketable {
         return false;
     }
 
-    interface Stall {
-    stalls: StallDefinition[],
-    reqLevel: number,
-    exp: number,
-    respawnTicks: number,
-    rewards: Item[]
 }
 
-const map: Map<number, Stall> = new Map<number, Stall>();
+export class StallDefinition {
+    /**
+     * The stall's object id.
+     */
+    private readonly objectId: number;
 
-Object.values(Stall).forEach(stall => {
-    stall.stalls.forEach(stallDef => {
-        map.set(stallDef.objectId, stall);
-    });
-});
+    /**
+     * The replacement object for when this stall temporarily despawns.
+     */
+    private readonly replacement: number;
 
-export function get(objectId: number): Stall | undefined {
-    return map.get(objectId);
-}
-
-export function init(player: Player, object: GameObject): boolean {
-    const stall = get(object.id);
-    if (!stall) {
-        return false;
-    }
-    if (player.skillManager.getCurrentLevel(Skill.THIEVING) < stall.reqLevel) {
-        return false;
-    }
-    if (!player.clickDelay.elapsed(1000)) {
-        return false;
-    }
-    player.clickDelay.reset();
-    player.setPositionToFace(object.location);
-    player.performAnimation(THIEVING_ANIMATION);
-    const item = stall.rewards[Misc.getRandom(stall.rewards.length - 1)];
-    player.inventory.add(item.id, item.amount > 1 ? Misc.getRandom(item.amount) : 1);
-    PetHandler.onSkill(player, Skill.THIEVING);
-}
-        public static get(objectId: number): Optional < Stall > {
-    return map.get(objectId) || null;
-}
-            public getStalls(): StallDefinition[] {
-    return this.stalls;
-}
-            public getReqLevel(): number {
-    return this.reqLevel;
-}
-            public getExp(): number {
-    return this.exp;
-}
-            public getRespawnTicks(): number {
-    return this.respawnTicks;
-}
-            public getRewards(): Item[] {
-    return this.rewards;
-}
-            }
-
-interface Optional<T> {
-    get(): T;
-}
-
-declare const Optional: {
-    ofNullable<T>(value: T | null | undefined): Optional<T>;
-}
-
-class StallDefinition {
-    private objectId: number;
-    private replacement: number | undefined;
-
-    constructor(objectId: number, replacement?: number) {
+    constructor(objectId: number, replacement: number) {
         this.objectId = objectId;
         this.replacement = replacement;
     }
 
-    getObjectId() {
+    public getObjectId(): number {
         return this.objectId;
     }
 
-    getReplacement() {
+    public getReplacement(): number {
         return this.replacement;
     }
 }
 
+export class Stall {
 
-// public enum Stall {
-//     BAKERS_STALL(new StallDefinition[] { new StallDefinition(11730, Optional.of(634)), }, 5, 16, 3,
-//             new Item(CAKE), new Item(CHOCOLATE_SLICE), new Item(BREAD)), CRAFTING_STALL(
-//                     new StallDefinition[] { new StallDefinition(4874, Optional.empty()),
-//                             new StallDefinition(6166, Optional.empty()) },
-//                     5, 16, 12, new Item(CHISEL), new Item(RING_MOULD), new Item(NECKLACE_MOULD)), MONKEY_STALL(
-//                             new StallDefinition[] { new StallDefinition(4875, Optional.empty()) }, 5, 16, 12,
-//                             new Item(BANANA)), MONKEY_GENERAL_STALL(
-//                                     new StallDefinition[] { new StallDefinition(4876, Optional.empty()) }, 5,
-//                                     16, 12, new Item(POT), new Item(TINDERBOX), new Item(HAMMER)), TEA_STALL(
-//                                             new StallDefinition[] { new StallDefinition(635, Optional.of(634)),
-//                                                     new StallDefinition(6574, Optional.of(6573)),
-//                                                     new StallDefinition(20350, Optional.of(20349)) },
-//                                             5, 16, 12, new Item(CUP_OF_TEA)), SILK_STALL(
-//                                                     new StallDefinition[] {
-//                                                             new StallDefinition(11729, Optional.of(634)) },
-//                                                     20, 24, 8, new Item(SILK)), WINE_STALL(
-//                                                             new StallDefinition[] { new StallDefinition(14011,
-//                                                                     Optional.of(634)) },
-//                                                             22, 27, 27, new Item(JUG_OF_WATER),
-//                                                             new Item(JUG_OF_WINE), new Item(GRAPES),
-//                                                             new Item(EMPTY_JUG),
-//                                                             new Item(BOTTLE_OF_WINE)), SEED_STALL(
-//                                                                     new StallDefinition[] { new StallDefinition(
-//                                                                             7053, Optional.of(634)), },
-//                                                                     27, 10, 30, new Item(POTATO_SEED, 12),
-//                                                                     new Item(ONION_SEED, 11),
-//                                                                     new Item(CABBAGE_SEED, 10),
-//                                                                     new Item(TOMATO_SEED, 9),
-//                                                                     new Item(SWEETCORN_SEED, 7),
-//                                                                     new Item(STRAWBERRY_SEED, 5),
-//                                                                     new Item(WATERMELON_SEED, 3),
-//                                                                     new Item(BARLEY_SEED, 5),
-//                                                                     new Item(HAMMERSTONE_SEED, 5),
-//                                                                     new Item(ASGARNIAN_SEED, 5),
-//                                                                     new Item(JUTE_SEED, 5),
-//                                                                     new Item(YANILLIAN_SEED, 5),
-//                                                                     new Item(KRANDORIAN_SEED, 5),
-//                                                                     new Item(WILDBLOOD_SEED, 3),
-//                                                                     new Item(MARIGOLD_SEED, 4),
-//                                                                     new Item(ROSEMARY_SEED, 4),
-//                                                                     new Item(NASTURTIUM_SEED, 4)), FUR_STALL(
-//                                                                             new StallDefinition[] {
-//                                                                                     new StallDefinition(11732,
-//                                                                                             Optional.of(634)),
-//                                                                                     new StallDefinition(4278,
-//                                                                                             Optional.of(634)) },
-//                                                                             35, 36, 17,
-//                                                                             new Item(
-//                                                                                     GREY_WOLF_FUR)), FISH_STALL(
-//                                                                                             new StallDefinition[] {
-//                                                                                                     new StallDefinition(
-//                                                                                                             4277,
-//                                                                                                             Optional.of(
-//                                                                                                                     4276)),
-//                                                                                                     new StallDefinition(
-//                                                                                                             4707,
-//                                                                                                             Optional.of(
-//                                                                                                                     4276)),
-//                                                                                                     new StallDefinition(
-//                                                                                                             4705,
-//                                                                                                             Optional.of(
-//                                                                                                                     4276)) },
-//                                                                                             42, 42, 17,
-//                                                                                             new Item(
-//                                                                                                     RAW_SALMON),
-//                                                                                             new Item(
-//                                                                                                     RAW_TUNA)), CROSSBOW_STALL(
-//                                                                                                             new StallDefinition[] {
-//                                                                                                                     new StallDefinition(
-//                                                                                                                             17031,
-//                                                                                                                             Optional.of(
-//                                                                                                                                     6984)) },
-//                                                                                                             49,
-//                                                                                                             52,
-//                                                                                                             15,
-//                                                                                                             new Item(
-//                                                                                                                     BRONZE_BOLTS,
-//                                                                                                                     6),
-//                                                                                                             new Item(
-//                                                                                                                     BRONZE_LIMBS),
-//                                                                                                             new Item(
-//                                                                                                                     WOODEN_STOCK)), SILVER_STALL(
-//                                                                                                                             new StallDefinition[] {
-//                                                                                                                                     new StallDefinition(
-//                                                                                                                                             11734,
-//                                                                                                                                             Optional.of(
-//                                                                                                                                                     634)),
-//                                                                                                                                     new StallDefinition(
-//                                                                                                                                             6164,
-//                                                                                                                                             Optional.of(
-//                                                                                                                                                     6984)), },
-//                                                                                                                             50,
-//                                                                                                                             54,
-//                                                                                                                             50,
-//                                                                                                                             new Item(
-//                                                                                                                                     SILVER_ORE)), SPICE_STALL(
-//                                                                                                                                             new StallDefinition[] {
-//                                                                                                                                                     new StallDefinition(
-//                                                                                                                                                             11733,
-//                                                                                                                                                             Optional.of(
-//                                                                                                                                                                     634)),
-//                                                                                                                                                     new StallDefinition(
-//                                                                                                                                                             6572,
-//                                                                                                                                                             Optional.of(
-//                                                                                                                                                                     6573)),
-//                                                                                                                                                     new StallDefinition(
-//                                                                                                                                                             20348,
-//                                                                                                                                                             Optional.of(
-//                                                                                                                                                                     20349)), },
-//                                                                                                                                             65,
-//                                                                                                                                             81,
-//                                                                                                                                             133,
-//                                                                                                                                             new Item(
-//                                                                                                                                                     SPICE)), MAGIC_STALL(
-//                                                                                                                                                             new StallDefinition[] {
-//                                                                                                                                                                     new StallDefinition(
-//                                                                                                                                                                             4877,
-//                                                                                                                                                                             Optional.empty()), },
-//                                                                                                                                                             65,
-//                                                                                                                                                             100,
-//                                                                                                                                                             133,
-//                                                                                                                                                             new Item(
-//                                                                                                                                                                     AIR_RUNE,
-//                                                                                                                                                                     20),
-//                                                                                                                                                             new Item(
-//                                                                                                                                                                     WATER_RUNE,
-//                                                                                                                                                                     20),
-//                                                                                                                                                             new Item(
-//                                                                                                                                                                     EARTH_RUNE,
-//                                                                                                                                                                     20),
-//                                                                                                                                                             new Item(
-//                                                                                                                                                                     FIRE_RUNE,
-//                                                                                                                                                                     20),
-//                                                                                                                                                             new Item(
-//                                                                                                                                                                     LAW_RUNE,
-//                                                                                                                                                                     6)), SCIMITAR_STALL(
-//                                                                                                                                                                             new StallDefinition[] {
-//                                                                                                                                                                                     new StallDefinition(
-//                                                                                                                                                                                             4878,
-//                                                                                                                                                                                             Optional.empty()) },
-//                                                                                                                                                                             65,
-//                                                                                                                                                                             100,
-//                                                                                                                                                                             133,
-//                                                                                                                                                                             new Item(
-//                                                                                                                                                                                     IRON_SCIMITAR)), GEM_STALL(
-//                                                                                                                                                                                             new StallDefinition[] {
-//                                                                                                                                                                                                     new StallDefinition(
-//                                                                                                                                                                                                             11731,
-//                                                                                                                                                                                                             Optional.of(
-//                                                                                                                                                                                                                     634)),
-//                                                                                                                                                                                                     new StallDefinition(
-//                                                                                                                                                                                                             6162,
-//                                                                                                                                                                                                             Optional.of(
-//                                                                                                                                                                                                                     6984)), },
-//                                                                                                                                                                                             75,
-//                                                                                                                                                                                             160,
-//                                                                                                                                                                                             133,
-//                                                                                                                                                                                             new Item(
-//                                                                                                                                                                                                     UNCUT_SAPPHIRE),
-//                                                                                                                                                                                             new Item(
-//                                                                                                                                                                                                     UNCUT_EMERALD),
-//                                                                                                                                                                                             new Item(
-//                                                                                                                                                                                                     UNCUT_RUBY),
-//                                                                                                                                                                                             new Item(
-//                                                                                                                                                                                                     UNCUT_DIAMOND)),;
+    /**
+         * Represents a stall which can be stolen from using the Thieving skill.
+         *
+         * @author Professor Oak
+         */
+    public static readonly BAKERS_STALL = new Stall([new StallDefinition(11730, 634)], 5, 16, 3, [new Item(ItemIdentifiers.CAKE), new Item(ItemIdentifiers.CHOCOLATE_SLICE), new Item(ItemIdentifiers.BREAD)])
+    public static readonly CRAFTING_STALL = new Stall([new StallDefinition(4874, null), new StallDefinition(6166, null)], 5, 16, 12, [new Item(ItemIdentifiers.CHISEL), new Item(ItemIdentifiers.RING_MOULD), new Item(ItemIdentifiers.NECKLACE_MOULD)])
+    public static readonly MONKEY_STALL = new Stall([new StallDefinition(4875, null)], 5, 16, 12, [new Item(ItemIdentifiers.BANANA)])
+    public static readonly MONKEY_GENERAL_STALL = new Stall([new StallDefinition(4876, null)], 5, 16, 12, [new Item(ItemIdentifiers.POT), new Item(ItemIdentifiers.TINDERBOX), new Item(ItemIdentifiers.HAMMER)])
+    public static readonly TEA_STALL = new Stall([new StallDefinition(635, 634), new StallDefinition(6574, 6573), new StallDefinition(20350, 20349)], 5, 16, 12, [new Item(ItemIdentifiers.CUP_OF_TEA)])
+    public static readonly SILK_STALL = new Stall([new StallDefinition(11729, 634)], 20, 24, 8, [new Item(ItemIdentifiers.SILK)])
+    public static readonly WINE_STALL = new Stall([new StallDefinition(14011, 634)], 22, 27, 27, [new Item(ItemIdentifiers.JUG_OF_WATER), new Item(ItemIdentifiers.JUG_OF_WINE), new Item(ItemIdentifiers.GRAPES), new Item(ItemIdentifiers.EMPTY_JUG), new Item(ItemIdentifiers.BOTTLE_OF_WINE)])
+    public static readonly SEED_STALL = new Stall([new StallDefinition(7053, 634),], 27, 10, 30, [new Item(ItemIdentifiers.POTATO_SEED, 12), new Item(ItemIdentifiers.ONION_SEED, 11), new Item(ItemIdentifiers.CABBAGE_SEED, 10), new Item(ItemIdentifiers.TOMATO_SEED, 9), new Item(ItemIdentifiers.SWEETCORN_SEED, 7), new Item(ItemIdentifiers.STRAWBERRY_SEED, 5), new Item(ItemIdentifiers.WATERMELON_SEED, 3), new Item(ItemIdentifiers.BARLEY_SEED, 5), new Item(ItemIdentifiers.HAMMERSTONE_SEED, 5), new Item(ItemIdentifiers.ASGARNIAN_SEED, 5), new Item(ItemIdentifiers.JUTE_SEED, 5), new Item(ItemIdentifiers.YANILLIAN_SEED, 5), new Item(ItemIdentifiers.KRANDORIAN_SEED, 5), new Item(ItemIdentifiers.WILDBLOOD_SEED, 3), new Item(ItemIdentifiers.MARIGOLD_SEED, 4), new Item(ItemIdentifiers.ROSEMARY_SEED, 4), new Item(ItemIdentifiers.NASTURTIUM_SEED, 4)])
+    public static readonly FUR_STALL = new Stall([new StallDefinition(11732, 634), new StallDefinition(4278, 634)], 35, 36, 17, [new Item(ItemIdentifiers.GREY_WOLF_FUR)])
+    public static readonly FISH_STALL = new Stall([new StallDefinition(4277, 4276), new StallDefinition(4707, 4276), new StallDefinition(4705, 4276)], 42, 42, 17, [new Item(ItemIdentifiers.RAW_SALMON), new Item(ItemIdentifiers.RAW_TUNA)])
+    public static readonly CROSSBOW_STALL = new Stall([new StallDefinition(17031, 6984)], 49, 52, 15, [new Item(ItemIdentifiers.BRONZE_BOLTS, 6), new Item(ItemIdentifiers.BRONZE_LIMBS), new Item(ItemIdentifiers.WOODEN_STOCK)])
+    public static readonly SILVER_STALL = new Stall([new StallDefinition(11734, 634), new StallDefinition(6164, 6984),], 50, 54, 50, [new Item(ItemIdentifiers.SILVER_ORE)])
+    public static readonly SPICE_STALL = new Stall([new StallDefinition(11733, 634), new StallDefinition(6572, 6573), new StallDefinition(20348, 20349)], 65, 81, 133, [new Item(ItemIdentifiers.SPICE)])
+    public static readonly MAGIC_STALL = new Stall([new StallDefinition(4877, null),], 65, 100, 133, [new Item(ItemIdentifiers.AIR_RUNE, 20), new Item(ItemIdentifiers.WATER_RUNE, 20), new Item(ItemIdentifiers.EARTH_RUNE, 20), new Item(ItemIdentifiers.FIRE_RUNE, 20), new Item(ItemIdentifiers.LAW_RUNE, 6)])
+    public static readonly SCIMITAR_STALL = new Stall([new StallDefinition(4878, null)], 65, 100, 133, [new Item(ItemIdentifiers.IRON_SCIMITAR)])
+    public static readonly GEM_STALL = new Stall([new StallDefinition(11731, 634), new StallDefinition(6162, 6984),], 75, 160, 133, [new Item(ItemIdentifiers.UNCUT_SAPPHIRE), new Item(ItemIdentifiers.UNCUT_EMERALD), new Item(ItemIdentifiers.UNCUT_RUBY), new Item(ItemIdentifiers.UNCUT_DIAMOND)])
 
+
+    constructor(stalls: StallDefinition[], reqLevel: number, exp: number, respawnTicks: number, rewards: Item[]) {
+        this.stalls = stalls;
+        this.reqLevel = reqLevel;
+        this.exp = exp;
+        this.respawnTicks = respawnTicks;
+        this.rewards = rewards;
+    }
+
+    public static get(objectId: number): Stall {
+        return Stall.map.get(objectId);
+    }
+
+    public getStalls(): StallDefinition[] {
+        return this.stalls;
+    }
+
+    public getReqLevel(): number {
+        return this.reqLevel;
+    }
+
+    public getExp(): number {
+        return this.exp;
+    }
+
+    public getRespawnTicks(): number {
+        return this.respawnTicks;
+    }
+
+    public getRewards(): Item[] {
+        return this.rewards;
+    }
+
+
+    private static map: Map<number, Stall> = new Map<number, Stall>();
+
+    static {
+        for (const stall of Object.values(Stall)) {
+            for (const def of stall.getStalls()) {
+                Stall.map.set(def.getObjectId(), stall);
+            }
+        }
+    }
+
+    private stalls: StallDefinition[];
+    private reqLevel: number;
+    private exp: number;
+    private respawnTicks: number;
+    private rewards: Item[];
+
+}

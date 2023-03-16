@@ -20,7 +20,7 @@ export class ShopManager extends ShopIdentifiers {
         }
     }
     
-    public static open(player: Player, shop: Shop, scrollReset: boolean) {
+    public static open(player: Player, shop: Shop, scrollReset?: boolean) {
         player.shop = shop;
         
         player.packetSender.sendItemContainer(player.inventory, Shop.INVENTORY_INTERFACE_ID);

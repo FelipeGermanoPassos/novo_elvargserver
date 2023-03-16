@@ -1,68 +1,59 @@
 import { Item } from "../Item";
 import { Player } from "../../entity/impl/player/Player";
+import { StackType } from "./StackType";
+import { Bank } from "./impl/Bank";
+import { Inventory } from "./impl/Inventory";
+import { Equipment } from "./impl/Equipment";
+import { ItemDefinition } from "../../definition/ItemDefinition";
+import { Task } from "../../task/Task";
+import { ItemOnGroundManager } from "../../entity/impl/grounditem/ItemOnGroundManager";
+import { TaskManager } from "../../task/TaskManager";
 
-export class ItemContainer {
+
+export abstract class ItemContainer {
     public player: Player;
     public items: Item[] = new Array(this.capacity());
-    
-    constructor() {
+
+    constructor(capacity?: number);
+    constructor(player?: Player, capacity?: number);
+    constructor(arg1?: Player | number, arg2?: number) {
+        if (arg1 instanceof Player) {
+            this.player = arg1;
+            this.items = new Array(arg2 || 0);
+        } else if (typeof arg1 === 'number') {
+            this.items = new Array(arg1);
+        } else {
+            this.items = new Array(0);
+        }
         for (let i = 0; i < this.capacity(); i++) {
-            this.items[i] = new Item(-1, 0);
-        }
-    }
-    
-    constructor(capacity: number) {
-        this.items = new Array(capacity);
-        for (let i = 0; i < capacity; i++) {
-            this.items[i] = new Item(-1, 0);
-        }
-    }
-    
-    constructor(player: Player) {
-        this.player = player;
-        for (let i = 0; i < this.capacity(); i++) {
-            this.items[i] = new Item(-1, 0);
-        }
-    }
-    
-    constructor(player: Player, capacity: number) {
-        this.player = player;
-        this.items = new Array(capacity);
-        for (let i = 0; i < capacity; i++) {
             this.items[i] = new Item(-1, 0);
         }
     }
 
-    constructor(player: Player, capacity: number)
-    constructor(player: Player)
-    constructor(capacity: number)
-    constructor()
-    constructor(pc?: any, capacity?: any){
-        if ()
-    }
-    
+
+
     abstract capacity(): number;
-    
+
     abstract stackType(): StackType;
-    
+
     abstract refreshItems(): ItemContainer;
-    
+
     abstract full(): ItemContainer;
-    
-    getPlayer(): Player {
+
+    public getPlayer(): Player {
         return this.player;
     }
-    
-    setPlayer(player: Player): ItemContainer {
+
+    public setPlayer(player: Player): ItemContainer {
         this.player = player;
         return this;
     }
-    
+
     public getItems(): Item[] {
         return this.items;
     }
-    
-    getItemIdsArray(): number[] {
+
+    public getItemIdsArray(): number[] {
         let array = new Array(this.items.length);
         for (let i = 0; i < this.items.length; i++) {
             array[i] = this.items[i].getId();
@@ -74,16 +65,16 @@ export class ItemContainer {
         this.items = items;
         return this;
     }
-    
-    getCopiedItems(): Item[] {
+
+    public getCopiedItems(): Item[] {
         let it: Item[] = new Array(this.items.length);
         for (let i = 0; i < it.length; i++) {
             it[i] = this.items[i].clone();
         }
         return it;
     }
-    
-    getValidItems(): Item[] {
+
+    public getValidItems(): Item[] {
         let items: Item[] = [];
         for (let item of this.items) {
             if (item != null && item.getId() > 0) {
@@ -94,8 +85,8 @@ export class ItemContainer {
         }
         return items;
     }
-    
-    getValidItemsArray(): Item[] {
+
+    public getValidItemsArray(): Item[] {
         let items = this.getValidItems();
         let array: Item[] = new Array(items.length);
         for (let i = 0; i < items.length; i++) {
@@ -103,8 +94,8 @@ export class ItemContainer {
         }
         return array;
     }
-    
-    copyValidItemsArray(): Item[] {
+
+    public copyValidItemsArray(): Item[] {
         let items = this.getValidItems();
         let array: Item[] = new Array(items.length);
         for (let i = 0; i < items.length; i++) {
@@ -112,17 +103,17 @@ export class ItemContainer {
         }
         return array;
     }
-    
-    setItem(slot: number, item: Item): ItemContainer {
+
+    public setItem(slot: number, item: Item): ItemContainer {
         this.items[slot] = item;
         return this;
     }
-    
-    isSlotOccupied(slot: number): boolean {
+
+    public isSlotOccupied(slot: number): boolean {
         return this.items[slot] != null && this.items[slot].getId() > 0 && this.items[slot].getAmount() > 0;
     }
-    
-    swap(fromSlot: number, toSlot: number): ItemContainer {
+
+    public swap(fromSlot: number, toSlot: number): ItemContainer {
         let temporaryItem = this.getItems()[fromSlot];
         if (temporaryItem == null || temporaryItem.getId() <= 0) {
             return this;
@@ -132,16 +123,16 @@ export class ItemContainer {
         return this;
     }
 
-  
-    shiftSwap(fromSlot: number, toSlot: number): ItemContainer {
+
+    public shiftSwap(fromSlot: number, toSlot: number): ItemContainer {
         let temporaryItem = this.getItems()[fromSlot];
         if (temporaryItem == null || temporaryItem.getId() <= 0) {
-        return this;
+            return this;
         }
         return this;
     }
 
-    getFreeSlots(): number {
+    public getFreeSlots(): number {
         let space = 0;
         for (let item of this.items) {
             if (item.getId() == -1) {
@@ -150,16 +141,16 @@ export class ItemContainer {
         }
         return space;
     }
-    
-    isFull(): boolean {
+
+    public isFull(): boolean {
         return this.getEmptySlot() == -1;
     }
-    
-    isEmpty(): boolean {
+
+    public isEmpty(): boolean {
         return this.getFreeSlots() == this.capacity();
     }
-    
-    contains(id: number): boolean {
+
+    public containsNumber(id: number): boolean {
         for (let items of this.items) {
             if (items.getId() == id) {
                 return true;
@@ -167,46 +158,46 @@ export class ItemContainer {
         }
         return false;
     }
-    
-    contains(item: Item): boolean {
+
+    public containsItem(item: Item): boolean {
         return this.getAmount(item.getId()) >= item.getAmount();
     }
-    
-    contains(item: Item[]): boolean {
+
+    public containsArray(item: Item[]): boolean {
         if (item.length == 0) {
             return false;
         }
-    
+
         for (let nextItem of item) {
             if (nextItem == null) {
                 continue;
             }
-    
-            if (!this.contains(nextItem.getId())) {
+
+            if (!this.containsNumber(nextItem.getId())) {
                 return false;
             }
         }
         return true;
     }
 
-    containsAny(itemIds: number[]): boolean {
+    public containsAnyIds(itemIds: number[]): boolean {
         if (itemIds.length == 0 || this.isEmpty()) {
-        return false;
+            return false;
         }
-        
+
         for (let itemId of itemIds) {
             if (itemId == -1) {
                 continue;
             }
 
-            if (this.contains(itemId)) {
+            if (this.containsNumber(itemId)) {
                 return true;
             }
         }
         return false;
     }
 
-    getEmptySlot(): number {
+    public getEmptySlot(): number {
         for (let i = 0; i < this.capacity(); i++) {
             if (this.items[i].getId() <= 0 || this.items[i].getAmount() <= 0 && !(this instanceof Bank)) {
                 return i;
@@ -215,7 +206,7 @@ export class ItemContainer {
         return -1;
     }
 
-    getSlot(slotId: number): number {
+    public getSlot(slotId: number): number {
         if (this.items.length < slotId || !this.items[slotId].isValid()) {
             return -1;
         }
@@ -223,18 +214,18 @@ export class ItemContainer {
         return this.items[slotId].getId();
     }
 
-    getSlotForItemId(id: number): number {
+    public getSlotForItemId(id: number): number {
         for (let i = 0; i < this.capacity(); i++) {
-        if (this.items[i].getId() == id) {
-        if (this.items[i].getAmount() > 0 || (this instanceof Bank && this.items[i].getAmount() == 0)) {
-        return i;
-        }
-        }
+            if (this.items[i].getId() == id) {
+                if (this.items[i].getAmount() > 0 || (this instanceof Bank && this.items[i].getAmount() == 0)) {
+                    return i;
+                }
+            }
         }
         return -1;
     }
-    
-    getAmount(id: number): number {
+
+    public getAmount(id: number): number {
         let totalAmount = 0;
         for (let item of this.items) {
             if (item.getId() == id) {
@@ -243,92 +234,96 @@ export class ItemContainer {
         }
         return totalAmount;
     }
-    
+
     getAmountForSlot(slot: number): number {
         return this.items[slot].getAmount();
     }
-    
+
     resetItems(): ItemContainer {
         for (let i = 0; i < this.capacity(); i++) {
             this.items[i] = new Item(-1, 0);
         }
         return this;
     }
-    
+
     forSlot(slot: number): Item {
         return this.items[slot];
     }
 
+<<<<<<< Updated upstream
     public switchItem(to: ItemContainer, item: Item sort: boolean, refresh: boolean): ItemContainer {
+=======
+    public switchItem(to: ItemContainer, item: Item, sort: boolean, slot: number, refresh: boolean): ItemContainer {
+>>>>>>> Stashed changes
         if (this.getItems()[slot].getId() !== item.getId()) {
-        return this;
+            return this;
         }
-        
-        if (to.getFreeSlots() <= 0 && !(to.contains(item.getId()) && item.getDefinition().isStackable())) {
+
+        if (to.getFreeSlots() <= 0 && !(to.containsNumber(item.getId()) && item.getDefinition().isStackable())) {
             to.full();
             return this;
         }
-        
+
         if ((this instanceof Inventory || this instanceof Equipment) && to instanceof Bank) {
             if (to.getAmount(item.getId()) + item.getAmount() > Number.MAX_SAFE_INTEGER
-                    || to.getAmount(item.getId()) + item.getAmount() <= 0) {
+                || to.getAmount(item.getId()) + item.getAmount() <= 0) {
                 item.setAmount(Number.MAX_SAFE_INTEGER - (to.getAmount(item.getId())));
                 if (item.getAmount() <= 0) {
                     this.getPlayer().getPacketSender()
-                    .sendMessage("You cannot deposit that entire amount into your bank.");
-                        return this;
+                        .sendMessage("You cannot deposit that entire amount into your bank.");
+                    return this;
                 }
             }
         }
-    
-        this.delete(item, slot, refresh, to);
-    
+
+        this.deleteItemContainer(item, slot, refresh, to);
+
         // Noted items should not be in bank. Un-note if it's noted..
         if (to instanceof Bank && ItemDefinition.forId(item.getId()).isNoted()
-                && !ItemDefinition.forId(item.getId() - 1).isNoted()) {
+            && !ItemDefinition.forId(item.getId() - 1).isNoted()) {
             item.setId(item.getId() - 1);
         }
-    
+
         to.add(item, refresh);
-    
+
         if (sort && this.getAmount(item.getId()) <= 0) {
             this.sortItems();
         }
-    
+
         if (refresh) {
             this.refreshItems();
             to.refreshItems();
         }
-    
+
         // Add item to bank search aswell!!
         if (to instanceof Bank) {
             if (this.getPlayer().isSearchingBank()) {
                 Bank.addToBankSearch(this.getPlayer(), item, false);
             }
         }
-    
+
         return this;
     }
 
-    public switchItem(to: ItemContainer, item: Item, sort: boolean, refresh: boolean): ItemContainer {
-        if (to.getFreeSlots() <= 0 && !(to.contains(item.getId()) && item.getDefinition().isStackable())) {
-        to.full();
-        return this;
+    public switchItems(to: ItemContainer, item: Item, sort: boolean, refresh?: boolean): ItemContainer {
+        if (to.getFreeSlots() <= 0 && !(to.containsNumber(item.getId()) && item.getDefinition().isStackable())) {
+            to.full();
+            return this;
         }
         let proper_amt = this.getAmount(item.getId());
-    
+
         if (item.getAmount() > proper_amt) {
             item.setAmount(proper_amt);
         }
-    
+
         if (item.getAmount() <= 0) {
             return this;
         }
-    
-        this.delete(item, refresh);
-    
+
+        this.deleteBoolean(item, refresh);
+
         to.add(item, refresh);
-    
+
         if (sort && this.getAmount(item.getId()) <= 0) {
             this.sortItems();
         }
@@ -338,21 +333,21 @@ export class ItemContainer {
         }
         return this;
     }
-    
+
     /*
         * Checks if container is full
         */
-    public full(itemId: number): boolean {
-        return this.getFreeSlots() <= 0 && !(this.contains(itemId) && ItemDefinition.forId(itemId).isStackable());
+    public fullBoolean(itemId: number): boolean {
+        return this.getFreeSlots() <= 0 && !(this.containsNumber(itemId) && ItemDefinition.forId(itemId).isStackable());
     }
-    
+
     public addItems(items: Item[], refresh: boolean): ItemContainer {
         if (items == null) {
             return this;
         }
         for (let item of items) {
             if (item.getId() > 0 && (item.getAmount() > 0
-                    || (item.getAmount() == 0 && this instanceof Bank))) {
+                || (item.getAmount() == 0 && this instanceof Bank))) {
                 this.add(item, refresh);
             }
         }
@@ -361,29 +356,33 @@ export class ItemContainer {
 
     public sortItems(): ItemContainer {
         for (let k = 0; k < this.capacity(); k++) {
-        if (this.getItems()[k] == null) {
-        continue;
-        }
-        for (let i = 0; i < (this.capacity() - 1); i++) {
-        if (this.getItems()[i] == null || this.getItems()[i].getId() <= 0
-        || (this.getItems()[i].getAmount() <= 0 && !(this instanceof Bank))) {
-        this.swap((i + 1), i);
-        }
-        }
+            if (this.getItems()[k] == null) {
+                continue;
+            }
+            for (let i = 0; i < (this.capacity() - 1); i++) {
+                if (this.getItems()[i] == null || this.getItems()[i].getId() <= 0
+                    || (this.getItems()[i].getAmount() <= 0 && !(this instanceof Bank))) {
+                    this.swap((i + 1), i);
+                }
+            }
         }
         return this;
     }
-        
+
     /**
      * Adds an item to the item container.
      *
      * @param item The item to add.
      * @return The ItemContainer instance.
      */
+<<<<<<< Updated upstream
     public add(item: Item): ItemContainer {
+=======
+    public addItem(item: Item): ItemContainer {
+>>>>>>> Stashed changes
         return this.add(item, true);
     }
-        
+
     /**
      * Adds an item to the item container.
      *
@@ -391,51 +390,56 @@ export class ItemContainer {
      * @param amount The amount of the item.
      * @return The ItemContainer instance.
      */
+<<<<<<< Updated upstream
     public add(id: number, amount: number): ItemContainer {
         return this.add(new Item(id, amount));
+=======
+    public adds(id: number, amount: number): ItemContainer {
+        return this.addItem(new Item(id, amount));
+>>>>>>> Stashed changes
     }
 
     public add(item: Item, refresh: boolean): ItemContainer {
         if (item.getId() <= 0 || (item.getAmount() <= 0 && !(this instanceof Bank))) {
-        return this;
+            return this;
         }
         if (ItemDefinition.forId(item.getId()).isStackable() || this.stackType() == StackType.STACKS) {
-        let slot = this.getSlotForItemId(item.getId());
-        if (slot == -1) {
-        slot = this.getEmptySlot();
-        }
-        if (slot == -1) {
-        if (this.getPlayer() != null) {
-        this.getPlayer().getPacketSender().sendMessage("You couldn't hold all those items.");
-        }
-        if (refresh) {
-        this.refreshItems();
-        }
-        return this;
-        }
-        let totalAmount = (this.items[slot].getAmount() + item.getAmount());
-        this.items[slot].setId(item.getId());
-        if (totalAmount > Number.MAX_SAFE_INTEGER) {
-        this.items[slot].setAmount(Number.MAX_SAFE_INTEGER);
+            let slot = this.getSlotForItemId(item.getId());
+            if (slot == -1) {
+                slot = this.getEmptySlot();
+            }
+            if (slot == -1) {
+                if (this.getPlayer() != null) {
+                    this.getPlayer().getPacketSender().sendMessage("You couldn't hold all those items.");
+                }
+                if (refresh) {
+                    this.refreshItems();
+                }
+                return this;
+            }
+            let totalAmount = (this.items[slot].getAmount() + item.getAmount());
+            this.items[slot].setId(item.getId());
+            if (totalAmount > Number.MAX_SAFE_INTEGER) {
+                this.items[slot].setAmount(Number.MAX_SAFE_INTEGER);
+            } else {
+                this.items[slot].setAmount(this.items[slot].getAmount() + item.getAmount());
+            }
         } else {
-        this.items[slot].setAmount(this.items[slot].getAmount() + item.getAmount());
-        }
-        } else {
-        let amount = item.getAmount();
-        while (amount > 0) {
-        let slot = this.getEmptySlot();
-        if (slot == -1) {
-        this.getPlayer().getPacketSender().sendMessage("You couldn't hold all those items.");
-        if (refresh) {
-        this.refreshItems();
-        }
-        return this;
-        } else {
-        this.items[slot].setId(item.getId());
-        this.items[slot].setAmount(1);
-        }
-        amount--;
-        }
+            let amount = item.getAmount();
+            while (amount > 0) {
+                let slot = this.getEmptySlot();
+                if (slot == -1) {
+                    this.getPlayer().getPacketSender().sendMessage("You couldn't hold all those items.");
+                    if (refresh) {
+                        this.refreshItems();
+                    }
+                    return this;
+                } else {
+                    this.items[slot].setId(item.getId());
+                    this.items[slot].setAmount(1);
+                }
+                amount--;
+            }
         }
         if (refresh) {
             this.refreshItems();
@@ -443,10 +447,15 @@ export class ItemContainer {
         return this;
     }
 
+<<<<<<< Updated upstream
     public delete(item: Item): ItemContainer {
         return this.delete(item.getId(), item.getAmount());
+=======
+    public deletes(item: Item): ItemContainer {
+        return this.deleteNumber(item.getId(), item.getAmount());
+>>>>>>> Stashed changes
     }
-        
+
     /**
      * Deletes an item from the item container.
      *
@@ -455,10 +464,15 @@ export class ItemContainer {
      *             the first one found).
      * @return The ItemContainer instance.
      */
+<<<<<<< Updated upstream
     public delete(item: Item, slot: number): ItemContainer {
         return this.delete(item, slot, true);
+=======
+    public deleteItem(item: Item, slot: number): ItemContainer {
+        return this.deletedItem(item, slot, true);
+>>>>>>> Stashed changes
     }
-    
+
     /**
      * Deletes an item from the item container.
      *
@@ -466,14 +480,23 @@ export class ItemContainer {
      * @param amount The amount of the item to delete.
      * @return The ItemContainer instance.
      */
+<<<<<<< Updated upstream
     public delete(id: number, amount: number): ItemContainer {
         return this.delete(id, amount, true);
     }
     
     public delete(item: Item, refresh: boolean): ItemContainer {
         return this.delete(item.getId(), item.getAmount(), refresh);
+=======
+    public deleteNumber(id: number, amount: number): ItemContainer {
+        return this.deleted(id, amount, true);
     }
-    
+
+    public deleteBoolean(item: Item, refresh: boolean): ItemContainer {
+        return this.deleted(item.getId(), item.getAmount(), refresh);
+>>>>>>> Stashed changes
+    }
+
     /**
      * Deletes an item from the item container.
      *
@@ -482,58 +505,62 @@ export class ItemContainer {
      * @param refresh If <code>true</code> the item container interface will refresh.
      * @return The ItemContainer instance.
      */
-    public delete(id: number, amount: number, refresh: boolean): ItemContainer {
-        return this.delete(new Item(id, amount), this.getSlotForItemId(id), refresh);
+    public deleted(id: number, amount: number, refresh: boolean): ItemContainer {
+        return this.deletedItem(new Item(id, amount), this.getSlotForItemId(id), refresh);
     }
 
-    public delete(item: Item, slot: number, refresh: boolean, toContainer: ItemContainer): ItemContainer {
+    public deletedItem(item: Item, slot: number, refresh: boolean) {
+        return this.deleteItemContainer(item, slot, refresh, null);
+    }
+
+    public deleteItemContainer(item: Item, slot: number, refresh: boolean, toContainer: ItemContainer): ItemContainer {
         if (item.getId() <= 0 || (item.getAmount() <= 0 && !(this instanceof Bank)) || slot < 0) {
-        return this;
+            return this;
         }
         let leavePlaceHolder = (toContainer instanceof Inventory && this instanceof Bank
-        && this.getPlayer().isPlaceholders());
+            && this.getPlayer().isPlaceholders());
         if (item.getAmount() > this.getAmount(item.getId())) {
-        item.setAmount(this.getAmount(item.getId()));
+            item.setAmount(this.getAmount(item.getId()));
         }
         if (item.getDefinition().isStackable() || this.stackType() == StackType.STACKS) {
-        this.items[slot].setAmount(this.items[slot].getAmount() - item.getAmount());
-        if (this.items[slot].getAmount() < 1) {
-        this.items[slot].setAmount(0);
-        if (!leavePlaceHolder) {
-        this.items[slot].setId(-1);
-        }
-        }
+            this.items[slot].setAmount(this.items[slot].getAmount() - item.getAmount());
+            if (this.items[slot].getAmount() < 1) {
+                this.items[slot].setAmount(0);
+                if (!leavePlaceHolder) {
+                    this.items[slot].setId(-1);
+                }
+            }
         } else {
-        let amount = item.getAmount();
-        while (amount > 0) {
-        if (slot == -1 || (toContainer != null && toContainer.isFull())) {
-        break;
-        }
-        if (!leavePlaceHolder) {
-        this.items[slot].setId(-1);
-        }
-        items[slot].setAmount(0);
-        slot = this.getSlotForItemId(item.getId());
-        amount--;
-        }
+            let amount = item.getAmount();
+            while (amount > 0) {
+                if (slot == -1 || (toContainer != null && toContainer.isFull())) {
+                    break;
+                }
+                if (!leavePlaceHolder) {
+                    this.items[slot].setId(-1);
+                }
+                this.items[slot].setAmount(0);
+                slot = this.getSlotForItemId(item.getId());
+                amount--;
+            }
         }
         if (refresh) {
-        this.refreshItems();
+            this.refreshItems();
         }
         return this;
     }
 
-    deleteItemSet(optional?: Item[]) {
+    public deleteItemAny(optional?: Item[]) {
         if (optional) {
             for (let deleteItem of optional) {
                 if (!deleteItem) {
                     continue;
                 }
-                this.delete(deleteItem);
+                this.deletes(deleteItem);
             }
         }
     }
-    
+
     getById(id: number): Item | null {
         for (let i = 0; i < this.items.length; i++) {
             if (!this.items[i]) {
@@ -545,44 +572,52 @@ export class ItemContainer {
         }
         return null;
     }
-    
-    containsAll(ids: number[]): boolean {
-        return ids.every(id => this.contains(id));
+
+    public contains(id: number): boolean {
+        for (const item of this.items) {
+            if (item.getId() === id) {
+                return true;
+            }
+        }
+        return false;
     }
-    
-    containsAll(items: Item[]): boolean {
-        return items.filter(item => item).every(item => this.contains(item.id));
+    containsAllAny(ids: number[]): boolean {
+        return ids.every(id => this.containsNumber(id));
     }
-    
+
+    containsAllItem(items: Item[]): boolean {
+        return items.filter(item => item).every(item => this.containsNumber(item.id));
+    }
+
     containsAny(ids: number[]): boolean {
-        return ids.some(id => this.contains(id));
+        return ids.some(id => this.containsNumber(id));
     }
-    
+
     set(slot: number, item: Item) {
         this.items[slot] = item;
     }
-    
+
     get(slot: number): Item | undefined {
         return this.items[slot];
     }
-    
+
     isSlotFree(slot: number): boolean {
         return !this.items[slot] || this.items[slot].id === -1;
     }
-    
+
     toSafeArray(): Item[] {
         return this.items.filter(item => item) as Item[];
     }
 
     moveItems(to: ItemContainer, refreshOrig = true, refreshTo = true) {
         for (let it of this.getValidItems()) {
-            if (to.getFreeSlots() <= 0 && !(to.contains(it.id) && it.definition.isStackable())) {
+            if (to.getFreeSlots() <= 0 && !(to.containsNumber(it.id) && it.getDefinition().isStackable())) {
                 break;
             }
             to.add(it, false);
-            this.delete(it.id, it.amount, false);
+            this.deleted(it.id, it.amount, false);
         }
-    
+
         if (refreshOrig) {
             this.refreshItems();
         }
@@ -590,57 +625,68 @@ export class ItemContainer {
             to.refreshItems();
         }
     }
-    
+
     addItemSet(item: Item[]) {
         for (let addItem of item) {
             if (!addItem) {
                 continue;
             }
-            this.add(addItem);
+            this.addItem(addItem);
         }
     }
-    
-    deleteItemSet(item: Item[]) {
-        for (let deleteItem of item) {
-            if (!deleteItem) {
+
+    deleteItemSet(optional: Item[]) {
+        let deleteItem: Item
+        for (deleteItem of optional) {
+            if (deleteItem == null) {
                 continue;
             }
-            this.delete(deleteItem);
+            this.deletes(deleteItem);
         }
     }
 
     forceAdd(player: Player, item: Item) {
-        if (this.getFreeSlots() <= 0 && !(this.contains(item.id) && item.definition.isStackable())) {
-            TaskManager.submit(new Task(1, () => {
+        if (this.getFreeSlots() <= 0 && !(this.containsNumber(item.id) && item.getDefinition().isStackable())) {
+            TaskManager.submit(new ItemContainerTask(() => {
                 ItemOnGroundManager.register(player, item);
             }));
         } else {
-            this.add(item);
+            this.addItem(item);
         }
     }
-    
+
     getTotalValue(): string {
         let value = 0;
-    
+
         for (let item of this.getValidItems()) {
-            value += item.definition.value * item.amount;
+            value += item.getDefinition().getValue() * item.amount;
         }
-    
+
         if (value >= Number.MAX_SAFE_INTEGER) {
             return "Too High!";
         }
-    
+
         return value.toString();
     }
-    
-    hasAt(slot: number, item: number): boolean {
+
+    hasAts(slot: number, item: number): boolean {
         let at = this.items[slot];
         return at != null && at.id === item;
     }
-    
+
     hasAt(slot: number): boolean {
         return slot >= 0 && slot < this.items.length && this.items[slot] != null;
     }
+}
+
+class ItemContainerTask extends Task {
+    constructor(private readonly execFunc: Function) {
+        super(1);
+    }
+    execute(): void {
+        this.execFunc();
+    }
+
 }
 
 

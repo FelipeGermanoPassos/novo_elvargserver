@@ -10,9 +10,9 @@ export class MagicSpellbook {
     * The spellbook's teleport type
     */
 
-    public static NORMAL = { interfaceId: 1151, type: TeleportType.NORMAL };
-    public static ANCIENT = { interfaceId: 12855, type: TeleportType.ANCIENT };
-    public static LUNAR = { interfaceId: 29999, type: TeleportType.LUNAR };
+    public static readonly NORMAL = new MagicSpellbook(1151, TeleportType.NORMAL);
+    public static readonly ANCIENT = new MagicSpellbook(12855, TeleportType.ANCIENT);
+    public static readonly LUNAR = new MagicSpellbook(29999, TeleportType.LUNAR);
     private teleportType: TeleportType;
 
     private constructor(interfaceId: number, teleportType: TeleportType) {
