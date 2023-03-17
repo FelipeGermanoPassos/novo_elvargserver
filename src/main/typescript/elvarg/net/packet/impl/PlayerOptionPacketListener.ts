@@ -1,11 +1,13 @@
-import { Player } from './Player';
-import { World } from './World';
-import { Packet } from './Packet';
+import { Player } from '../../../game/entity/impl/player/Player';
+import { World } from '../../../game/World';
+import { Packet } from '../Packet';
+import { PlayerRights } from '../../../game/model/rights/PlayerRights';
+import { PacketConstants } from '../PacketConstants';
 
 export class PlayerOptionPacketListener {
     public static attack(player: Player, packet: Packet) {
         let index: number = packet.readLEShort();
-        if (index > World.getPlayers().capacity() || index < 0)
+        if (index > World.getPlayers().capacityReturn() || index < 0)
             return;
         const attacked: Player = World.getPlayers().get(index);
     
@@ -29,7 +31,7 @@ export class PlayerOptionPacketListener {
      */
     public static option1(player: Player, packet: Packet) {
         let id: number = packet.readShort() & 0xFFFF;
-        if (id < 0 || id > World.getPlayers().capacity())
+        if (id < 0 || id > World.getPlayers().capacityReturn())
             return;
         let player2: Player = World.getPlayers().get(id);
         if (player2 == null)
@@ -49,7 +51,7 @@ export class PlayerOptionPacketListener {
      */
     public static option2(player: Player, packet: Packet) {
         let id: number = packet.readShort() & 0xFFFF;
-        if (id < 0 || id > World.getPlayers().capacity())
+        if (id < 0 || id > World.getPlayers().capacityReturn())
             return;
         let player2: Player = World.getPlayers().get(id);
         if (player2 == null)
@@ -63,7 +65,7 @@ export class PlayerOptionPacketListener {
 
     private static option3(player: Player, packet: Packet) {
         let id = packet.readLEShortA() & 0xFFFF;
-        if (id < 0 || id > World.getPlayers().capacity())
+        if (id < 0 || id > World.getPlayers().capacityReturn())
             return;
         let player2 = World.getPlayers().get(id);
         if (player2 == null)
@@ -87,16 +89,16 @@ export class PlayerOptionPacketListener {
 
         switch (packet.getOpcode()) {
             case PacketConstants.ATTACK_PLAYER_OPCODE:
-                this.attack(player, packet);
+                PlayerOptionPacketListener.attack(player, packet);
                 break;
             case PacketConstants.PLAYER_OPTION_1_OPCODE:
-                this.option1(player, packet);
+                PlayerOptionPacketListener.option1(player, packet);
                 break;
                 case PacketConstants.PLAYER_OPTION_2_OPCODE:
-                    option2(player, packet);
+                    PlayerOptionPacketListener.option2(player, packet);
                     break;
                 case PacketConstants.PLAYER_OPTION_3_OPCODE:
-                    option3(player, packet);
+                    PlayerOptionPacketListener.option3(player, packet);
                     break;
             }
         }

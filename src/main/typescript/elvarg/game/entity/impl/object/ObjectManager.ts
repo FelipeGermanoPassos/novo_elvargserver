@@ -104,6 +104,16 @@ export class ObjectManager {
         }
         return false;
     }
+
+    public static existsLocation(position: Location): boolean {
+        const objects: GameObject[] = World.getObjects();
+        for (const object of objects) {
+          if (object.getLocation().equals(position)) {
+            return true;
+          }
+        }
+        return false;
+      }
 }
 
 export enum OperationType {

@@ -1,7 +1,3 @@
-<<<<<<< Updated upstream
-export abstract class CombatNormalSpell extends CombatSpell {
-    finishCast(cast: Mobile, castOn: Mobile, accurate: boolean, damage: number): void { }
-=======
 import { CombatSpell } from "./CombatSpell";
 import { Mobile } from "../../../entity/impl/Mobile";
 import { Animation } from "../../../model/Animation";
@@ -26,6 +22,9 @@ interface CombatNormalSpellOptions {
   }
 
 export class CombatNormalSpell extends CombatSpell {
+    getSpell(): CombatSpell {
+      throw new Error("Method not implemented.");
+    }
     constructor(private readonly options: CombatNormalSpellOptions){
         super();
     }
@@ -93,5 +92,4 @@ export class CombatNormalSpell extends CombatSpell {
         }
     }  
 
->>>>>>> Stashed changes
 }

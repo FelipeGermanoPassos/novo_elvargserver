@@ -1,3 +1,9 @@
+import { Player } from "../../entity/impl/player/Player";
+import { ItemDefinition } from "../../definition/ItemDefinition";
+import { DamageFormulas } from "../../content/combat/formula/DamageFormulas";
+import { RangedWeapon } from "../../content/combat/ranged/RangedData";
+import { Ammunitions } from "../../content/combat/ranged/RangedData";
+
 export class BonusManager {
     public static readonly ATTACK_STAB = 0;
     public static readonly ATTACK_SLASH = 1;
@@ -40,12 +46,12 @@ export class BonusManager {
     private otherBonus: number[] = new Array(4);
 
     public static open(player: Player) {
-        player.getPacketSender().sendInterface(INTERFACE_ID);
+        player.getPacketSender().sendInterface(BonusManager.INTERFACE_ID);
         BonusManager.update(player);
     }
 
     public static update(player: Player) {
-        let totalBonuses = STRING_ID.length;
+        let totalBonuses = BonusManager.STRING_ID.length;
         let bonuses = new Array(totalBonuses);
         for (const item of player.getEquipment().getItems()) {
             const definition = ItemDefinition.forId(item.getId());
@@ -69,29 +75,26 @@ export class BonusManager {
                 let index = i - 10;
                 player.getBonusManager().otherBonus[index] = bonuses[i];
             }
-            player.getPacketSender().sendString(Number.parseInt(STRING_ID[i][0]), STRING_ID[i][1] + ": " + bonuses[i]);
+            player.getPacketSender().sendString( BonusManager.STRING_ID[i][1] + ": " + bonuses[i], Number.parseInt(BonusManager.STRING_ID[i][0]));
         }
 
         /**
          * Update maxhit frames on the interface.
          */
-        if (player.getInterfaceId() == INTERFACE_ID) {
+        if (player.getInterfaceId() == BonusManager.INTERFACE_ID) {
 
             // Update some combat data first,
             // including ranged ammunition/weapon
-            player.getCombat().setAmmunition(Ammunition.getFor(player));
+            player.getCombat().setAmmunition(Ammunitions.getFor(player));
             player.getCombat().setRangedWeapon(RangedWeapon.getFor(player));
 
-            player.getPacketSender().sendString(MELEE_MAXHIT_FRAME,
-                "Melee maxhit: " + this.getDamageString(DamageFormulas.calculateMaxMeleeHit(player)));
-            player.getPacketSender().sendString(RANGED_MAXHIT_FRAME,
-                "Ranged maxhit: " + this.getDamageString(DamageFormulas.calculateMaxRangedHit(player)));
-            player.getPacketSender().sendString(MAGIC_MAXHIT_FRAME,
-                "Magic maxhit: " + this.getDamageString(DamageFormulas.getMagicMaxhit(player)));
+            player.getPacketSender().sendString("Melee maxhit: " + this.getDamageString(DamageFormulas.calculateMaxMeleeHit(player)), BonusManager.MELEE_MAXHIT_FRAME);
+            player.getPacketSender().sendString("Ranged maxhit: " + this.getDamageString(DamageFormulas.calculateMaxRangedHit(player)), BonusManager.RANGED_MAXHIT_FRAME);
+            player.getPacketSender().sendString("Magic maxhit: " + this.getDamageString(DamageFormulas.getMagicMaxhit(player)), BonusManager.MAGIC_MAXHIT_FRAME);
         }
     }
 
-    private getDamageString(damage: number): string {
+    public static getDamageString(damage: number): string {
         if (damage == 0) {
             return "---";
         }

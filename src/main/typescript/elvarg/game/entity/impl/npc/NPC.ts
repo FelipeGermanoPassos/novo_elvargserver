@@ -20,6 +20,9 @@ import * as util from 'util';
 
 
 export class NPC extends Mobile {
+    getSize(): number {
+        return this.size();
+    }
     private id: number;
     private movementCoordinator: NPCMovementCoordinator = new NPCMovementCoordinator(this);
     private hitpoints: number;
@@ -41,7 +44,7 @@ export class NPC extends Mobile {
         if (this.getDefinition() == null) {
             this.setHitpoints(this.hitpoints = 10);
         } else {
-            this.setHitpoints(this.getDefinition().this.getHitpoints());
+            this.setHitpoints(this.getDefinition().getHitpoints());
         }
     }
     private static NPC_IMPLEMENTATION_MAP: Map<number, any>;
@@ -110,26 +113,26 @@ export class NPC extends Mobile {
         }
     }
 
-    onAdd() {
+    public onAdd() {
 
     }
 
-    onRemove() {
+    public onRemove() {
 
     }
 
-    isAggressiveTo(player: Player): boolean {
+    public isAggressiveTo(player: Player): boolean {
         return player.getSkillManager().getCombatLevel() <= (this.getCurrentDefinition().getCombatLevel() * 2)
             || player.getArea() instanceof WildernessArea;
     }
 
-    aggressionDistance(): number {
+    public aggressionDistance(): number {
         let attackDistance = CombatFactory.getMethod(this).attackDistance(this);
 
         return Math.max(attackDistance, 3);
     }
 
-    process() {
+    public process() {
         if (this.getDefinition() != null) {
             this.getTimers().process();
             this.getMovementQueue().process();
@@ -137,7 +140,7 @@ export class NPC extends Mobile {
             this.getCombat().process();
             this.handleBarricadeTicks();
             AreaManager.process(this);
-            if (this.getCombat().getLastAttack().elapsed(20000)
+            if (this.getCombat().getLastAttack().hasElapsed(20000)
                 || this.movementCoordinator.getCoordinateState() == CoordinateState.RETREATING) {
                 if (this.getDefinition().getHitpoints() > this.hitpoints) {
                     this.setHitpoints(this.hitpoints + (this.getDefinition().getHitpoints() * 0.1));
@@ -149,7 +152,7 @@ export class NPC extends Mobile {
         }
     }
 
-    getPlayersWithinDistance(distance: number): Player[] {
+    public getPlayersWithinDistance(distance: number): Player[] {
         let list: Player[] = [];
         for (let player of World.getPlayers()) {
             if (player == null) {
@@ -165,25 +168,25 @@ export class NPC extends Mobile {
         return list;
     }
 
-    appendDeath() {
+    public appendDeath() {
         if (!this.isDying) {
             TaskManager.submit(new NPCDeathTask(this));
             this.isDying = true;
         }
     }
 
-    getHitpoints(): number {
+    public getHitpoints(): number {
         return this.hitpoints;
     }
 
-    setHitpoints(hitpoints: number): NPC {
+    public setHitpoints(hitpoints: number): NPC {
         this.hitpoints = hitpoints;
         if (this.hitpoints <= 0)
             this.appendDeath();
         return this;
     }
 
-    heal(heal: number) {
+    public heal(heal: number) {
         if ((this.hitpoints + heal) > this.getDefinition().getHitpoints()) {
             this.setHitpoints(this.getDefinition().getHitpoints());
             return;
@@ -191,19 +194,19 @@ export class NPC extends Mobile {
         this.setHitpoints(this.hitpoints + heal);
     }
 
-    isNpc(): boolean {
+    public isNpc(): boolean {
         return true;
     }
 
-    equals(other: Object): boolean {
+    public equals(other: Object): boolean {
         return other instanceof NPC && (other as NPC).getIndex() == this.getIndex() && (other as NPC).getId() == this.getId();
     }
 
-    size(): number {
+    public size(): number {
         return this.getCurrentDefinition() == null ? 1 : this.getCurrentDefinition().getSize();
     }
 
-    getBaseAttack(type: CombatType): number {
+    public getBaseAttack(type: CombatType): number {
         if (type === CombatType.RANGED) {
             return this.getCurrentDefinition().getStats()[3];
         } else if (type === CombatType.MAGIC) {
@@ -218,7 +221,7 @@ export class NPC extends Mobile {
         // 4 = magic
     }
 
-    getBaseDefence(type: CombatType): number {
+    public getBaseDefence(type: CombatType): number {
         let base = 0;
         switch (type) {
             case CombatType.MAGIC:
@@ -237,20 +240,20 @@ export class NPC extends Mobile {
         return base;
     }
 
-    getBaseAttackSpeed(): number {
+    public getBaseAttackSpeed(): number {
         return this.getCurrentDefinition().getAttackSpeed();
     }
 
-    getAttackAnim(): number {
+    public getAttackAnim(): number {
         return this.getCurrentDefinition().getAttackAnim();
     }
 
-    getAttackSound(): Sound {
+    public getAttackSound(): Sound {
         // TODO: need to put proper sounds
         return Sound.IMP_ATTACKING;
     }
 
-    getBlockAnim(): number {
+    public getBlockAnim(): number {
         return this.getCurrentDefinition().getDefenceAnim();
     }
 
@@ -258,43 +261,43 @@ export class NPC extends Mobile {
      * Getters and setters
      */
 
-    getId(): number {
+    public getId(): number {
         if (this.getNpcTransformationId() !== -1) {
             return this.getNpcTransformationId();
         }
         return this.id;
     }
 
-    getRealId(): number {
+    public getRealId(): number {
         return this.id;
     }
 
-    isVisible(): boolean {
+    public isVisible(): boolean {
         return this.visible;
     }
 
-    setVisible(visible: boolean): void {
+    public setVisible(visible: boolean): void {
         this.visible = visible;
     }
 
-    isDyingFunction(): boolean {
+    public isDyingFunction(): boolean {
         return this.isDying;
     }
 
-    setDying(isDying: boolean): void {
+    public setDying(isDying: boolean): void {
         this.isDying = isDying;
     }
 
-    getOwner(): Player {
+    public getOwner(): Player {
         return this.owner;
     }
 
-    setOwner(owner: Player): NPC {
+    public setOwner(owner: Player): NPC {
         this.owner = owner;
         return this;
     }
 
-    getMovementCoordinator(): NPCMovementCoordinator {
+    public getMovementCoordinator(): NPCMovementCoordinator {
         return this.movementCoordinator;
     }
 
@@ -303,7 +306,7 @@ export class NPC extends Mobile {
      *
      * @return
      */
-    getCurrentDefinition(): NpcDefinition {
+    public getCurrentDefinition(): NpcDefinition {
         if (this.getNpcTransformationId() !== -1) {
             return NpcDefinition.forId(this.getNpcTransformationId());
         }
@@ -316,54 +319,54 @@ export class NPC extends Mobile {
      *
      * @return
      */
-    getDefinition(): NpcDefinition {
+    public getDefinition(): NpcDefinition {
         return NpcDefinition.forId(this.id);
     }
 
-    isBarricade(): boolean {
+    public isBarricade(): boolean {
         return [5722, 5723, 5724, 5725].some(n => this.getId() === n);
     }
 
-    getSpawnPosition(): Location {
+    public getSpawnPosition(): Location {
         return this.spawnPosition;
     }
 
-    getHeadIcon(): number {
+    public getHeadIcon(): number {
         return this.headIcon;
     }
 
-    setHeadIcon(headIcon: number): void {
+    public setHeadIcon(headIcon: number): void {
         this.headIcon = headIcon;
         // getUpdateFlag().flag(Flag.NPC_APPEARANCE);
     }
 
-    getCombatMethod(): CombatMethod {
+    public getCombatMethod(): CombatMethod {
         // By default, NPCs use Melee combat.
         // This can be overridden by creating a class in entity.impl.npc.impl
         return CombatFactory.MELEE_COMBAT;
     }
 
-    clone(): NPC {
+    public clone(): NPC {
         return NPC.create(this.getId(), this.getSpawnPosition());
     }
 
-    getFace(): FacingDirection {
+    public getFace(): FacingDirection {
         return this.face;
     }
 
-    setFace(face: FacingDirection): void {
+    public setFace(face: FacingDirection): void {
         this.face = face;
     }
 
-    isPet(): boolean {
+    public isPet(): boolean {
         return this.pet;
     }
 
-    setPet(pet: boolean): void {
+    public setPet(pet: boolean): void {
         this.pet = pet;
     }
 
-    manipulateHit(hit: PendingHit): PendingHit {
+    public manipulateHit(hit: PendingHit): PendingHit {
         return hit;
     }
 
@@ -372,7 +375,7 @@ export class NPC extends Mobile {
      *
      * @param implementationClasses
      */
-    static initImplementations(implementationClasses: any[]): void {
+    public static initImplementations(implementationClasses: any[]): void {
         // Add all the implemented NPCs to NPC_IMPLEMENTATION_MAP
         this.NPC_IMPLEMENTATION_MAP = new Map<number, any[]>();
         for (const clazz of implementationClasses) {

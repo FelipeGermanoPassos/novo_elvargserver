@@ -2,8 +2,6 @@ import { Mobile } from "../../../entity/impl/Mobile";
 import { Player } from "../../../entity/impl/player/Player";
 import { Item } from "../../../model/Item";
 import { CombatSpell } from "./CombatSpell";
-<<<<<<< Updated upstream
-=======
 import { Animation } from "../../../model/Animation";
 import { Graphic } from "../../../model/Graphic";
 import { Projectile } from "../../../model/Projectile";
@@ -18,12 +16,24 @@ interface CombatEffectSpellInterface {
     itemsRequired: (player: Player) => Item[];
     levelRequired: () => number;
     spellId: () => number;
+    getSpellbook?: () => any;
 }
 
 
->>>>>>> Stashed changes
 
-export class CombatEffectSpell extends CombatSpell {
+export class  CombatEffectSpell extends CombatSpell {
+    levelRequired(): number {
+        throw new Error("Method not implemented.");
+    }
+    getSpell(): CombatSpell {
+        throw new Error("Method not implemented.");
+    }
+    itemsRequired(player: Player): Item[] {
+        throw new Error("Method not implemented.");
+    }
+    baseExperience() {
+        throw new Error("Method not implemented.");
+    }
 
     constructor(private readonly options: CombatEffectSpellInterface) {
         super();
@@ -50,6 +60,7 @@ export class CombatEffectSpell extends CombatSpell {
     public equipmentRequired(player: Player): Item[] {
         return null;
     }
+
     public finishCast(cast: Mobile, castOn: Mobile, accurate: boolean, damage: number): void {
         if (accurate) {
             this.spellEffect(cast, castOn);
@@ -58,9 +69,6 @@ export class CombatEffectSpell extends CombatSpell {
     public spellEffect(cast: Mobile, castOn: Mobile) {
 
     }
-<<<<<<< Updated upstream
-=======
 
 
->>>>>>> Stashed changes
 }

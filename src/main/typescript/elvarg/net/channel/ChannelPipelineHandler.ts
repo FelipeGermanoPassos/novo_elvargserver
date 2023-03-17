@@ -6,6 +6,7 @@ import { LoginEncoder } from './encoder';
 import { IdleStateHandler } from 'netty';
 import { ChannelFilter } from './ChannelFilter';
 import { ChannelEventHandler } from './ChannelEventHandler';
+import { SocketChannel } from 'netty';
 
 export class ChannelPipelineHandler extends ChannelInitializer<SocketChannel> {
     private readonly FILTER = new ChannelFilter();

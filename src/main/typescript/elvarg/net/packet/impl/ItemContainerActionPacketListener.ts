@@ -1,4 +1,35 @@
-class ItemContainerActionPacketListener {
+import { EquipmentMaking } from "../../../game/content/skill/skillable/impl/Smithing";
+import { Player } from "../../../game/entity/impl/player/Player";
+import { Packet } from "../Packet";
+import { Bank } from "../../../game/model/container/impl/Bank";
+import { DepositBox } from "../../../game/content/DepositBox";
+import { Dueling } from "../../../game/content/Duelling";
+import { Trading } from "../../../game/content/Trading";
+import { PriceChecker } from "../../../game/model/container/impl/PriceChecker";
+import { Shop } from "../../../game/model/container/shop/Shop";
+import { ShopManager } from "../../../game/model/container/shop/ShopManager";
+import { PlayerStatus } from "../../../game/model/PlayerStatus";
+import { Equipment } from "../../../game/model/container/impl/Equipment";
+import { BonusManager } from "../../../game/model/equipment/BonusManager";
+import { WeaponInterfaces } from "../../../game/content/combat/WeaponInterfaces";
+import { CombatSpecial } from "../../../game/content/combat/CombatSpecial";
+import { Autocasting } from "../../../game/content/combat/magic/Autocasting";
+import { PacketConstants } from "../PacketConstants";
+import { Item } from "../../../game/model/Item";
+import { Flag } from "../../../game/model/Flag";
+import { EnteredAmountAction } from "../../../game/model/EnteredAmountAction";
+
+class ItemContainerEnteredAmountAction implements EnteredAmountAction{
+    constructor(private readonly execFunc: Function){
+
+    }
+    execute(amount: number): void {
+        this.execFunc();
+    }
+
+}
+
+export class ItemContainerActionPacketListener {
     static firstAction(player: Player, packet: Packet) {
         let containerId = packet.readInt();
         let slot = packet.readShortA();
@@ -51,7 +82,7 @@ class ItemContainerActionPacketListener {
                 break;
 
             case Bank.INVENTORY_INTERFACE_ID:
-                Bank.deposit(player, id, slot, 1);
+                Bank.deposits(player, id, slot, 1);
                 break;
 
             case Shop.ITEM_CHILD_ID:
@@ -74,7 +105,7 @@ class ItemContainerActionPacketListener {
                     player.getEquipment().setItem(slot, new Item(-1, 0));
 
                     if (stackItem) {
-                        player.getInventory().add(item.getId(), item.getAmount());
+                        player.getInventory().adds(item.getId(), item.getAmount());
                     } else {
                         player.getInventory().setItem(inventorySlot, item);
                     }
@@ -99,10 +130,10 @@ class ItemContainerActionPacketListener {
         }
     }
 
-    private static void secondAction(Player player, Packet packet) {
-            int interfaceId = packet.readInt();
-            int id = packet.readLEShortA();
-            int slot = packet.readLEShort();
+    private static secondAction(player: Player, packet: Packet): void {
+        let interfaceId = packet.readInt();
+        let id = packet.readShortA();
+        let slot = packet.readLEShort();
 
         // Bank withdrawal..
         if (interfaceId >= Bank.CONTAINER_START && interfaceId < Bank.CONTAINER_START + Bank.TOTAL_BANK_TABS) {
@@ -136,7 +167,7 @@ class ItemContainerActionPacketListener {
                 }
                 break;
             case Bank.INVENTORY_INTERFACE_ID:
-                Bank.deposit(player, id, slot, 5);
+                Bank.deposits(player, id, slot, 5);
                 break;
             case Dueling.MAIN_INTERFACE_CONTAINER:
                 if (player.getStatus() == PlayerStatus.DUELING) {
@@ -237,7 +268,7 @@ class ItemContainerActionPacketListener {
                 }
                 break;
             case Bank.INVENTORY_INTERFACE_ID:
-                Bank.deposit(player, id, slot, -1);
+                Bank.deposits(player, id, slot, -1);
                 break;
             // Withdrawing items from duel
             case Dueling.MAIN_INTERFACE_CONTAINER:
@@ -277,77 +308,77 @@ class ItemContainerActionPacketListener {
 
         // Bank withdrawal..
         if (interfaceId >= Bank.CONTAINER_START && interfaceId < Bank.CONTAINER_START + Bank.TOTAL_BANK_TABS) {
-            player.setEnteredAmountAction((amount) => {
+            player.setEnteredAmountAction(new ItemContainerEnteredAmountAction((amount: number) => {
                 Bank.withdraw(player, id, slot, amount, interfaceId - Bank.CONTAINER_START);
-            });
+            }));
             player.getPacketSender().sendEnterAmountPrompt("How many would you like to withdraw?");
             return;
         }
 
         if (interfaceId == 7423) {
-            player.setEnteredAmountAction((amount) => DepositBox.deposit(player, slot, id, amount));
+            player.setEnteredAmountAction(new ItemContainerEnteredAmountAction((amount) => DepositBox.deposit(player, slot, id, amount)));
             player.getPacketSender().sendEnterAmountPrompt("How many would you like to deposit?");
             return;
         }
 
         switch (interfaceId) {
             case Shop.INVENTORY_INTERFACE_ID:
-                player.setEnteredAmountAction((amount) => {
+                player.setEnteredAmountAction(new ItemContainerEnteredAmountAction((amount) => {
                     ShopManager.sellItem(player, slot, id, amount);
-                });
+                }));
                 player.getPacketSender().sendEnterAmountPrompt("How many would you like to sell?");
                 break;
             case Shop.ITEM_CHILD_ID:
-                player.setEnteredAmountAction((amount) => {
+                player.setEnteredAmountAction(new ItemContainerEnteredAmountAction((amount) => {
                     ShopManager.buyItem(player, slot, id, amount);
-                });
+                }));
                 player.getPacketSender().sendEnterAmountPrompt("How many would you like to buy?");
                 break;
 
             case Bank.INVENTORY_INTERFACE_ID:
-                player.setEnteredAmountAction((amount) => {
-                    Bank.deposit(player, id, slot, amount);
-                });
+                player.setEnteredAmountAction(new ItemContainerEnteredAmountAction((amount) => {
+                    Bank.deposits(player, id, slot, amount);
+                }));
                 player.getPacketSender().sendEnterAmountPrompt("How many would you like to bank?");
                 break;
             case Trading.INVENTORY_CONTAINER_INTERFACE: // Duel/Trade inventory
                 if (player.getStatus() == PlayerStatus.PRICE_CHECKING) {
-                    player.setEnteredAmountAction((amount) => {
+                    player.setEnteredAmountAction(new ItemContainerEnteredAmountAction((amount) => {
                         player.getPriceChecker().deposit(id, amount, slot);
-                    });
+                    }));
                     player.getPacketSender().sendEnterAmountPrompt("How many would you like to deposit?");
                 } else if (player.getStatus() == PlayerStatus.TRADING) {
-                    player.setEnteredAmountAction((amount) => {
+                    player.setEnteredAmountAction(new ItemContainerEnteredAmountAction((amount) => {
                         player.getTrading().handleItem(id, amount, slot, player.getInventory(), player.getTrading().getContainer());
-                    });
+                    }));
                     player.getPacketSender().sendEnterAmountPrompt("How many would you like to offer?");
                 } else if (player.getStatus() == PlayerStatus.DUELING) {
-                    player.setEnteredAmountAction((amount) => {
+                    player.setEnteredAmountAction(new ItemContainerEnteredAmountAction((amount) => {
                         player.getDueling().handleItem(id, amount, slot, player.getInventory(), player.getDueling().getContainer());
-                    });
+                    }));
                     player.getPacketSender().sendEnterAmountPrompt("How many would you like to offer?");
                 }
                 break;
             case Trading.CONTAINER_INTERFACE_ID:
                 if (player.getStatus() == PlayerStatus.TRADING) {
-                    player.setEnteredAmountAction((amount) => {
+                    player.setEnteredAmountAction(new ItemContainerEnteredAmountAction((amount) => {
                         player.getTrading().handleItem(id, amount, slot, player.getTrading().getContainer(), player.getInventory());
-                    });
+                    }));
                     player.getPacketSender().sendEnterAmountPrompt("How many would you like to remove?");
                 }
                 break;
             case Dueling.MAIN_INTERFACE_CONTAINER:
                 if (player.getStatus() == PlayerStatus.DUELING) {
-                    player.setEnteredAmountAction((amount) => {
+                    player.setEnteredAmountAction(new ItemContainerEnteredAmountAction((amount) => {
                         player.getDueling().handleItem(id, amount, slot, player.getDueling().getContainer(), player.getInventory());
-                    });
+                    }));
                     player.getPacketSender().sendEnterAmountPrompt("How many would you like to remove?");
                 }
                 break;
             case PriceChecker.CONTAINER_ID:
-                player.setEnteredAmountAction((amount) => {
+                player.setEnteredAmountAction(new ItemContainerEnteredAmountAction((amount) => {
                     player.getPriceChecker().withdraw(id, amount, slot);
-                });
+                }));
                 player.getPacketSender().sendEnterAmountPrompt("How many would you like to withdraw?");
                 break;
         }
@@ -364,22 +395,22 @@ class ItemContainerActionPacketListener {
 
         switch (packet.getOpcode()) {
             case PacketConstants.FIRST_ITEM_CONTAINER_ACTION_OPCODE:
-                firstAction(player, packet);
+                ItemContainerActionPacketListener.firstAction(player, packet);
                 break;
             case PacketConstants.SECOND_ITEM_CONTAINER_ACTION_OPCODE:
-                secondAction(player, packet);
+                ItemContainerActionPacketListener.secondAction(player, packet);
                 break;
             case PacketConstants.THIRD_ITEM_CONTAINER_ACTION_OPCODE:
-                thirdAction(player, packet);
+                ItemContainerActionPacketListener.thirdAction(player, packet);
                 break;
             case PacketConstants.FOURTH_ITEM_CONTAINER_ACTION_OPCODE:
-                fourthAction(player, packet);
+                ItemContainerActionPacketListener.fourthAction(player, packet);
                 break;
             case PacketConstants.FIFTH_ITEM_CONTAINER_ACTION_OPCODE:
-                fifthAction(player, packet);
+                ItemContainerActionPacketListener.fifthAction(player, packet);
                 break;
             case PacketConstants.SIXTH_ITEM_CONTAINER_ACTION_OPCODE:
-                sixthAction(player, packet);
+                ItemContainerActionPacketListener.sixthAction(player, packet);
                 break;
         }
     }

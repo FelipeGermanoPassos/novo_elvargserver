@@ -5,16 +5,15 @@ import { PendingHit } from "./hit/PendingHit";
 import { CombatSpell } from "./magic/CombatSpell";
 import { CombatMethod } from "./method/CombatMethod";
 import { GraniteMaulCombatMethod } from "./method/impl/specials/GraniteMaulCombatMethod";
-import { RangedData, RangedWeapon } from "./ranged/RangedData";
+import { RangedData, RangedWeapon, Ammunitions } from "./ranged/RangedData";
 import { Mobile } from "../../entity/impl/Mobile";
 import { Player } from "../../entity/impl/player/Player";
 import { SecondsTimer } from "../../model/SecondsTimer";
 import { StatementDialogue } from "../../model/dialogues/entries/impl/StatementDialogue";
 import { Stopwatch } from "../../../util/Stopwatch";
 import { TimerKey } from "../../../util/timers/TimerKey";
-import { CombatFactory } from "./CombatFactory";
+import { CombatFactory, CanAttackResponse } from "./CombatFactory";
 import { CombatSpecial } from "./CombatSpecial";
-
 export class Combat {
     private character: Mobile;
     private hitQueue: HitQueue;
@@ -60,7 +59,7 @@ export class Combat {
         this.hitQueue.process(this.character);
 
         // Reset attacker if we haven't been attacked in 6 seconds.
-        if (this.lastAttack.elapsed(6000)) {
+        if (this.lastAttack.elapsedTime(6000)) {
             this.setUnderAttack(null);
             return;
         }
@@ -101,7 +100,7 @@ export class Combat {
         }
 
         switch (CombatFactory.canAttack(this.character, this.method, this.target)) {
-            case CombatFactory.CAN_ATTACK: {
+            case CanAttackResponse.CAN_ATTACK: {
                 if (this.character.getCombat().getAttacker() == null) {
                     // Call the onCombatBegan hook once when combat begins
                     this.method.onCombatBegan(this.character, this.attacker);
@@ -123,7 +122,7 @@ export class Combat {
                 // Reset attack timer
                 if (!graniteMaulSpecial) {
                     let speed = this.method.attackSpeed(this.character);
-                    this.character.getTimers().register(TimerKey.COMBAT_ATTACK, speed);
+                    this.character.getTimers().registers(TimerKey.COMBAT_ATTACK, speed);
                 }
                 instant = false;
                 if (this.character.isSpecialActivated()) {
@@ -134,66 +133,66 @@ export class Combat {
                     }
                 }
             }
-            case CombatFactory.ALREADY_UNDER_ATTACK: {
+            case CanAttackResponse.ALREADY_UNDER_ATTACK: {
                 if (this.character.isPlayer()) {
                     this.character.getAsPlayer().getPacketSender().sendMessage("You are already under attack!");
                 }
                 this.character.getCombat().reset();
             }
-            case CombatFactory.CANT_ATTACK_IN_AREA: {
+            case CanAttackResponse.CANT_ATTACK_IN_AREA: {
                 this.character.getCombat().reset();
             }
-            case CombatFactory.COMBAT_METHOD_NOT_ALLOWED: {
+            case CanAttackResponse.COMBAT_METHOD_NOT_ALLOWED: {
             }
-            case CombatFactory.LEVEL_DIFFERENCE_TOO_GREAT: {
+            case CanAttackResponse.LEVEL_DIFFERENCE_TOO_GREAT: {
                 this.character.getAsPlayer().getPacketSender().sendMessage("Your level difference is too great.");
                 this.character.getAsPlayer().getPacketSender().sendMessage("You need to move deeper into the Wilderness.");
                 this.character.getCombat().reset();
             }
-            case CombatFactory.NOT_ENOUGH_SPECIAL_ENERGY: {
+            case CanAttackResponse.NOT_ENOUGH_SPECIAL_ENERGY: {
                 let p = this.character.getAsPlayer();
                 p.getPacketSender().sendMessage("You do not have enough special attack energy left!");
                 p.setSpecialActivated(false);
                 CombatSpecial.updateBar(this.character.getAsPlayer());
                 p.getCombat().reset();
             }
-            case CombatFactory.STUNNED: {
+            case CanAttackResponse.STUNNED: {
                 let p = this.character.getAsPlayer();
                 p.getPacketSender().sendMessage("You're currently stunned and cannot attack.");
                 p.getCombat().reset();
             }
-            case CombatFactory.DUEL_NOT_STARTED_YET: {
+            case CanAttackResponse.DUEL_NOT_STARTED_YET: {
                 let p = this.character.getAsPlayer();
                 p.getPacketSender().sendMessage("The duel has not started yet!");
                 p.getCombat().reset();
             }
-            case CombatFactory.DUEL_WRONG_OPPONENT: {
+            case CanAttackResponse.DUEL_WRONG_OPPONENT: {
                 let p = this.character.getAsPlayer();
                 p.getPacketSender().sendMessage("This is not your opponent!");
                 p.getCombat().reset();
             }
-            case CombatFactory.DUEL_MELEE_DISABLED: {
+            case CanAttackResponse.DUEL_MELEE_DISABLED: {
                 let p = this.character.getAsPlayer();
                 StatementDialogue.send(p, "Melee has been disabled in this duel!");
                 p.getCombat().reset();
             }
-            case CombatFactory.DUEL_RANGED_DISABLED: {
+            case CanAttackResponse.DUEL_RANGED_DISABLED: {
                 let p = this.character.getAsPlayer();
                 StatementDialogue.send(p, "Ranged has been disabled in this duel!");
                 p.getCombat().reset();
             }
-            case CombatFactory.DUEL_MAGIC_DISABLED: {
+            case CanAttackResponse.DUEL_MAGIC_DISABLED: {
                 let p = this.character.getAsPlayer();
                 StatementDialogue.send(p, "Magic has been disabled in this duel!");
                 p.getCombat().reset();
             }
-            case CombatFactory.TARGET_IS_IMMUNE: {
+            case CanAttackResponse.TARGET_IS_IMMUNE: {
                 if (this.character.isPlayer()) {
-                    ((Player) this.character).getPacketSender().sendMessage("This npc is currently immune to attacks.");
-                }
+    (this.character as Player).getPacketSender().sendMessage("This npc is currently immune to attacks.");
+}
                 this.character.getCombat().reset();
             }
-            case CombatFactory.INVALID_TARGET: {
+            case CanAttackResponse.INVALID_TARGET: {
                 this.character.getCombat().reset();
             }
         }
@@ -233,7 +232,7 @@ export class Combat {
 
         // The damage and killer placeholders.
         let damage = 0;
-        let killer = Optional.empty();
+        let killer: any | null | undefined = null;
 
         for (let entry of this.damageMap.entries()) {
 
@@ -243,7 +242,7 @@ export class Combat {
             }
 
             // Check if the cached time is valid.
-            let timeout = entry[1].getStopwatch().elapsed();
+            let timeout = entry[1].getStopwatch().valueOf();
             if (timeout > CombatConstants.DAMAGE_CACHE_TIMEOUT) {
                 continue;
             }
@@ -258,7 +257,7 @@ export class Combat {
             // new 'placeholder'.
             if (entry[1].getDamage() > damage) {
                 damage = entry[1].getDamage();
-                killer = Optional.of(entry[0]);
+                killer = entry[0];
             }
         }
 
@@ -271,11 +270,11 @@ export class Combat {
     }
 
     public damageMapContains(player: Player): boolean {
-        let damageCache = this.damageMap.get(player);
+        let damageCache:HitDamageCache = this.damageMap.get(player);
         if (damageCache == null) {
             return false;
         }
-        return damageCache.getStopwatch().elapsed() < CombatConstants.DAMAGE_CACHE_TIMEOUT;
+        return damageCache.getStopwatch() < CombatConstants.DAMAGE_CACHE_TIMEOUT;
     }
 
     public getCharacter(): Mobile {
@@ -339,27 +338,27 @@ export class Combat {
         this.previousCast = previousCast;
     }
 
-    public getRangedWeapon(): RangedWeapon {
+    public getRangedWeapon(): RangedData {
         return this.rangedWeapon;
     }
 
-    public setRangedWeapon(rangedWeapon: RangedWeapon) {
+    public setRangedWeapon(rangedWeapon: RangedData) {
         this.rangedWeapon = rangedWeapon;
     }
 
-    public getAmmunition(): RangedData.Ammunition {
+    public getAmmunition(): RangedData {
         return this.rangeAmmoData;
     }
 
-    public setAmmunition(rangeAmmoData: RangedData.Ammunition) {
+    public setAmmunition(rangeAmmoData: RangedData) {
         this.rangeAmmoData = rangeAmmoData;
     }
 
-    public getRangeAmmoData(): RangedData.Ammunition {
+    public getRangeAmmoData(): RangedData {
         return this.rangeAmmoData;
     }
 
-    public setRangeAmmoData(rangeAmmoData: RangedData.Ammunition) {
+    public setRangeAmmoData(rangeAmmoData: RangedData) {
         this.rangeAmmoData = rangeAmmoData;
     }
 

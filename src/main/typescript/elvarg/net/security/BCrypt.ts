@@ -364,8 +364,8 @@ export class BCrypt {
             throw new Error("Invalid maxolen");
 
         while (off < slen - 1 && olen < maxolen) {
-            c1 = char64(s.charCodeAt(off++));
-            c2 = char64(s.charCodeAt(off++));
+            c1 = BCrypt.char64(String.fromCharCode(s.charCodeAt(off++)));
+            c2 = BCrypt.char64(String.fromCharCode(s.charCodeAt(off++)));
             if (c1 == -1 || c2 == -1)
                 break;
             o = c1 << 2;
@@ -373,7 +373,7 @@ export class BCrypt {
             rs += String.fromCharCode(o);
             if (++olen >= maxolen || off >= slen)
                 break;
-            c3 = char64(s.charCodeAt(off++));
+            c3 = BCrypt.char64(String.fromCharCode(s.charCodeAt(off++)));
             if (c3 == -1)
                 break;
             o = (c2 & 0x0f) << 4;
@@ -381,7 +381,7 @@ export class BCrypt {
             rs += String.fromCharCode(o);
             if (++olen >= maxolen || off >= slen)
                 break;
-            c4 = char64(s.charCodeAt(off++));
+            c4 = BCrypt.char64(String.fromCharCode(s.charCodeAt(off++)));
             o = (c3 & 0x03) << 6;
             o |= c4;
             rs += String.fromCharCode(o);
@@ -441,10 +441,10 @@ export class BCrypt {
             throw new Error("UTF-8 is not supported");
         }
 
-        saltb = decode_base64(real_salt, BCRYPT_SALT_LEN);
+        saltb = BCrypt.decode_base64(real_salt, BCrypt.BCRYPT_SALT_LEN);
 
         B = new BCrypt();
-        hashed = B.crypt_raw(passwordb, saltb, rounds, bf_crypt_ciphertext.slice());
+        hashed = B.crypt_raw(passwordb, saltb, rounds, BCrypt.bf_crypt_ciphertext.slice());
 
         rs += "$2";
         if (minor >= 'a') {
@@ -459,14 +459,14 @@ export class BCrypt {
         }
         rs += rounds.toString();
         rs += "$";
-        rs += encode_base64(saltb, saltb.length);
-        rs += encode_base64(hashed, bf_crypt_ciphertext.length * 4 - 1));
+        rs += BCrypt.encode_base64(saltb, saltb.length);
+        rs += BCrypt.encode_base64(hashed, BCrypt.bf_crypt_ciphertext.length * 4 - 1);
         return rs.toString();
     }
 
     public static gensalt(log_rounds: number, random: SecureRandom): string {
         let rs = '';
-        let rnd = new Uint8Array(BCRYPT_SALT_LEN);
+        let rnd = new Uint8Array(BCrypt.BCRYPT_SALT_LEN);
 
         random.getRandomValues(rnd);
 
@@ -479,23 +479,23 @@ export class BCrypt {
         }
         rs += log_rounds.toString();
         rs += "$";
-        rs += encode_base64(rnd, rnd.length);
+        rs += BCrypt.encode_base64(rnd, rnd.length);
         return rs;
     }
 
-    public static gensalt(log_rounds: number): string {
+    public static gensalts(log_rounds: number): string {
         return this.gensalt(log_rounds, new SecureRandom());
     }
 
-    public static gensalt(): string {
-        return this.gensalt(GENSALT_DEFAULT_LOG2_ROUNDS);
+    public static genssalt(): string {
+        return this.gensalts(BCrypt.GENSALT_DEFAULT_LOG2_ROUNDS);
     }
 
     public static checkpw(plaintext: string, hashed: string): boolean {
         let hashed_bytes;
         let try_bytes;
         try {
-            let try_pw = hashpw(plaintext, hashed);
+            let try_pw = BCrypt.hashpw(plaintext, hashed);
             hashed_bytes = new TextEncoder().encode(hashed);
             try_bytes = new TextEncoder().encode(try_pw);
         } catch (uee) {
@@ -511,23 +511,23 @@ export class BCrypt {
 
     private encipher(lr: number[], off: number) {
         let i, n, l = lr[off], r = lr[off + 1];
-        l ^= P[0];
-        for (i = 0; i <= BLOWFISH_NUM_ROUNDS - 2;) {
+        l ^= this.P[0];
+        for (i = 0; i <= BCrypt.BLOWFISH_NUM_ROUNDS - 2;) {
             // Feistel substitution on left word
-            n = S[(l >> 24) & 0xff];
-            n += S[0x100 | ((l >> 16) & 0xff)];
-            n ^= S[0x200 | ((l >> 8) & 0xff)];
-            n += S[0x300 | (l & 0xff)];
-            r ^= n ^ P[++i];
+            n = this.S[(l >> 24) & 0xff];
+            n += this.S[0x100 | ((l >> 16) & 0xff)];
+            n ^= this.S[0x200 | ((l >> 8) & 0xff)];
+            n += this.S[0x300 | (l & 0xff)];
+            r ^= n ^ this.P[++i];
 
             // Feistel substitution on right word
-            n = S[(r >> 24) & 0xff];
-            n += S[0x100 | ((r >> 16) & 0xff)];
-            n ^= S[0x200 | ((r >> 8) & 0xff)];
-            n += S[0x300 | (r & 0xff)];
-            l ^= n ^ P[++i];
+            n = this.S[(r >> 24) & 0xff];
+            n += this.S[0x100 | ((r >> 16) & 0xff)];
+            n ^= this.S[0x200 | ((r >> 8) & 0xff)];
+            n += this.S[0x300 | (r & 0xff)];
+            l ^= n ^ this.P[++i];
         }
-        lr[off] = r ^ P[BLOWFISH_NUM_ROUNDS + 1];
+        lr[off] = r ^ this.P[BCrypt.BLOWFISH_NUM_ROUNDS + 1];
         lr[off + 1] = l;
     }
 
@@ -535,28 +535,28 @@ export class BCrypt {
      * Initialise the Blowfish key schedule
      */
     private init_key() {
-        P = [...P_orig];
-        S = [...S_orig];
+        this.P = [...BCrypt.P_orig];
+        this.S = [...BCrypt.S_orig];
     }
 
     private key(key: Uint8Array) {
         let i;
-        let koffp = [0];
+        let koffp = 0;
         let lr = [0, 0];
-        let plen = P.length, slen = S.length;
+        let plen = this.P.length, slen = this.S.length;
         for (i = 0; i < plen; i++)
-            P[i] = P[i] ^ streamtoword(key, koffp);
+        this.P[i] = this.P[i] ^ BCrypt.streamtoword(key, [koffp]);
 
         for (i = 0; i < plen; i += 2) {
-            encipher(lr, 0);
-            P[i] = lr[0];
-            P[i + 1] = lr[1];
+            this.encipher(lr, 0);
+            this.P[i] = lr[0];
+            this.P[i + 1] = lr[1];
         }
 
         for (i = 0; i < slen; i += 2) {
-            encipher(lr, 0);
-            S[i] = lr[0];
-            S[i + 1] = lr[1];
+            this.encipher(lr, 0);
+            this.S[i] = lr[0];
+            this.S[i + 1] = lr[1];
         }
     }
 
@@ -570,29 +570,29 @@ export class BCrypt {
      */
     private ekskey(data: Uint8Array, key: Uint8Array) {
         let i;
-        let koffp = [0], doffp = [0];
-        let lr = [0, 0];
-        let plen = P.length, slen = S.length;
-
+        let koffp = 0, doffp = 0;
+        let lr = ([0, 0]);
+        let plen = this.P.length, slen = this.S.length;
+      
         for (i = 0; i < plen; i++)
-            P[i] = P[i] ^ streamtoword(key, koffp);
-
+          this.P[i] = this.P[i] ^ BCrypt.streamtoword(key, [koffp]);
+      
         for (i = 0; i < plen; i += 2) {
-            lr[0] ^= streamtoword(data, doffp);
-            lr[1] ^= streamtoword(data, doffp);
-            encipher(lr, 0);
-            P[i] = lr[0];
-            P[i + 1] = lr[1];
+          lr[0] ^= BCrypt.streamtoword(data, [doffp]);
+          lr[1] ^= BCrypt.streamtoword(data, [doffp]);
+          this.encipher(lr, 0);
+          this.P[i] = lr[0];
+          this.P[i + 1] = lr[1];
         }
-
+      
         for (i = 0; i < slen; i += 2) {
-            lr[0] ^= streamtoword(data, doffp);
-            lr[1] ^= streamtoword(data, doffp);
-            encipher(lr, 0);
-            S[i] = lr[0];
-            S[i + 1] = lr[1];
+          lr[0] ^= BCrypt.streamtoword(data, [doffp]);
+          lr[1] ^= BCrypt.streamtoword(data, [doffp]);
+          this.encipher(lr, 0);
+          this.S[i] = lr[0];
+          this.S[i + 1] = lr[1];
         }
-    }
+      }
 
     public crypt_raw(password: Uint8Array, salt: Uint8Array, log_rounds: number,
         cdata: number[]): Uint8Array {
@@ -603,7 +603,7 @@ export class BCrypt {
         if (log_rounds < 4 || log_rounds > 30)
             throw new Error("Bad number of rounds");
         rounds = 1 << log_rounds;
-        if (salt.length != BCRYPT_SALT_LEN)
+        if (salt.length != BCrypt.BCRYPT_SALT_LEN)
             throw new Error("Bad salt length");
 
         this.init_key();

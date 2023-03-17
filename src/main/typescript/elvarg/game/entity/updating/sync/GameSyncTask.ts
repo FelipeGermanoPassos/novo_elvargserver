@@ -1,10 +1,10 @@
-import { World } from '../../../Worlds'
+import { World } from '../../../World'
 
 export abstract class GameSyncTask {
     private players: boolean;
     private concurrent: boolean;
 
-    constructor(players: boolean, concurrent: boolean) {
+    constructor(players: boolean, concurrent?: boolean) {
         this.players = players;
         this.concurrent = concurrent;
         this.players = true
@@ -18,11 +18,11 @@ export abstract class GameSyncTask {
     }
 
     public getAmount(): number {
-        return (this.players ? World.getPlayers().size() : World.getNpcs().size());
+        return (this.players ? World.getPlayers().sizeReturn() : World.getNpcs().sizeReturn());
     }
 
     public getCapacity(): number {
-        return (this.players ? World.getPlayers().capacity() : World.getNpcs().capacity());
+        return (this.players ? World.getPlayers().capacityReturn() : World.getNpcs().capacityReturn());
     }
 
     public isConcurrent(): boolean {

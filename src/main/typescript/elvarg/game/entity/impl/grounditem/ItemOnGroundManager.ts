@@ -1,14 +1,20 @@
-import { GameConstants, World, Location, TaskManager } from "com.elvarg.game"
-import { Player, ItemOnGround, State, GroundItemRespawnTask } from "com.elvarg.game.entity.impl.grounditem"
-import { Item } from "com.elvarg.game.model"
-import { Optional } from "java.util"
+import { GameConstants } from "../../../GameConstants"
+import { World } from "../../../World"
+import { Location } from "../../../model/Location"
+import { TaskManager } from "../../../task/TaskManager"
+import { Player } from "../player/Player"
+import { ItemOnGround } from "./ItemOnGround"
+import { State } from "./ItemOnGround"
+import { GroundItemRespawnTask } from '../../../task/impl/GroundItemRespawnTask'
+import { Item } from "../../../model/Item"
+//import { Optional } from "java.util"
 
 export class ItemOnGroundManager {
     public static readonly STATE_UPDATE_DELAY: number = 50
 
     public static onRegionChange(player: Player): void {
         for (let item of World.getItems()) {
-            ItemOnGroundManager.perform(player, item, OperationType.CREATE)
+            ItemOnGroundManager.performPlayer(player, item, OperationType.CREATE)
         }
     }
 
@@ -24,18 +30,18 @@ export class ItemOnGroundManager {
         }
     }
 
-    public static perform( item: ItemOnGround, type: OperationType): void {
+    public static perform(item: ItemOnGround, type: OperationType): void {
         switch (item.getState()) {
             case State.SEEN_BY_PLAYER:
-                if (item.getOwner().isPresent()) {
-                    let owner = World.getPlayerByName(item.getOwner().get())
-                    owner.ifPresent(o => ItemOnGroundManager.perform(o, item, type))
+                let owner = World.getPlayerByName(item.getOwner())
+                if (owner != null) {
+                    ItemOnGroundManager.performPlayer(owner, item)
                 }
                 break;
             case State.SEEN_BY_EVERYONE:
                 for (let player of World.getPlayers()) {
                     if (player) {
-                        ItemOnGroundManager.perform(player, item, type)
+                        ItemOnGroundManager.performPlayer(player, item)
                     }
                 }
                 break;
@@ -43,7 +49,7 @@ export class ItemOnGroundManager {
                 break;
         }
     }
-    public static performPlayer(player: Player, item: ItemOnGround, type: OperationType): void {
+    public static performPlayer(player: Player, item: ItemOnGround, type?: OperationType): void {
         if (item.isPendingRemoval()) {
             type = OperationType.DELETE;
         }
@@ -77,7 +83,7 @@ export class ItemOnGroundManager {
     }
     public static register(item: ItemOnGround) {
         // No point spamming with spawned items...
-        let spawnable = GameConstants.ALLOWED_SPAWNS.includes(item.getItem().getId());
+        let spawnable = Array.from(GameConstants.ALLOWED_SPAWNS).includes(item.getItem().getId());
         if (spawnable) {
             return;
         }
@@ -109,8 +115,8 @@ export class ItemOnGroundManager {
             // If we aren't the owner, we shouldn't modify it.
             if (item_.getState() === State.SEEN_BY_PLAYER) {
                 let flag = true;
-                if (item_.getOwner().isPresent() && item.getOwner().isPresent()) {
-                    if (item_.getOwner().get() === item.getOwner().get()) {
+                if (item_.getOwner() && item.getOwner()) {
+                    if (item_.getOwner() === item.getOwner()) {
                         flag = false;
                     }
                 }
@@ -136,37 +142,37 @@ export class ItemOnGroundManager {
         ItemOnGroundManager.perform(item, OperationType.DELETE);
     }
 
-    public static register(player: Player, item: Item): ItemOnGround {
-        return this.register(player, item, player.getLocation().clone());
+    public static registers(player: Player, item: Item): ItemOnGround {
+        return this.registerLocation(player, item, player.getLocation().clone());
     }
 
-    public static register(player: Player, item: Item, position: Location): ItemOnGround {
-        let i = new ItemOnGround(State.SEEN_BY_PLAYER, Optional.of(player.getUsername()), position, item, true,
+    public static registerLocation(player: Player, item: Item, position: Location): ItemOnGround {
+        let i = new ItemOnGround(State.SEEN_BY_PLAYER, player.getUsername(), position, item, true,
             -1, player.getPrivateArea());
         this.register(i);
         return i;
     }
 
     public static registerNonGlobal(player: Player, item: Item) {
-        this.registerNonGlobal(player, item, player.getLocation().clone());
+        this.registerNonGlobals(player, item, player.getLocation().clone());
     }
 
-    public static registerNonGlobal(player: Player, item: Item, position: Location) {
-        this.register(new ItemOnGround(State.SEEN_BY_PLAYER, Optional.of(player.getUsername()), position, item, false, -1, player.getPrivateArea()));
+    public static registerNonGlobals(player: Player, item: Item, position: Location) {
+        this.register(new ItemOnGround(State.SEEN_BY_PLAYER, player.getUsername(), position, item, false, -1, player.getPrivateArea()));
     }
 
     public static registerGlobal(player: Player, item: Item) {
-        this.register(new ItemOnGround(State.SEEN_BY_EVERYONE, Optional.of(player.getUsername()), player.getLocation().clone(), item, false, -1, player.getPrivateArea()));
+        this.register(new ItemOnGround(State.SEEN_BY_EVERYONE, player.getUsername(), player.getLocation().clone(), item, false, -1, player.getPrivateArea()));
     }
 
-    public static getGroundItem(owner: Optional<string>, id: number, position: Location): Optional<ItemOnGround> {
+    public static getGroundItem(owner: string | null, id: number, position: Location): ItemOnGround | null {
         let iterator = World.getItems().iterator();
         for (let item of iterator) {
             if (item == null || item.isPendingRemoval()) {
                 continue;
             }
             if (item.getState() === State.SEEN_BY_PLAYER) {
-                if (!owner.isPresent() || !this.isOwner(owner.get(), item)) {
+                if (!owner || !this.isOwner(owner, item)) {
                     continue;
                 }
             }
@@ -176,25 +182,25 @@ export class ItemOnGroundManager {
             if (!item.getPosition().equals(position)) {
                 continue;
             }
-            return Optional.of(item);
+            return item;
         }
-        return Optional.empty();
+        return null;
     }
 
     public static exists(item: ItemOnGround): boolean {
-        return this.getGroundItem(item.getOwner(), item.getItem().getId(), item.getPosition()).isPresent();
+        return this.getGroundItem(item.getOwner(), item.getItem().getId(), item.getPosition()) !== undefined;
     }
 
     private static isOwner(username: string, item: ItemOnGround): boolean {
-        if (!item.getOwner().isPresent()) {
-            return item.getOwner().get() === username;
-        }
+        return item.getOwner() === username;
         return false;
     }
 
 
 }
 
-export enum OperationType {
-    CREATE, DELETE, ALTER
+export class OperationType {
+    public static readonly CREATE = new OperationType();
+    public static readonly DELETE = new OperationType();
+    public static readonly ALTER = new OperationType();
 }

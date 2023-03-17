@@ -5,7 +5,7 @@ import { NPCInteraction } from "../NPCInteraction";
 
 class Banker implements NPCInteraction {
     firstOptionClick(player: Player, npc: NPC) {
-        player.dialogueManager.start(new BankerDialogue());
+        player.getDialogueManager().startDialogues(new BankerDialogue());
     }
 
     secondOptionClick(player: Player, npc: NPC) {

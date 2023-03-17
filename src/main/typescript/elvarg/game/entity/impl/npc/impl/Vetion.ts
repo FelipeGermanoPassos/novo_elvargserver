@@ -1,4 +1,4 @@
-import { World } from "../../../../Worlds"
+import { World } from "../../../../World"
 import { PendingHit } from "../../../../content/combat/hit/PendingHit"
 import { CombatMethod } from "../../../../content/combat/method/CombatMethod"
 import { ChaosFanaticCombatMethod } from "../../../../content/combat/method/impl/npcs/ChaosFanaticCombatMethod"

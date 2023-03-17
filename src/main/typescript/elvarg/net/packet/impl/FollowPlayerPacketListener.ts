@@ -1,15 +1,20 @@
-import { Player } from 'com.elvarg.game.entity.impl.player'
-import { World } from 'com.elvarg'
-import { TaskManager } from 'com.elvarg'
+import { World } from '../../../game/World';
+import { Player } from '../../../game/entity/impl/player/Player';
+import { TaskManager } from '../../../game/task/TaskManager';
+import { Packet } from '../Packet';
+import { PacketExecutor } from '../PacketExecutor';
+import { Task } from '../../../game/task/Task';
+import { PathFinder } from '../../../game/model/movement/path/PathFinder';
+import { Location } from '../../../game/model/Location';
 
-class FollowPlayerPacketListener implements PacketExecutor {
+export class FollowPlayerPacketListener implements PacketExecutor {
     execute(player: Player, packet: Packet): void {
         if (player.busy()) {
             return;
         }
         TaskManager.cancelTasks(player.getIndex());
         const otherPlayersIndex = packet.readLEShort();
-        if (otherPlayersIndex < 0 || otherPlayersIndex > World.getPlayers().capacity())
+        if (otherPlayersIndex < 0 || otherPlayersIndex > World.getPlayers().capacityReturn())
             return;
         const leader = World.getPlayers().get(otherPlayersIndex);
         if (leader == null) {
@@ -31,33 +36,43 @@ class FollowPlayerPacketListener implements PacketExecutor {
 
         player.setFollowing(leader);
         player.setMobileInteraction(leader);
-
-        TaskManager.submit(new Task(1, player.getIndex(), true) {
-
-            protected execute() {
-                if (player.getFollowing() == null) {
-                    player.setPositionToFace(null);
-                    this.stop();
-                    return;
-                }
-
-                if (leader.isTeleporting() || !leader.getLocation().isWithinDistance(player.getLocation(), 15)) {
-                    player.setPositionToFace(null);
-                    this.stop();
-                    return;
-                }
-                let destX = leader.getMovementQueue().followX;
-                let destY = leader..followY;
-                if (Objects.equals(new Location(destX, destY), player.getLocation()) || destX == -1 && destY == -1) {
-                    return;
-                }
-                player.getMovementQueue().reset();
-                player.setPositionToFace(leader.getLocation());
-                player.setMobileInteraction(leader);
-                PathFinder.calculateWalkRoute(player, destX, destY);
-            }
-        });
     }
 }
+
+class FollowTask extends Task {
+    private player: Player;
+    private leader: Player;
+
+    constructor(player: Player, leader: Player) {
+        super(1, player.getIndex(), true);
+        this.player = player;
+        this.leader = leader;
+    }
+
+    execute() {
+        if (this.player.getFollowing() == null) {
+            this.player.setPositionToFace(null);
+            this.stop();
+            return;
+        }
+
+        if (this.leader.isTeleportingReturn() || !this.leader.getLocation().isWithinDistance(this.player.getLocation(), 15)) {
+            this.player.setPositionToFace(null);
+            this.stop();
+            return;
+        }
+        let destX = this.leader.getMovementQueue().followX;
+        let destY = this.leader.getMovementQueue().followY;
+        if ((destX === -1 && destY === -1) || this.player.getLocation().equals(new Location(destX, destY))) {
+            return;
+          }
+        this.player.getMovementQueue().reset();
+        this.player.setPositionToFace(this.leader.getLocation());
+        this.player.setMobileInteraction(this.leader);
+        PathFinder.calculateWalkRoute(this.player, destX, destY);
+    }
+}
+
+
 
 

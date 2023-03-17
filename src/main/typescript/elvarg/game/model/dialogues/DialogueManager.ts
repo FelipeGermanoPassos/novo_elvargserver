@@ -1,4 +1,11 @@
 import { Player } from "../../entity/impl/player/Player";
+import { DynamicDialogueBuilder } from "./builders/DynamicDialogueBuilder";
+import { DialogueBuilder } from "./builders/DialogueBuilder";
+import { Dialogue } from "./entries/Dialogue";
+import { TestStaticDialogue } from '../../model/dialogues/builders/impl/TestStaticDialogue'
+import { DialogueOption } from "./DialogueOption";
+import { OptionsDialogue } from "./entries/impl/OptionsDialogue";
+import { OptionDialogue } from "./entries/impl/OptionDialogue";
 
 export class DialogueManager {
     public static STATIC_DIALOGUES: Map<number, DialogueBuilder> = new Map<number, DialogueBuilder>();
@@ -7,10 +14,7 @@ export class DialogueManager {
         DialogueManager.STATIC_DIALOGUES.set(0, new TestStaticDialogue());
     }
 
-    /**
-     * Represents the owner of this {@link DialogueManager} instance.
-     */
-    private player: Player;
+    private readonly player: Player;
 
     /**
      * A {@link Map} which holds all of the current dialogue entries and indexes.
@@ -19,7 +23,7 @@ export class DialogueManager {
 
     /**
      * The current dialogue's index.
-     */
+     */ 
     private index: number;
 
     /**
@@ -58,6 +62,61 @@ export class DialogueManager {
             return;
         }
 
-        this.start(this.index + 1);
+        this.startDialogue(this.index + 1);
     }
+
+    public startDialogue(index: number): void {
+        this.index = index;
+        this.startDialogueOption();
+    }
+    
+    public startStaticDialogue(id: number): void {
+        const builder = DialogueManager.STATIC_DIALOGUES.get(id);
+        if (builder) {
+            this.startDialogueOption();
+        }
+    }
+    
+    public startDialogues(builder: DialogueBuilder): void {
+        this.startDialogue(0);
+    }
+    
+    public startDialog(builder: DialogueBuilder, index: number): void {
+        if (builder instanceof DynamicDialogueBuilder) {
+            (builder as DynamicDialogueBuilder).build(this.player);
+        }
+        this.startDialogueMap(builder.getDialogues(), index);
+    }
+    
+    private startDialogueMap(entries: Map<number, Dialogue>, index: number): void {
+        this.reset();
+        this.dialogues.clear();
+        entries.forEach((value, key) => {
+            this.dialogues.set(key, value);
+        });
+        this.startDialogueOption();
+    }
+    
+    private startDialogueOption(): void {
+        const dialogue = this.dialogues.get(this.index);
+        if (!dialogue) {
+            this.player.getPacketSender().sendInterfaceRemoval();
+            return;
+        }
+        dialogue.send(this.player);
+    }
+    
+    public handleOption(option: DialogueOption): void {
+        const dialogue = this.dialogues.get(this.index);
+        if (dialogue instanceof OptionsDialogue) {
+            (dialogue as OptionsDialogue).execute(option, this.player);
+            return;
+          }
+        if (!(dialogue instanceof OptionDialogue)) {
+            this.player.getPacketSender().sendInterfaceRemoval();
+            return;
+        }
+        (dialogue as OptionDialogue).execute(option);
+    }
+    
 }

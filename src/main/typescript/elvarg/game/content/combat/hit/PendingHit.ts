@@ -110,7 +110,7 @@ export class PendingHit {
         if (this.attacker.isNpc()) {
             return new Array();
         }
-        return ((this.attacker as Player).getFightType().getStyle().skill(this.combatType));
+        return ((this.attacker as Player).getFightType().constructor().getStyle().skill(this.combatType));
     }
 
     public getCombatType(): CombatType {

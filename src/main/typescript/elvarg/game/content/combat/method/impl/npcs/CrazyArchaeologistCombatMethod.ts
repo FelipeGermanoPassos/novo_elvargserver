@@ -14,7 +14,17 @@ import { TaskManager } from "../../../../../task/TaskManager";
 import { Misc } from "../../../../../../util/Misc";
 import { TimerKey } from "../../../../../../util/timers/TimerKey";
 
-static enum Attack {
+class ChaosTask extends Task {
+    constructor(n1: number, private readonly execFunc: Function, target?: Mobile, b?: boolean) {
+        super(n1, target, b)
+    }
+    execute(): void {
+        this.execFunc();
+        this.stop();
+    }
+}
+
+enum Attack {
     SPECIAL_ATTACK, DEFAULT_RANGED_ATTACK, DEFAULT_MELEE_ATTACK
 }
 
@@ -59,14 +69,10 @@ export class CrazyArchaeologistCombatMethod extends CombatMethod {
         character.forceChat(CrazyArchaeologistCombatMethod.QUOTES[Misc.getRandom(CrazyArchaeologistCombatMethod.QUOTES.length - 1)]);
 
         if (this.attack == Attack.DEFAULT_RANGED_ATTACK) {
-            character.performAnimation(CrazyArchaeologistCombatMethod.RANSGED_ATTACK_ANIM);
-            new Projectile(character, target, 1259, 40, 65, 31, 43).sendProjectile();
-            TaskManager.submit(new Task(3, target, false) {
-                execute() {
-                    target.performGraphic(CrazyArchaeologistCombatMethod.RANGED_END_GFX);
-                    stop();
-                }
-            });
+            character.performAnimation(CrazyArchaeologistCombatMethod.RANGED_ATTACK_ANIM);
+            const projectile2 = Projectile.createProjectile(character, target, 1259, 40, 65, 31, 43);
+            projectile2.sendProjectile();
+            TaskManager.submit(new ChaosTask(3, ()=>{target.performGraphic(CrazyArchaeologistCombatMethod.RANGED_END_GFX)},target, false));
         } else if (this.attack == Attack.SPECIAL_ATTACK) {
             character.performAnimation(CrazyArchaeologistCombatMethod.RANGED_ATTACK_ANIM);
             character.forceChat("Rain of Knowledge!");
@@ -80,21 +86,16 @@ export class CrazyArchaeologistCombatMethod extends CombatMethod {
             for (let pos of attackPositions) {
                 new Projectile(character.getLocation(), pos, null, 1260, 40, 80, 31, 43, character.getPrivateArea()).sendProjectile();
             }
-            TaskManager.submit(new Task(4) {
-                execute() {
-                    for (let pos of attackPositions) {
-                        target.getAsPlayer().getPacketSender().sendGlobalGraphic(CrazyArchaeologistCombatMethod.MAKE_IT_RAIN_START_GFX, pos);
-                        for (let player of character.getAsNpc().getPlayersWithinDistance(10)) {
-                            if (player.getLocation().equals(pos)) {
-                                player.getCombat().getHitQueue().addPendingDamage(new HitDamage(Misc.getRandom(25), HitMask.RED));
-                            }
-                        }
+            TaskManager.submit(new ChaosTask(4, ()=>{for (let pos of attackPositions) {
+                target.getAsPlayer().getPacketSender().sendGlobalGraphic(CrazyArchaeologistCombatMethod.MAKE_IT_RAIN_START_GFX, pos);
+                for (let player of character.getAsNpc().getPlayersWithinDistance(10)) {
+                    if (player.getLocation().equals(pos)) {
+                        player.getCombat().getHitQueue().addPendingDamage([new HitDamage(Misc.getRandom(25), HitMask.RED)]);
                     }
-                    finished(character, target);
-                    stop();
                 }
-            });
-            character.getTimers().register(TimerKey.COMBAT_ATTACK, 5);
+            }
+            this.finished(character, target);}));
+            character.getTimers().registers(TimerKey.COMBAT_ATTACK, 5);
         } else if (this.attack == Attack.DEFAULT_MELEE_ATTACK) {
             character.performAnimation(CrazyArchaeologistCombatMethod.MELEE_ATTACK_ANIM);
         }

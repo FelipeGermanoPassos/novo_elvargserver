@@ -1,12 +1,12 @@
 export class TeleportButton {
-    HOME = [-1, 19210, 21741, 19210]
-    TRAINING = [-1, 1164, 13035, 30064]
-    MINIGAME = [2, 1167, 13045, 30075]
-    WILDERNESS = [0, 1170, 13053, 30083]
-    SLAYER = [-1, 1174, 13061, 30114]
-    CITY = [-1, 1540, 13079, 30146]
-    SKILLS = [3, 1541, 13069, 30106]
-    BOSSES = [1, 7455, 13087, 30138]
+    public static readonly HOME = new TeleportButton(-1, 19210, 21741, 19210);
+    public static readonly TRAINING = new TeleportButton(-1, 1164, 13035, 30064);
+    public static readonly MINIGAME = new TeleportButton(2, 1167, 13045, 30075);
+    public static readonly WILDERNESS = new TeleportButton(0, 1170, 13053, 30083);
+    public static readonly SLAYER = new TeleportButton(-1, 1174, 13061, 30114);
+    public static readonly CITY = new TeleportButton(-1, 1540, 13079, 30146);
+    public static readonly SKILLS = new TeleportButton(3, 1541, 13069, 30106);
+    public static readonly BOSSES = new TeleportButton(1, 7455, 13087, 30138);
 
     menu: number;
     ids: number[];

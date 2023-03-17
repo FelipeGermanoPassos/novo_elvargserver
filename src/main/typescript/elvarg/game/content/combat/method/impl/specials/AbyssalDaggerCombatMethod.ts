@@ -7,7 +7,7 @@ import { Mobile } from "../../../../../entity/impl/Mobile";
 import { CombatSpecial } from "../../../CombatSpecial";
 
 export class AbyssalDaggerCombatMethod extends MeleeCombatMethod {
-    private static readonly ANIMATION = new Animation(3300, Priority.HIGH);
+    private static readonly ANIMATION = new Animation(3300);
     private static readonly GRAPHIC = new Graphic(1283, Priority.HIGH);
 
     hits(character: Mobile, target: Mobile): PendingHit[] {

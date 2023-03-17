@@ -2,7 +2,7 @@ import { ItemOnGround } from "../../entity/impl/grounditem/ItemOnGround";
 import { ItemOnGroundManager } from "../../entity/impl/grounditem/ItemOnGroundManager";
 import { Task } from "../Task";
 
-class GroundItemRespawnTask extends Task {
+export class GroundItemRespawnTask extends Task {
     /**
     * The {@link ItemOnGround} which is going to respawn.
     */

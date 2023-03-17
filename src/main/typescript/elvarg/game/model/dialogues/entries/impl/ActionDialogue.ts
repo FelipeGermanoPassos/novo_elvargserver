@@ -1,3 +1,6 @@
+import { Action } from "../../../Action";
+import { Dialogue } from "../Dialogue";
+import { Player } from "../../../../entity/impl/player/Player";
 export class ActionDialogue extends Dialogue {
     private action: Action;
 

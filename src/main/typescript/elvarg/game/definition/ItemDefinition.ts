@@ -151,6 +151,6 @@ export class ItemDefinition {
     }
 
     public unNote(): number {
-        return ItemDefinition.forId(this.id - 1).getName().equals(this.name) ? this.id - 1 : this.id;
+        return ItemDefinition.forId(this.id - 1).getName().toString() ? this.id - 1 : this.id;
     }
 }

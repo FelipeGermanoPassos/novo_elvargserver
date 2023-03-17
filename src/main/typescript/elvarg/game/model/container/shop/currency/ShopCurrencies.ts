@@ -1,3 +1,4 @@
+ 
 import { ShopCurrency } from "./ShopCurrency";
 import { CoinsCurrency } from "./impl/CoinsCurrency";
 import { BloodMoneyCurrency } from "./impl/BloodMoneyCurrency";

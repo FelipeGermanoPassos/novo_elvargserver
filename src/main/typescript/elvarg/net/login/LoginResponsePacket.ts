@@ -1,4 +1,4 @@
-import {PlayerRights} from '../../game/model/rights/PlayerRights';
+import { PlayerRights } from '../../game/model/rights/PlayerRights';
 export class LoginResponsePacket {
     private readonly response: number;
     private readonly rights: PlayerRights;

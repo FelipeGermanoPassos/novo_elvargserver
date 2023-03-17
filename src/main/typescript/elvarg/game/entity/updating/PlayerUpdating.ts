@@ -1,11 +1,15 @@
-import World from '../../Worlds'
-import ItemDefinition from '../../definition/ItemDefinition'
-import Mobile from '../impl/Mobile'
-import Player from '../impl/player/Player'
-import PlayerBot from '../impl/playerbot/PlayerBot'
-import AreaManager from '../../model/areas/AreaManager'
-import Equipment from '../../model/container/impl/Equipment'
-
+import {World} from '../../World'
+import {ItemDefinition} from '../../definition/ItemDefinition'
+import {Player} from '../impl/player/Player'
+import {PlayerBot} from '../impl/playerbot/PlayerBot'
+import {Equipment} from '../../model/container/impl/Equipment'
+import { PacketType } from '../../../net/packet/PacketType'
+import { PacketBuilder, AccessType, ValueType } from '../../../net/packet/PacketBuilder'
+import { EquipmentType } from '../../model/EquipmentType'
+import { Appearance } from '../../model/Appearance'
+import { Flag } from '../../model/Flag'
+import { ByteOrder } from '../../../net/packet/ByteOrder'
+import { Skill } from '../../model/Skill'
 
 export class PlayerUpdating {
     private static MAX_NEW_PLAYERS_PER_CYCLE = 25;
@@ -14,20 +18,20 @@ export class PlayerUpdating {
         const update = new PacketBuilder();
         const packet = new PacketBuilder(81, PacketType.VARIABLE_SHORT);
         packet.initializeAccess(AccessType.BIT);
-        updateMovement(player, packet);
-        appendUpdates(player, update, player, false, true);
-        packet.putBits(8, player.getLocalPlayers().size());
+        this.updateMovement(player, packet);
+        this.appendUpdates(player, update, player, false, true);
+        packet.putBits(8, player.getLocalPlayers().length);
         for (const playerIterator of player.getLocalPlayers()) {
             if (World.getPlayers().get(playerIterator.getIndex()) != null
                 && playerIterator.getLocation().isViewableFrom(player.getLocation())
                 && !playerIterator.isNeedsPlacement()
                 && playerIterator.getPrivateArea() === player.getPrivateArea()) {
-                updateOtherPlayerMovement(packet, playerIterator);
+                    this.updateOtherPlayerMovement(packet, playerIterator);
                 if (playerIterator.getUpdateFlag().isUpdateRequired()) {
-                    appendUpdates(player, update, playerIterator, false, false);
+                    this.appendUpdates(player, update, playerIterator, false, false);
                 }
             } else {
-                playerIterator.remove();
+                playerIterator.onRemove();
                 packet.putBits(1, 1);
                 packet.putBits(2, 3);
             }
@@ -35,7 +39,7 @@ export class PlayerUpdating {
         let playersAdded = 0;
 
         for (const otherPlayer of World.getPlayers()) {
-            if (player.getLocalPlayers().size() >= 79 || playersAdded > MAX_NEW_PLAYERS_PER_CYCLE)
+            if (player.getLocalPlayers().length >= 79 || playersAdded > PlayerUpdating.MAX_NEW_PLAYERS_PER_CYCLE)
                 break;
             if (otherPlayer == null || otherPlayer == player || player.getLocalPlayers().includes(otherPlayer)
                 || !otherPlayer.getLocation().isViewableFrom(player.getLocation())
@@ -43,8 +47,8 @@ export class PlayerUpdating {
                 continue;
             }
             player.getLocalPlayers().push(otherPlayer);
-            addPlayer(player, otherPlayer, packet);
-            appendUpdates(player, update, otherPlayer, true, false);
+            this.addPlayer(player, otherPlayer, packet);
+            this.appendUpdates(player, update, otherPlayer, true, false);
             playersAdded++;
         }
 
@@ -166,11 +170,11 @@ export class PlayerUpdating {
             builder.putBits(3, target.runningDirection.id);
 
             // Write a flag indicating if a block update happened.
-            builder.putBits(1, target.updateFlag.updateRequired ? 1 : 0);
+            builder.putBits(1, target.updateFlag.isUpdateRequired() ? 1 : 0);
         }
     }
     private static appendUpdates(player: Player, builder: PacketBuilder, target: Player, updateAppearance: boolean, noChat: boolean) {
-        if (!target.updateFlag.updateRequired && !updateAppearance) {
+        if (!target.updateFlag.isUpdateRequired() && !updateAppearance) {
             return;
         }
         // If we don't need to update again, simply send the cached update block
@@ -215,38 +219,38 @@ export class PlayerUpdating {
         }
         if (mask >= 0x100) {
             mask |= 0x40;
-            builder.putShort(mask, ByteOrder.LITTLE);
+            builder.putShorts(mask, ByteOrder.LITTLE);
         } else {
             builder.put(mask);
         }
         if (flag.flagged(Flag.FORCED_MOVEMENT) && target.forceMovement != null) {
-            updateForcedMovement(player, builder, target);
+            this.updateForcedMovement(player, builder, target);
         }
         if (flag.flagged(Flag.GRAPHIC) && target.graphic != null) {
-            updateGraphics(builder, target);
+            this.updateGraphics(builder, target);
         }
         if (flag.flagged(Flag.ANIMATION) && target.animation != null) {
-            updateAnimation(builder, target);
+            this.updateAnimation(builder, target);
         }
         if (flag.flagged(Flag.FORCED_CHAT) && target.forcedChat != null) {
-            updateForcedChat(builder, target);
+            this.updateForcedChat(builder, target);
         } if (flag.flagged(Flag.CHAT) && target.currentChatMessage != null && !noChat && !player.relations.ignoreList.includes(target.longUsername)) {
-            updateChat(builder, target, player);
+            this.updateChat(builder, target, player);
         }
         if (flag.flagged(Flag.ENTITY_INTERACTION)) {
-            updateEntityInteraction(builder, target);
+            this.updateEntityInteraction(builder, target);
         }
         if (flag.flagged(Flag.APPEARANCE) || updateAppearance) {
-            updateAppearance(player, builder, target);
+            this.updateAppearance(player, builder, target);
         }
         if (flag.flagged(Flag.FACE_POSITION) && target.positionToFace != null) {
-            updateFacingPosition(builder, target);
+            this.updateFacingPosition(builder, target);
         }
         if (flag.flagged(Flag.SINGLE_HIT)) {
-            updateSingleHit(builder, target);
+            this.updateSingleHit(builder, target);
         }
         if (flag.flagged(Flag.DOUBLE_HIT)) {
-            updateDoubleHit(builder, target);
+            this.updateDoubleHit(builder, target);
         }
         /*if (!player.equals(target) && !updateAppearance && !noChat) {
         player.cachedUpdateBlock = builder.buffer();
@@ -255,10 +259,10 @@ export class PlayerUpdating {
     private static updateChat(builder: PacketBuilder, target: Player, receiver: Player) {
         const message = target.currentChatMessage;
         const bytes = message.text;
-        builder.putShort(((message.color & 0xff) << 8) | (message.effects & 0xff), ByteOrder.LITTLE);
-        builder.put(target.rights.ordinal);
-        builder.put(target.donatorRights.ordinal);
-        builder.put(bytes.length, ValueType.C);
+        builder.putShorts(((message.colour & 0xff) << 8) | (message.effects & 0xff), ByteOrder.LITTLE);
+        builder.put(target.getRights().getSpriteId());
+        builder.put(target.getRights().getSpriteId());
+        builder.puts(bytes.length, ValueType.C);
         for (let ptr = bytes.length - 1; ptr >= 0; ptr--) {
             builder.put(bytes[ptr]);
         }
@@ -276,40 +280,40 @@ export class PlayerUpdating {
         const endX = target.forceMovement.end.getX();
         const endY = target.forceMovement.end.getY();
 
-        builder.put(startX, ValueType.S);
-        builder.put(startY, ValueType.S);
-        builder.put(startX + endX, ValueType.S);
-        builder.put(startY + endY, ValueType.S);
+        builder.puts(startX, ValueType.S);
+        builder.puts(startY, ValueType.S);
+        builder.puts(startX + endX, ValueType.S);
+        builder.puts(startY + endY, ValueType.S);
         builder.putShort(target.forceMovement.speed, ValueType.A, ByteOrder.LITTLE);
         builder.putShort(target.forceMovement.reverseSpeed, ValueType.A, ByteOrder.BIG);
         builder.putShort(target.forceMovement.animation, ValueType.A, ByteOrder.LITTLE);
-        builder.put(target.forceMovement.direction, ValueType.S);
+        builder.puts(target.forceMovement.direction, ValueType.S);
     }
     private static updateAnimation(builder: PacketBuilder, target: Player) {
-        builder.putShort(target.animation.id, ByteOrder.LITTLE);
-        builder.put(target.animation.delay, ValueType.C);
+        builder.putShorts(target.animation.id, ByteOrder.LITTLE);
+        builder.puts(target.animation.delay, ValueType.C);
     }
     private static updateGraphics(builder: PacketBuilder, target: Player) {
-        builder.putShort(target.graphic.id, ByteOrder.LITTLE);
+        builder.putShorts(target.graphic.id, ByteOrder.LITTLE);
         builder.putInt(
-            ((target.graphic.height.ordinal * 50) << 16) + (target.graphic.delay & 0xffff));
+            ((target.graphic.height * 50) << 16) + (target.graphic.delay & 0xffff));
     }
     private static updateSingleHit(builder: PacketBuilder, target: Player) {
         builder.putShort(target.primaryHit.damage);
         builder.put(target.primaryHit.hitmask.ordinal);
-        builder.putShort(target.hitpoints);
+        builder.putShort(target.points);
         builder.putShort(target.skillManager.getMaxLevel(Skill.HITPOINTS));
     }
     private static updateDoubleHit(builder: PacketBuilder, target: Player) {
         builder.putShort(target.secondaryHit.damage);
         builder.put(target.secondaryHit.hitmask.ordinal);
-        builder.putShort(target.hitpoints);
+        builder.putShort(target.points);
         builder.putShort(target.skillManager.getMaxLevel(Skill.HITPOINTS));
     }
     private static updateFacingPosition(builder: PacketBuilder, target: Player) {
         const position = target.positionToFace;
         builder.putShort(position.x * 2 + 1, ValueType.A, ByteOrder.LITTLE);
-        builder.putShort(position.y * 2 + 1, ByteOrder.LITTLE);
+        builder.putShorts(position.y * 2 + 1, ByteOrder.LITTLE);
     }
     private static updateEntityInteraction(builder: PacketBuilder, target: Player) {
         let entity = target.interactingMobile;
@@ -317,9 +321,9 @@ export class PlayerUpdating {
             let index = entity.index;
             if (entity instanceof Player)
                 index += +32768;
-            builder.putShort(index, ByteOrder.LITTLE);
+            builder.putShorts(index, ByteOrder.LITTLE);
         } else {
-            builder.putShort(-1, ByteOrder.LITTLE);
+            builder.putShorts(-1, ByteOrder.LITTLE);
         }
     }
     private static updateAppearance(player: Player, out: PacketBuilder, target: Player): void {
@@ -439,10 +443,10 @@ export class PlayerUpdating {
 
         properties.putLong(target.getLongUsername());
         properties.put(target.getSkillManager().getCombatLevel());
-        properties.put(target.getRights().ordinal());
+        properties.put(target.getRights().getSpriteId());
         properties.putString(target.getLoyaltyTitle());
 
-        out.put(properties.buffer().writerIndex(), ValueType.C);
+        out.puts(properties.buffer().writerIndex(), ValueType.C);
         out.putBytes(properties.buffer());
     }
 }

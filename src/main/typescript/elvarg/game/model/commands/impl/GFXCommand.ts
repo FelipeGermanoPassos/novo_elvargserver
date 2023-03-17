@@ -3,7 +3,7 @@ import { Command } from '../../../model/commands/Command';
 import { Player } from '../../../entity/impl/player/Player';
 import { Graphic } from '../../Graphic';
 
-class GFXCommand implements Command {
+export class GFXCommand implements Command {
     execute(player: Player, command: string, parts: string[]) {
         let gfx = parseInt(parts[1]);
         player.performGraphic(new Graphic(gfx, 0));

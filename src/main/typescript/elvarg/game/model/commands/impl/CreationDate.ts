@@ -1,13 +1,29 @@
 import { Player } from '../../../entity/impl/player/Player';
 import { Command } from '../../../model/commands/Command';
-import * as moment from 'moment';
 
 export class CreationDate implements Command {
     execute(player: Player, command: string, parts: string[]) {
-        let creationDate = moment(player.getCreationDate());
-        let dateSuffix = this.getDateSuffix(creationDate.date());
+        let calendar = new Date(player.getCreationDate().getTime());
 
-        player.forceChat(`I started playing on the ${creationDate.date()}${dateSuffix} of ${creationDate.format('MMMM')}, ${creationDate.year()}!`);
+        let dateSuffix;
+        switch (calendar.getDate() % 10) {
+            case 1:
+                dateSuffix = "st";
+                break;
+            case 2:
+                dateSuffix = "nd";
+                break;
+            case 3:
+                dateSuffix = "rd";
+                break;
+            default:
+                dateSuffix = "th";
+                break;
+        }
+
+        player.forceChat("I started playing on the " + calendar.getDate() + dateSuffix + " of "
+            + new Intl.DateTimeFormat('en-US', { month: 'long' }).format(calendar) + ", "
+            + calendar.getFullYear() + "!");
     }
 
     canUse(player: Player) {

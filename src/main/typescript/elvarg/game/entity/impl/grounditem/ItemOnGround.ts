@@ -1,16 +1,17 @@
-import { World } from "../../../Worlds";
+import { World } from "../../../World";
 import { ItemOnGroundManager, OperationType } from "../grounditem/ItemOnGroundManager"
 import { Player } from "../player/Player"
 import { Item } from "../../../model/Item"
 import { Location } from "../../../model/Location"
 import { PrivateArea } from "../../../model/areas/impl/PrivateArea";
+//import { Optional } from 'optional'
 
 
 
 export class ItemOnGround {
     position: Location;
     state: State = State.SEEN_BY_PLAYER;
-    owner: Optional<string> = Optional.empty();
+    owner: string | null;
     item: Item;
     tick: number;
     goesGlobal: boolean;
@@ -19,7 +20,7 @@ export class ItemOnGround {
     oldAmount: number;
     privateArea: PrivateArea;
 
-    constructor(state: State, owner: Optional<string>, position: Location, item: Item, goesGlobal: boolean, respawnTimer: number, privateArea: PrivateArea) {
+    constructor(state: State, owner: string | undefined, position: Location, item: Item, goesGlobal: boolean, respawnTimer: number, privateArea: PrivateArea) {
         this.state = state;
         this.owner = owner;
         this.position = position;
@@ -42,12 +43,10 @@ export class ItemOnGround {
                     if (this.state == State.SEEN_BY_PLAYER && this.getgoesGlobal()) {
 
                         //We make the item despawn for the owner..
-                        if (this.getOwner().isPresent()) {
-
-
-                            let o = World.getPlayerByName(this.getOwner().get());
-                            if (o.isPresent()) {
-                                ItemOnGroundManager.performPlayer(o.get(), this, OperationType.DELETE);
+                        if (this.getOwner() != null) {
+                            let o = World.getPlayerByName(this.getOwner());
+                            if (o) {
+                                ItemOnGroundManager.performPlayer(o.getAsPlayer(), this, OperationType.DELETE);
                             }
                         }
 
@@ -82,7 +81,7 @@ export class ItemOnGround {
         return this.position;
     }
 
-    public getOwner(): Optional<string> {
+    public getOwner(): string | undefined {
         return this.owner;
     }
 
@@ -151,9 +150,8 @@ export class ItemOnGround {
         if (!(o instanceof ItemOnGround))
             return false;
         let item = o as ItemOnGround;
-        if (item.getOwner().isPresent()
-            && this.getOwner().isPresent()) {
-            if (!item.getOwner().get().equals(this.getOwner().get())) {
+        if (item.getOwner() && this.getOwner()) {
+            if (item.getOwner() !== this.getOwner()) {
                 return false;
             }
         }

@@ -6,16 +6,14 @@ import { EquipPacketListener } from "../../../../../net/packet/impl/EquipPacketL
 import { TimerKey } from "../../../../../util/timers/TimerKey";
 import { CombatAction } from "./CombatAction";
 import { PrayerData } from "../../../../content/PrayerHandler";
-
+import { Player } from "../../player/Player";
+''
 
 export abstract class CombatSwitch implements CombatAction {
 
     switchItemIds: number[];
     prayers: PrayerData[];
     instant: boolean;
-    shouldPerform;
-    stopAfter;
-
 
     constructor(switchItemIds: number[], prayerData?: PrayerData[]) {
         this.switchItemIds = switchItemIds;
@@ -25,6 +23,12 @@ export abstract class CombatSwitch implements CombatAction {
             this.prayers = [];
         }
         this.instant = false;
+    }
+    shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
+        throw new Error("Method not implemented.");
+    }
+    stopAfter(): boolean {
+        throw new Error("Method not implemented.");
     }
 
     private doSwitch(playerBot: PlayerBot) {

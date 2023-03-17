@@ -6,49 +6,19 @@ import { Location } from "../../../../model/Location"
 import { FightCavesArea } from "../../../../model/areas/impl/FightCavesArea"
 
 export class TztokJad extends NPC {
-    private static readonly COMBAT_METHOD = new JadCombatMethod();
-    area: FightCavesArea;
+    private static readonly COMBAT_METHOD: CombatMethod = new JadCombatMethod();
 
-    constructor(player: Player, area: FightCavesArea, id: number, position: Location) {
-        super(id, position);
-        this.setOwner(player);
-        this.area = area;
-        this.area.add(this);
-    }
+constructor(private player: Player, private area: FightCavesArea, private id: number, private position: Location) {
+    super(id, position);
+    this.setOwner(player);
+    area.add(this);
+}
 
-    public aggressionDistance(): number {
+    aggressionDistance(): number {
         return 64;
     }
 
-    public getCombatMethod(): CombatMethod {
+    getCombatMethod(): CombatMethod {
         return TztokJad.COMBAT_METHOD;
-    }
-
-    public location() {
-
-    }
-
-    public getSize() {
-
-    }
-
-    public getLocation() {
-
-    }
-
-    public setLocation() {
-
-    }
-
-    public setArea() {
-
-    }
-
-    public getArea() {
-
-    }
-
-    public getPrivateArea() {
-
     }
 }

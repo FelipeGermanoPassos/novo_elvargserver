@@ -1,65 +1,12 @@
 import { Mobile } from "../../../entity/impl/Mobile";
 import { Player } from "../../../entity/impl/player/Player";
-import { UpdateFlag } from "../../../model/UpdateFlag"
-import { Spell } from "./Spell";
-<<<<<<< Updated upstream
-=======
-import { Skill } from "../../../model/Skill";
-import { Item } from "../../../model/Item";
-import { MagicSpellbook } from "../../../model/MagicSpellbook";
+import { Animation } from "../../../model/Animation";
 import { Graphic } from "../../../model/Graphic";
 import { GraphicHeight } from "../../../model/GraphicHeight";
-import { EffectTimer } from "../../../model/EffectTimer";
-import { Animation } from "../../../model/Animation";
-
-class EffectSpellSpell implements Spell {
-
-    constructor(private readonly spellIdFunction: Function, private readonly levelRequiredFunction: Function, private readonly baseExperienceFunction: Function, private readonly itemsRequiredFunction: Function, private readonly equipmentRequiredFunction: Function, private readonly startCastFunction: Function, getSpellbookFunction?: Function) {
-
-    }
-
-    baseExperience(): number {
-        return this.baseExperienceFunction();
-    }
-
-    spellId(): number {
-        return this.spellIdFunction();
-    }
-    levelRequired(): number {
-        return this.levelRequiredFunction();
-    }
-    itemsRequired(player: Player): Item[] {
-        return this.itemsRequiredFunction();
-    }
-    equipmentRequired(player: Player): Item[] {
-        return this.equipmentRequiredFunction();
-    }
-    startCast(cast: Mobile, castOn: Mobile): void {
-        return this.startCastFunction();
-    }
-    public getSpellbook(): MagicSpellbook {
-        return this.spellIdFunction();
-    }
-    canCast(player: Player, del: boolean): boolean {
-        throw new Error("Method not implemented.");
-    }
-    private spell: EffectSpells;
-
-
-
-    public static forSpellId(spellId: number): EffectSpells {
-        const spell = EffectSpells.map.get(spellId);
-        return spell;
-    }
-
-    private static spell: Spell;
-
-    private static getSpell(): Spell {
-        return this.spell;
-    }
-
-}
->>>>>>> Stashed changes
+import { Item } from "../../../model/Item";
+import { MagicSpellbook } from "../../../model/MagicSpellbook";
+import { Skill } from "../../../model/Skill";
+import { Spell } from "./Spell";
 
 export class EffectSpells {
 
@@ -68,8 +15,8 @@ export class EffectSpells {
 
     public static handleSpell(player: Player, button: number) {
 
-        const spell = EffectSpellSpell.forSpellId(button);
-        if (spell instanceof EffectSpellSpell) {
+        const spell = EffectSpells.forSpellId(button);
+        if (spell instanceof EffectSpells) {
             if (spell !== null) {
                 return false;
             }
@@ -141,67 +88,11 @@ export class EffectSpells {
             }
             return true;
         }
-<<<<<<< Updated upstream
-        switch (spell.get()) {
-            case this.BONES_TO_PEACHES:
-            case this.BONES_TO_BANANAS:
-                if (!player.getClickDelay().elapsed(500)) {
-                    return true;
-                }
-                if (!player.getInventory().contains(526)) {
-                    player.getPacketSender().sendMessage("You do not have any bones in your inventory.");
-                    return true;
-                }
-                player.getInventory().deleteItemSet(spell.get().getSpell().itemsRequired(player));
-                let i = 0;
-                player.getInventory().getValidItems().forEach(invItem => {
-                    if (invItem.getId() == 526) {
-                        player.getInventory().delete(526, 1).add(spell.get() == EffectSpell.BONES_TO_PEACHES ? 6883 : 1963, 1);
-                        i++;
-                    }
-                });
-                player.performGraphic(new Graphic(141, GraphicHeight.MIDDLE));
-                player.performAnimation(new Animation(722));
-                player.getSkillManager().addExperience(Skill.MAGIC, spell.get().getSpell().baseExperience() * i);
-                player.getClickDelay().reset();
-                break;
-            case VENGEANCE:
-                if (player.getDueling().inDuel()) {
-                    player.getPacketSender().sendMessage("You cannot cast Vengeance during a duel!");
-                    return true;
-                }
-                if (player.getSkillManager().getMaxLevel(Skill.DEFENCE) < 40) {
-                    player.getPacketSender().sendMessage("You need at least level 40 Defence to cast this spell.");
-                    return true;
-                }
-                if (player.hasVengeance()) {
-                    player.getPacketSender().sendMessage("You already have Vengeance's effect.");
-                    return true;
-                }
-
-
-                if (!player.getVengeanceTimer().finished()) {
-                    player.getPacketSender().sendMessage("You must wait another " + player.getVengeanceTimer().secondsRemaining() + " seconds before you can cast that again.");
-                    return true;
-                }
-
-                //Send message and effect timer to client
-
-                player.setHasVengeance(true);
-                player.getVengeanceTimer().start(30);
-                player.getPacketSender().sendEffectTimer(30, EffectTimer.VENGEANCE)
-                    .sendMessage("You now have Vengeance's effect.");
-                player.getInventory().deleteItemSet(EffectSpell.VENGEANCE.getSpell().itemsRequired(player));
-                player.performAnimation(new Animation(4410));
-                player.performGraphic(new Graphic(726, GraphicHeight.HIGH));
-                break;
-=======
-        else {
-            throw new Error("Error in spell casting!");
->>>>>>> Stashed changes
-        }
-
     }
+
+
+
+
 
     public static readonly BONES_TO_BANANAS = new EffectSpells(
         null,

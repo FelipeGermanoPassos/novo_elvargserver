@@ -10,7 +10,7 @@ import { Projectile } from "../../../../../model/Projectile";
 
 export class BallistaCombatMethod extends RangedCombatMethod {
 
-    private static readonly ANIMATION = new Animation(7222, Priority.HIGH);
+    private static readonly ANIMATION = new Animation(7222);
 
     hits(character: Mobile, target: Mobile): PendingHit[] {
         return [new PendingHit(character, target, this, 2)];
@@ -34,7 +34,7 @@ export class BallistaCombatMethod extends RangedCombatMethod {
         const player = character.getAsPlayer();
         CombatSpecial.drain(player, CombatSpecial.BALLISTA.getDrainAmount());
         character.performAnimation(BallistaCombatMethod.ANIMATION);
-        new Projectile(player, target, 1301, 70, 30, 43, 31).sendProjectile();
+        Projectile.createProjectile(player, target, 1301, 70, 30, 43, 31).sendProjectile();
         CombatFactory.decrementAmmo(player, target.getLocation(), 1);
     }
 }

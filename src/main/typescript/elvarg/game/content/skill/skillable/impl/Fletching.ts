@@ -1,3 +1,6 @@
+import { ItemDefinition } from "../../../../definition/ItemDefinition";
+import { Skill } from "../../../../model/Skill";
+
 export class Fletching extends ItemIdentifiers {
     /**
  * Attempts to fletch ammo.
@@ -9,7 +12,7 @@ export class Fletching extends ItemIdentifiers {
  */
     public static fletchAmmo(player: Player, itemUsed: number, itemUsedWith: number): boolean {
         //Making ammo such as bolts and arrows..
-        for (let ammo of FletchableAmmo.values()) {
+        for (let ammo of Object.values(FletchableAmmo)) {
             if ((ammo.getItem1() == itemUsed || ammo.getItem1() == itemUsedWith)
                 && (ammo.getItem2() == itemUsed || ammo.getItem2() == itemUsedWith)) {
                 if (player.getSkillManager().getCurrentLevel(Skill.FLETCHING) >= ammo.getLevelReq()) {
@@ -34,7 +37,7 @@ export class Fletching extends ItemIdentifiers {
         return false;
     }
 
-    const fletchCrossbow = (player: Player, itemUsed: number, itemUsedWith: number): boolean => {
+    public static fletchCrossbow = (player: Player, itemUsed: number, itemUsedWith: number): boolean => {
         for (const c of FletchableCrossbow.values()) {
             if ((c.getStock() === itemUsed || c.getStock() === itemUsedWith)
                 && (c.getLimbs() === itemUsed || c.getLimbs() === itemUsedWith)) {
@@ -47,7 +50,7 @@ export class Fletching extends ItemIdentifiers {
         return false;
     }
 
-    const stringBow = (player: Player, itemUsed: number, itemUsedWith: number): boolean => {
+    public static stringBow = (player: Player, itemUsed: number, itemUsedWith: number): boolean => {
         if (itemUsed === BOW_STRING || itemUsedWith === BOW_STRING || itemUsed === CROSSBOW_STRING || itemUsedWith === CROSSBOW_STRING) {
             const string = itemUsed === BOW_STRING || itemUsed === CROSSBOW_STRING ? itemUsed : itemUsedWith;
             const unstrung = itemUsed === BOW_STRING || itemUsed === CROSSBOW_STRING ? itemUsedWith : itemUsed;
@@ -67,7 +70,7 @@ export class Fletching extends ItemIdentifiers {
         return false;
     }
 
-    const fletchLog = (player: Player, itemUsed: number, itemUsedWith: number): boolean => {
+    public static fletchLog = (player: Player, itemUsed: number, itemUsedWith: number): boolean => {
         if (itemUsed === ItemIdentifiers.KNIFE || itemUsedWith === ItemIdentifiers.KNIFE) {
             const logId = itemUsed === ItemIdentifiers.KNIFE ? itemUsedWith : itemUsed;
             const list = FletchableLog.logs.get(logId);
@@ -126,7 +129,6 @@ enum FletchableAmmo {
     DRAGONSTONE_BOLTS = { id: 9144, arrowHead: 9193, product: 9341, level: 82, exp: 71 },
     ONYX_BOLTS = { id: 9144, arrowHead: 9194, product: 9342, level: 94, exp: 73 };
 
-    class FletchableAmmo {
     constructor(
         public item1: number,
         public item2: number,
@@ -135,7 +137,8 @@ enum FletchableAmmo {
         public levelReq: number
     ) { }
     
-        public getItem1(): number {
+        
+    public getItem1(): number {
         return this.item1;
     }
     

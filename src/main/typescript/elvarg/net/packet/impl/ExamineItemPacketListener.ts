@@ -1,4 +1,11 @@
-class ExamineItemPacketListener implements PacketExecutor {
+import { Misc } from "../../../util/Misc";
+import { Bank } from "../../../game/model/container/impl/Bank";
+import { Player } from "../../../game/entity/impl/player/Player";
+import { ItemDefinition } from "../../../game/definition/ItemDefinition";
+import { PacketExecutor } from "../PacketExecutor";
+import { Packet } from "../Packet";
+
+export class ExamineItemPacketListener implements PacketExecutor {
     execute(player: Player, packet: Packet) {
         let itemId = packet.readShort();
         let interfaceId = packet.readInt();

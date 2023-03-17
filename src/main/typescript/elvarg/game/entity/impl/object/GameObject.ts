@@ -1,6 +1,6 @@
 import { Entity } from "../../Entity";
 import { ObjectDefinition } from "../../../definition/ObjectDefinition"
-import { World } from "../../../Worlds";
+import { World } from "../../../World";
 import { Player } from "../player/Player";
 import { Animation } from "../../../model/Animation"
 import { Graphic } from "../../../model/Graphic"

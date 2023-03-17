@@ -7,12 +7,12 @@ import { CombatSpecial } from "../../../CombatSpecial";
 import { PendingHit } from "../../../hit/PendingHit";
 
 export class SaradominSwordCombatMethod extends MeleeCombatMethod {
-    private static ENEMY_GRAPHIC = new Graphic(1196, Priority.HIGH);
-    private static ANIMATION = new Animation(1132, Priority.HIGH);
+    private static ENEMY_GRAPHIC = new Graphic(1196);
+    private static ANIMATION = new Animation(1132);
     private static GRAPHIC = new Graphic(1213, Priority.HIGH);
 
     hits(character: Mobile, target: Mobile): PendingHit[] {
-        const hit = new PendingHit(character, target, this, true, 2, 0);
+        const hit = new PendingHit(character, target, this, 2);
         hit.getHits()[1].setDamage(hit.isAccurate() ? hit.getHits()[0].getDamage() + 16 : 0);
         hit.updateTotalDamage();
         return [hit];

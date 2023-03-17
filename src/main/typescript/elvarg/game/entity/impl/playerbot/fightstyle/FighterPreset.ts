@@ -6,8 +6,3 @@ export interface FighterPreset {
     getCombatActions(): CombatAction[];
     eatAtPercent(): number
 }
-export class FighterPreset{
-    eatAtPercent(){
-        return 40;
-    }
-}

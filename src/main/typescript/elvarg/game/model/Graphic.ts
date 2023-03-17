@@ -1,17 +1,17 @@
 import { GraphicHeight } from "./GraphicHeight";
 import { Priority } from "./Priority";
 export class Graphic {
-    private id: number;
-    private delay: number;
-    private height: GraphicHeight;
-    private priority: Priority;
+    public id: number;
+    public delay: number;
+    public height: GraphicHeight;
+    public priority: Priority;
 
-    constructor(id: number, delay: number) {
+    constructor(id: number, delay?: number, height: GraphicHeight = GraphicHeight.LOW) {
         this.id = id;
-        this.delay = delay;
-        this.height = GraphicHeight.LOW;
+        this.delay = delay ?? -1;
+        this.height = height;
         this.priority = Priority.LOW;
-    }
+      }
 
     public getId(): number {
         return this.id;

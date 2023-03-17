@@ -10,10 +10,15 @@ import { PolygonalBoundary } from "../../../PolygonalBoundary";
 import { Equipment } from "../../../container/impl/Equipment";
 import { Team } from "../../../../content/minigames/impl/CastleWars";
 import { Task } from "../../../../task/Task";
+import { ObjectIdentifiers } from "../../../../../util/ObjectIdentifiers";
+import { Location } from "../../../Location";
+import { Flag } from "../../../Flag";
+import { StatementDialogue } from "../../../dialogues/entries/impl/StatementDialogue";
+import { Item } from "../../../Item";
 
 
 
-class CastleWarsGameArea extends Area {
+export class CastleWarsGameArea extends Area {
     private static DUNGEON_BOUNDARIES: Boundary[] = [
         new Boundary(2365, 2404, 9500, 9530,0),
         new Boundary(2394, 2431, 9474, 9499,0),
@@ -65,17 +70,17 @@ class CastleWarsGameArea extends Area {
             return;
         }
 
-        CastleWars.Team.removePlayer(player);
+        Team.removePlayer(player);
 
-        if (this.player.size < 2 || (CastleWars.Team.ZAMORAK.getPlayers().size === 0 ||
-            CastleWars.Team.SARADOMIN.getPlayers().size === 0)) {
+        if (this.getPlayers.length < 2 || (Team.ZAMORAK.getPlayers().length === 0 ||
+           Team.SARADOMIN.getPlayers().length === 0)) {
         // If either team has no players left, the game must end
             CastleWars.endGame();
         }
 
         if (logout) {
         // Player has logged out, teleport them to the lobby
-            player.moveTo(new Location());
+            player.moveTo(new Location(2440, 3089, 0));
         }
 
         // Remove items
@@ -91,13 +96,11 @@ class CastleWarsGameArea extends Area {
         player.getPacketSender().sendEntityHintRemoval(true);
     }
 
-    @Override
     public canPlayerBotIdle(playerBot: PlayerBot): boolean {
         // Allow Player Bots to idle here
         return true;
     }
 
-    @Override
     public canEquipItem(player: Player, slot: number, item: Item): boolean {
         if (slot === Equipment.CAPE_SLOT || slot === Equipment.HEAD_SLOT) {
             player.getPacketSender().sendMessage("You can't remove your team's colours.");
@@ -117,21 +120,21 @@ class CastleWarsGameArea extends Area {
         
     handleObjectClick(player: any, objectId: number, type: number) {
         switch (objectId) {
-            case PORTAL_10:// Portals in team respawn room
-            case PORTAL_11:
-                player.moveTo(new Loc ation(2440, 3089, 0));
+            case ObjectIdentifiers.PORTAL_10:// Portals in team respawn room
+            case ObjectIdentifiers.PORTAL_11:
+                player.moveTo(new Location(2440, 3089, 0));
                 player.getPacketSender().sendMessage("The Castle Wars game has ended for you!");
                 return true;
     
-            case SARADOMIN_STANDARD_2:
+            case ObjectIdentifiers.SARADOMIN_STANDARD_2:
             case 4377:
-                let team = CastleWars.Team.getTeamForPlayer(player);
+                let team = Team.getTeamForPlayer(player);
                 if (team == null) {
                     return true;
                 }
     
         switch (team) {
-            case CastleWars.Team.SARADOMIN:
+            case Team.SARADOMIN:
             CastleWars.returnFlag(player, player.getEquipment().getSlot(Equipment.WEAPON_SLOT));
             return true;
             case CastleWars.Team.ZAMORAK:
@@ -140,15 +143,15 @@ class CastleWarsGameArea extends Area {
         }
         return true;
     
-        case ZAMORAK_STANDARD_2: // zammy flag
+        case ObjectIdentifiers.ZAMORAK_STANDARD_2: // zammy flag
         case 4378:
-            team = CastleWars.Team.getTeamForPlayer(player);
+            team = Team.getTeamForPlayer(player);
             if (team == null) {
                 return true;
             }
 
         switch (team) {
-            case CastleWars.Team.SARADOMIN:
+            case Team.SARADOMIN:
                 CastleWars.captureFlag(player, team);
                 return true;
             case CastleWars.Team.ZAMORAK:
@@ -157,16 +160,16 @@ class CastleWarsGameArea extends Area {
         }
         return true;
 
-        case TRAPDOOR_16: // Trap door into saradomin spawn point
-            if (CastleWars.Team.getTeamForPlayer(player) == CastleWars.Team.ZAMORAK) {
+        case ObjectIdentifiers.TRAPDOOR_16: // Trap door into saradomin spawn point
+            if (Team.getTeamForPlayer(player) == Team.ZAMORAK) {
                 player.getPacketSender().sendMessage("You are not allowed in the other teams spawn point.");
                 return true;
             }
 
             player.moveTo(new Location(2429, 3075, 1));
             return true;
-        case TRAPDOOR_17: // Trap door into saradomin spawn point
-            if (CastleWars.Team.getTeamForPlayer(player) == CastleWars.Team.SARADOMIN) {
+        case ObjectIdentifiers.TRAPDOOR_17: // Trap door into saradomin spawn point
+            if (Team.getTeamForPlayer(player) == Team.SARADOMIN) {
                 player.getPacketSender().sendMessage("You are not allowed in the other teams spawn point.");
                 return true;
             }
@@ -179,12 +182,12 @@ class CastleWarsGameArea extends Area {
     }
 
     canTeleport(player: any) {
-        ConditionDialogue.send(player, "You can't leave just like that!");
+        StatementDialogue.send(player, "You can't leave just like that!");
         return false;
         }
         
     handleDeath(player: any, kill: any) {
-        let team = CastleWars.Team.getTeamForPlayer(player);
+        let team = Team.getTeamForPlayer(player);
     
         if (team == null) {
             console.error("no team for " + player.getUsername());

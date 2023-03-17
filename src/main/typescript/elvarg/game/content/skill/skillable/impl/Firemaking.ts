@@ -1,33 +1,67 @@
-class Firemaking extends DefaultSkillable {
+import { Animation } from "../../../../model/Animation";
+import { Player } from "../../../../entity/impl/player/Player";
+import { GameObject } from "../../../../entity/impl/object/GameObject";
+import { ItemOnGround } from "../../../../entity/impl/grounditem/ItemOnGround";
+import { ItemIdentifiers } from "../../../../../util/ItemIdentifiers";
+import { DefaultSkillable } from "./DefaultSkillable";
+import { ItemOnGroundManager } from "../../../../entity/impl/grounditem/ItemOnGroundManager";
+import { Task } from "../../../../task/Task";
+import { TaskManager } from "../../../../task/TaskManager";
+import { ObjectIdentifiers } from "../../../../../util/ObjectIdentifiers";
+import { MovementQueue } from "../../../../model/movement/MovementQueue";
+import { Skill } from "../../../../model/Skill";
+import { Misc } from "../../../../../util/Misc";
+import { ObjectManager } from "../../../../entity/impl/object/ObjectManager";
+import { Item } from "../../../../model/Item";
+import { TimedObjectSpawnTask } from '../../../../task/impl/TimedObjectSpawnTask'
+import { PetHandler } from "../../../PetHandler";
+import { Cooking } from './Cooking'
+import { Action } from "../../../../model/Action";
+
+class FireAction implements Action {
+    constructor(private readonly execFunc: Function){
+
+    }
+    execute(): void {
+        this.execFunc();
+    }
+
+}
+
+class FireMakingTask extends Task {
+
+    constructor(n: number, player: Player, b: boolean, private readonly func: Function) {
+        super(3);
+    }
+
+    execute(): void {
+        this.func();
+    }
+
+}
+
+export class Firemaking extends DefaultSkillable {
     static LIGHT_FIRE = new Animation(733);
     /**
      * The {@link LightableLog} which we will be attempting
      * to light.
      */
-    private log: LightableLog;
-    /**
-     * A log on the ground.
-     * <p>
-     * If present - we will focus on lighting this instead of
-     * a log from the inventory.
-     */
-    private groundLog: ItemOnGround | undefined;
-    /**
-     * Represents a bonfire, which we will be adding logs to
-     * if present.
-     */
-    private bonfire: GameObject | undefined;
-    /**
-     * Represents the amount of logs to add to a bonfire.
-     */
-    private bonfireAmount: number;
+    log: LightableLog;
+    groundLog: ItemOnGround | null = null;
+    bonfire: GameObject | null = null;
+    bonfireAmount: number | null = null;
 
-    FireMaking(log: LightableLog, bonfire: GameObject, bonfireAmount: number) {
+    constructor(log: LightableLog, groundLog?: ItemOnGround, bonfire?: GameObject, bonfireAmount?: number) {
+        super();
         this.log = log;
-        this.bonfire = bonfire;
-        this.bonfireAmount = bonfireAmount;
+        if (groundLog !== undefined) {
+            this.groundLog = groundLog;
+        }
+        if (bonfire !== undefined && bonfireAmount !== undefined) {
+            this.bonfire = bonfire;
+            this.bonfireAmount = bonfireAmount;
+        }
     }
-
     /**
      * Checks if we should light a log.
      *
@@ -58,10 +92,10 @@ class Firemaking extends DefaultSkillable {
         //If we're lighting a log from our inventory..
         if (!this.groundLog && !this.bonfire) {
             //Delete logs from inventory..
-            player.getInventory().delete(this.log.getLogId(), 1);
+            player.getInventory().deleteNumber(this.log.getLogId(), 1);
 
             //Place logs on ground..
-            this.groundLog = ItemOnGroundManager.register(player, new Item(this.log.getLogId(), 1));
+            this.groundLog = ItemOnGroundManager.registers(player, new Item(this.log.getLogId(), 1));
         }
 
         //Face logs if present.
@@ -80,7 +114,7 @@ class Firemaking extends DefaultSkillable {
             player.performAnimation(Firemaking.LIGHT_FIRE);
             return;
         }
-        const animLoop = new Task(3, player, true, () => {
+        const animLoop = new FireMakingTask(3, player, true, () => {
             player.performAnimation(Cooking.ANIMATION); //Cooking anim looks fine for bonfires
         });
         TaskManager.submit(animLoop);
@@ -114,11 +148,11 @@ class Firemaking extends DefaultSkillable {
 
                 //Create fire..
                 TaskManager.submit(new TimedObjectSpawnTask(new GameObject(ObjectIdentifiers.FIRE_5, pos, 10, 0, player.getPrivateArea()), this.log.getRespawnTimer(),
-                    () => {
-                        if (!ItemOnGroundManager.getGroundItem(player.getUsername(), ItemIdentifiers.ASHES, pos).isPresent()) {
-                            ItemOnGroundManager.register(player, new Item(ItemIdentifiers.ASHES), pos);
+                new FireAction(() => {
+                        if (!ItemOnGroundManager.getGroundItem(player.getUsername(), ItemIdentifiers.ASHES, pos)) {
+                            ItemOnGroundManager.registerLocation(player, new Item(ItemIdentifiers.ASHES), pos);
                         }
-                    }));
+                    })));
 
                 //Step away from the fire..
                 if (player.getLocation().equals(pos)) {
@@ -126,11 +160,11 @@ class Firemaking extends DefaultSkillable {
                 }
             } else {
                 //Delete logs from inventory when using a bonfire..
-                player.getInventory().delete(this.log.getLogId(), 1);
+                player.getInventory().deleteNumber(this.log.getLogId(), 1);
             }
 
             //Add experience..
-            player.getSkillManager().addExperience(Skill.FIREMAKING, this.log.getExperience());
+            player.getSkillManager().addExperiences(Skill.FIREMAKING, this.log.getExperience());
 
             //Send message..
             player.getPacketSender().sendMessage("The logs catch fire and begin to burn.");
@@ -180,7 +214,7 @@ class Firemaking extends DefaultSkillable {
         } else {
             //Check if there's already an object where the player wants to light a fire..
             if (/*ClippedRegionManager.getObject(player.getPosition()).isPresent()
-                    ||*/ ObjectManager.exists(player.getLocation())) {
+                    ||*/ ObjectManager.existsLocation(player.getLocation())) {
                 player.getPacketSender().sendMessage("You cannot light a fire here. Try moving around a bit.");
                 return false;
             }
@@ -204,49 +238,47 @@ class Firemaking extends DefaultSkillable {
     }
 }
 
-enum LightableLog {
-    NORMAL = { logId: 1511, level: 1, experience: 40, cycles: 7, firemakingRespawnTimer: 60 },
-    ACHEY = { logId: 2862, level: 1, experience: 40, cycles: 7, firemakingRespawnTimer: 65 },
-    OAK = { logId: 1521, level: 15, experience: 60, cycles: 8, firemakingRespawnTimer: 70 },
-    WILLOW = { logId: 1519, level: 30, experience: 90, cycles: 9, firemakingRespawnTimer: 80 },
-    TEAK = { logId: 6333, level: 35, experience: 105, cycles: 9, firemakingRespawnTimer: 80 },
-    ARTIC_PINE = { logId: 10810, level: 42, experience: 125, cycles: 10, firemakingRespawnTimer: 80 },
-    MAPLE = { logId: 1517, level: 45, experience: 135, cycles: 10, firemakingRespawnTimer: 85 },
-    MAHOGANY = { logId: 6332, level: 50, experience: 157, cycles: 11, firemakingRespawnTimer: 85 },
-    EUCALYPTUS = { logId: 12581, level: 58, experience: 193, cycles: 12, firemakingRespawnTimer: 85 },
-    YEW = { logId: 1515, level: 60, experience: 202, cycles: 13, firemakingRespawnTimer: 90 },
-    MAGIC = { logId: 1513, level: 75, experience: 303, cycles: 15, firemakingRespawnTimer: 100 },
+export class LightableLog {
+    NORMAL = { logId: 1511, level: 1, experience: 40, cycles: 7, firemakingRespawnTimer: 60 };
+    ACHEY = { logId: 2862, level: 1, experience: 40, cycles: 7, firemakingRespawnTimer: 65 };
+    OAK = { logId: 1521, level: 15, experience: 60, cycles: 8, firemakingRespawnTimer: 70 };
+    WILLOW = { logId: 1519, level: 30, experience: 90, cycles: 9, firemakingRespawnTimer: 80 };
+    TEAK = { logId: 6333, level: 35, experience: 105, cycles: 9, firemakingRespawnTimer: 80 };
+    ARTIC_PINE = { logId: 10810, level: 42, experience: 125, cycles: 10, firemakingRespawnTimer: 80 };
+    MAPLE = { logId: 1517, level: 45, experience: 135, cycles: 10, firemakingRespawnTimer: 85 };
+    MAHOGANY = { logId: 6332, level: 50, experience: 157, cycles: 11, firemakingRespawnTimer: 85 };
+    EUCALYPTUS = { logId: 12581, level: 58, experience: 193, cycles: 12, firemakingRespawnTimer: 85 };
+    YEW = { logId: 1515, level: 60, experience: 202, cycles: 13, firemakingRespawnTimer: 90 };
+    MAGIC = { logId: 1513, level: 75, experience: 303, cycles: 15, firemakingRespawnTimer: 100 };
     REDWOOD = { logId: 19669, level: 90, experience: 350, cycles: 18, firemakingRespawnTimer: 120 };
 
-    let lightableLogs: { [key: number]: LightableLog } = { };
+    private static lightableLogs: { [key: number]: LightableLog } = {};
 
-    LightableLog.prototype.getExperience = function () {
+    getExperience() {
         return this.experience;
     }
 
-    LightableLog.prototype.getLogId = function () {
+    getLogId() {
         return this.logId;
     }
 
-    LightableLog.prototype.getLevel = function () {
+    getLevel() {
         return this.level;
     }
 
-    LightableLog.prototype.getCycles = function () {
+    getCycles() {
         return this.cycles;
     }
 
-    LightableLog.prototype.getRespawnTimer = function () {
+    getRespawnTimer() {
         return this.respawnTimer;
     }
 
-    LightableLog.prototype.getForItem = function (item: number) {
-        return lightableLogs[item] ? lightableLogs[item] : null;
+    public static getForItem(item: number) {
+        return LightableLog.lightableLogs[item] ? LightableLog.lightableLogs[item] : null;
     }
 
-    for (let log in LightableLog) {
-        if (typeof LightableLog[log] === "object") {
-            lightableLogs[LightableLog[log].logId] = LightableLog[log];
-        }
+    constructor(private logId: number, private level: number, private experience: number, private cycles: number, private respawnTimer: number) {
+        LightableLog.lightableLogs[logId] = this;
     }
 }

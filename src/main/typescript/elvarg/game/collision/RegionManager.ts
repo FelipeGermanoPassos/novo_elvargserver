@@ -55,11 +55,11 @@ export class RegionManager {
     }
 
     public static getRegion(x: number, y: number): Region | undefined {
-        loadMapFiles(x, y);
+        RegionManager.loadMapFiles(x, y);
         let regionX = x >> 3;
         let regionY = y >> 3;
         let regionId = ((regionX / 8) << 8) + (regionY / 8);
-        return RegionManager.getRegion(regionId);
+        return RegionManager.getRegionid(regionId);
     }
     private static addClippingForVariableObject(x: number, y: number, height: number, type: number, direction: number, tall: boolean, privateArea: PrivateArea) {
         if (type == 0) {
@@ -287,7 +287,7 @@ export class RegionManager {
     }
 
     public static addObject(objectId: number, x: number, y: number, height: number, type: number, direction: number) {
-        const position = new Location(x, y, height);
+        const position = new Location(x, y);
 
         if (height === 0) {
             if (x >= 3092 && x <= 3094 && (y === 3513 || y === 3514 || y === 3507 || y === 3506)) {
@@ -336,16 +336,16 @@ export class RegionManager {
         }
 
         if (type === 22) {
-            if (def.hasActions() && def.solid) {
+            if (def.hasActions() && ObjectDefinition.solid) {
                 RegionManager.addClipping(x, y, height, 0x200000, object.getPrivateArea());
             }
         } else if (type >= 9) {
-            if (def.solid) {
-                RegionManager.addClippingForSolidObject(x, y, height, xLength, yLength, def.impenetrable, object.getPrivateArea());
+            if (ObjectDefinition.solid) {
+                RegionManager.addClippingForSolidObject(x, y, height, xLength, yLength, ObjectDefinition.impenetrable, object.getPrivateArea());
             }
         } else if (type >= 0 && type <= 3) {
-            if (def.solid) {
-                RegionManager.addClippingForVariableObject(x, y, height, type, direction, def.impenetrable, object.getPrivateArea());
+            if (ObjectDefinition.solid) {
+                RegionManager.addClippingForVariableObject(x, y, height, type, direction, ObjectDefinition.impenetrable, object.getPrivateArea());
             }
         }
     }
@@ -376,23 +376,23 @@ export class RegionManager {
         }
 
         if (type === 22) {
-            if (def.hasActions() && def.solid) {
+            if (def.hasActions() && ObjectDefinition.solid) {
                 this.removeClipping(x, y, height, 0x200000, object.getPrivateArea());
             }
         } else if (type >= 9) {
-            if (def.solid) {
-                this.removeClippingForSolidObject(x, y, height, xLength, yLength, def.solid, object.getPrivateArea());
+            if (ObjectDefinition.solid) {
+                this.removeClippingForSolidObject(x, y, height, xLength, yLength, ObjectDefinition.solid, object.getPrivateArea());
             }
         } else if (type >= 0 && type <= 3) {
-            if (def.solid) {
-                RegionManager.removeClippingForVariableObject(x, y, height, type, direction, def.solid, object.getPrivateArea());
+            if (ObjectDefinition.solid) {
+                RegionManager.removeClippingForVariableObject(x, y, height, type, direction, ObjectDefinition.solid, object.getPrivateArea());
             }
         }
     }
 
     public static addClipping(x: number, y: number, height: number, shift: number, privateArea: PrivateArea) {
         if (privateArea) {
-            privateArea.setClip(new Location(x, y, height), shift);
+            privateArea.setClip(new Location(x, y), shift);
             return;
         }
         const r = RegionManager.getRegion(x, y);
@@ -414,7 +414,7 @@ export class RegionManager {
 
     public static getClipping(x: number, y: number, height: number, privateArea: PrivateArea) {
         if (privateArea) {
-            const privateClip = privateArea.getClip(new Location(x, y, height));
+            const privateClip = privateArea.getClip(new Location(x, y));
             if (privateClip !== 0) {
                 return privateClip;
             }
@@ -429,7 +429,7 @@ export class RegionManager {
     }
 
     public static wallExists(location: Location, area: PrivateArea, type: number) {
-        const object = MapObjects.get(location, type, area);
+        const object = MapObjects.get(type, location, area);
         if (object) {
             const objectDef = object.getDefinition();
             if (!objectDef.name || objectDef.name === "null") {
@@ -527,7 +527,7 @@ export class RegionManager {
             a = to;
             b = from;
         }
-        return this.canProjectileAttack(a, b, attacker.size, attacker.getPrivateArea());
+        return this.canProjectileAttack(attacker, from, to);
     }
     public static canProjectileAttackTarget(attacker: Mobile, target: Mobile): boolean {
         let a = attacker.getLocation();
@@ -542,7 +542,7 @@ export class RegionManager {
             a = target.getLocation();
             b = attacker.getLocation();
         }
-        return RegionManager.canProjectileAttack(a, b, attacker.size(), attacker.getPrivateArea());
+        return RegionManager.canProjectileAttack(attacker, a, b);
     }
 
     public static canProjectileAttackReturn(a: Location, b: Location, size: number, area: PrivateArea): boolean {

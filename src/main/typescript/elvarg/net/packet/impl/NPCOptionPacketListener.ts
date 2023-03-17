@@ -1,4 +1,23 @@
-class NPCOptionPacketListener {
+import { Player } from "../../../game/entity/impl/player/Player";
+import { Packet } from "../Packet";
+import { World } from "../../../game/World";
+import { PacketConstants } from "../PacketConstants";
+import { CombatSpells } from "../../../game/content/combat/magic/CombatSpells";
+import { PetHandler } from "../../../game/content/PetHandler";
+import { QuestHandler } from "../../../game/content/quests/QuestHandler";
+import { Fishing, FishingTool } from '../../../game/content/skill/skillable/impl/Fishing'
+import { Pickpocketing } from '../../../game/content/skill/skillable/impl/Thieving'
+import { ParduDialogue } from '../../../game/model/dialogues/builders/impl/ParduDialogue'
+import { PlayerRights } from "../../../game/model/rights/PlayerRights";
+import { NPCInteractionSystem } from "../../../game/entity/impl/npc/NPCInteractionSystem";
+import { ShopManager } from "../../../game/model/container/shop/ShopManager";
+import { NPC } from "../../../game/entity/impl/npc/NPC";
+import { EmblemTraderDialogue } from "../../../game/model/dialogues/builders/impl/EmblemTraderDialogue";
+import { ShopIdentifiers } from "../../../util/ShopIdentifiers";
+import { NieveDialogue } from '../../../game/model/dialogues/builders/impl/NieveDialogue'
+import { NpcIdentifiers } from "../../../util/NpcIdentifiers";
+
+export class NPCOptionPacketListener {
     execute(player: Player, packet: Packet) {
         if (player.busy()) {
             return;
@@ -6,7 +25,7 @@ class NPCOptionPacketListener {
 
         let index = packet.readLEShortA();
 
-        if (index < 0 || index > World.getNpcs().capacity()) {
+        if (index < 0 || index > World.getNpcs().capacityReturn()) {
             return;
         }
 
@@ -55,7 +74,7 @@ class NPCOptionPacketListener {
             return;
         }
 
-        player.getMovementQueue().walkToEntity(npc, () => handleInteraction(player, npc, packet));
+        player.getMovementQueue().walkToEntity(npc, () => this.handleInteraction(player, npc, packet));
     }
 
     private handleInteraction(player: Player, npc: NPC, packet: Packet) {
@@ -78,51 +97,51 @@ if (opcode === PacketConstants.FIRST_CLICK_NPC_OPCODE) {
     }
 
     switch (npc.getId()) {
-        case SHOP_KEEPER_4:
-            ShopManager.open(player, ShopIdentifiers.GENERAL_STORE);
+        case NpcIdentifiers.SHOP_KEEPER_4:
+            ShopManager.opens(player, ShopIdentifiers.GENERAL_STORE);
             break;
-        case CHARLIE_THE_COOK:
-            ShopManager.open(player, ShopIdentifiers.FOOD_SHOP);
+        case NpcIdentifiers.CHARLIE_THE_COOK:
+            ShopManager.opens(player, ShopIdentifiers.FOOD_SHOP);
             break;
-        case RICK:
-            ShopManager.open(player, ShopIdentifiers.PURE_SHOP);
+        case NpcIdentifiers.RICK:
+            ShopManager.opens(player, ShopIdentifiers.PURE_SHOP);
             break;
-        case AJJAT:
-            ShopManager.open(player, ShopIdentifiers.ARMOR_SHOP);
+        case NpcIdentifiers.AJJAT:
+            ShopManager.opens(player, ShopIdentifiers.ARMOR_SHOP);
             break;
-        case MAGIC_INSTRUCTOR:
-            ShopManager.open(player, ShopIdentifiers.MAGE_ARMOR_SHOP);
+        case NpcIdentifiers.MAGIC_INSTRUCTOR:
+            ShopManager.opens(player, ShopIdentifiers.MAGE_ARMOR_SHOP);
             break;
-        case ARMOUR_SALESMAN:
-            ShopManager.open(player, ShopIdentifiers.RANGE_SHOP);
+        case NpcIdentifiers.ARMOUR_SALESMAN:
+            ShopManager.opens(player, ShopIdentifiers.RANGE_SHOP);
             break;
-        case BANKER_2:
-        case TZHAAR_KET_ZUH:
+        case NpcIdentifiers.BANKER_2:
+        case NpcIdentifiers.TZHAAR_KET_ZUH:
             player.getBank(player.getCurrentBankTab()).open();
             break;
-        case MAKE_OVER_MAGE:
+        case NpcIdentifiers.MAKE_OVER_MAGE:
             player.getPacketSender().sendInterfaceRemoval().sendInterface(3559);
             player.getAppearance().setCanChangeAppearance(true);
             break;
-        case SECURITY_GUARD:
+        case NpcIdentifiers.SECURITY_GUARD:
             //DialogueManager.start(player, 2500);
             break;
-        case EMBLEM_TRADER:
-        case EMBLEM_TRADER_2:
-        case EMBLEM_TRADER_3:
-            player.getDialogueManager().start(new EmblemTraderDialogue());
+        case NpcIdentifiers.EMBLEM_TRADER:
+        case NpcIdentifiers.EMBLEM_TRADER_2:
+        case NpcIdentifiers.EMBLEM_TRADER_3:
+            player.getDialogueManager().startDialogues(new EmblemTraderDialogue());
             break;
 
-        case PERDU:
-            player.getDialogueManager().start(new ParduDialogue());
+        case NpcIdentifiers.PERDU:
+            player.getDialogueManager().startDialogues(new ParduDialogue());
             break;
 
-        case FINANCIAL_ADVISOR:
+        case NpcIdentifiers.FINANCIAL_ADVISOR:
             //DialogueManager.start(player, 15);
             // Removed
             break;
-        case NIEVE:
-            player.getDialogueManager().start(new NieveDialogue());
+        case NpcIdentifiers.NIEVE:
+            player.getDialogueManager().startDialogues(new NieveDialogue());
             break;
     }
     return;
@@ -144,33 +163,33 @@ if (opcode == PacketConstants.SECOND_CLICK_NPC_OPCODE) {
     }
 
     switch (npc.getId()) {
-        case NIEVE:
-            player.getDialogueManager().start(new NieveDialogue(), 2);
+        case NpcIdentifiers.NIEVE:
+            player.getDialogueManager().startDialog(new NieveDialogue(), 2);
             break;
-        case BANKER:
-        case BANKER_2:
-        case BANKER_3:
-        case BANKER_4:
-        case BANKER_5:
-        case BANKER_6:
-        case BANKER_7:
-        case TZHAAR_KET_ZUH:
+        case NpcIdentifiers.BANKER:
+        case NpcIdentifiers.BANKER_2:
+        case NpcIdentifiers.BANKER_3:
+        case NpcIdentifiers.BANKER_4:
+        case NpcIdentifiers.BANKER_5:
+        case NpcIdentifiers.BANKER_6:
+        case NpcIdentifiers.BANKER_7:
+        case NpcIdentifiers.TZHAAR_KET_ZUH:
             player.getBank(player.getCurrentBankTab()).open();
             break;
         case 1497: // Net and bait
         case 1498: // Net and bait
             player.getSkillManager().startSkillable(new Fishing(npc, FishingTool.FISHING_ROD));
             break;
-        case RICHARD_2:
-            ShopManager.open(player, ShopIdentifiers.TEAMCAPE_SHOP);
+        case NpcIdentifiers.RICHARD_2:
+            ShopManager.opens(player, ShopIdentifiers.TEAMCAPE_SHOP);
             break;
-        case EMBLEM_TRADER:
-        case EMBLEM_TRADER_2:
-        case EMBLEM_TRADER_3:
-            ShopManager.open(player, ShopIdentifiers.PVP_SHOP);
+        case NpcIdentifiers.EMBLEM_TRADER:
+        case NpcIdentifiers.EMBLEM_TRADER_2:
+        case NpcIdentifiers.EMBLEM_TRADER_3:
+            ShopManager.opens(player, ShopIdentifiers.PVP_SHOP);
             break;
-        case MAGIC_INSTRUCTOR:
-            ShopManager.open(player, ShopIdentifiers.MAGE_ARMOR_SHOP);
+        case NpcIdentifiers.MAGIC_INSTRUCTOR:
+            ShopManager.opens(player, ShopIdentifiers.MAGE_ARMOR_SHOP);
             break;
 
     }
@@ -190,11 +209,11 @@ if (opcode == PacketConstants.THIRD_CLICK_NPC_OPCODE) {
 
     switch (npc.getId()) {
 
-        case EMBLEM_TRADER:
-            player.getDialogueManager().start(new EmblemTraderDialogue(), 2);
+        case NpcIdentifiers.EMBLEM_TRADER:
+            player.getDialogueManager().startDialog(new EmblemTraderDialogue(), 2);
             break;
-        case MAGIC_INSTRUCTOR:
-            ShopManager.open(player, ShopIdentifiers.MAGE_RUNES_SHOP);
+        case NpcIdentifiers.MAGIC_INSTRUCTOR:
+            ShopManager.opens(player, ShopIdentifiers.MAGE_RUNES_SHOP);
             break;
     }
     return;
@@ -207,8 +226,8 @@ if (opcode == PacketConstants.FOURTH_CLICK_NPC_OPCODE) {
     }
 
     switch (npc.getId()) {
-        case EMBLEM_TRADER:
-            player.getDialogueManager().start(new EmblemTraderDialogue(), 5);
+        case NpcIdentifiers.EMBLEM_TRADER:
+            player.getDialogueManager().startDialog(new EmblemTraderDialogue(), 5);
             break;
     }
     return;

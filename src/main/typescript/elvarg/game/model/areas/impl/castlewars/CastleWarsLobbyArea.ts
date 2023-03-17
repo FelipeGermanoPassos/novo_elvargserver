@@ -5,11 +5,12 @@ import {PlayerBot} from '../../../../entity/impl/playerbot/PlayerBot'
 import {Arrays} from 'collections'
 import {Boundary} from '../../../../model/Boundary';
 import {Area} from '../../../../model/areas/Area';
-import {obj} from  '../../../../../util/ObjectIdentifiers';
+import {ObjectIdentifiers} from  '../../../../../util/ObjectIdentifiers';
+import { Team } from '../../../../content/minigames/impl/CastleWars';
 
 
 
-class CastleWarsLobbyArea extends Area {
+export class CastleWarsLobbyArea extends Area {
     private lanthus: Lanthus;
 
     constructor() {
@@ -22,19 +23,19 @@ class CastleWarsLobbyArea extends Area {
 
     public handleObjectClick(player: Player, objectId: number, type: number): boolean {
         switch (objectId) {
-            case obj.ZAMORAK_PORTAL:
-                CastleWars.addToWaitingRoom(player, CastleWars.Team.ZAMORAK);
+            case ObjectIdentifiers.ZAMORAK_PORTAL:
+                CastleWars.addToWaitingRoom(player, Team.ZAMORAK);
                 return true;
 
-            case obj.SARADOMIN_PORTAL:
-                CastleWars.addToWaitingRoom(player, CastleWars.Team.SARADOMIN);
+            case ObjectIdentifiers.SARADOMIN_PORTAL:
+                CastleWars.addToWaitingRoom(player, Team.SARADOMIN);
                 return true;
 
-            case obj.GUTHIX_PORTAL:
-                CastleWars.addToWaitingRoom(player, CastleWars.Team.GUTHIX);
+            case ObjectIdentifiers.GUTHIX_PORTAL:
+                CastleWars.addToWaitingRoom(player, Team.GUTHIX);
                 return true;
 
-            case obj.CASTLEWARS_BANK_CHEST:
+            case ObjectIdentifiers.BANK_CHEST_2:
                 if (type === 1) {
                     player.getBank(player.getCurrentBankTab()).open();
                 } else {

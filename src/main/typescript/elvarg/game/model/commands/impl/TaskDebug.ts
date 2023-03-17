@@ -3,7 +3,7 @@ import { Command } from '../../../model/commands/Command';
 import { Player } from '../../../entity/impl/player/Player';
 import { TaskManager } from '../../../task/TaskManager';
 
-class TaskDebug implements Command {
+export class TaskDebug implements Command {
     execute(player: Player, command: string, parts: string[]) {
         player.getPacketSender().sendMessage("Active tasks :" + TaskManager.getTaskAmount() + ".");
     }

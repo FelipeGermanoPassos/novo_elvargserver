@@ -1,27 +1,27 @@
 import { CombatType } from "./CombatType";
-import { Skills } from "../../model/Skill";
+import { Skill } from "../../model/Skill";
 export abstract class FightStyle {
     static ACCURATE = new class extends FightStyle {
         skill(type: CombatType) {
-            return type === CombatType.RANGED ? [Skills.RANGED] : [Skills.ATTACK];
+            return type === CombatType.RANGED ? [Skill.RANGED] : [Skill.ATTACK];
         }
     }
 
     static AGGRESSIVE = new class extends FightStyle {
         skill(type: CombatType) {
-            return type === CombatType.RANGED ? [Skills.RANGED] : [Skills.STRENGTH];
+            return type === CombatType.RANGED ? [Skill.RANGED] : [Skill.STRENGTH];
         }
     }
 
     static DEFENSIVE = new class extends FightStyle {
         skill(type: CombatType) {
-            return type === CombatType.RANGED ? [Skills.RANGED, Skills.DEFENCE] : [Skills.DEFENCE];
+            return type === CombatType.RANGED ? [Skill.RANGED, Skill.DEFENCE] : [Skill.DEFENCE];
         }
     }
 
     static CONTROLLED = new class extends FightStyle {
         skill() {
-            return [Skills.ATTACK, Skills.STRENGTH, Skills.DEFENCE];
+            return [Skill.ATTACK, Skill.STRENGTH, Skill.DEFENCE];
         }
     }
 

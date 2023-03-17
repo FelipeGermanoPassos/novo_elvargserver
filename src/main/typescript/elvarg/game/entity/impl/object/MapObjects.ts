@@ -149,7 +149,7 @@ export class MapObjects {
             }
         }
 
-        RegionManager.removeClipping(position.getX(), position.getY(), position.getZ(), clipShift);
+        RegionManager.removeClipping(position.getX(), position.getY(), position.getZ(), clipShift, null);
     }
 
     static getHash(x: number, y: number, z: number): number {

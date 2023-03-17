@@ -1,3 +1,5 @@
+import { Player } from "../../../entity/impl/player/Player";
+
 export interface Skillable {
     start(player: Player): void;
     cancel(player: Player): void;

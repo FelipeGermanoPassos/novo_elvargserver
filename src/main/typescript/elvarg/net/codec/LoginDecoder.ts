@@ -1,18 +1,20 @@
-import { ByteToMessageDecoder, ChannelHandlerContext, ChannelFutureListener } from 'netty';
-import { Server } from './server';
-import { GameConstants } from './game-constants';
-import { ByteBufUtils } from './byte-buf-utils';
-import { NetworkConstants } from './network-constants';
-import { LoginDetailsMessage } from './login/login-details-message';
-import { LoginResponses } from './login/login-responses';
-import { IsaacRandom } from './security/isaac-random';
-import { Misc } from './util/misc';
-import { DiscordUtil } from './util/discord-util';
+import { ByteToMessageDecoder, ChannelHandlerContext, ChannelFutureListener, Unpooled, ByteBuf } from 'netty';
+import { Server } from '../../Server';
+import { GameConstants } from '../../game/GameConstants';
+import { ByteBufUtils } from '../ByteBufUtils';
+import { NetworkConstants } from '../NetworkConstants';
+import { LoginDetailsMessage } from '../login/LoginDetailsMessage';
+import { LoginResponses } from '../login/LoginResponses';
+import { IsaacRandom } from '../security/IsaacRandom';
+import { Misc } from '../../util/Misc';
+import { DiscordUtil } from '../../util/DiscordUtil';
 import { BigInteger } from 'big-integer';
 import { Random } from 'random';
 
 enum LoginDecoderState {
-    LOGIN_REQUEST
+    LOGIN_REQUEST,
+    LOGIN_TYPE,
+    LOGIN
 }
 
 export class LoginDecoder extends ByteToMessageDecoder {
@@ -23,7 +25,7 @@ export class LoginDecoder extends ByteToMessageDecoder {
     private hostAddressOverride: string | null = null;
 
     public static sendLoginResponse(ctx: ChannelHandlerContext, response: number) {
-        let buffer = Unpooled.buffer(Byte.BYTES);
+        let buffer = Unpooled.buffer(1);
         buffer.writeByte(response);
         ctx.writeAndFlush(buffer).addListener(ChannelFutureListener.CLOSE);
     }
@@ -68,7 +70,7 @@ export class LoginDecoder extends ByteToMessageDecoder {
         }
 
         // Send information to the client
-        let buf = Unpooled.buffer(Byte.BYTES + Long.BYTES);
+        let buf = Unpooled.buffer(1 + 8);
         buf.writeByte(0); // 0 = continue login
         buf.writeLong(LoginDecoder.random.nextLong()); // This long will be used for encryption later on
         ctx.writeAndFlush(buf);
@@ -180,11 +182,6 @@ export class LoginDecoder extends ByteToMessageDecoder {
                 } else {
                     LoginDecoder.sendLoginResponse(ctx, LoginResponses.INVALID_CREDENTIALS_COMBINATION);
                 }
-            }
-            enum LoginDecoderState {
-                LOGIN_REQUEST,
-                LOGIN_TYPE,
-                LOGIN
             }
         }
     }

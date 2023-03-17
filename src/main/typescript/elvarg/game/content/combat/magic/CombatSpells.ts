@@ -1,46 +1,8 @@
-<<<<<<< Updated upstream
-export enum CombatSpells {
-    WIND_STRIKE = new CombatNormalSpell() {
-    static castAnimation() {
-        return Optional.of(new Animation(711));
-    }
-    castProjectile(cast: Mobile, castOn: Mobile): Optional < Projectile > {
-        return Optional.of(new Projectile(cast, castOn, 91, 0, 20, 43, 31));
-    }
 
-    endGraphic(): Optional < Graphic > {
-        return Optional.of(new Graphic(92, GraphicHeight.HIGH));
-    }
-
-    maximumHit(): number {
-        return 2;
-    }
-
-    startGraphic(): Optional < Graphic > {
-        return Optional.of(new Graphic(90, GraphicHeight.HIGH));
-    }
-
-    baseExperience(): number {
-        return 5;
-    }
-
-    equipmentRequired(player: Player): Optional < Item[] > {
-        return Optional.empty();
-    }
-
-    itemsRequired(player: Player): Optional < Item[] > {
-        return Optional.of(new Item[] { new Item(556), new Item(558) });
-    }
-
-    levelRequired(): number {
-        return 1;
-    }
-}
-=======
 import { Mobile } from "../../../entity/impl/Mobile";
 import { Player } from "../../../entity/impl/player/Player";
 import { Animation } from "../../../model/Animation";
-import { EffectTimer, EffectTimers } from "../../../model/EffectTimer";
+import {  EffectTimer } from "../../../model/EffectTimer";
 import { Graphic } from "../../../model/Graphic";
 import { GraphicHeight } from "../../../model/GraphicHeight";
 import { Item } from "../../../model/Item";
@@ -66,7 +28,7 @@ export class CombatAncientSpellExtend implements CombatAncientSpell {
     public equipmentRequired(player: Player): Item[] {
         throw new Error("Method not implemented.");
     }
-    canCast(player: Player, del: boolean): boolean {
+    canCast(player: Player): any {
         throw new Error("Method not implemented.");
     }
 
@@ -1375,7 +1337,7 @@ export class CombatSpells {
                 }
                 const seconds = player.getPrayerActive()[PrayerHandler.PROTECT_FROM_MAGIC] ? 300 : 600;
                 player.getCombat().getTeleblockTimer().start(seconds);
-                player.getPacketSender().sendEffectTimer(seconds, EffectTimers.TELE_BLOCK)
+                player.getPacketSender().sendEffectTimer(seconds, EffectTimer.TELE_BLOCK)
                     .sendMessage("You have just been teleblocked!");
             } else if (castOn.isNpc()) {
                 if (cast.isPlayer()) {
@@ -1848,5 +1810,5 @@ Gets the spell with a {@link CombatSpell#spellId()} of {@code id}.
         return spell ? spell.getSpell() : null;
     }
 
->>>>>>> Stashed changes
+
 }

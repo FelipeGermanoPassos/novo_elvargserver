@@ -12,7 +12,7 @@ import { Area } from "./Area";
 import { CanAttackResponse } from "../../content/combat/CombatFactory";
 import { Boundary } from "../Boundary";
 
-class AreaManager {
+export class AreaManager {
 
     public static areas: Area[] = [];
 
@@ -20,12 +20,12 @@ class AreaManager {
         AreaManager.areas.push(new BarrowsArea());
         AreaManager.areas.push(new DuelArenaArea());
         AreaManager.areas.push(new WildernessArea());
-        AreaManager.areas.push(new KingBlackDragonArea(new Boundary()));
+        AreaManager.areas.push(new KingBlackDragonArea());
         AreaManager.areas.push(new GodwarsDungeonArea());
-        AreaManager.areas.push(CastleWars.CastleWarsLobbyArea.LOBBY_AREA);
-        AreaManager.areas.push(CastleWars.CastleWarsZamorakWaitingArea.ZAMORAK_WAITING_AREA);
-        AreaManager.areas.push(CastleWars.CastleWarsSaradominWaitingArea.SARADOMIN_WAITING_AREA);
-        AreaManager.areas.push(CastleWars.CastleWarsGameArea.GAME_AREA);
+        AreaManager.areas.push(CastleWars.LOBBY_AREA);
+        AreaManager.areas.push(CastleWars.ZAMORAK_WAITING_AREA);
+        AreaManager.areas.push(CastleWars.SARADOMIN_WAITING_AREA);
+        AreaManager.areas.push(CastleWars.GAME_AREA);
     }
 
     /**

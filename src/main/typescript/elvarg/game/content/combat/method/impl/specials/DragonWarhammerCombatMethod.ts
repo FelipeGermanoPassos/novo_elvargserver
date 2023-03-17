@@ -8,7 +8,7 @@ import { PendingHit } from "../../../hit/PendingHit";
 import { Skill } from "../../../../../model/Skill";
 
 export class DragonWarhammerCombatMethod extends MeleeCombatMethod {
-    private static ANIMATION = new Animation(1378, Priority.HIGH);
+    private static ANIMATION = new Animation(1378);
     private static GRAPHIC = new Graphic(1292, Priority.HIGH);
 
     start(character: Mobile, target: Mobile): void {

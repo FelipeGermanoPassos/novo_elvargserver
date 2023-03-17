@@ -91,7 +91,7 @@ export class RangedCombatMethod extends CombatMethod {
         }
 
         // Fire projectile
-        new Projectile(character, target, projectileId, delay, speed, heightStart, heightEnd).sendProjectile();
+        Projectile.createProjectile(character, target, projectileId, delay, speed, heightStart, heightEnd).sendProjectile();
 
         // Send sound
         Sounds.sendSound(character.getAsPlayer(), Sound.SHOOT_ARROW);
@@ -99,7 +99,7 @@ export class RangedCombatMethod extends CombatMethod {
         // Dark bow sends two arrows, so send another projectile and delete another
         // arrow.
         if (rangedWeapon === RangedWeapon.DARK_BOW) {
-            new Projectile(character, target, ammo.getProjectileId(), delay - 7, speed + 4, heightStart + 5, heightEnd).sendProjectile();
+            Projectile.createProjectile(character, target, ammo.getProjectileId(), delay - 7, speed + 4, heightStart + 5, heightEnd).sendProjectile();
 
             // Decrement 2 ammo if d bow
             if (character.isPlayer()) {

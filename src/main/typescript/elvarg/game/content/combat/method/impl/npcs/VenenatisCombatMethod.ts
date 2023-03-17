@@ -7,7 +7,7 @@ import { Mobile } from "../../../../../entity/impl/Mobile";
 import { PendingHit } from "../../../hit/PendingHit";
 import { Projectile } from "../../../../../model/Projectile";
 import { Misc } from "../../../../../../util/Misc";
-import { Skills } from "../../../../../model/Skill";
+import { Skill } from "../../../../../model/Skill";
 
 export class VenenatisCombatMethod extends CombatMethod {
     static readonly MELEE_ATTACK_ANIMATION = new Animation(5319);
@@ -27,7 +27,7 @@ export class VenenatisCombatMethod extends CombatMethod {
     start(character: Mobile, target: Mobile) {
         if (this.currentAttackType === CombatType.MAGIC) {
             character.performAnimation(VenenatisCombatMethod.MAGIC_ATTACK_ANIMATION);
-            new Projectile(character, target, 165, 40, 55, 31, 43).sendProjectile();
+            Projectile.createProjectile(character, target, 165, 40, 55, 31, 43).sendProjectile();
         } else if (this.currentAttackType === CombatType.MELEE) {
             character.performAnimation(VenenatisCombatMethod.MELEE_ATTACK_ANIMATION);
         }
@@ -58,7 +58,7 @@ export class VenenatisCombatMethod extends CombatMethod {
         if (Misc.getRandom(100) <= 15) {
             const player = hit.getTarget().getAsPlayer();
             hit.getTarget().performGraphic(VenenatisCombatMethod.DRAIN_PRAYER_GRAPHIC);
-            player.getSkillManager().decreaseCurrentLevel(Skills.PRAYER, (hit.getTotalDamage() * 0.35) as number, 0);
+            player.getSkillManager().decreaseCurrentLevel(Skill.PRAYER, (hit.getTotalDamage() * 0.35) as number, 0);
             player.getPacketSender().sendMessage("Venenatis drained your prayer!");
         }
     }

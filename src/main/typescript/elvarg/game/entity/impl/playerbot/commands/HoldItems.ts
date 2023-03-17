@@ -9,7 +9,7 @@ export class HoldItems implements BotCommand {
     }
 
     start(playerBot: PlayerBot, args: string[]): void {
-        if (playerBot.getTradingInteraction().holdingItems.containsKey(playerBot.getInteractingWith())) {
+        if (playerBot.getTradingInteraction().holdingItems.has(playerBot.getInteractingWith())) {
             // Player bots can only store one set of items for a given player
             playerBot.sendChat("Sorry, " + playerBot.getInteractingWith().getUsername() + ", I'm already holding items for you.");
             playerBot.stopCommand();

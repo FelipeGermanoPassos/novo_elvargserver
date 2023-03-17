@@ -1,5 +1,57 @@
-class ItemActionPacketListener implements PacketExecutor {
-    execute(player: Player, packet: Packet) {
+import { PacketExecutor } from "../PacketExecutor";
+import { Packet } from "../Packet";
+import { Player } from "../../../game/entity/impl/player/Player";
+import { Barricades } from "../../../game/entity/impl/npc/impl/Barricades";
+import { Herblore } from '../../../game/content/skill/skillable/impl/Herblore'
+import { Food } from "../../../game/content/Food";
+import { TeleportHandler } from "../../../game/model/teleportation/TeleportHandler";
+import { TeleportTablets } from '../../../game/model/teleportation/TeleportTablets'
+import { TeleportType } from "../../../game/model/teleportation/TeleportType";
+import { ItemIdentifiers } from "../../../util/ItemIdentifiers";
+import { Runecrafting } from "../../../game/content/skill/skillable/impl/Runecrafting";
+import { PotionConsumable } from '../../../game/content/PotionConsumable'
+import { Barrows } from '../../../game/content/minigames/impl/Barrows'
+import { Animation } from "../../../game/model/Animation";
+import { Task } from "../../../game/task/Task";
+import { TaskManager } from "../../../game/task/TaskManager";
+import { PacketConstants } from "../PacketConstants";
+import { WildernessArea } from "../../../game/model/areas/impl/WildernessArea";
+import { CombatSpecial } from "../../../game/content/combat/CombatSpecial";
+import { ItemDefinition } from "../../../game/definition/ItemDefinition";
+import { Prayer } from '../../../game/content/skill/skillable/impl/Prayer'
+import { Gambling } from '../../../game/content/Gambiling'
+import { GameConstants } from "../../../game/GameConstants";
+import { BirdNest } from "../../../game/content/skill/skillable/impl/woodcutting/BirdNest";
+import { BarrowsSet } from "../../../game/model/BarrowsSet";
+
+class ItemActionTask extends Task{
+    constructor(n1: number, p: Player, b: boolean, private readonly execFunc: Function){
+        super(n1,p,b)
+    }
+    execute(): void {
+        this.execFunc();
+        this.stop()
+    }
+
+}
+
+export class ItemActionPacketListener implements PacketExecutor {
+    execute(player: Player, packet: Packet): void {
+        if (player == null || player.getHitpoints() <= 0)
+            return;
+        switch (packet.getOpcode()) {
+            case PacketConstants.SECOND_ITEM_ACTION_OPCODE:
+                ItemActionPacketListener.secondAction(player, packet);
+                break;
+            case PacketConstants.FIRST_ITEM_ACTION_OPCODE:
+                ItemActionPacketListener.firstAction(player, packet);
+                break;
+            case PacketConstants.THIRD_ITEM_ACTION_OPCODE:
+                this.thirdClickAction(player, packet);
+                break;
+        }
+    }
+    private static firstAction(player: Player, packet: Packet) {
         let interfaceId = packet.readUnsignedShort();
         let itemId = packet.readShort();
         let slot = packet.readShort();
@@ -11,7 +63,7 @@ class ItemActionPacketListener implements PacketExecutor {
             return;
         }
 
-        if (player.isTeleporting() || player.getHitpoints() <= 0) {
+        if (player.isTeleportingReturn() || player.getHitpoints() <= 0) {
             return;
         }
 
@@ -57,18 +109,13 @@ class ItemActionPacketListener implements PacketExecutor {
             case ItemIdentifiers.BIRD_NEST_3:
             case ItemIdentifiers.BIRD_NEST_4:
             case ItemIdentifiers.BIRD_NEST_5:
-                handleSearchNest(player, itemId);
+                BirdNest.handleSearchNest(player, itemId);
                 break;
             case ItemIdentifiers.SPADE:
                 player.performAnimation(new Animation(830));
-                TaskManager.submit(new Task(1, player, false) {
-                    protected execute() {
-                        if (!player.isTeleporting()) {
-                            Barrows.dig(player);
-                        }
-                        this.stop();
-                    }
-                });
+                TaskManager.submit(new ItemActionTask(1, player, false, () =>{if (!player.isTeleportingReturn()) {
+                    Barrows.dig(player);
+                }}));
                 break;
             case Gambling.MITHRIL_SEEDS:
                 Gambling.plantFlower(player);
@@ -78,7 +125,7 @@ class ItemActionPacketListener implements PacketExecutor {
                     if (player.getSpecialPercentage() < 100) {
                         player.getPacketSender().sendInterfaceRemoval();
                         player.performAnimation(new Animation(829));
-                        player.getInventory().delete(9520, 1);
+                        player.getInventory().deleteNumber(9520, 1);
                         player.setSpecialPercentage(100);
                         CombatSpecial.updateBar(player);
                         player.getPacketSender().sendMessage("You now have 100% special attack energy.");
@@ -92,7 +139,7 @@ class ItemActionPacketListener implements PacketExecutor {
             case ItemIdentifiers.TELEPORT_TO_HOUSE:
                 if (TeleportHandler.checkReqs(player, GameConstants.DEFAULT_LOCATION)) {
                     TeleportHandler.teleport(player, GameConstants.DEFAULT_LOCATION, TeleportType.TELE_TAB, false);
-                    player.getInventory().delete(ItemIdentifiers.TELEPORT_TO_HOUSE, 1);
+                    player.getInventory().deleteNumber(ItemIdentifiers.TELEPORT_TO_HOUSE, 1);
                 }
                 break;
 
@@ -104,7 +151,7 @@ class ItemActionPacketListener implements PacketExecutor {
                     return;
                 }
                 if (itemId == 2542 && player.isPreserveUnlocked() || itemId == 2543 && player.isRigourUnlocked()
-                    || itemId == 2544 && player.isAuguryUnlocked()) {
+                    || itemId == 2544 && player.getAuguryUnlocked()) {
                     player.getPacketSender().sendMessage("You have already unlocked that prayer.");
                     return;
                 }
@@ -126,24 +173,21 @@ class ItemActionPacketListener implements PacketExecutor {
             case 12881:
             case 12883:
             case 12877:
-			BarrowsSet set = BarrowsSet.get(itemId);
-                if (set != null) {
-                    if (!player.getInventory().contains(set.getSetId())) {
-                        return;
-                    }
-                    if ((player.getInventory().getFreeSlots() - 1) < set.getItems().length) {
-                        player.getPacketSender().sendMessage(
-                            "You need at least " + set.getItems().length + " free inventory slots to do that.");
-                        return;
-                    }
-                    player.getInventory().delete(set.getSetId(), 1);
-                    for (int item : set.getItems()) {
-                        player.getInventory().add(item, 1);
-                    }
-                    player.getPacketSender()
-                        .sendMessage("You've opened your " + ItemDefinition.forId(itemId).getName() + ".");
+                const set: BarrowsSet | null = BarrowsSet.get(itemId);
+                if (set) {
+                  if (!player.getInventory().contains(set.getSetId())) {
+                    return;
+                  }
+                  if ((player.getInventory().getFreeSlots() - 1) < set.getItems().length) {
+                    player.getPacketSender().sendMessage(`You need at least ${set.getItems().length} free inventory slots to do that.`);
+                    return;
+                  }
+                  player.getInventory().deleteNumber(set.getSetId(), 1);
+                  for (const item of set.getItems()) {
+                    player.getInventory().adds(item, 1);
+                  }
+                  player.getPacketSender().sendMessage(`You've opened your ${ItemDefinition.forId(itemId).getName()}.`);
                 }
-                break;
         }
     }
 
@@ -202,21 +246,6 @@ class ItemActionPacketListener implements PacketExecutor {
         switch (itemId) {
             case 12926:
                 player.getPacketSender().sendMessage("Your Toxic blowpipe has " + player.getBlowpipeScales() + " Zulrah scales left.");
-                break;
-        }
-    }
-    public execute(player: Player, packet: Packet) {
-        if (player == null || player.getHitpoints() <= 0)
-            return;
-        switch (packet.getOpcode()) {
-            case PacketConstants.SECOND_ITEM_ACTION_OPCODE:
-                this.secondAction(player, packet);
-                break;
-            case PacketConstants.FIRST_ITEM_ACTION_OPCODE:
-                firstAction(player, packet);
-                break;
-            case PacketConstants.THIRD_ITEM_ACTION_OPCODE:
-                thirdClickAction(player, packet);
                 break;
         }
     }

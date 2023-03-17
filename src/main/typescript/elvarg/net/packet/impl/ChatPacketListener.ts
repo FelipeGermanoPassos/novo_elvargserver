@@ -1,4 +1,13 @@
-class ChatPacketListener implements PacketExecutor {
+import { PlayerPunishment } from "../../../util/PlayerPunishment";
+import { Misc } from "../../../util/Misc";
+import { Packet } from "../Packet";
+import { PacketConstants } from "../PacketConstants";
+import { ClanChatManager } from "../../../game/content/clan/ClanChatManager";
+import { ChatMessage } from "../../../game/model/ChatMessage";
+import { Player } from "../../../game/entity/impl/player/Player";
+import { PacketExecutor } from '../../packet/PacketExecutor'
+
+export class ChatPacketListener implements PacketExecutor {
     private static allowChat(player: Player, text: string) {
         if (!text || text.length === 0) {
             return false;
@@ -18,7 +27,7 @@ class ChatPacketListener implements PacketExecutor {
         switch (packet.getOpcode()) {
             case PacketConstants.CLAN_CHAT_OPCODE:
                 let clanMessage = packet.readString();
-                if (!this.allowChat(player, clanMessage)) {
+                if (!ChatPacketListener.allowChat(player, clanMessage)) {
                     return;
                 }
                 ClanChatManager.sendMessage(player, clanMessage);
@@ -30,7 +39,7 @@ class ChatPacketListener implements PacketExecutor {
                 let text = packet.readReversedBytesA(size);
                 let chatMessage = Misc.ucFirst(Misc.textUnpack(text, size).toLowerCase());
 
-                if (!this.allowChat(player, chatMessage)) {
+                if (!ChatPacketListener.allowChat(player, chatMessage)) {
                     return;
                 }
                 if (player.getChatMessageQueue().length >= 5) {

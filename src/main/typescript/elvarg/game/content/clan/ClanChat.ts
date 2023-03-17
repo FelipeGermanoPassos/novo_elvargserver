@@ -10,7 +10,7 @@ export class ClanChat {
     private index: number;
     private name: string;
     private owner: Player;
-    private ownerName: string;
+    public ownerName: string;
     private lootShare: boolean;
     private rankRequirement: ClanChatRank[] = new Array(3);
     private members: Player[] = new Array();
@@ -126,7 +126,7 @@ export class ClanChat {
         return this.rankRequirement;
     }
 
-    public setRankRequirements(index: number, rankRequirement: ClanChatRank): ClanChat {
+    public  setRankRequirements(index: number, rankRequirement: ClanChatRank): ClanChat {
         this.rankRequirement[index] = rankRequirement;
         return this;
     }

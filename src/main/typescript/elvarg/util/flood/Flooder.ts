@@ -1,6 +1,6 @@
-import {Misc} from 'misc'
-import {Client} from '../flood/Client'
-import {Lock} from 'lock'
+import { Misc } from '../Misc';
+import { Client } from '../flood/Client'
+import { Lock } from 'lock'
 
 export class Flooder {
     clients: Map<string, Client> = new Map<string, Client>();

@@ -11,9 +11,6 @@ import { ShopDefinitionLoader } from "./definition/loader/impl/ShopDefinitionLoa
 import { NpcDefinitionLoader } from "./definition/loader/impl/NpcDefinitionLoader";
 import { NpcDropDefinitionLoader } from "./definition/loader/impl/NpcDropDefinitionLoader";
 import { NpcSpawnDefinitionLoader } from "./definition/loader/impl/NpcSpawnDefinitionLoader";
-import * as ArrayDeque from 'collections'
-import * as Queue from 'collections'
-
 
 export class GameBuilder {
     private backgroundLoader = new BackgroundLoader();
@@ -38,20 +35,22 @@ export class GameBuilder {
             throw new Error("Background load did not complete normally!");
     }
     
-    public createBackgroundTasks(): Queue<() => void> {
-        const tasks = new ArrayDeque<() => void>();
-        tasks.add(ClanChatManager.init);
-        tasks.add(CombatPoisonData.init);
-        tasks.add(PlayerPunishment.init);
+    public createBackgroundTasks(): Iterable<() => void> {
+        function* tasks(): IterableIterator<() => void> {
+            yield ClanChatManager.init;
+            yield CombatPoisonData.init;
+            yield PlayerPunishment.init;
     
-        // Load definitions..
-        tasks.add(new ObjectSpawnDefinitionLoader());
-        tasks.add(new ItemDefinitionLoader());
-        tasks.add(new ShopDefinitionLoader());
-        tasks.add(new NpcDefinitionLoader());
-        tasks.add(new NpcDropDefinitionLoader());
-        tasks.add(new NpcSpawnDefinitionLoader());
-        //tasks.add(new NPCSpawnDumper());        
-        return tasks;
+            // Load definitions..
+            yield () => new ObjectSpawnDefinitionLoader().load();
+            yield () => new ItemDefinitionLoader().load();
+            yield () => new ShopDefinitionLoader().load();
+            yield () => new NpcDefinitionLoader().load();
+            yield () => new NpcDropDefinitionLoader().load();
+            yield () => new NpcSpawnDefinitionLoader().load();
+            //yield () => new NPCSpawnDumper().dump();
+        }
+    
+        return tasks();
     }
 }

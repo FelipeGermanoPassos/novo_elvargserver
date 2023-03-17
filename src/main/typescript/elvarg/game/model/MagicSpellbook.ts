@@ -1,7 +1,7 @@
 import { Autocasting } from '../content/combat/magic/Autocasting';
 import { Player } from '../entity/impl/player/Player';
 import { TeleportType } from '../model/teleportation/TeleportType';
-
+import { Skill } from './Skill';
 
 
 export class MagicSpellbook {
@@ -10,9 +10,10 @@ export class MagicSpellbook {
     * The spellbook's teleport type
     */
 
-    public static readonly NORMAL = new MagicSpellbook(1151, TeleportType.NORMAL);
-    public static readonly ANCIENT = new MagicSpellbook(12855, TeleportType.ANCIENT);
-    public static readonly LUNAR = new MagicSpellbook(29999, TeleportType.LUNAR);
+    public static NORMAL = new MagicSpellbook( 1151, TeleportType.NORMAL );
+    public static ANCIENT = new MagicSpellbook(  12855, TeleportType.ANCIENT );
+    public static LUNAR = new MagicSpellbook( 29999, TeleportType.LUNAR );
+    
     private teleportType: TeleportType;
 
     private constructor(interfaceId: number, teleportType: TeleportType) {

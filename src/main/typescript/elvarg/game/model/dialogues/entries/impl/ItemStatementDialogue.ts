@@ -1,4 +1,10 @@
+<<<<<<< HEAD
 <<<<<<< Updated upstream
+=======
+import { Dialogue } from "../Dialogue";
+import { Player } from "../../../../entity/impl/player/Player";
+
+>>>>>>> 252876145a1ec4af2cfd19a101625f14378734ce
 class ItemStatementDialogue extends Dialogue {
 =======
 import { Dialogue } from "../Dialogue";
@@ -29,9 +35,9 @@ export class ItemStatementDialogue extends Dialogue {
         let startDialogueChildId = ItemStatementDialogue.CHATBOX_INTERFACES[length - 1];
         let headChildId = startDialogueChildId - 2;
         player.getPacketSender().sendInterfaceModel(headChildId, itemId, modelZoom);
-        player.getPacketSender().sendString(startDialogueChildId - 1, title);
+        player.getPacketSender().sendString(title, startDialogueChildId - 1,);
         for (let i = 0; i < statements.length; i++) {
-            player.getPacketSender().sendString(startDialogueChildId + i, statements[i]);
+            player.getPacketSender().sendString(statements[i],startDialogueChildId + i,);
         }
         player.getPacketSender().sendChatboxInterface(startDialogueChildId - 3);
     }

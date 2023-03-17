@@ -30,11 +30,9 @@ export class Sound {
 
     // woodcutting sounds
 
-<<<<<<< Updated upstream
-    public static WOODCUTTING_CHOP = { id: 472, volume: 1, delay: 10, loopType: 0 }
-=======
+
+
     public static readonly WOODCUTTING_CHOP = new Sound(472, 1, 10, 0);
->>>>>>> Stashed changes
 
     public static WOODCUTTING_TREE_DOWN = new Sound(473, 1, 0, 0)
 
@@ -64,11 +62,8 @@ export class Sound {
     public static WEAPON_WHIP = new Sound(1080, 1, 25, 0)
 
     // Special attack
-<<<<<<< Updated upstream
-    public static DRAGON_DAGGER_SPECIAL = { id: 385, volume: 1, delay: 25, loopType: 0 }
-=======
+
     public static readonly DRAGON_DAGGER_SPECIAL = new Sound(385, 1, 25, 0)
->>>>>>> Stashed changes
 
     // Spell sounds
 
@@ -80,6 +75,7 @@ export class Sound {
     public static DROP_ITEM = new Sound(376, 1, 0, 0)
     public static PICK_UP_ITEM = new Sound(358, 1, 0, 0)
 
+
     public static SET_UP_BARRICADE = new Sound(358, 1, 0, 0)
 
     public static FIRE_LIGHT = new Sound(375, 1, 0, 0)
@@ -90,32 +86,33 @@ export class Sound {
     public static FOOD_EAT = new Sound(317, 1, 0, 0)
     public static DRINK = new Sound(334, 1, 0, 0)
 
-    private static id: number;
-    private static volume: number;
-    private static delay: number;
+    public id: number;
+    public volume: number;
+    public delay: number;
 
-    private static loopType: number;
+    public loopType: number;
 
     constructor(id: number, volume: number, delay: number, loopType: number) {
-        Sound.id = id;
-        Sound.volume = volume;
-        Sound.delay = delay;
-        Sound.loopType = loopType;
+
+        this.id = id;
+        this.volume = volume;
+        this.delay = delay;
+        this.loopType = loopType;
     }
 
     public getId(): number {
-        return Sound.id;
+        return this.id;
     }
 
     public getVolume(): number {
-        return Sound.volume;
+        return this.volume;
     }
 
     public getDelay(): number {
-        return Sound.delay;
+        return this.delay;
     }
 
-    public getLoopType(): number { return Sound.loopType; }
+    public getLoopType(): number { return this.loopType; }
 
 }
 

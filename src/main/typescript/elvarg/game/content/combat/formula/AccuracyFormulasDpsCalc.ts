@@ -7,8 +7,10 @@ import { FightStyle } from '../FightStyle';
 import { Misc } from "../../../../util/Misc";
 import { Mobile } from "../../../entity/impl/Mobile";
 import { BonusManager } from "../../../model/equipment/BonusManager";
-import { Skills } from "../../../model/Skill";
+import { Skill } from "../../../model/Skill";
 import { CombatEquipment } from "../../combat/CombatEquipment";
+import { FightType } from '../FightType';
+import { Player } from '../../../entity/impl/player/Player';
 
 export class AccuracyFormulasDpsCalc {
     static randomFloat() {
@@ -63,7 +65,7 @@ export class AccuracyFormulasDpsCalc {
 
         let player = entity.getAsPlayer();
 
-        att += player.getSkillManager().getCurrentLevel(Skills.ATTACK);
+        att += player.getSkillManager().getCurrentLevel(Skill.ATTACK);
 
         let prayerBonus = 1;
 
@@ -82,7 +84,7 @@ export class AccuracyFormulasDpsCalc {
 
         att *= prayerBonus;
 
-        let fightStyle = player.getFightType().getStyle();
+        let fightStyle = FightType.getStyle();
         if (fightStyle == FightStyle.ACCURATE)
             att += 3;
         else if (fightStyle == FightStyle.CONTROLLED)
@@ -93,7 +95,7 @@ export class AccuracyFormulasDpsCalc {
 
         // Special attack
         if (player.isSpecialActivated()) {
-            att *= player.getCombatSpecial().getAccuracyMultiplier();
+            att *= Player.getCombatSpecial().getAccuracyMultiplier()
         }
 
         return att;
@@ -114,7 +116,7 @@ export class AccuracyFormulasDpsCalc {
         let attSlash = player.getBonusManager().getAttackBonus()[BonusManager.ATTACK_SLASH];
         let attCrush = player.getBonusManager().getAttackBonus()[BonusManager.ATTACK_CRUSH];
 
-        switch (player.getFightType().getBonusType()) {
+        switch (FightType.getBonusTypes()) {
             case BonusManager.ATTACK_STAB:
                 attRoll *= attStab + 64;
                 break;
@@ -140,7 +142,7 @@ export class AccuracyFormulasDpsCalc {
         }
 
         let player = enemy.getAsPlayer();
-        def = player.getSkillManager().getCurrentLevel(Skills.DEFENCE);
+        def = player.getSkillManager().getCurrentLevel(Skill.DEFENCE);
 
 
         let prayerBonus = 1;
@@ -164,7 +166,7 @@ export class AccuracyFormulasDpsCalc {
 
         def *= prayerBonus;
 
-        let fightStyle = player.getFightType().getStyle();
+        let fightStyle = FightType.getStyle();
         if (fightStyle == FightStyle.DEFENSIVE)
             def += 3;
         else if (fightStyle == FightStyle.CONTROLLED)
@@ -233,7 +235,7 @@ export class AccuracyFormulasDpsCalc {
         }
 
         let player = entity.getAsPlayer();
-        rngStrength += player.getSkillManager().getCurrentLevel(Skills.RANGED);
+        rngStrength += player.getSkillManager().getCurrentLevel(Skill.RANGED);
 
         // Prayers
         let prayerMod = 1.0;
@@ -248,7 +250,7 @@ export class AccuracyFormulasDpsCalc {
         }
         rngStrength = (rngStrength * prayerMod);
 
-        let fightStyle = player.getFightType().getStyle();
+        let fightStyle = FightType.getStyle();
         if (fightStyle == FightStyle.ACCURATE)
             rngStrength += 3;
 
@@ -281,7 +283,7 @@ export class AccuracyFormulasDpsCalc {
         }
 
         let player = entity.getAsPlayer();
-        mag += player.getSkillManager().getCurrentLevel(Skills.MAGIC);
+        mag += player.getSkillManager().getCurrentLevel(Skill.MAGIC);
 
         let prayerBonus = 1;
 
@@ -298,7 +300,7 @@ export class AccuracyFormulasDpsCalc {
 
         mag *= prayerBonus;
 
-        let fightStyle = player.getFightType().getStyle();
+        let fightStyle = FightType.getStyle();
         if (fightStyle == FightStyle.ACCURATE)
             mag += 3;
         else if (fightStyle == FightStyle.DEFENSIVE)

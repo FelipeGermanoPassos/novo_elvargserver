@@ -9,8 +9,8 @@ import { PendingHit } from "../../../hit/PendingHit";
 import { CombatFactory } from "../../../CombatFactory";
 
 export class DragonScimitarCombatMethod extends MeleeCombatMethod {
-    private static ANIMATION = new Animation(1872, Priority.HIGH);
-    private static GRAPHIC = new Graphic(347, GraphicHeight.HIGH, Priority.HIGH);
+    private static ANIMATION = new Animation(1872);
+    private static GRAPHIC = new Graphic(347, GraphicHeight.HIGH);
 
     start(character: Mobile, target: Mobile) {
         CombatSpecial.drain(character, CombatSpecial.DRAGON_SCIMITAR.getDrainAmount());

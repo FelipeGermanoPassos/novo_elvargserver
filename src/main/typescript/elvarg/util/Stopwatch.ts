@@ -5,7 +5,7 @@ export class Stopwatch {
         this.time = 0;
     }
 
-    public start(startAt: number): void {
+    public start(startAt?: number): void {
         this.time = Date.now() - startAt;
     }
 

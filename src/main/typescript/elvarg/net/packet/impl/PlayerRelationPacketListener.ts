@@ -1,4 +1,12 @@
-class PlayerRelationPacketListener implements PacketExecutor {
+
+import { Player } from '../../../game/entity/impl/player/Player';
+import { World } from '../../../game/World';
+import { Packet } from '../Packet';
+import { PacketConstants } from '../PacketConstants';
+import { PacketExecutor } from '../PacketExecutor';
+import { Misc } from '../../../util/Misc';
+
+export class PlayerRelationPacketListener implements PacketExecutor {
 
     execute(player: Player, packet: Packet) {
         try {
@@ -22,9 +30,9 @@ class PlayerRelationPacketListener implements PacketExecutor {
                 case PacketConstants.SEND_PM_OPCODE:
                     let size = packet.getSize();
                     let message = packet.readBytes(size);
-                    let friend = World.getPlayerByName(Misc.formatText(Misc.longToString(username)).replaceAll("_", " "));
-                    if (friend.isPresent()) {
-                        player.getRelations().message(friend.get(), message, size);
+                    let friend = World.getPlayerByName(Misc.formatText(Misc.longToString(username)).replace("_", " "));
+                    if (friend) {
+                        player.getRelations().message(friend, new Uint8Array(message), size);
                     } else {
                         player.getPacketSender().sendMessage("That player is offline.");
                     }

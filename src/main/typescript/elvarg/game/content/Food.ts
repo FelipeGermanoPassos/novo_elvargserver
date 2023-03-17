@@ -1,8 +1,16 @@
+import { TimerKey } from "../../util/timers/TimerKey";
+import { Player } from "../entity/impl/player/Player";
+import { Sounds } from "../Sounds";
+import { Sound } from "../Sound";
+import { Skill } from "../model/Skill";
+import { Item } from "../model/Item";
+import { Animation } from "../model/Animation";
+
 export class Food {
     /**
      * The {@link Animation} that will be played when consuming food.
      */
-    private static readonly ANIMATION = new Animation(829, Priority.HIGH);
+    private static readonly ANIMATION = new Animation(829);
 
     public static consume(player: Player, item: number, slot: number): boolean {
         const food = Edible.types.get(item);
@@ -37,8 +45,8 @@ export class Food {
         player.getTimers().extendOrRegister(TimerKey.COMBAT_ATTACK, 5);
 
         if (food == Edible.KARAMBWAN) {
-            player.getTimers().register(TimerKey.KARAMBWAN, 3); // Register karambwan timer too
-            player.getTimers().register(TimerKey.POTION, 3); // Register the potion timer (karambwan blocks pots)
+            player.getTimers().registers(TimerKey.KARAMBWAN, 3); // Register karambwan timer too
+            player.getTimers().registers(TimerKey.POTION, 3); // Register the potion timer (karambwan blocks pots)
         }
 
         // Close interfaces..
@@ -50,18 +58,18 @@ export class Food {
         // Send sound..
         Sounds.sendSound(player, Sound.FOOD_EAT);
 
-        player.performAnimation(ANIMATION);
+        player.performAnimation(Food.ANIMATION);
 
         // Delete food from inventory..
-        player.getInventory().delete(food.item, slot);
+        player.getInventory().deleteItem(food.item, slot);
 
         // Heal the player..
         const currentHp = player.getSkillManager().getCurrentLevel(Skill.HITPOINTS);
-        const maxHp = player.getSkillManager().getMaxLevel(Skill.HITPOINTS);
-        const healAmount = food.heal;
+        let maxHp = player.getSkillManager().getMaxLevel(Skill.HITPOINTS);
+        let healAmount = food.heal;
 
         if (food == Edible.ANGLERFISH) {
-                int c = 2;
+                let c: number = 2;
             if (currentHp >= 25) {
                 c = 4;
             }
@@ -96,83 +104,95 @@ export class Food {
 
         // Handle cake slices..
         if (food == Edible.CAKE || food == Edible.SECOND_CAKE_SLICE) {
-            player.getInventory().add(new Item(food.item.getId() + 2, 1));
+            player.getInventory().deleteItem(new Item(food.item.getId() + 2),1);
         }
         return true;
     }
 
 }
-const types: Map<number, Edible> = new Map();
 
-for (const type of Object.values(Edible)) {
-    types.set(type.item.getId(), type);
-
-    Edible.prototype.getItem = function () {
-        return this.item;
-    }
-}
-
-static getTypes(): number[] {
-    return Array.from(types.keys());
-}
-
-getHeal(): number {
-    return this.heal;
-}
-
-interface Edible {
-    item: Item,
-    heal: number,
-    name: string
-}
-
-export enum Edible {
-    KEBAB = { item: new Item(1971), heal: 4 },
-    CHEESE = { item: new Item(1985), heal: 4 },
-    CAKE = { item: new Item(1891), heal: 5 },
-    SECOND_CAKE_SLICE = { item: new Item(1893), heal: 5 },
-    THIRD_CAKE_SLICE = { item: new Item(1895), heal: 5 },
-    BANDAGES = { item: new Item(14640), heal: 12 },
-    JANGERBERRIES = { item: new Item(247), heal: 2 },
-    WORM_CRUNCHIES = { item: new Item(2205), heal: 7 },
-    EDIBLE_SEAWEED = { item: new Item(403), heal: 4 },
-    ANCHOVIES = { item: new Item(319), heal: 1 },
-    SHRIMPS = { item: new Item(315), heal: 3 },
-    SARDINE = { item: new Item(325), heal: 4 },
-    COD = { item: new Item(339), heal: 7 },
-    TROUT = { item: new Item(333), heal: 7 },
-    PIKE = { item: new Item(351), heal: 8 },
-    SALMON = { item: new Item(329), heal: 9 },
-    TUNA = { item: new Item(361), heal: 10 },
-    LOBSTER = { item: new Item(379), heal: 12 },
-    BASS = { item: new Item(365), heal: 13 },
-    SWORDFISH = { item: new Item(373), heal 14},
-    MEAT_PIZZA = { item: new Item(2293), heal: 14 },
-    MONKFISH = { item: new Item(7946), heal: 16 },
-    SHARK = { item: new Item(385), heal: 20 },
-    SEA_TURTLE = { item: new Item(397), heal: 21 },
-    DARK_CRAB = { item: new Item(11936), heal: 22 },
-    MANTA_RAY = { item: new Item(391), heal: 22 },
-    KARAMBWAN = { item: new Item(3144), heal: 18 },
-    ANGLERFISH = { item: new Item(13441), heal: 22 },
+export class Edible {
+    public static readonly KEBAB = new Edible(new Item(1971), 4);
+    public static readonly CHEESE = new Edible(new Item(1985), 4);
+    public static readonly CAKE = new Edible(new Item(1891), 5 );
+    public static readonly SECOND_CAKE_SLICE = new Edible(new Item(1893), 5 );
+    public static readonly THIRD_CAKE_SLICE = new Edible(new Item(1895), 5 );
+    public static readonly BANDAGES = new Edible(new Item(14640), 12 );
+    public static readonly JANGERBERRIES = new Edible(new Item(247), 2 );
+    public static readonly WORM_CRUNCHIES = new Edible(new Item(2205), 7 );
+    public static readonly EDIBLE_SEAWEED = new Edible(new Item(403), 4 );
+    public static readonly ANCHOVIES = new Edible(new Item(319), 1 );
+    public static readonly SHRIMPS = new Edible(new Item(315), 3 );
+    public static readonly SARDINE = new Edible(new Item(325), 4 );
+    public static readonly COD = new Edible(new Item(339), 7 );
+    public static readonly TROUT = new Edible(new Item(333), 7 );
+    public static readonly PIKE = new Edible(new Item(351), 8 );
+    public static readonly SALMON = new Edible(new Item(329), 9 );
+    public static readonly TUNA = new Edible(new Item(361), 10 );
+    public static readonly LOBSTER = new Edible(new Item(379), 12 );
+    public static readonly BASS = new Edible(new Item(365), 13 );
+    public static readonly SWORDFISH = new Edible(new Item(373), 14 );
+    public static readonly MEAT_PIZZA = new Edible(new Item(2293), 14 );
+    public static readonly MONKFISH = new Edible(new Item(7946), 16 );
+    public static readonly SHARK = new Edible(new Item(385), 20 );
+    public static readonly SEA_TURTLE = new Edible(new Item(397), 21 );
+    public static readonly DARK_CRAB = new Edible(new Item(11936), 22 );
+    public static readonly MANTA_RAY = new Edible(new Item(391), 22 );
+    public static readonly KARAMBWAN = new Edible(new Item(3144), 18);
+    public static readonly ANGLERFISH = new Edible(new Item(13441), 22 );
     /*
     * Baked goods food types a player can make with the cooking skill.
     */
-    POTATO = { item: new Item(1942), heal: 1 },
-    BAKED_POTATO = { item: new Item(6701), heal: 4 },
-    POTATO_WITH_BUTTER = { item: new Item(6703), heal: 14 },
-    CHILLI_POTATO = { item: new Item(7054), heal: 14 },
-    EGG_POTATO = { item: new Item(7056), heal: 16 },
-    POTATO_WITH_CHEESE = { item: new Item(6705), heal: 16 },
-    MUSHROOM_POTATO = { item: new Item(7058), heal: 20 },
-    TUNA_POTATO = { item: new Item(7060), heal: 20 },
-    SPINACH_ROLL = { item: new Item(1969), heal: 2 },
-    BANANA = { item: new Item(1963), heal: 2 },
-    BANANA_ = { item: new Item(18199), heal: 2 },
-    CABBAGE = { item: new Item(1965), heal: 2 },
-    ORANGE = { item: new Item(2108), heal: 2 },
-    PINEAPPLE_CHUNKS = { item: new Item(2116), heal: 2 },
-    PINEAPPLE_RINGS = { item: new Item(2118), heal: 2 },
-    PEACH = { item: new Item(6883), heal: 8 },
-    PURPLE_SWEETS = { item: new Item(4561), heal: 3 },
+    public static readonly POTATO = ( new Item(1942), 1 );
+    public static readonly BAKED_POTATO = ( new Item(6701), 4 );
+    public static readonly POTATO_WITH_BUTTER = (  new Item(6703), 14 );
+    public static readonly CHILLI_POTATO = ( new Item(7054), 14 );
+    public static readonly EGG_POTATO = ( new Item(7056), 16 );
+    public static readonly POTATO_WITH_CHEESE = ( new Item(6705), 16 );
+    public static readonly MUSHROOM_POTATO = ( new Item(7058), 20 );
+    public static readonly TUNA_POTATO = ( new Item(7060), 20 );
+    public static readonly SPINACH_ROLL = ( new Item(1969), 2 );
+    public static readonly BANANA = ( new Item(1963), 2 );
+    public static readonly BANANA_ = ( new Item(18199), 2 );
+    public static readonly CABBAGE = ( new Item(1965), 2 );
+    public static readonly ORANGE = ( new Item(2108), 2 );
+    public static readonly PINEAPPLE_CHUNKS = ( new Item(2116), 2 );
+    public static readonly PINEAPPLE_RINGS = ( new Item(2118), 2 );
+    public static readonly PEACH = ( new Item(6883), 8 );
+    public static readonly PURPLE_SWEETS = ( new Item(4561), 3 );
+
+    public static types: Map<number, Edible> = new Map();
+
+    static {
+        for (const type of Object.values(Edible)) {
+            Edible.types.set(type.item.getId(), type);
+        }
+    }
+
+    public item: Item;
+    public heal: number;
+    public name: string;
+
+    constructor(item: Item, heal: number, name?: string) {
+        this.item = item;
+        this.heal = heal;
+        this.name = name.toLowerCase().replace(/__/g, "-").replace(/_/g, " ");
+    }
+
+    public getItem(): Item {
+        return this.item;
+    }
+
+    /**
+     * Returns an array of all Edible item ids.
+     *
+     * @return {Integer[]} edibleTypes
+     */
+    public static getTypes(): number[] {
+        return Object.keys(Edible.types).map(Number);
+    }
+
+    public getHeal(): number {
+        return this.heal;
+    }
 }

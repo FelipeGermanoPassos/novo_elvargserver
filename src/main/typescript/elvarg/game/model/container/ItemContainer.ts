@@ -250,11 +250,15 @@ export abstract class ItemContainer {
         return this.items[slot];
     }
 
+<<<<<<< HEAD
 <<<<<<< Updated upstream
     public switchItem(to: ItemContainer, item: Item sort: boolean, refresh: boolean): ItemContainer {
 =======
     public switchItem(to: ItemContainer, item: Item, sort: boolean, slot: number, refresh: boolean): ItemContainer {
 >>>>>>> Stashed changes
+=======
+    public switchItem(to: ItemContainer, item: Item, sort: boolean, slot: number, refresh: boolean): ItemContainer {
+>>>>>>> 252876145a1ec4af2cfd19a101625f14378734ce
         if (this.getItems()[slot].getId() !== item.getId()) {
             return this;
         }
@@ -375,11 +379,15 @@ export abstract class ItemContainer {
      * @param item The item to add.
      * @return The ItemContainer instance.
      */
+<<<<<<< HEAD
 <<<<<<< Updated upstream
     public add(item: Item): ItemContainer {
 =======
     public addItem(item: Item): ItemContainer {
 >>>>>>> Stashed changes
+=======
+    public addItem(item: Item): ItemContainer {
+>>>>>>> 252876145a1ec4af2cfd19a101625f14378734ce
         return this.add(item, true);
     }
 
@@ -390,6 +398,7 @@ export abstract class ItemContainer {
      * @param amount The amount of the item.
      * @return The ItemContainer instance.
      */
+<<<<<<< HEAD
 <<<<<<< Updated upstream
     public add(id: number, amount: number): ItemContainer {
         return this.add(new Item(id, amount));
@@ -397,6 +406,10 @@ export abstract class ItemContainer {
     public adds(id: number, amount: number): ItemContainer {
         return this.addItem(new Item(id, amount));
 >>>>>>> Stashed changes
+=======
+    public adds(id: number, amount: number): ItemContainer {
+        return this.addItem(new Item(id, amount));
+>>>>>>> 252876145a1ec4af2cfd19a101625f14378734ce
     }
 
     public add(item: Item, refresh: boolean): ItemContainer {
@@ -447,6 +460,7 @@ export abstract class ItemContainer {
         return this;
     }
 
+<<<<<<< HEAD
 <<<<<<< Updated upstream
     public delete(item: Item): ItemContainer {
         return this.delete(item.getId(), item.getAmount());
@@ -454,6 +468,10 @@ export abstract class ItemContainer {
     public deletes(item: Item): ItemContainer {
         return this.deleteNumber(item.getId(), item.getAmount());
 >>>>>>> Stashed changes
+=======
+    public deletes(item: Item): ItemContainer {
+        return this.deleteNumber(item.getId(), item.getAmount());
+>>>>>>> 252876145a1ec4af2cfd19a101625f14378734ce
     }
 
     /**
@@ -464,6 +482,7 @@ export abstract class ItemContainer {
      *             the first one found).
      * @return The ItemContainer instance.
      */
+<<<<<<< HEAD
 <<<<<<< Updated upstream
     public delete(item: Item, slot: number): ItemContainer {
         return this.delete(item, slot, true);
@@ -471,6 +490,10 @@ export abstract class ItemContainer {
     public deleteItem(item: Item, slot: number): ItemContainer {
         return this.deletedItem(item, slot, true);
 >>>>>>> Stashed changes
+=======
+    public deleteItem(item: Item, slot: number): ItemContainer {
+        return this.deletedItem(item, slot, true);
+>>>>>>> 252876145a1ec4af2cfd19a101625f14378734ce
     }
 
     /**
@@ -480,6 +503,7 @@ export abstract class ItemContainer {
      * @param amount The amount of the item to delete.
      * @return The ItemContainer instance.
      */
+<<<<<<< HEAD
 <<<<<<< Updated upstream
     public delete(id: number, amount: number): ItemContainer {
         return this.delete(id, amount, true);
@@ -497,6 +521,16 @@ export abstract class ItemContainer {
 >>>>>>> Stashed changes
     }
 
+=======
+    public deleteNumber(id: number, amount: number): ItemContainer {
+        return this.deleted(id, amount, true);
+    }
+
+    public deleteBoolean(item: Item, refresh: boolean): ItemContainer {
+        return this.deleted(item.getId(), item.getAmount(), refresh);
+    }
+
+>>>>>>> 252876145a1ec4af2cfd19a101625f14378734ce
     /**
      * Deletes an item from the item container.
      *
@@ -635,10 +669,16 @@ export abstract class ItemContainer {
         }
     }
 
+<<<<<<< HEAD
     deleteItemSet(optional: Item[]) {
         let deleteItem: Item
         for (deleteItem of optional) {
             if (deleteItem == null) {
+=======
+    deleteItemSet(item: Item[]) {
+        for (let deleteItem of item) {
+            if (!deleteItem) {
+>>>>>>> 252876145a1ec4af2cfd19a101625f14378734ce
                 continue;
             }
             this.deletes(deleteItem);
@@ -648,7 +688,11 @@ export abstract class ItemContainer {
     forceAdd(player: Player, item: Item) {
         if (this.getFreeSlots() <= 0 && !(this.containsNumber(item.id) && item.getDefinition().isStackable())) {
             TaskManager.submit(new ItemContainerTask(() => {
+<<<<<<< HEAD
                 ItemOnGroundManager.register(player, item);
+=======
+                ItemOnGroundManager.registers(player, item);
+>>>>>>> 252876145a1ec4af2cfd19a101625f14378734ce
             }));
         } else {
             this.addItem(item);

@@ -1,4 +1,5 @@
 import { Location } from '../model/Location';
+import { Player } from '../entity/impl/player/Player';
 
 export class Region {
     private regionId: number;

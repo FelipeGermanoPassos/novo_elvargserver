@@ -1,5 +1,6 @@
-import { ChannelHandlerContext, MessageToByteEncoder } from 'netty';
-import { LoginResponsePacket, LoginResponses } from '../login';
+import { ChannelHandlerContext, MessageToByteEncoder, ByteBuf } from 'netty';
+import { LoginResponsePacket } from '../login/LoginResponsePacket';
+import { LoginResponses } from '../login/LoginResponses';
 
 /**
 Encodes login.
@@ -11,7 +12,7 @@ export class LoginEncoder extends MessageToByteEncoder<LoginResponsePacket> {
         out.writeByte(msg.getResponse());
 
         if (msg.getResponse() == LoginResponses.LOGIN_SUCCESSFUL) {
-            out.writeByte(msg.getRights().ordinal());
+            out.writeByte(msg.getRights());
         }
     }
 }

@@ -8,7 +8,7 @@ export class BankTabCreationPacketListener implements PacketExecutor {
     execute(player: Player, packet: Packet) {
         let interfaceId = packet.readInt();
         let fromSlot = packet.readShort();
-        let to_tab = packet.readLEShort();
+        let to_tab = packet.readShort();
 
         let fromBankTab = interfaceId - Bank.CONTAINER_START;
         if (fromBankTab >= 0 && fromBankTab < Bank.TOTAL_BANK_TABS) {
@@ -34,7 +34,7 @@ export class BankTabCreationPacketListener implements PacketExecutor {
                 player.setNoteWithdrawal(false);
 
                 //Make the item switch
-                player.getBank(fromBankTab).switchItem(player.getBank(to_tab), item, slot, false, false);
+                player.getBank(fromBankTab).switchItem(player.getBank(to_tab), item, false, slot, false);
 
                 //Re-set the note var
                 player.setNoteWithdrawal(note);

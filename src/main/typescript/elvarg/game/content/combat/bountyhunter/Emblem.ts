@@ -1,12 +1,20 @@
-export const Emblem = [
-    { name: 'MYSTERIOUS_EMBLEM_1', id: 12746, value: 500 },
-    { name: 'MYSTERIOUS_EMBLEM_2', id: 12748, value: 1000 },
-    { name: 'MYSTERIOUS_EMBLEM_3', id: 12749, value: 1800 },
-    { name: 'MYSTERIOUS_EMBLEM_4', id: 12750, value: 3200 },
-    { name: 'MYSTERIOUS_EMBLEM_5', id: 12751, value: 4800 },
-    { name: 'MYSTERIOUS_EMBLEM_6', id: 12752, value: 6800 },
-    { name: 'MYSTERIOUS_EMBLEM_7', id: 12753, value: 9000 },
-    { name: 'MYSTERIOUS_EMBLEM_8', id: 12754, value: 12000 },
-    { name: 'MYSTERIOUS_EMBLEM_9', id: 12755, value: 16000 },
-    { name: 'MYSTERIOUS_EMBLEM_10', id: 12756, value: 20000 },
-]
+export class Emblem {
+    public static readonly MYSTERIOUS_EMBLEM_1 = new Emblem(12746, 500 );
+    public static readonly MYSTERIOUS_EMBLEM_2 = new Emblem( 12748, 1000 );
+    public static readonly MYSTERIOUS_EMBLEM_3 = new Emblem( 12749, 1800 );
+    public static readonly MYSTERIOUS_EMBLEM_4 = new Emblem( 12750, 3200 );
+    public static readonly MYSTERIOUS_EMBLEM_5 = new Emblem( 12751, 4800 );
+    public static readonly MYSTERIOUS_EMBLEM_6 = new Emblem( 12752, 6800 );
+    public static readonly MYSTERIOUS_EMBLEM_7 = new Emblem( 12753, 9000 );
+    public static readonly MYSTERIOUS_EMBLEM_8 = new Emblem( 12754, 12000 );
+    public static readonly MYSTERIOUS_EMBLEM_9 = new Emblem( 12755, 16000 );
+    public static readonly MYSTERIOUS_EMBLEM_10 = new Emblem( 12756, 20000 );
+
+    id: number;
+    value: number;
+
+    constructor(id: number, value: number) {
+        this.id = id;
+        this.value = value;
+    }
+}

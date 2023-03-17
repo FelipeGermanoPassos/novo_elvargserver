@@ -19,8 +19,4 @@ export class ElderChaosDruid extends NPC {
     public getCombatMethod(): CombatMethod {
         return CombatFactory.MAGIC_COMBAT;
     }
-
-    getSize() {
-
-    }
 }

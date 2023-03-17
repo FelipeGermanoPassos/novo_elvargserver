@@ -1,4 +1,7 @@
 import { Player } from "../entity/impl/player/Player";
+import { World } from "../World";
+import { Misc } from "../../util/Misc";
+import { ClanChatManager } from "../content/clan/ClanChatManager";
 
 export class PlayerRelations {
     private status: PrivateChatStatus = PrivateChatStatus.ON;
@@ -228,6 +231,6 @@ export class PlayerRelations {
 
 }
 
-enum PrivateChatStatus {
+export enum PrivateChatStatus {
     ON, FRIENDS_ONLY, OFF
 }

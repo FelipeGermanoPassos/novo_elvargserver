@@ -5,7 +5,7 @@ import { World } from '../../../World';
 import { GameConstants } from '../../../GameConstants';
 import { PlayerPunishment } from '../../../../util/PlayerPunishment';
 
-class UnMutePlayer implements Command {
+export class UnMutePlayer implements Command {
     execute(player: Player, command: string, parts: string[]) {
         let player2 = command.substring(parts[0].length + 1);
         let plr = World.getPlayerByName(player2);

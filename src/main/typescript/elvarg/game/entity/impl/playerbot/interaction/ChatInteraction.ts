@@ -42,7 +42,8 @@ export class ChatInteraction {
     public receivedGameMessage(message: string) {
         if (this.playerBot.getInteractingWith() != null) {
             // If this bot is currently interacting with someone, no need to shout
-            this.playerBot.getPacketSender().sendPrivateMessage(this.playerBot.getInteractingWith(), message.getBytes(), message.getBytes().length);
+            const messageBytes = new TextEncoder().encode(message);
+            this.playerBot.getPacketSender().sendPrivateMessage(this.playerBot.getInteractingWith(), messageBytes, messageBytes.length);
         }
     }
 
@@ -64,10 +65,10 @@ export class ChatInteraction {
      * @param fromPlayer
      * @param type
      */
-    private processCommand(chatMessage: string, fromPlayer: Player, type: CommandType, typeclass: Commandclass) {
+    private processCommand(chatMessage: string, fromPlayer: Player, type: CommandType, typeclass?: Commandclass) {
         if (chatMessage.includes("stop")) {
-            if (this.playerBot.getActiveCommand() != null &&
-                (fromPlayer == this.playerBot.getInteractingWith() || GameConstants.PLAYER_BOT_OVERRIDE.includes(fromPlayer.getRights()))) {
+            if (this.playerBot.getActiveCommand() !== null &&
+                (fromPlayer === this.playerBot.getInteractingWith() || GameConstants.PLAYER_BOT_OVERRIDE.includes(fromPlayer.getAmountDonated()))) {
                 this.playerBot.stopCommand();
             }
 
@@ -94,7 +95,7 @@ export class ChatInteraction {
                 }
 
                 // Get params after trigger
-                let clipIndex = chatMessage.indexOf(trigger) + trigger.length + SPACE_LENGTH;
+                let clipIndex = chatMessage.indexOf(trigger) + trigger.length + ChatInteraction.SPACE_LENGTH;
                 let sub = chatMessage.length > clipIndex ? chatMessage.substring(clipIndex) : chatMessage;
                 this.playerBot.startCommand(command, fromPlayer, sub.split(" ", 5));
                 return; // Don't process any more commands

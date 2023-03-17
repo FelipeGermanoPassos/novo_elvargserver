@@ -22,20 +22,31 @@ import { RegionManager } from "../../collision/RegionManager";
 import { Misc } from "../../../util/Misc";
 import { Boundary } from "../../model/Boundary";
 
-export class Mobile extends Entity {
+class MobileTask extends Task {
+    constructor(ticks: number, private readonly execFunc: Function) {
+        super(ticks, false);
+    }
+    execute(): void {
+        this.execFunc();
+        this.stop()
+    }
+
+}
+
+export abstract class Mobile extends Entity {
     private index: number;
-    private lastKnownRegion: Location;
+    public lastKnownRegion: Location;
     private timers = new TimerRepository();
     private combat = new Combat(this);
     private movementQueue = new MovementQueue(this);
-    private forcedChat: string;
-    private walkingDirection: Direction = Directions.NONE;
-    private runningDirection: Direction = Directions.NONE;
+    public forcedChat: string;
+    public walkingDirection: Direction = Direction.NONE;
+    public runningDirection: Direction = Direction.NONE;
     private lastCombat = new Stopwatch();
-    private updateFlag = new UpdateFlag();
-    private positionToFace: Location;
-    private animation: Animation;
-    private graphic: Graphic;
+    public updateFlag = new UpdateFlag();
+    public positionToFace: Location;
+    public animation: Animation;
+    public graphic: Graphic;
     private following: Mobile;
 
     private attributes = new Map<Object, Object>();
@@ -76,11 +87,11 @@ export class Mobile extends Entity {
         super(position);
     }
 
-    abstract onAdd(): void;
+    public abstract onAdd(): void;
 
-    abstract onRemove(): void;
+    public abstract onRemove(): void;
 
-    abstract manipulateHit(hit: PendingHit): PendingHit;
+    public abstract manipulateHit(hit: PendingHit): PendingHit;
 
     /**
      * Teleports the character to a target location
@@ -88,9 +99,61 @@ export class Mobile extends Entity {
      * @param teleportTarget
      * @return
      */
-    moveTo(teleportTarget: Location): Mobile {
+    public moveTo(teleportTarget: Location): Mobile {
         this.getMovementQueue().reset();
         this.setLocation(teleportTarget.clone());
+        this.setNeedsPlacement(true);
+        this.setResetMovementQueue(true);
+        this.setMobileInteraction(null);
+        if (this instanceof Player) {
+            this.getMovementQueue().handleRegionChange();
+        }
+        return this;
+    }
+
+    smartMove(location: Location, radius: number): Mobile {
+        let chosen: Location | null = null;
+        let requestedX: number = location.x;
+        let requestedY: number = location.y;
+        let height: number = location.z;
+
+        while (true) {
+            let randomX: number = Misc.random(requestedX - radius, requestedX + radius);
+            let randomY: number = Misc.random(requestedY - radius, requestedY + radius);
+            let randomLocation: Location = new Location(randomX, randomY, height);
+
+            if (!RegionManager.blocked(randomLocation, null)) {
+                chosen = randomLocation;
+                break;
+            }
+        }
+
+        this.getMovementQueue().reset();
+        this.setLocation(chosen.clone());
+        this.setNeedsPlacement(true);
+        this.setResetMovementQueue(true);
+        this.setMobileInteraction(null);
+        if (this instanceof Player) {
+            this.movementQueue.handleRegionChange();
+        }
+
+        return this;
+    }
+
+    public smartMoves(bounds: Boundary): Mobile {
+        let chosen: Location | null = null;
+        const height = bounds.height;
+        while (true) {
+            const randomX = Misc.random(bounds.getX(), bounds.getX2());
+            const randomY = Misc.random(bounds.getY(), bounds.getY2());
+            const randomLocation = new Location(randomX, randomY, height);
+            if (!RegionManager.blocked(randomLocation, null)) {
+                chosen = randomLocation;
+                break;
+            }
+        }
+        this.getMovementQueue().reset();
+        this.setLocation(chosen.clone());
         this.setNeedsPlacement(true);
         this.setResetMovementQueue(true);
         this.setMobileInteraction(null);
@@ -130,7 +193,7 @@ export class Mobile extends Entity {
 
     performAnimation(animation: Animation) {
         if (this.animation != null && animation != null) {
-            if (this.animation.getPriority().ordinal() > animation.getPriority().ordinal()) {
+            if (this.animation.getPriority() > animation.getPriority()) {
                 return;
             }
         }
@@ -141,7 +204,7 @@ export class Mobile extends Entity {
 
     performGraphic(graphic: Graphic) {
         if (this.graphic != null && graphic != null) {
-            if (this.graphic.getPriority().ordinal() > graphic.getPriority().ordinal()) {
+            if (this.graphic.getPriority() > graphic.getPriority()) {
                 return;
             }
         }
@@ -151,25 +214,17 @@ export class Mobile extends Entity {
     }
 
     delayedAnimation(animation: Animation, ticks: number) {
-        TaskManager.submit(new Task(ticks, false) {
-            execute() {
-                this.performAnimation(animation);
-                this.stop();
-            }
-        });
+        TaskManager.submit(new MobileTask(ticks, () => {
+            this.performAnimation(animation);
+        }));
     }
 
     delayedGraphic(graphic: Graphic, ticks: number) {
-        TaskManager.submit(new Task(ticks, false) {
-            execute() {
-                this.performGraphic(graphic);
-                this.stop();
-            }
-        });
+        TaskManager.submit(new MobileTask(ticks, () => { this.performGraphic(graphic) }));
     }
 
     boundaryTiles(): Location[] {
-        const size = this.size();
+        const size: number = this.getSize();
         const tiles: Location[] = new Array(size * size);
         let index = 0;
         for (let x = 0; x < size; x++) {
@@ -181,7 +236,7 @@ export class Mobile extends Entity {
     }
 
     outterTiles(): Location[] {
-        const size = this.size();
+        const size = this.getSize();
         const tiles: Location[] = new Array(size * 4);
         let index = 0;
         for (let x = 0; x < size; x++) {
@@ -196,7 +251,7 @@ export class Mobile extends Entity {
     }
 
     tiles(): Location[] {
-        const size = this.size();
+        const size = this.getSize();
         const tiles: Location[] = new Array(size * size);
         let index = 0;
         for (let x = 0; x < size; x++) {
@@ -217,29 +272,29 @@ export class Mobile extends Entity {
         return true;
     }
 
-    abstract appendDeath(): void;
+    public abstract appendDeath(): void;
 
-    abstract heal(damage: number): void;
+    public heal(damage: number): void { };
 
-    getHitpointsAfterPendingDamage(): number {
+    public getHitpointsAfterPendingDamage(): number {
         return this.getHitpoints() - this.getCombat().getHitQueue().getAccumulatedDamage();
     }
 
-    abstract getHitpoints(): number;
+    public abstract getHitpoints(): number;
 
-    abstract setHitpoints(hitpoints: number): Mobile;
+    public abstract setHitpoints(hitpoints: number): Mobile;
 
-    abstract getBaseAttack(type: CombatType): number;
+    public abstract getBaseAttack(type: CombatType): number;
 
-    abstract getBaseDefence(type: CombatType): number;
+    public abstract getBaseDefence(type: CombatType): number;
 
-    abstract getBaseAttackSpeed(): number;
+    public abstract getBaseAttackSpeed(): number;
 
-    abstract getAttackAnim(): number;
+    public abstract getAttackAnim(): number;
 
-    abstract getAttackSound(): Sound;
+    public abstract getAttackSound(): Sound;
 
-    abstract getBlockAnim(): number;
+    public abstract getBlockAnim(): number;
 
     /*
      * Getters and setters Also contains methods.
@@ -321,7 +376,7 @@ export class Mobile extends Entity {
     getPrayerActive(): boolean[] {
         return this.prayerActive;
     }
-    setPrayerActive(prayerActive: boolean[]): Mobile {
+    setPrayerActives(prayerActive: boolean[]): Mobile {
         this.prayerActive = prayerActive;
         return this;
     }
@@ -340,7 +395,7 @@ export class Mobile extends Entity {
         return this;
     }
 
-    setCurseActive(id: number, curseActive: boolean): Mobile {
+    setCurseActives(id: number, curseActive: boolean): Mobile {
         this.curseActive[id] = curseActive;
         return this;
     }
@@ -410,11 +465,11 @@ export class Mobile extends Entity {
     }
 
     isRegistered(): boolean {
-        return this.registered;
+        return this.registred;
     }
 
     setRegistered(registered: boolean): void {
-        this.registered = registered;
+        this.registred = registered;
     }
 
     isNeedsPlacement(): boolean {
@@ -538,21 +593,21 @@ export class Mobile extends Entity {
         if (!this.isPlayer()) {
             return null;
         }
-        return (this as Player);
+        return (this as unknown as Player);
     }
 
     getAsPlayerBot(): PlayerBot | null {
         if (!this.isPlayerBot()) {
             return null;
         }
-        return (this as PlayerBot);
+        return (this as unknown as PlayerBot);
     }
 
     getAsNpc(): NPC | null {
         if (!this.isNpc()) {
             return null;
         }
-        return (this as NPC);
+        return (this as unknown as NPC);
     }
 
     sendMessage(message: string): void {

@@ -1,4 +1,4 @@
-import { World } from '../../game/Worlds';
+import { World } from '../../game/World';
 import { GameObject } from '../entity/impl/object/GameObject';
 import { ObjectManager } from '../entity/impl/object/ObjectManager';
 import { Graphic } from '../model/Graphic';
@@ -8,6 +8,23 @@ import { Task } from '../task/Task';
 import { TaskManager } from '../task/TaskManager';
 import { Misc } from '../../util/Misc';
 import { TeleportType } from '../model/teleportation/TeleportType';
+
+class ObeliskTask extends Task{
+    constructor(private readonly func: Function, private readonly funcStop: Function){
+        super(4, false);
+
+    }
+    execute(): void {
+        this.func();
+        this.stop();
+    }
+
+    stop() {
+        super.stop();
+        this.funcStop();
+    }
+    
+}
 
 
 export class Obelisks {
@@ -21,41 +38,48 @@ export class Obelisks {
                 ObjectManager.register(new GameObject(14825, new Location(Obelisks.OBELISK_COORDS[index][0] + 4, Obelisks.OBELISK_COORDS[index][1]), 10, 0, null), true);
                 ObjectManager.register(new GameObject(14825, new Location(Obelisks.OBELISK_COORDS[index][0], Obelisks.OBELISK_COORDS[index][1] + 4), 10, 0, null), true);
                 ObjectManager.register(new GameObject(14825, new Location(Obelisks.OBELISK_COORDS[index][0] + 4, Obelisks.OBELISK_COORDS[index][1] + 4), 10, 0, null), true);
-                TaskManager.submit(new Task(4, false) {
-                    public execute() {
-                        const obeliskLocation = new Location(Obelisks.OBELISK_COORDS[index][0] + 2,
-                            OBELISK_COORDS[index][1] + 2);
-                        const random = Misc.getRandom(5);
-                        while (random == index)
-                            random = Misc.getRandom(5);
-                        const newLocation = new Location(OBELISK_COORDS[random][0] + 2,
-                            OBELISK_COORDS[random][1] + 2);
-                        for (const player of World.getPlayers()) {
-                            if (player == null || !(player.getArea() instanceof WildernessArea))
-                                continue;
-                            if (player.getLocation().isWithinDistance(obeliskLocation, 1) && !player.getCombat().getTeleBlockTimer().finished())
-                                player.getPacketSender().sendMessage("A magical spell is blocking you from teleporting.");
+                TaskManager.submit(new ObeliskTask(() => {
+                    const obeliskLocation = new Location(Obelisks.OBELISK_COORDS[index][0] + 2,
+                        Obelisks.OBELISK_COORDS[index][1] + 2);
+                    let random = Misc.getRandom(5);
+                    while (random == index)
+                        random = Misc.getRandom(5);
+                    const newLocation = new Location(Obelisks.OBELISK_COORDS[random][0] + 2,
+                        Obelisks.OBELISK_COORDS[random][1] + 2);
+                    for (const player of World.getPlayers()) {
+                        if (player == null || !(player.getArea() instanceof WildernessArea))
+                            continue;
+                        if (player.getLocation().isWithinDistance(obeliskLocation, 1) && !player.getCombat().getTeleblockTimer().finished())
+                            player.getPacketSender().sendMessage("A magical spell is blocking you from teleporting.");
 
-                            if (player.getLocation().isWithinDistance(obeliskLocation, 1) && player.getCombat().getTeleBlockTimer().finished()) {
-                                player.performGraphic(new Graphic(661));
-                                player.moveTo(newLocation);
-                                player.performAnimation(TeleportType.NORMAL.getEndAnimation());
-                            }
+                        if (player.getLocation().isWithinDistance(obeliskLocation, 1) && player.getCombat().getTeleblockTimer().finished()) {
+                            player.performGraphic(new Graphic(661));
+                            player.moveTo(newLocation);
+                            player.performAnimation(TeleportType.NORMAL.getEndAnimation());
                         }
-                        Obelisks.deactivate(index);
-                        this.stop();
                     }
-
-                    public stop() {
-                        super.stop();
-                        OBELISK_ACTIVATED[index] = false;
-                    }
-                });
+                    Obelisks.deactivate(index);
+                }, ()=> {
+                    Obelisks.OBELISK_ACTIVATED[index] = false;
+                }));
             }
             return true;
         }
         return false;
     }
+
+
+    public static deactivate(index: number): void {
+        let obeliskX: number, obeliskY: number;
+        for (let i = 0; i < this.obelisks.length; i++) {
+          obeliskX = i == 1 || i == 3 ? this.OBELISK_COORDS[index][0] + 4 : this.OBELISK_COORDS[index][0];
+          obeliskY = i >= 2 ? this.OBELISK_COORDS[index][1] + 4 : this.OBELISK_COORDS[index][1];
+          ObjectManager.register(
+            new GameObject(this.OBELISK_IDS[index], new Location(obeliskX, obeliskY), 10, 0, undefined),
+            true
+          );
+        }
+      }
 
     /*
      * Obelisk ids

@@ -12,12 +12,11 @@ import { WeaponInterfaces } from "../../../content/combat/WeaponInterfaces";
 import { BountyHunter } from "../../../content/combat/bountyhunter/BountyHunter"
 import { PendingHit } from "../../../content/combat/hit/PendingHit";
 import { Autocasting } from "../../../content/combat/magic/Autocasting";
-import { Barrows } from "../../../content/minigames/impl/Barrows"
+import { Barrows, Brother } from "../../../content/minigames/impl/Barrows"
 import { Presetable } from "../../../content/presets/Presetable";
 import { Presetables } from "../../../content/presets/Presetables";
 import { SkillManager } from "../../../content/skill/SkillManager";
 import { Skillable } from "../../../content/skill/skillable/Skillable";
-import { Runecrafting, PouchContainer, Pouch } from "../../../content/skill/skillable/impl/Runecrafting"
 import { ActiveSlayerTask } from "../../../content/skill/slayer/ActiveSlayerTask"
 import { ItemDefinition } from "../../../definition/ItemDefinition";
 import { PlayerBotDefinition } from "../../../definition/PlayerBotDefinition";
@@ -28,21 +27,17 @@ import { PlayerBot } from "../playerbot/PlayerBot";
 import { Animation } from "../../../model/Animation";
 import { Appearance } from "../../../model/Appearance";
 import { ChatMessage } from "../../../model/ChatMessage";
-import { EffectTimer, EffectTimers } from "../../../model/EffectTimer";
 import { EnteredAmountAction } from "../../../model/EnteredAmountAction";
 import { EnteredSyntaxAction } from "../../../model/EnteredSyntaxAction";
 import { Flag } from "../../../model/Flag";
 import { ForceMovement } from "../../../model/ForceMovement";
 import { God } from "../../../model/God";
-import { Item } from "../../../model/Item";
 import { Location } from "../../../model/Location";
-import { MagicSpellbook, MagicSpellbooks } from "../../../model/MagicSpellbook";
 import { PlayerInteractingOption, PlayerInteractingOptions } from "../../../model/PlayerInteractingOption";
 import { PlayerRelations } from "../../../model/PlayerRelations";
 import { PlayerStatus } from "../../../model/PlayerStatus";
 import { SecondsTimer } from "../../../model/SecondsTimer";
-import { Skill, Skills } from "../../../model/Skill";
-import { SkullType, SkullTypes } from "../../../model/SkullType";
+import { Skill } from "../../../model/Skill";
 import { AreaManager } from "../../../model/areas/AreaManager";
 import { Bank } from "../../../model/container/impl/Bank";
 import { Equipment } from "../../../model/container/impl/Equipment";
@@ -71,14 +66,22 @@ import { TimerKey } from "../../../../util/timers/TimerKey";
 import { Trading } from "../../../content/Trading";
 import { Dueling } from "../../../content/Duelling";
 import { QuickPrayers } from "../../../content/QuickPrayers";
-
+import { MagicSpellbook } from "../../../model/MagicSpellbook";
+import { PouchContainer, Pouch } from "../../../content/skill/skillable/impl/Runecrafting";
+import { SkullType } from "../../../model/SkullType";
+import { EffectTimer } from "../../../model/EffectTimer";
+import { PetHandler } from "../../../content/PetHandler";
+import { Task } from "../../../task/Task";
 
 export class Player extends Mobile {
+    getSize(): number {
+        return 1;
+    }
     public increaseStats = new SecondsTimer();
     public decreaseStats = new SecondsTimer();
     private localPlayers: Player[] = [];
     private localNpcs: NPC[] = [];
-    private packetSender = new PacketSender(this);
+    public packetSender = new PacketSender(this);
     public appearance = new Appearance(this);
     public skillManager = new SkillManager(this);
     public relations = new PlayerRelations(this);
@@ -101,31 +104,31 @@ export class Player extends Mobile {
     private targetSearchTimer = new SecondsTimer();
     public recentKills: string[] = []; // Contains ip addresses of recent kills
     private chatMessageQueue = new Array<ChatMessage>();
-    private currentChatMessage: ChatMessage;
+    public currentChatMessage: ChatMessage;
     // Logout
-    private forcedLogoutTimer = new SecondsTimer();
+    public forcedLogoutTimer = new SecondsTimer();
     // Trading
     private trading = new Trading(this);
     private dueling = new Dueling(this);
-    private dialogueManager = new DialogueManager(this);
+    public dialogueManager = new DialogueManager(this);
     // Presets
     private currentPreset: Presetable;
     public presets: Presetable[] = new Array(Presetables.MAX_PRESETS);
     private openPresetsOnDeath = true;
 
-    private username: string;
+    public username: string;
     private passwordHashWithSalt: string;
     private hostAddress: string;
     private isDiscordLogin
     private cachedDiscordAccessToken: string;
-    private longUsername: number;
+    public longUsername: number;
     private session: PlayerSession;
-    private playerInteractingOption = PlayerInteractingOptions.NONE;
-    private status: PlayerStatus = PlayerStatus.NONE;
-    private currentClanChat: ClanChat;
-    private clanChatName: string;
-    private shop: Shop;
-    private interfaceId: number = -1
+    private playerInteractingOption: PlayerInteractingOption;
+    public status: PlayerStatus = PlayerStatus.NONE;
+    public currentClanChat: ClanChat;
+    public clanChatName: string;
+    public shop: Shop;
+    public interfaceId: number = -1
     private walkableInterfaceId: number = -1
     private multiIcon: number;
     private isRunning = true;
@@ -133,13 +136,13 @@ export class Player extends Mobile {
     private lastRunRecovery = new Stopwatch();
     private isDying: boolean;
     private allowRegionChangePacket: boolean;
-    private experienceLocked: boolean;
-    private forceMovement: ForceMovement;
+    public experienceLocked: boolean;
+    public forceMovement: ForceMovement;
     private currentPet: NPC;
     private skillAnimation: number;
     private drainingPrayer: boolean;
     private prayerPointDrain: number;
-    private spellbook = MagicSpellbooks.NORMAL;
+    private spellbook: MagicSpellbook;
     private previousTeleports = new Map<TeleportButton, Location>();
     private teleportInterfaceOpen: boolean;
     private destroyItem = -1;
@@ -154,7 +157,7 @@ export class Player extends Mobile {
     private skill: Skillable;
     private creationMenu: CreationMenu;
     // Entering data
-    private enteredAmountAction: EnteredAmountAction;
+    public enteredAmountAction: EnteredAmountAction;
     private enteredSyntaxAction: EnteredSyntaxAction;
 
     // Time the account was created
@@ -169,7 +172,7 @@ export class Player extends Mobile {
     private consecutiveTasks: number;
 
     // Combat
-    public skullType: SkullTypes = SkullTypes.WHITE_SKULL;
+    public skullType: SkullType;
     public combatSpecial: CombatSpecial;
     private recoilDamage: number;
     private vengeanceTimer = new SecondsTimer();
@@ -187,17 +190,18 @@ export class Player extends Mobile {
     public highestKillstreak: number;
     public deaths: number;
     private safeTimer = 180;
+    public pcPoints: number;
     // Barrows
     public barrowsCrypt: number;
     public barrowsChestsLooted: number;
-    public killedBrothers: boolean[] = Array(Barrows.Brother.values().length).fill(false);
+    public killedBrothers: boolean[] = Array(Brother.length).fill(false);
     private currentBrother: NPC;
     private preserveUnlocked: boolean;
     private rigourUnlocked: boolean;
     private auguryUnlocked: boolean;
     private targetTeleportUnlocked: boolean;
     // Banking
-    private currentBankTab: number;
+    public currentBankTab: number;
     public banks: Bank[] = Array(Bank.TOTAL_BANK_TABS).fill(null); // last index is for bank searches
     private noteWithdrawal: boolean;
     private insertMode: boolean;
@@ -206,15 +210,15 @@ export class Player extends Mobile {
     private placeholders = true;
     private infiniteHealth: boolean;
     private fightType = FightType.UNARMED_KICK;
-    private weapon: WeaponInterfaces;
+    public weapon: WeaponInterfaces;
     private autoRetaliate = true;
 
     // GWD
-    public godwarsKillcount: number[] = Array(God.values().length).fill(0);
+    public godwarsKillcount: number[] = Array(Object.keys(God).length / 2).fill(0);
 
     // Rights
-    private rights = PlayerRights.NONE;
-    private donatorRights = DonatorRights.NONE;
+    public rights = PlayerRights.NONE;
+    public donatorRights = DonatorRights.NONE;
     /**
      * The cached player update block for updating.
      */
@@ -252,19 +256,19 @@ export class Player extends Mobile {
         this.setWildernessLevel(0);
         this.setRecoilDamage(0);
         this.setSkullTimer(0);
-        this.setSkullType(SkullTypes.WHITE_SKULL);
+        this.setSkullType(SkullType.WHITE_SKULL);
         WeaponInterfaces.assign(this);
         BonusManager.update(this);
         PrayerHandler.deactivatePrayers(this);
         this.getEquipment().refreshItems();
         this.getInventory().refreshItems();
-        for (let skill of Skill.values())
-            this.getSkillManager().setCurrentLevel(skill, this.getSkillManager().getMaxLevel(skill));
+        for (let skill of Object.values(Skill))
+            this.getSkillManager().setCurrentLevels(skill, this.getSkillManager().getMaxLevel(skill));
         this.setRunEnergy(100);
         this.getPacketSender().sendRunEnergy();
         this.getMovementQueue().setBlockMovement(false).reset();
-        this.getPacketSender().sendEffectTimer(0, EffectTimers.ANTIFIRE).sendEffectTimer(0, EffectTimers.FREEZE)
-            .sendEffectTimer(0, EffectTimers.VENGEANCE).sendEffectTimer(0, EffectTimers.TELE_BLOCK);
+        this.getPacketSender().sendEffectTimer(0, EffectTimer.ANTIFIRE).sendEffectTimer(0, EffectTimer.FREEZE)
+            .sendEffectTimer(0, EffectTimer.VENGEANCE).sendEffectTimer(0, EffectTimer.TELE_BLOCK);
         this.getPacketSender().sendPoisonType(0);
         this.getPacketSender().sendSpecialAttackState(false);
         this.setUntargetable(false);
@@ -288,16 +292,16 @@ export class Player extends Mobile {
     }
 
     public getHitpoints(): number {
-        return this.getSkillManager().getCurrentLevel(Skills.HITPOINTS);
+        return this.getSkillManager().getCurrentLevel(Skill.HITPOINTS);
     }
 
 
     public getAttackAnim(): number {
-        return this.getFightType().getAnimation();
+        return FightType.getAnimation();
     }
 
     public getAttackSound(): Sound {
-        return this.getFightType().getAttackSound();
+        return FightType.getAttackSound();
     }
 
     public getBlockAnim(): number {
@@ -313,39 +317,39 @@ export class Player extends Mobile {
         }
 
         if (this.infiniteHealth) {
-            if (this.getSkillManager().getCurrentLevel(Skills.HITPOINTS) > hitpoints) {
+            if (this.getSkillManager().getCurrentLevel(Skill.HITPOINTS) > hitpoints) {
                 return this;
             }
         }
 
-        this.getSkillManager().setCurrentLevel(Skills.HITPOINTS, hitpoints);
-        this.getPacketSender().sendSkill(Skills.HITPOINTS);
+        this.getSkillManager().setCurrentLevels(Skill.HITPOINTS, hitpoints);
+        this.getPacketSender().sendSkill(Skill.HITPOINTS);
         if (this.getHitpoints() <= 0 && !this.isDying)
             this.appendDeath();
         return this;
     }
     public heal(amount: number) {
-        let level = this.getSkillManager().getMaxLevel(Skills.HITPOINTS);
-        if ((this.getSkillManager().getCurrentLevel(Skills.HITPOINTS) + amount) >= level) {
+        let level = this.getSkillManager().getMaxLevel(Skill.HITPOINTS);
+        if ((this.getSkillManager().getCurrentLevel(Skill.HITPOINTS) + amount) >= level) {
             this.setHitpoints(level);
         } else {
-            this.setHitpoints(this.getSkillManager().getCurrentLevel(Skills.HITPOINTS) + amount);
+            this.setHitpoints(this.getSkillManager().getCurrentLevel(Skill.HITPOINTS) + amount);
         }
     }
 
 
     public getBaseAttack(type: CombatType): number {
         if (type == CombatType.RANGED)
-            return this.getSkillManager().getCurrentLevel(Skills.RANGED);
+            return this.getSkillManager().getCurrentLevel(Skill.RANGED);
         else if (type == CombatType.MAGIC)
-            return this.getSkillManager().getCurrentLevel(Skills.MAGIC);
-        return this.getSkillManager().getCurrentLevel(Skills.ATTACK);
+            return this.getSkillManager().getCurrentLevel(Skill.MAGIC);
+        return this.getSkillManager().getCurrentLevel(Skill.ATTACK);
     }
 
     public getBaseDefence(type: CombatType): number {
         if (type == CombatType.MAGIC)
-            return this.getSkillManager().getCurrentLevel(Skills.MAGIC);
-        return this.getSkillManager().getCurrentLevel(Skills.DEFENCE);
+            return this.getSkillManager().getCurrentLevel(Skill.MAGIC);
+        return this.getSkillManager().getCurrentLevel(Skill.DEFENCE);
     }
 
     public getBaseAttackSpeed(): number {
@@ -419,7 +423,7 @@ export class Player extends Mobile {
         }
 
         // Send queued chat messages
-        if (!this.getChatMessageQueue().isEmpty()) {
+        if (this.getChatMessageQueue().length > 0) {
             this.setCurrentChatMessage(this.getChatMessageQueue().shift());
             this.getUpdateFlag().flag(Flag.CHAT);
         } else {
@@ -427,7 +431,7 @@ export class Player extends Mobile {
         }
 
         // Increase run energy
-        if (this.runEnergy < 100 && (!this.getMovementQueue().isMoving() || !this.isRunning)) {
+        if (this.runEnergy < 100 && (!this.getMovementQueue().isMovings() || !this.isRunning)) {
             if (this.lastRunRecovery.elapsedTime(MovementQueue.runEnergyRestoreDelay(this))) {
                 this.runEnergy++;
                 this.getPacketSender().sendRunEnergy();
@@ -452,11 +456,11 @@ export class Player extends Mobile {
 
                             // Rapid restore effect - 2x restore rate for all stats except hp/prayer
                             // Rapid heal - 2x restore rate for hitpoints
-                            if (skill != Skills.HITPOINTS && skill != Skills.PRAYER) {
+                            if (skill != Skill.HITPOINTS && skill != Skill.PRAYER) {
                                 if (PrayerHandler.isActivated(this, PrayerHandler.RAPID_RESTORE)) {
                                     restoreRate = 2;
                                 }
-                            } else if (skill == Skills.HITPOINTS) {
+                            } else if (skill == Skill.HITPOINTS) {
                                 if (PrayerHandler.isActivated(this, PrayerHandler.RAPID_HEAL)) {
                                     restoreRate = 2;
                                 }
@@ -470,7 +474,7 @@ export class Player extends Mobile {
                         if (this.decreaseStats.secondsElapsed() >= (PrayerHandler.isActivated(this, PrayerHandler.PRESERVE) ? 72 : 60)) {
 
                             // Never decrease Hitpoints / Prayer
-                            if (skill != Skills.HITPOINTS && skill != Skills.PRAYER) {
+                            if (skill != Skill.HITPOINTS && skill != Skill.PRAYER) {
                                 this.getSkillManager().decreaseCurrentLevel(skill, 1, 1);
                             }
 
@@ -563,7 +567,7 @@ export class Player extends Mobile {
 
         let totalExp = 0;
         let skill: Skill;
-        for (skill of Skill.values()) {
+        for (const skill of Object.values(Skill)) {
             this.getSkillManager().updateSkill(skill);
             totalExp += this.getSkillManager().getExperience(skill);
         }
@@ -599,17 +603,17 @@ export class Player extends Mobile {
         // Update weapon data and interfaces..
         WeaponInterfaces.assign(this);
         // Update weapon interface configs
-        this.getPacketSender().sendConfig(this.getFightType().getParentId(), this.getFightType().getChildId())
+        this.getPacketSender().sendConfig(FightType.getParentId(), FightType.getChildId())
             .sendConfig(172, this.autoRetaliateReturn() ? 1 : 0).updateSpecialAttackOrb();
 
         // Reset autocasting
         Autocasting.setAutocast(this, null);
 
         // Send pvp stats..
-        this.getPacketSender().sendString(52029, "@or1@Killstreak: " + this.getKillstreak())
-            .sendString(52030, "@or1@Kills: " + this.getTotalKills()).sendString(52031, "@or1@Deaths: " + this.getDeaths())
-            .sendString(52033, "@or1@K/D Ratio: " + this.getKillDeathRatio())
-            .sendString(52034, "@or1@Donated: " + this.getAmountDonated());
+        this.getPacketSender().sendString("@or1@Killstreak: " + this.getKillstreak(), 52029)
+            .sendString("@or1@Kills: " + this.getTotalKills(), 52030).sendString("@or1@Deaths: " + this.getDeaths(), 52031)
+            .sendString("@or1@K/D Ratio: " + this.getKillDeathRatio(), 52033)
+            .sendString("@or1@Donated: " + this.getAmountDonated(), 52034);
 
         // Join clanchat
         ClanChatManager.onLogin(this);
@@ -624,15 +628,15 @@ export class Player extends Mobile {
         }
 
         if (!this.getVengeanceTimer().finished()) {
-            this.getPacketSender().sendEffectTimer(this.getVengeanceTimer().secondsRemaining(), EffectTimers.VENGEANCE);
+            this.getPacketSender().sendEffectTimer(this.getVengeanceTimer().secondsRemaining(), EffectTimer.VENGEANCE);
         }
         if (!this.getCombat().getFireImmunityTimer().finished()) {
             this.getPacketSender().sendEffectTimer(this.getCombat().getFireImmunityTimer().secondsRemaining(),
-                EffectTimers.ANTIFIRE);
+                EffectTimer.ANTIFIRE);
         }
-        if (!this.getCombat().getTeleBlockTimer().finished()) {
-            this.getPacketSender().sendEffectTimer(this.getCombat().getTeleBlockTimer().secondsRemaining(),
-                EffectTimers.TELE_BLOCK);
+        if (!this.getCombat().getTeleblockTimer().finished()) {
+            this.getPacketSender().sendEffectTimer(this.getCombat().getTeleblockTimer().secondsRemaining(),
+                EffectTimer.TELE_BLOCK);
         }
 
         this.decreaseStats.start(60);
@@ -750,11 +754,11 @@ export class Player extends Mobile {
         return this;
     }
 
-    public getRights(): typeof PlayerRights.NONE {
+    public getRights(): PlayerRights {
         return this.rights;
     }
 
-    public setRights(rights: typeof PlayerRights.NONE): this {
+    public setRights(rights: PlayerRights): this {
         this.rights = rights;
         return this;
     }
@@ -836,7 +840,7 @@ export class Player extends Mobile {
         return this.playerInteractingOption;
     }
 
-    public setPlayerInteractingOption(playerInteractingOption: PlayerInteractingOptions): Player {
+    public setPlayerInteractingOption(playerInteractingOption: PlayerInteractingOption): Player {
         this.playerInteractingOption = playerInteractingOption;
         return this;
     }
@@ -916,11 +920,11 @@ export class Player extends Mobile {
     }
 
     public static getCombatSpecial(): CombatSpecial {
-        return this.combatSpecial;
+        return this.getCombatSpecial();
     }
 
     public setCombatSpecial(combatSpecial: CombatSpecial) {
-        Player.combatSpecial = combatSpecial;
+        this.combatSpecial = combatSpecial;
     }
 
     public getRecoilDamage(): number {
@@ -935,7 +939,7 @@ export class Player extends Mobile {
         return this.spellbook;
     }
 
-    public setSpellbook(spellbook: typeof MagicSpellbooks.NORMAL) {
+    public setSpellbook(spellbook: MagicSpellbook) {
         this.spellbook = spellbook;
     }
 
@@ -1286,11 +1290,11 @@ export class Player extends Mobile {
         return this.specialAttackRestore;
     }
 
-    public getSkullType(): SkullTypes {
+    public getSkullType(): SkullType {
         return this.skullType;
     }
 
-    public setSkullType(skullType: SkullTypes) {
+    public setSkullType(skullType: SkullType) {
         this.skullType = skullType;
     }
 
@@ -1350,7 +1354,7 @@ export class Player extends Mobile {
         this.skill = skill;
     }
 
-    public public getCreationMenu(): CreationMenu {
+    public getCreationMenu(): CreationMenu {
         return this.creationMenu;
     }
 
@@ -1578,7 +1582,7 @@ export class Player extends Mobile {
         return this.fightType;
     }
 
-    public setFightType(fightType: typeof FightType.UNARMED_KICK): void {
+    public setFightType(fightType: FightType): void {
         this.fightType = fightType;
     }
 
@@ -1624,16 +1628,26 @@ export class Player extends Mobile {
         this.questProgress = questProgress;
     }
 
-    getSize() {
-
+    public climb(down: boolean, location: Location): void {
+        this.performAnimation(new Animation(down ? 827 : 828));
+        const task = new PlayerTask(1, this.getIndex(), true, () => {
+            let ticks = 0;
+            ticks++;
+            if (ticks === 2) {
+                this.moveTo(location);
+                task.stop();
+            }
+        });
+        TaskManager.submit(task);
     }
+}
 
-    public castlewarsKills: number;
-    public castlewarsDeaths: number;
-    public castlewarsIdleTime: number;
-
-
-    public resetCastlewarsIdleTime() {
-        this.castlewarsIdleTime = 200;
+class PlayerTask extends Task{
+    constructor(n1: number, n2: number, b: boolean, private readonly execFunc: Function){
+        super(n1, n2, b)
     }
+    execute(): void {
+        this.execFunc();
+    }
+    
 }

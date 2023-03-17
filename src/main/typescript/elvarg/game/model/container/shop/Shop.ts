@@ -16,21 +16,37 @@ export class Shop {
     public static CURRENCY_COINS = ShopCurrencies.COINS;
     
     public id: number;
-    private name: string;
-    private originalStock: Item[];
+    public name: string;
+    public originalStock: Item[];
     public currentStock: Item[] = new Array(Shop.MAX_SHOP_ITEMS);
     private restocking: boolean;
     public currency: ShopCurrency;
 
-    constructor(name: string, originalStock: Item[], currency: ShopCurrency = Shop.CURRENCY_COINS, id: number = ShopManager.generateUnusedId()) {
-        this.id = id;
-        this.name = name;
-        this.originalStock = originalStock;
-        for (let i = 0; i < originalStock.length; i++) {
-            this.currentStock[i] = originalStock[i].clone();
+    constructor(name: string, originalStock: Item[], currency?: ShopCurrency);
+    constructor(id: number, name: string, originalStock: Item[], currency?: ShopCurrency);
+    constructor(...args: any[]) {
+        if (args.length === 2 || args.length === 3) {
+          // Constructor with optional currency parameter
+          if (args.length === 3) {
+            this.currency = args[2];
+          } else {
+            this.currency = ShopCurrencies.COINS;
+          }
+          this.id = ShopManager.generateUnusedId();
+          this.name = args[0];
+          this.originalStock = args[1];
+          this.currentStock = this.originalStock.map(item => item.clone());
+        } else if (args.length === 4) {
+          // Constructor with all parameters
+          this.id = args[0];
+          this.name = args[1];
+          this.originalStock = args[2];
+          this.currentStock = this.originalStock.map(item => item.clone());
+          this.currency = args[3];
+        } else {
+          throw new Error('Invalid constructor parameters');
         }
-        this.currency = currency;
-    }
+      }
     
     removeItem(itemId: number, amount: number) {
         for (let i = 0; i < this.currentStock.length; i++) {

@@ -13,17 +13,16 @@ import { Location } from "./model/Location"
 import { PlayerRights } from "./model/rights/PlayerRights"
 
 
-
 export class GameConstants {
     public static readonly NAME: string = "RspsApp";
     public static readonly CLIENT_UID: number = 8784521;
     public static readonly DEFINITIONS_DIRECTORY: string = "./data/definitions/";
     public static readonly CLIPPING_DIRECTORY: string = "./data/clipping/";
-    public static readonly PLAYER_PERSISTENCE: PlayerPersistence = new JSONFilePlayerPersistence();
+    public static readonly PLAYER_PERSISTENCE = new JSONFilePlayerPersistence();
     public static readonly CONCURRENCY: boolean = false;
     public static readonly GAME_ENGINE_PROCESSING_CYCLE_RATE: number = 600;
     public static readonly QUEUED_LOOP_THRESHOLD: number = 45;
-    public static readonly DEFAULT_LOCATION: Location = new Location(3089, 3524, 0);
+    public static readonly DEFAULT_LOCATION = new Location(3089, 3524);
     public static readonly QUEUE_SWITCHING_REFRESH: boolean = true;
     public static readonly DROP_THRESHOLD: number = 2;
     public static readonly COMBAT_SKILLS_EXP_MULTIPLIER: number = 6;
@@ -70,17 +69,17 @@ export class GameConstants {
         1704, 1731, 1725, 1727, 1729]);
 
     public static readonly PLAYER_BOTS: PlayerBotDefinition[] = [
-        new PlayerBotDefinition("Bot Hello123", new Location(3085, 3528,0), new ObbyMaulerFighterPreset()),
-        new PlayerBotDefinition("Elvemage", new Location(3093, 3529,0), new NHPureFighterPreset()),
-        new PlayerBotDefinition("Bot 1337Pk", new Location(3087, 3530,0), new DDSPureRFighterPreset()),
-        new PlayerBotDefinition("Bot Kids Ranqe", new Location(3089, 3530,0), new GRangerFighterPreset()),
-        new PlayerBotDefinition("Bot Josh", new Location(3091, 3533,0), new DDSPureMFighterPreset()),
-        new PlayerBotDefinition("Bot Odablock", new Location(3091, 3536,0), new TribridMaxFighterPreset()),
-        new PlayerBotDefinition("Bot SKillSpecs", new Location(3095, 3535,0), new MidTribridMaxFighterPreset()),
-        new PlayerBotDefinition("Bot F2P Pure", new Location(3096, 3530,0), new F2PMeleeFighterPreset()),
+        new PlayerBotDefinition("Bot Hello123", new Location(3085, 3528), new ObbyMaulerFighterPreset()),
+        new PlayerBotDefinition("Elvemage", new Location(3093, 3529), new NHPureFighterPreset()),
+        new PlayerBotDefinition("Bot 1337Pk", new Location(3087, 3530), new DDSPureRFighterPreset()),
+        new PlayerBotDefinition("Bot Kids Ranqe", new Location(3089, 3530), new GRangerFighterPreset()),
+        new PlayerBotDefinition("Bot Josh", new Location(3091, 3533), new DDSPureMFighterPreset()),
+        new PlayerBotDefinition("Bot Odablock", new Location(3091, 3536), new TribridMaxFighterPreset()),
+        new PlayerBotDefinition("Bot SKillSpecs", new Location(3095, 3535), new MidTribridMaxFighterPreset()),
+        new PlayerBotDefinition("Bot F2P Pure", new Location(3096, 3530), new F2PMeleeFighterPreset()),
     ];
 
     public static readonly PLAYER_BOT_PASSWORD: string = "wirfunerpro4n!1";
-    public static readonly PLAYER_BOT_OVERRIDE: PlayerRights[] = [PlayerRights.MODERATOR, PlayerRights.ADMINISTRATOR, PlayerRights.DEVELOPER, PlayerRights.OWNER];
+    public static readonly PLAYER_BOT_OVERRIDE: number[] = [PlayerRights.MODERATOR.getSpriteId(), PlayerRights.ADMINISTRATOR.getSpriteId(), PlayerRights.DEVELOPER.getSpriteId(), PlayerRights.OWNER.getSpriteId()];
 }
 

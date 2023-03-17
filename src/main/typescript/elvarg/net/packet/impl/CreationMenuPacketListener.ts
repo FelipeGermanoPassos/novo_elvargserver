@@ -1,4 +1,6 @@
-import { Player } from '../../entity/impl/player'
+import { Player } from '../../../game/entity/impl/player/Player';
+import { Packet } from '../Packet';
+import { PacketExecutor } from '../PacketExecutor';
 
 export class CreationMenuPacketListener implements PacketExecutor {
     execute(player: Player, packet: Packet) {

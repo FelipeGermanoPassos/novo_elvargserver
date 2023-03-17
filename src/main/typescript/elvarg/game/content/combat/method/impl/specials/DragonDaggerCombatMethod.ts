@@ -11,8 +11,8 @@ import { Sounds } from "../../../../../Sounds";
 
 export class DragonDaggerCombatMethod extends MeleeCombatMethod {
 
-    private static readonly ANIMATION = new Animation(1062, Priority.HIGH);
-    private static readonly GRAPHIC = new Graphic(252, GraphicHeight.HIGH, Priority.HIGH);
+    private static readonly ANIMATION = new Animation(1062);
+    private static readonly GRAPHIC = new Graphic(252, GraphicHeight.HIGH);
 
     public hits(character: Mobile, target: Mobile): PendingHit[] {
         return [new PendingHit(character, target, this),

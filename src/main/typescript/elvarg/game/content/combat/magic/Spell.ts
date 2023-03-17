@@ -1,12 +1,4 @@
-<<<<<<< Updated upstream
-export class Spell {
-    public canCast(player: Player, delete: boolean): boolean {
-    if (player.skillManager.getCurrentLevel(Skill.MAGIC) < levelRequired()) {
-        player.packetSender.sendMessage(
-            `You need a Magic level of ${levelRequired()} to cast this spell.`);
-        player.combat.reset();
-        return false;
-=======
+
 import { Misc } from "../../../../util/Misc";
 import { Mobile } from "../../../entity/impl/Mobile";
 import { Player } from "../../../entity/impl/player/Player";
@@ -29,7 +21,6 @@ export abstract class Spell {
 
     public getSpellbook(): MagicSpellbook {
         return MagicSpellbook.NORMAL;
->>>>>>> Stashed changes
     }
 
     canCast(player: Player, del: boolean): boolean {
@@ -84,7 +75,7 @@ export abstract class Spell {
                 let item: Item
                 for (item of suppressedItems) {
                     if (item !== null) {
-                        player.getInventory().deletes(item);
+                        player.getInventory().delete(item);
                     }
                 }
             }
@@ -93,25 +84,7 @@ export abstract class Spell {
         return true;
     }
 
+
+
+
 }
-<<<<<<< Updated upstream
-getSpellbook(): MagicSpellbook {
-    return MagicSpellbook.NORMAL;
-}
-
-
-
-interface Spells {
-    spellId(): number;
-    levelRequired(): number;
-    baseExperience(): number;
-    itemsRequired(player: Player): Optional<Item[]>;
-    equipmentRequired(player: Player): Optional<Item[]>;
-    startCast(cast: Mobile, castOn: Mobile): void;
-}
-
-=======
-
-
-
->>>>>>> Stashed changes

@@ -14,7 +14,4 @@ export class KingBlackDragon extends NPC {
         return KingBlackDragon.COMBAT_METHOD;
     }
 
-    getSize() {
-
-    }
 }

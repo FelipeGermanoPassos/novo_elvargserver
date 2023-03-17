@@ -1,22 +1,23 @@
+import { Direction } from "../model/Direction";
 import { FacingDirection } from "../model/FacingDirection";
 import { Location } from "../model/Location";
 import { DefaultSpawnDefinition } from "./DefaultSpawnDefinition";
 
 export class NpcSpawnDefinition extends DefaultSpawnDefinition {
 
-    facing: FacingDirection;
+    facing: Direction;
     radius: number;
     description: string;
 
 
-    constructor(id: number, position: Location, facing: FacingDirection, radius: number, descripton?: string) {
+    constructor(id: number, position: Location, facing: Direction, radius: number, descripton?: string) {
         super(id, position);
         this.facing = facing;
         this.radius = radius;
         this.description = descripton;
     }
 
-    getFacing(): FacingDirection {
+    getFacing(): Direction {
         return this.facing;
     }
 

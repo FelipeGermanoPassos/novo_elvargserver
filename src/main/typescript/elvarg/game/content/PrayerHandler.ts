@@ -1,10 +1,10 @@
-import { Dueling } from "./Duelling";
+import { Dueling, DuelRule } from "./Duelling";
 import { CombatType } from "./combat/CombatType";
 import { Mobile } from "../entity/impl/Mobile";
 import { NPC } from "../entity/impl/npc/NPC";
 import { Player } from "../entity/impl/player/Player";
 import { Skill } from "../model/Skill";
-import { SkullType, SkullTypes } from "../model/SkullType";
+import { SkullType } from "../model/SkullType";
 import { BonusManager } from "../model/equipment/BonusManager";
 import { PlayerRights } from "../model/rights/PlayerRights";
 import { Task } from "../task/Task";
@@ -50,39 +50,6 @@ export class PrayerHandler {
     public static OVERHEAD_PRAYERS: number[] = [PrayerHandler.PROTECT_FROM_MAGIC, PrayerHandler.PROTECT_FROM_MISSILES, PrayerHandler.PROTECT_FROM_MELEE, PrayerHandler.RETRIBUTION, PrayerHandler.REDEMPTION, PrayerHandler.SMITE];
     public static PROTECTION_PRAYERS: number[] = [PrayerHandler.PROTECT_FROM_MAGIC, PrayerHandler.PROTECT_FROM_MISSILES, PrayerHandler.PROTECT_FROM_MELEE];
 
-    public static PrayerDataList = {
-
-        THICK_SKIN: [1, 5, 5609, 83],
-        BURST_OF_STRENGTH: [4, 5, 5610, 84],
-        CLARITY_OF_THOUGHT: [7, 5, 5611, 85],
-        SHARP_EYE: [8, 5, 19812, 700],
-        MYSTIC_WILL: [9, 5, 19814, 701],
-        ROCK_SKIN: [10, 10, 5612, 86],
-        SUPERHUMAN_STRENGTH: [13, 10, 5613, 87],
-        IMPROVED_REFLEXES: [16, 10, 5614, 88],
-        RAPID_RESTORE: [19, 2.3, 5615, 89],
-        RAPID_HEAL: [22, 3, 5616, 90],
-        PROTECT_ITEM: [25, 3, 5617, 91],
-        HAWK_EYE: [26, 10, 19816, 702],
-        MYSTIC_LORE: [27, 10, 19818, 703],
-        STEEL_SKIN: [28, 20, 5618, 92],
-        ULTIMATE_STRENGTH: [31, 20, 5619, 93],
-        INCREDIBLE_REFLEXES: [34, 20, 5620, 94],
-        PROTECT_FROM_MAGIC: [37, 20, 5621, 95, 2],
-        PROTECT_FROM_MISSILES: [40, 20, 5622, 96, 1],
-        PROTECT_FROM_MELEE: [43, 20, 5623, 97, 0],
-        EAGLE_EYE: [44, 20, 19821, 704],
-        MYSTIC_MIGHT: [45, 20, 19823, 705],
-        RETRIBUTION: [46, 5, 683, 98, 4],
-        REDEMPTION: [49, 10, 684, 99, 5],
-        SMITE: [52, 32.0, 685, 100, 100, 6],
-        PRESERVE: [55, 3, 28001, 708],
-        CHIVALRY: [60, 38.5, 19825, 706],
-        PIETY: [70, 38.5, 19827, 707],
-        RIGOUR: [74, 38.5, 28004, 710],
-        AUGURY: [77, 38.5, 28007, 712]
-    }
-
     public static getProtectingPrayer(type: CombatType): number {
         switch (type) {
             case CombatType.MELEE:
@@ -109,22 +76,22 @@ export class PrayerHandler {
     public static togglePrayer(player: Player, buttonId: number): boolean {
         let prayerData = PrayerData.actionButton.get(buttonId);
         if (prayerData != null) {
-            if (!player.getPrayerActive()[prayerData.ordinal()])
-                PrayerHandler.activatePrayer(player, prayerData.ordinal());
+            if (!player.getPrayerActive()[prayerData.hint])
+                PrayerHandler.activatePrayer(player, prayerData);
             else
-                PrayerHandler.deactivatePrayer(player, prayerData.ordinal());
+                PrayerHandler.deactivatePrayer(player, prayerData.configId);
             return true;
         }
         return false;
     }
 
     public static activatePrayer(character: Mobile, pd: PrayerData) {
-        PrayerHandler.activatePrayer(character, pd.ordinal());
+        PrayerHandler.activatePrayer(character, pd);
     }
 
     public static activatePrayerPrayerId(character: Mobile, prayerId: number) {
         // Get the prayer data
-        const pd = PrayerData.get(prayerId);
+        const pd = PrayerData.actionButton.get(prayerId);
 
         // Check if it's available
         if (!pd) {
@@ -138,7 +105,7 @@ export class PrayerHandler {
             if (character.isNpc()) {
                 const npc = character.getAsNpc();
                 if (pd.hint !== -1) {
-                    const hintId = getHeadHint(character);
+                    const hintId = this.getHeadHint(character);
                     if (npc.getHeadIcon() !== hintId) {
                         npc.setHeadIcon(hintId);
                     }
@@ -164,21 +131,21 @@ export class PrayerHandler {
             case PrayerHandler.THICK_SKIN:
             case PrayerHandler.ROCK_SKIN:
             case PrayerHandler.STEEL_SKIN:
-                PrayerHandler.resetPrayers(character, PrayerHandler.DEFENCE_PRAYERS, prayerId);
+                PrayerHandler.resetPrayersC(character, PrayerHandler.DEFENCE_PRAYERS, prayerId);
                 break;
             case PrayerHandler.BURST_OF_STRENGTH:
             case PrayerHandler.SUPERHUMAN_STRENGTH:
             case PrayerHandler.ULTIMATE_STRENGTH:
-                PrayerHandler.resetPrayers(character, PrayerHandler.STRENGTH_PRAYERS, prayerId);
-                PrayerHandler.resetPrayers(character, PrayerHandler.RANGED_PRAYERS, prayerId);
-                PrayerHandler.resetPrayers(character, PrayerHandler.MAGIC_PRAYERS, prayerId);
+                PrayerHandler.resetPrayersC(character, PrayerHandler.STRENGTH_PRAYERS, prayerId);
+                PrayerHandler.resetPrayersC(character, PrayerHandler.RANGED_PRAYERS, prayerId);
+                PrayerHandler.resetPrayersC(character, PrayerHandler.MAGIC_PRAYERS, prayerId);
                 break;
             case PrayerHandler.CLARITY_OF_THOUGHT:
             case PrayerHandler.IMPROVED_REFLEXES:
             case PrayerHandler.INCREDIBLE_REFLEXES:
-                PrayerHandler.resetPrayers(character, PrayerHandler.ATTACK_PRAYERS, prayerId);
-                PrayerHandler.resetPrayers(character, PrayerHandler.RANGED_PRAYERS, prayerId);
-                PrayerHandler.resetPrayers(character, PrayerHandler.MAGIC_PRAYERS, prayerId);
+                PrayerHandler.resetPrayersC(character, PrayerHandler.ATTACK_PRAYERS, prayerId);
+                PrayerHandler.resetPrayersC(character, PrayerHandler.RANGED_PRAYERS, prayerId);
+                PrayerHandler.resetPrayersC(character, PrayerHandler.MAGIC_PRAYERS, prayerId);
                 break;
             case PrayerHandler.SHARP_EYE:
             case PrayerHandler.HAWK_EYE:
@@ -186,30 +153,30 @@ export class PrayerHandler {
             case PrayerHandler.MYSTIC_WILL:
             case PrayerHandler.MYSTIC_LORE:
             case PrayerHandler.MYSTIC_MIGHT:
-                PrayerHandler.resetPrayers(character, PrayerHandler.STRENGTH_PRAYERS, prayerId);
-                PrayerHandler.resetPrayers(character, PrayerHandler.ATTACK_PRAYERS, prayerId);
-                PrayerHandler.resetPrayers(character, PrayerHandler.RANGED_PRAYERS, prayerId);
-                PrayerHandler.resetPrayers(character, PrayerHandler.MAGIC_PRAYERS, prayerId);
+                PrayerHandler.resetPrayersC(character, PrayerHandler.STRENGTH_PRAYERS, prayerId);
+                PrayerHandler.resetPrayersC(character, PrayerHandler.ATTACK_PRAYERS, prayerId);
+                PrayerHandler.resetPrayersC(character, PrayerHandler.RANGED_PRAYERS, prayerId);
+                PrayerHandler.resetPrayersC(character, PrayerHandler.MAGIC_PRAYERS, prayerId);
                 break;
             case PrayerHandler.CHIVALRY:
             case PrayerHandler.PIETY:
             case PrayerHandler.RIGOUR:
             case PrayerHandler.AUGURY:
-                PrayerHandler.resetPrayers(character, PrayerHandler.DEFENCE_PRAYERS, prayerId);
-                PrayerHandler.resetPrayers(character, PrayerHandler.STRENGTH_PRAYERS, prayerId);
-                PrayerHandler.resetPrayers(character, PrayerHandler.ATTACK_PRAYERS, prayerId);
-                PrayerHandler.resetPrayers(character, PrayerHandler.RANGED_PRAYERS, prayerId);
-                PrayerHandler.resetPrayers(character, PrayerHandler.MAGIC_PRAYERS, prayerId);
+                PrayerHandler.resetPrayersC(character, PrayerHandler.DEFENCE_PRAYERS, prayerId);
+                PrayerHandler.resetPrayersC(character, PrayerHandler.STRENGTH_PRAYERS, prayerId);
+                PrayerHandler.resetPrayersC(character, PrayerHandler.ATTACK_PRAYERS, prayerId);
+                PrayerHandler.resetPrayersC(character, PrayerHandler.RANGED_PRAYERS, prayerId);
+                PrayerHandler.resetPrayersC(character, PrayerHandler.MAGIC_PRAYERS, prayerId);
                 break;
             case PrayerHandler.PROTECT_FROM_MAGIC:
             case PrayerHandler.PROTECT_FROM_MISSILES:
             case PrayerHandler.PROTECT_FROM_MELEE:
-                PrayerHandler.resetPrayers(character, PrayerHandler.OVERHEAD_PRAYERS, prayerId);
+                PrayerHandler.resetPrayersC(character, PrayerHandler.OVERHEAD_PRAYERS, prayerId);
                 break;
             case PrayerHandler.RETRIBUTION:
             case PrayerHandler.REDEMPTION:
             case PrayerHandler.SMITE:
-                PrayerHandler.resetPrayers(character, PrayerHandler.OVERHEAD_PRAYERS, prayerId);
+                PrayerHandler.resetPrayersC(character, PrayerHandler.OVERHEAD_PRAYERS, prayerId);
                 break;
         }
         character.setPrayerActive(prayerId, true);
@@ -218,9 +185,9 @@ export class PrayerHandler {
         if (character.isPlayer()) {
             const player = character.getAsPlayer();
             player.getPacketSender().sendConfig(pd.configId, 1);
-            startDrain(player);
+            PrayerHandler.startDrain(player);
             if (pd.hint !== -1) {
-                const hintId = getHeadHint(character);
+                const hintId = PrayerHandler.getHeadHint(character);
                 player.getAppearance().setHeadHint(hintId);
             }
 
@@ -230,7 +197,7 @@ export class PrayerHandler {
         } else if (character.isNpc()) {
             const npc = character.getAsNpc();
             if (pd.hint !== -1) {
-                const hintId = getHeadHint(character);
+                const hintId = PrayerHandler.getHeadHint(character);
                 if (npc.getHeadIcon() !== hintId) {
                     npc.setHeadIcon(hintId);
                 }
@@ -238,37 +205,37 @@ export class PrayerHandler {
         }
     }
 
-    public static canUse(player: Player, prayer: number[], msg: boolean): boolean {
+    public static canUse(player: Player, prayer: PrayerData, msg: boolean): boolean {
         if (player.getSkillManager().getMaxLevel(Skill.PRAYER) < (prayer.requirement)) {
             if (msg) {
                 player.getPacketSender().sendConfig(prayer.configId, 0);
-                player.getPacketSender().sendMessage("You need a Prayer level of at least" + prayer.requirement + " to use" + prayer.getPrayerName() + ".");
+                player.getPacketSender().sendMessage("You need a Prayer level of at least" + prayer.requirement + " to use" + PrayerData.getPrayerName() + ".");
             }
             return false;
         }
-        if (prayer === this.PrayerDataList.CHIVALRY && player.getSkillManager().getMaxLevel(Skill.DEFENCE) < 60) {
+        if (prayer === PrayerData.CHIVALRY && player.getSkillManager().getMaxLevel(Skill.DEFENCE) < 60) {
             if (msg) {
                 player.getPacketSender().sendConfig(prayer.configId, 0);
                 player.getPacketSender().sendMessage("You need a Defence level of at least 60 to use Chivalry.");
             }
             return false;
         }
-        if (prayer === this.PrayerDataList.PIETY && player.getSkillManager().getMaxLevel(Skill.DEFENCE) < 70) {
+        if (prayer === PrayerData.PIETY && player.getSkillManager().getMaxLevel(Skill.DEFENCE) < 70) {
             if (msg) {
                 player.getPacketSender().sendConfig(prayer.configId, 0);
                 player.getPacketSender().sendMessage("You need a Defence level of at least 70 to use Piety.");
             }
             return false;
         }
-        if ((prayer === this.PrayerDataList.RIGOUR || prayer === this.PrayerDataList.AUGURY) && player.getSkillManager().getMaxLevel(Skill.DEFENCE) < 70) {
+        if ((prayer === PrayerData.RIGOUR || prayer === PrayerData.AUGURY) && player.getSkillManager().getMaxLevel(Skill.DEFENCE) < 70) {
             if (msg) {
                 player.getPacketSender().sendConfig(prayer.configId, 0);
                 player.getPacketSender().sendMessage("You need a Defence level of at least 70 to use that prayer.");
             }
             return false;
         }
-        if (prayer === this.PrayerDataList.PROTECT_ITEM) {
-            if (player.isSkulled() && player.getSkullType() === SkullTypes.RED_SKULL) {
+        if (prayer === PrayerData.PROTECT_ITEM) {
+            if (player.isSkulled() && player.getSkullType() === SkullType.RED_SKULL) {
                 if (msg) {
                     player.getPacketSender().sendConfig(prayer.configId, 0);
                     // DialogueManager.sendStatement(player, "You cannot use the Protect Item prayer with a red skull!");
@@ -277,8 +244,8 @@ export class PrayerHandler {
             }
         }
         if (!player.getCombat().getPrayerBlockTimer().finished()) {
-            if (prayer == this.PrayerDataList.PROTECT_FROM_MELEE || prayer == this.PrayerDataList.PROTECT_FROM_MISSILES
-                || prayer == this.PrayerDataList.PROTECT_FROM_MAGIC) {
+            if (prayer == PrayerData.PROTECT_FROM_MELEE || prayer == PrayerData.PROTECT_FROM_MISSILES
+                || prayer == PrayerData.PROTECT_FROM_MAGIC) {
                 if (msg) {
                     player.getPacketSender().sendConfig(prayer.configId, 0);
                     player.getPacketSender()
@@ -291,9 +258,9 @@ export class PrayerHandler {
         // Prayer locks
         let locked = false;
 
-        if (prayer == this.PrayerDataList.PRESERVE && !player.isPreserveUnlocked()
-            || prayer == this.PrayerDataList.RIGOUR && !player.isRigourUnlocked()
-            || prayer == this.PrayerDataList.AUGURY && !player.isAuguryUnlocked()) {
+        if (prayer == PrayerData.PRESERVE && !player.isPreserveUnlocked()
+            || prayer == PrayerData.RIGOUR && !player.isRigourUnlocked()
+            || prayer == PrayerData.AUGURY && !player.getAuguryUnlocked()) {
             if (player.getRights() != PlayerRights.OWNER && player.getRights() != PlayerRights.DEVELOPER) {
                 locked = true;
             }
@@ -307,7 +274,7 @@ export class PrayerHandler {
         }
 
         // Duel, disabled prayer?
-        if (player.getDueling().inDuel() && player.getDueling().getRules()[DuelRule.NO_PRAYER.ordinal()]) {
+        if (player.getDueling().inDuel() && player.getDueling().getRules()[DuelRule.NO_PRAYER.getButtonId()]) {
             if (msg) {
                 //   DialogueManager.sendStatement(player, "Prayer has been disabled in this duel!");
                 player.getPacketSender().sendConfig(prayer.configId, 0);
@@ -345,7 +312,7 @@ export class PrayerHandler {
 
     public static deactivatePrayers(character: Mobile): void {
         for (let i = 0; i < character.getPrayerActive().length; i++) {
-            deactivatePrayer(character, i);
+            this.deactivatePrayer(character, i);
         }
         if (character.isPlayer()) {
             character.getAsPlayer().getQuickPrayers().setEnabled(false);
@@ -364,7 +331,7 @@ export class PrayerHandler {
             player.getPrayerActive()[i] = false;
             player.getPacketSender().sendConfig(pd.configId, 0);
             if (pd.hint !== -1) {
-                const hintId = getHeadHint(player);
+                const hintId = this.getHeadHint(player);
                 player.getAppearance().setHeadHint(hintId);
             }
         }
@@ -372,7 +339,7 @@ export class PrayerHandler {
         player.getPacketSender().sendQuickPrayersState(false);
     }
 
-    getHeadHint(character: Mobile): number {
+    public static getHeadHint(character: Mobile): number {
         const prayers = character.getPrayerActive();
         if (prayers[PrayerHandler.PROTECT_FROM_MELEE]) {
             return 0;
@@ -400,7 +367,7 @@ export class PrayerHandler {
             return;
         }
         player.setDrainingPrayer(true);
-        let task = new Task(1, player, false, function () {
+        let task = new PlayerHandlerTask(player,  () => {
             let drainPerTick = 0;
             let pointDrain = player.getPrayerPointDrain();
             for (let i = 0; i < player.getPrayerActive().length; i++) {
@@ -417,21 +384,21 @@ export class PrayerHandler {
                 drainPerTick += drainTicks;
             }
             if (player.getHitpoints() <= 0 || drainPerTick <= 0) {
-                this.stop();
+                stop();
                 return;
             }
             let bonus = player.getBonusManager().getOtherBonus()[BonusManager.PRAYER];
             drainPerTick /= (1 + (0.0333 * bonus));
-
+        
             pointDrain += drainPerTick;
             let drainTreshold = Math.floor(pointDrain);
             if (drainTreshold >= 1) {
                 let total = (player.getSkillManager().getCurrentLevel(Skill.PRAYER) - drainTreshold);
                 player.getSkillManager().setCurrentLevel(Skill.PRAYER, total, true);
                 if (player.getSkillManager().getCurrentLevel(Skill.PRAYER) <= 0) {
-                    deactivatePrayers(player);
+                    PrayerHandler.deactivatePrayers(player);
                     player.getPacketSender().sendMessage("You have run out of Prayer points!");
-                    this.stop();
+                    stop();
                     return;
                 }
                 pointDrain -= drainTreshold;
@@ -440,14 +407,16 @@ export class PrayerHandler {
                 }
             }
             player.setPrayerPointDrain(pointDrain);
-        })
+    
+            function stop() {
+                player.setPrayerPointDrain(0);
+                player.setDrainingPrayer(false);
+                task.stop();
+            }
+        });
     }
 
-    stop() {
-        super.stop();
-        Player.setPrayerPointDrain(0);
-        Player.setDrainingPrayer(false);
-    }
+
 
     public static resetPrayersC(c: Mobile, prayers: number[], prayerID: number): void {
         for (let i = 0; i < prayers.length; i++) {
@@ -481,14 +450,45 @@ export class PrayerHandler {
 
 
 export class PrayerData {
+
+    public static readonly THICK_SKIN = new PrayerData(1, 5, 5609, 83);
+    public static readonly BURST_OF_STRENGTH =  new PrayerData(4, 5, 5610, 84);
+    public static readonly CLARITY_OF_THOUGHT = new PrayerData(7, 5, 5611, 85);
+    public static readonly SHARP_EYE = new PrayerData(8, 5, 19812, 700);
+    public static readonly MYSTIC_WILL = new PrayerData(9, 5, 19814, 701);
+    public static readonly ROCK_SKIN = new PrayerData (10, 10, 5612, 86);
+    public static readonly SUPERHUMAN_STRENGTH = new PrayerData (13, 10, 5613, 87);
+    public static readonly IMPROVED_REFLEXES = new PrayerData (16, 10, 5614, 88);
+    public static readonly RAPID_RESTORE = new PrayerData (19, 2.3, 5615, 89);
+    public static readonly RAPID_HEAL = new PrayerData (22, 3, 5616, 90);
+    public static readonly PROTECT_ITEM = new PrayerData (25, 3, 5617, 91);
+    public static readonly HAWK_EYE = new PrayerData (26, 10, 19816, 702);
+    public static readonly MYSTIC_LORE = new PrayerData (27, 10, 19818, 703);
+    public static readonly STEEL_SKIN = new PrayerData (28, 20, 5618, 92);
+    public static readonly ULTIMATE_STRENGTH = new PrayerData (31, 20, 5619, 93);
+    public static readonly INCREDIBLE_REFLEXES = new PrayerData (34, 20, 5620, 94);
+    public static readonly PROTECT_FROM_MAGIC = new PrayerData (37, 20, 5621, 95, [2]);
+    public static readonly PROTECT_FROM_MISSILES = new PrayerData (40, 20, 5622, 96, [1]);
+    public static readonly PROTECT_FROM_MELEE = new PrayerData (43, 20, 5623, 97, [0]);
+    public static readonly EAGLE_EYE = new PrayerData(44, 20, 19821, 704);
+    public static readonly MYSTIC_MIGHT = new PrayerData (45, 20, 19823, 705);
+    public static readonly RETRIBUTION = new PrayerData (46, 5, 683, 98, [4]);
+    public static readonly REDEMPTION = new PrayerData (49, 10, 684, 99, [5]);
+    public static readonly SMITE = new PrayerData (52, 32.0, 685, 100, [6]);
+    public static readonly PRESERVE = new PrayerData (55, 3, 28001, 708);
+    public static readonly CHIVALRY = new PrayerData (60, 38.5, 19825, 706);
+    public static readonly PIETY = new PrayerData (70, 38.5, 19827, 707);
+    public static readonly RIGOUR = new PrayerData (74, 38.5, 28004, 710);
+    public static readonly AUGURY = new PrayerData (77, 38.5, 28007, 712);
+
     /**
        * Contains the PrayerData with their corresponding prayerId.
        */
-    private static prayerData: HashMap<Integer, PrayerData> = new HashMap<Integer, PrayerData>();
+    public static prayerData: Map<number, PrayerData> = new Map<number, PrayerData>();
     /**
      * Contains the PrayerData with their corresponding buttonId.
      */
-    private static actionButton: HashMap<Integer, PrayerData> = new HashMap<Integer, PrayerData>();
+    public static actionButton: Map<number, PrayerData> = new Map<number, PrayerData>();
 
     /**
      * Populates the prayerId and buttonId maps.
@@ -503,7 +503,7 @@ export class PrayerData {
     /**
      * The prayer's level requirement for player to be able to activate it.
      */
-    private requirement: number;
+    public requirement: number;
     /**
      * The prayer's action button id in prayer tab.
      */
@@ -512,22 +512,22 @@ export class PrayerData {
      * The prayer's config id to switch their glow on/off by sending the sendConfig
      * packet.
      */
-    private configId: number;
+    public configId: number;
     /**
      * The rate of which the player's prayer points will be drained at 
      * per minute.
      */
-    private drainRate: number;
+    public drainRate: number;
     /**
      * The prayer's head icon hint index.
      */
-    private hint: number = -1;
+    public hint: number = -1;
     /**
      * The prayer's formatted name.
      */
     private name: string;
 
-    constructor(requirement: number, drainRate: number, buttonId: number, configId: number, hint: number[]) {
+    constructor(requirement: number, drainRate: number, buttonId: number, configId: number, hint?: number[]) {
         this.requirement = requirement;
         this.drainRate = drainRate;
         this.buttonId = buttonId;
@@ -541,12 +541,53 @@ export class PrayerData {
      *
      * @return The prayer's name
      */
-    private static getPrayerName(): string {
+    public static getPrayerName(): string {
         if (this.name == null)
-            return Misc.capitalizeWords(toString().toLowerCase().replaceAll("_", " "));
+            return Misc.capitalizeWords(toString().toLowerCase().replace("_", " "));
         return this.name;
     }
+
+    public static *values(): Iterable<PrayerData> {
+        yield PrayerData.THICK_SKIN;
+        yield PrayerData.BURST_OF_STRENGTH;
+        yield PrayerData.CLARITY_OF_THOUGHT
+        yield PrayerData.SHARP_EYE
+        yield PrayerData.MYSTIC_WILL
+        yield PrayerData.ROCK_SKIN
+        yield PrayerData.SUPERHUMAN_STRENGTH
+        yield PrayerData.IMPROVED_REFLEXES
+        yield PrayerData.RAPID_RESTORE
+        yield PrayerData.RAPID_HEAL
+        yield PrayerData.PROTECT_ITEM
+        yield PrayerData.HAWK_EYE
+        yield PrayerData.MYSTIC_LORE
+        yield PrayerData.STEEL_SKIN
+        yield PrayerData.ULTIMATE_STRENGTH
+        yield PrayerData.INCREDIBLE_REFLEXES
+        yield PrayerData.PROTECT_FROM_MAGIC
+        yield PrayerData.PROTECT_FROM_MISSILES
+        yield PrayerData.PROTECT_FROM_MELEE
+        yield PrayerData.EAGLE_EYE
+        yield PrayerData.MYSTIC_MIGHT
+        yield PrayerData.RETRIBUTION
+        yield PrayerData.REDEMPTION
+        yield PrayerData.SMITE
+        yield PrayerData.PRESERVE
+        yield PrayerData.CHIVALRY
+        yield PrayerData.PIETY
+        yield PrayerData.RIGOUR
+        yield PrayerData.AUGURY
+      }
+
 }
 
+class PlayerHandlerTask extends Task{
+    constructor(p: Player,private readonly execFunc: Function){
+        super(1, false);
+    }
+    execute(): void {
+        this.execFunc();
+    }
 
+}
 

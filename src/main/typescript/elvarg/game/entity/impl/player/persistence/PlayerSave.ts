@@ -534,7 +534,7 @@ export class PlayerSave {
 
         player.getCombat().getPoisonImmunityTimer().start(this.poisonImmunityTimer);
         player.getCombat().getFireImmunityTimer().start(this.fireImmunityTimer);
-        player.getCombat().getTeleBlockTimer().start(this.teleblockTimer);
+        player.getCombat().getTeleblockTimer().start(this.teleblockTimer);
         player.getTargetSearchTimer().start(this.targetSearchTimer);
         player.getSpecialAttackRestore().start(this.specialAttackRestoreTimer);
 
@@ -562,7 +562,7 @@ export class PlayerSave {
 
         player.getInventory().setItems(this.inventory);
         player.getEquipment().setItems(this.equipment);
-        player.getAppearance().set(this.appearance);
+        player.getAppearance().set();
         player.getSkillManager().setSkills(this.skills);
         player.getQuickPrayers().setPrayers(this.quickPrayers);
         player.setQuestPoints(this.questPoints);
@@ -620,7 +620,7 @@ export class PlayerSave {
         playerSave.poisonImmunityTimer = player.getCombat().getPoisonImmunityTimer().secondsRemaining();
         playerSave.fireImmunityTimer = player.getCombat().getFireImmunityTimer().secondsRemaining();
 
-        playerSave.teleblockTimer = player.getCombat().getTeleBlockTimer().secondsRemaining();
+        playerSave.teleblockTimer = player.getCombat().getTeleblockTimer().secondsRemaining();
         playerSave.targetSearchTimer = player.getTargetSearchTimer().secondsRemaining();
         playerSave.specialAttackRestoreTimer = player.getSpecialAttackRestore().secondsRemaining();
 

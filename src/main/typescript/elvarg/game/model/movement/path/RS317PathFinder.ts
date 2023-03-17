@@ -1,10 +1,15 @@
-public class RS317PathFinder {
+
+import { Mobile } from "../../../entity/impl/Mobile";
+import { Location } from "../../Location";
+import { RegionManager } from "../../../collision/RegionManager";
+
+export class RS317PathFinder {
 
     private static readonly DEFAULT_PATH_LENGTH = 4000;
 
     public static findPath(gc: Mobile, destX: number, destY: number, moveNear: boolean, xLength: number, yLength: number) {
         try {
-            if (destX == gc.getLocation().getLocalX() && destY == gc.getLocation().getLocalY() && !moveNear) {
+            if (destX == gc.getLocation().getRegionX() && destY == gc.getLocation().getRegionY() && !moveNear) {
                 return;
             }
 
@@ -21,8 +26,8 @@ public class RS317PathFinder {
                     cost[xx][yy] = 99999999;
                 }
             }
-            let curX = gc.getLocation().getLocalX();
-            let curY = gc.getLocation().getLocalY();
+            let curX = gc.getLocation().getRegionX();
+            let curY = gc.getLocation().getRegionY();
             if (curX > via.length - 1 || curY > via[curX].length - 1) {
                 return;
             }
@@ -36,7 +41,7 @@ public class RS317PathFinder {
             tileQueueX.push(curX);
             tileQueueY.push(curY);
             let foundPath = false;
-            while (tail != tileQueueX.length && tileQueueX.length < DEFAULT_PATH_LENGTH) {
+            while (tail != tileQueueX.length && tileQueueX.length < RS317PathFinder.DEFAULT_PATH_LENGTH) {
                 curX = tileQueueX[tail];
                 curY = tileQueueY[tail];
                 const curAbsX = gc.getLocation().getRegionX() * 8 + curX;
@@ -45,7 +50,7 @@ public class RS317PathFinder {
                     foundPath = true;
                     break;
                 }
-                tail = (tail + 1) % DEFAULT_PATH_LENGTH;
+                tail = (tail + 1) % RS317PathFinder.DEFAULT_PATH_LENGTH;
 
                 if (cost.length < curX || cost[curX].length < curY) {
                     return;
@@ -101,8 +106,8 @@ public class RS317PathFinder {
                     && (RegionManager.getClipping(curAbsX - 1, curAbsY + 1, height, privateArea) & 0x1280138) === 0
                     && (RegionManager.getClipping(curAbsX - 1, curAbsY, height, privateArea) & 0x1280108) === 0
                     && (RegionManager.getClipping(curAbsX, curAbsY + 1, height, privateArea) & 0x1280120) === 0) {
-                    tileQueueX.add(curX - 1);
-                    tileQueueY.add(curY + 1);
+                    tileQueueX.push(curX - 1);
+                    tileQueueY.push(curY + 1);
                     via[curX - 1][curY + 1] = 6;
                     cost[curX - 1][curY + 1] = thisCost;
                 }
@@ -112,8 +117,8 @@ public class RS317PathFinder {
                     && (RegionManager.getClipping(curAbsX + 1, curAbsY - 1, height, privateArea) & 0x1280183) === 0
                     && (RegionManager.getClipping(curAbsX + 1, curAbsY, height, privateArea) & 0x1280180) === 0
                     && (RegionManager.getClipping(curAbsX, curAbsY - 1, height, privateArea) & 0x1280102) === 0) {
-                    tileQueueX.add(curX + 1);
-                    tileQueueY.add(curY - 1);
+                    tileQueueX.push(curX + 1);
+                    tileQueueY.push(curY - 1);
                     via[curX + 1][curY - 1] = 9;
                     cost[curX + 1][curY - 1] = thisCost;
                 }
@@ -123,8 +128,8 @@ public class RS317PathFinder {
                     && (RegionManager.getClipping(curAbsX + 1, curAbsY + 1, height, privateArea) & 0x12801e0) === 0
                     && (RegionManager.getClipping(curAbsX + 1, curAbsY, height, privateArea) & 0x1280180) === 0
                     && (RegionManager.getClipping(curAbsX, curAbsY + 1, height, privateArea) & 0x1280120) === 0) {
-                    tileQueueX.add(curX + 1);
-                    tileQueueY.add(curY + 1);
+                    tileQueueX.push(curX + 1);
+                    tileQueueY.push(curY + 1);
                     via[curX + 1][curY + 1] = 12;
                     cost[curX + 1][curY + 1] = thisCost;
                 }
@@ -167,14 +172,14 @@ public class RS317PathFinder {
                 }
             }
             tail = 0;
-            tileQueueX.set(tail, curX);
-            tileQueueY.set(tail++, curY);
+            tileQueueX.push(tail, curX);
+            tileQueueY.push(tail++, curY);
             let l5;
-            for (let j5 = l5 = via[curX][curY]; curX !== gc.getLocation().getLocalX() || curY !== gc.getLocation().getLocalY(); j5 = via[curX][curY]) {
+            for (let j5 = l5 = via[curX][curY]; curX !== gc.getLocation().getRegionX() || curY !== gc.getLocation().getRegionY(); j5 = via[curX][curY]) {
                 if (j5 !== l5) {
                     l5 = j5;
-                    tileQueueX.set(tail, curX);
-                    tileQueueY.set(tail++, curY);
+                    tileQueueX.push(tail, curX);
+                    tileQueueY.push(tail++, curY);
                 }
                 if ((j5 & 2) !== 0) {
                     curX++;
@@ -195,7 +200,7 @@ public class RS317PathFinder {
                 tail--;
                 pathX = gc.getLocation().getRegionX() * 8 + tileQueueX[tail];
                 pathY = gc.getLocation().getRegionY() * 8 + tileQueueY[tail];
-                gc.getMovementQueue().addStep(new Location(pathX, pathY, gc.getLocation().getZ()));
+                gc.getMovementQueue().addSteps(new Location(pathX, pathY, gc.getLocation().getZ()));
             }
         } catch (e) {
             console.log(e);
@@ -206,12 +211,12 @@ public class RS317PathFinder {
         }
     }
 
-        export function isInDiagonalBlock(attacker: Location, attacked: Location): boolean {
+    public static isInDiagonalBlock(attacker: Location, attacked: Location): boolean {
         return attacked.getX() - 1 === attacker.getX() && attacked.getY() + 1 === attacker.getY()
-        || attacker.getX() - 1 === attacked.getX() && attacker.getY() + 1 === attacked.getY()
-        || attacked.getX() + 1 === attacker.getX() && attacked.getY() - 1 === attacker.getY()
-        || attacker.getX() + 1 === attacked.getX() && attacker.getY() - 1 === attacked.getY()
-        || attacked.getX() + 1 === attacker.getX() && attacked.getY() + 1 === attacker.getY()
-        || attacker.getX() + 1 === attacked.getX() && attacker.getY() + 1 === attacked.getY();
-}
+            || attacker.getX() - 1 === attacked.getX() && attacker.getY() + 1 === attacked.getY()
+            || attacked.getX() + 1 === attacker.getX() && attacked.getY() - 1 === attacker.getY()
+            || attacker.getX() + 1 === attacked.getX() && attacker.getY() - 1 === attacked.getY()
+            || attacked.getX() + 1 === attacker.getX() && attacked.getY() + 1 === attacker.getY()
+            || attacker.getX() + 1 === attacked.getX() && attacker.getY() + 1 === attacked.getY();
     }
+}

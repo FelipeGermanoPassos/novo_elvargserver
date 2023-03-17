@@ -1,4 +1,26 @@
+import { Equipment } from "../../../../model/container/impl/Equipment";
+import { BotCommand } from "./BotCommand";
+import { TaskManager } from "../../../../task/TaskManager";
+import { PlayerBot } from "../PlayerBot";
+import { Task } from "../../../../task/Task";
+import { Animation } from "../../../../model/Animation";
+import { CommandType } from "./CommandType";
+import { CastleWars } from "../../../../content/minigames/impl/CastleWars";
+
+class PlayCastleWarsTask extends Task{
+    constructor(p: number, private readonly exeFunc: Function){
+        super(5,false);
+    }
+    execute(): void {
+        this.exeFunc();
+        this.stop();
+    }
+    
+}
 export class PlayCastleWars implements BotCommand {
+
+    private static readonly WAVE_ANIM: Animation = new Animation(863);
+
     public triggers(): string[] {
         return ["castlewars", " cw"];
     }
@@ -12,14 +34,9 @@ export class PlayCastleWars implements BotCommand {
 
         playerBot.sendChat("Going to play Castlewars, BRB!");
 
-        playerBot.performAnimation(WAVE_ANIM);
+        playerBot.performAnimation(PlayCastleWars.WAVE_ANIM);
 
-        TaskManager.submit(new Task(5, playerBot.getIndex(), false) {
-            public execute(): void {
-                CastleWars.addToWaitRoom(playerBot, CastleWars.TEAM_GUTHIX);
-                this.stop();
-            }
-        });
+        TaskManager.submit(new PlayCastleWarsTask(playerBot.getIndex(), () => CastleWars.addToWaitRoom(playerBot, CastleWars.TEAM_GUTHIX)));
     }
 
     public stop(playerBot: PlayerBot): void {
@@ -27,7 +44,7 @@ export class PlayCastleWars implements BotCommand {
     }
 
     public supportedTypes(): CommandType[] {
-        return [PUBLIC_CHAT, PRIVATE_CHAT, CLAN_CHAT];
+        return [CommandType.PUBLIC_CHAT, CommandType.PRIVATE_CHAT, CommandType.CLAN_CHAT];
     }
 }
 

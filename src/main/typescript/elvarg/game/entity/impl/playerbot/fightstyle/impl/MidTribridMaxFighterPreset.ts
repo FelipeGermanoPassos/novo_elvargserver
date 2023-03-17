@@ -24,9 +24,54 @@ import { TimerKey } from "../../../../../../util/timers/TimerKey";
 import { ItemIdentifiers } from "../../../../../../util/ItemIdentifiers";
 
 
+class MidCombatSwitch extends CombatSwitch {
+    constructor(
+        switchItemIds: number[],
+        private readonly execFunc: (playerBot: PlayerBot, enemy: Mobile) => void,
+        prayerData?: PrayerData[]
+    ) {
+        super(switchItemIds, prayerData);
+    }
+
+    public shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
+        const canAttackNextTick = playerBot.getTimers().willEndIn(TimerKey.COMBAT_ATTACK, 1);
+        return canAttackNextTick && enemy.getMovementQueue().getMobility().canMove() && !enemy.getTimers().has(TimerKey.FREEZE_IMMUNITY) && CombatSpells.ICE_BARRAGE.getSpell().canCast(playerBot, false);
+    }
+
+    public performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void {
+        this.execFunc(playerBot, enemy);
+    }
+}
+
+class MidCombatAction implements CombatAction {
+    constructor(private readonly execFunc: Function) {
+
+    }
+    shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
+        return true;
+    }
+
+    perform(playerBot: PlayerBot, enemy: Mobile) {
+        this.execFunc(playerBot, enemy);
+    }
+    stopAfter(): boolean {
+        return false;
+    }
+}
+
+
+
 export class MidTribridMaxFighterPreset implements FighterPreset {
+    getItemPreset(): Presetable {
+        throw new Error("Method not implemented.");
+    }
+    getCombatActions(): CombatAction[] {
+        throw new Error("Method not implemented.");
+    }
+    eatAtPercent(): number {
+        throw new Error("Method not implemented.");
+    }
     private static RANDOM = new RandomGen();
-    private CombatAction = new CombatAction();
     public static BOT_MID_TRIBRID: Presetable = new Presetable("Mid Tribrid",
         [
             new Item(ItemIdentifiers.AVAS_ACCUMULATOR), new Item(ItemIdentifiers.BLACK_DHIDE_BODY), new Item(ItemIdentifiers.ABYSSAL_WHIP), new Item(ItemIdentifiers.SHARK),
@@ -56,130 +101,105 @@ export class MidTribridMaxFighterPreset implements FighterPreset {
     );
 
     public static COMBAT_ACTIONS: CombatAction[] = [
-        //Slower
-        {
-            shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-                return this.RANDOM.inclusive(0, 4) != 2;
-            },
-            perform(playerBot: PlayerBot, enemy: Mobile): void {
+        // Slower
+        new MidCombatAction(() => {
+            return this.RANDOM.getInclusive(0, 4) != 2;
+        }),
 
-            },
-            stopAfter(): boolean {
-                return false;
+        // OverHead prayers
+        new MidCombatAction((playerBot: PlayerBot, enemy: Mobile) => {
+            var combatMethod = CombatFactory.getMethod(enemy);
+            const magicAccuracy = enemy.isNpc() ? 0 : enemy.getAsPlayer().getBonusManager().getAttackBonus()[BonusManager.ATTACK_MAGIC];
+            var combatType = combatMethod.type();
+            if (!CombatFactory.canReach(enemy, combatMethod, playerBot) && magicAccuracy < 35) {
+                PrayerHandler.activatePrayer(playerBot, PrayerData.SMITE);
+                return;
             }
-        },
-        //OverHead prayers
-        {
-            shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-                return this.RANDOM.inclusive(0, 4) == 2;
-            },
-            perform(playerBot: PlayerBot, enemy: Mobile) {
-                const combatMethod = CombatFactory.getMethod(enemy);
-                const combatType = combatMethod.type();
 
-                const magicAccuracy = (enemy.isNpc() ? 0 : enemy.getAsPlayer().getBonusManager().getAttackBonus()[BonusManager.ATTACK_MAGIC]);
-
-                if (!CombatFactory.canReach(enemy, combatMethod, playerBot) && magicAccuracy < 35) {
-                    PrayerHandler.activatePrayer(playerBot, PrayerHandler.prayerData.SMITE);
-                    return;
-                }
-
-                if (combatType == CombatType.MELEE && CombatFactory.canReach(enemy, combatMethod, playerBot)) {
-                    PrayerHandler.activatePrayer(playerBot, PrayerHandler.prayerData.PROTECT_FROM_MELEE);
-                    return;
-                }
-
-                if (combatType == CombatType.RANGED) {
-                    PrayerHandler.activatePrayer(playerBot, PrayerHandler.prayerData.PROTECT_FROM_MISSILES);
-                } else {
-                    PrayerHandler.activatePrayer(playerBot, PrayerHandler.prayerData.PROTECT_FROM_MAGIC);
-                }
-            },
-            stopAfter(): boolean {
-                return false;
+            if (combatType == CombatType.MELEE && CombatFactory.canReach(enemy, combatMethod, playerBot)) {
+                PrayerHandler.activatePrayer(playerBot, PrayerData.PROTECT_FROM_MELEE);
+                return;
             }
-        },
-        new CombatSwitch([DRAGON_DAGGER_P_PLUS_PLUS_, DRAGON_DEFENDER]),
-        new PrayerHandler([PrayerHandler.PrayerData.PROTECT_ITEM, PrayerHandler.PrayerData.PIETY]), {
 
-            shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
+            if (combatType == CombatType.RANGED) {
+                PrayerHandler.activatePrayer(playerBot, PrayerData.PROTECT_FROM_MISSILES);
+            } else {
+                PrayerHandler.activatePrayer(playerBot, PrayerData.PROTECT_FROM_MAGIC);
+            }
+        }),
+
+        new MidCombatSwitch([/*switch item ids*/], (playerBot: PlayerBot, enemy: Mobile) => {
+            // perform after switch code here
+        }),
+
+        new MidCombatAction((playerBot: PlayerBot, enemy: Mobile) => {
+            var combatMethod = CombatFactory.getMethod(enemy);
+            let distance = playerBot.calculateDistance(enemy);
+            let cantAttack = playerBot.getTimers().has(TimerKey.COMBAT_ATTACK) && playerBot.getTimers().left(TimerKey.COMBAT_ATTACK) > 2;
+            return cantAttack
+                && playerBot.getMovementQueue().size() == 0
+                && !enemy.getMovementQueue().getMobility().canMove()
+                && distance == 1
+                && CombatFactory.canReach(enemy, combatMethod, playerBot);
+        }),
+
+        new MidCombatSwitch([ItemIdentifiers.MASTER_WAND, ItemIdentifiers.SARADOMIN_CAPE, ItemIdentifiers.MYSTIC_ROBE_TOP, ItemIdentifiers.MYSTIC_ROBE_BOTTOM, ItemIdentifiers.SPIRIT_SHIELD],
+            (playerBot, enemy) => {
                 const canAttackNextTick = playerBot.getTimers().willEndIn(TimerKey.COMBAT_ATTACK, 1);
-                return canAttackNextTick && playerBot.getMovementQueue().getMobility().canMove()
-                    && enemy.getHitpointsAfterPendingDamage() <= 49
-                    && playerBot.getSpecialPercentage() >= 50
-                    && !enemy.getPrayerActive()[PrayerHandler.PROTECT_FROM_MELEE];
-            },
-            performAfterSwitch(playerBot: PlayerBot, enemy: Mobile) {
-                playerBot.getCombat().setCastSpell(null);
-                if (!playerBot.isSpecialActivated()) {
-                    CombatSpecial.activate(playerBot);
-                }
-                playerBot.getCombat().attack(enemy);
-            }
-        },
-        new CombatAction() {
-
-            shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-                var combatMethod = CombatFactory.getMethod(enemy);
-                let distance = playerBot.calculateDistance(enemy);
-                let cantAttack = playerBot.getTimers().has(TimerKey.COMBAT_ATTACK) && playerBot.getTimers().left(TimerKey.COMBAT_ATTACK) > 2;
-                return cantAttack
-                    && playerBot.getMovementQueue().size() == 0
-                    && !enemy.getMovementQueue().getMobility().canMove()
-                    && distance == 1
-                    && CombatFactory.canReach(enemy, combatMethod, playerBot);
-            },
-            perform(playerBot: PlayerBot, enemy: Mobile) {
-                playerBot.setFollowing(null);
-                MovementQueue.randomClippedStepNotSouth(playerBot, 3);
-            }
-        },
-        new CombatAction(){
-
-            shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-                let pot = SUPER_RESTORE_POTIONS.getIds().map(id => ItemInSlot.getFromInventory(id, playerBot.getInventory())).filter(item => item !== null).find(item => true);
-                return pot && playerBot.getSkillManager().getCurrentLevel(Skill.PRAYER) < 50;
-            },
-            perform(playerBot: PlayerBot, enemy: Mobile) {
-                let pot = SUPER_RESTORE_POTIONS.getIds().map(id => ItemInSlot.getFromInventory(id, playerBot.getInventory())).filter(item => item !== null).find(item => true);
-                PotionConsumable.drink(playerBot, pot.getId(), pot.getSlot());
-            }
-        },
-        new CombatSwitchAction()([MASTER_WAND, SARADOMIN_CAPE, MYSTIC_ROBE_TOP, MYSTIC_ROBE_BOTTOM, SPIRIT_SHIELD]),
-        new PrayerHandler()([PrayerHandler.prayerData.PROTECT_ITEM, PrayerHandler.prayerData.MYSTIC_MIGHT]){
-
-            shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-                let canAttackNextTick = playerBot.getTimers().willEndIn(TimerKey.COMBAT_ATTACK, 1);
-                return canAttackNextTick && enemy.getMovementQueue().getMobility().canMove() && !enemy.getTimers().has(TimerKey.FREEZE_IMMUNITY) && CombatSpells.ICE_BARRAGE.getSpell().canCast(playerBot, false);
-            },
-
-            performAfterSwitch(playerBot: PlayerBot, enemy: Mobile) {
                 playerBot.getCombat().setCastSpell(CombatSpells.ICE_BARRAGE.getSpell());
                 playerBot.getCombat().attack(enemy);
-            }
-        },
+                return canAttackNextTick && enemy.getMovementQueue().getMobility().canMove() && !enemy.getTimers().has(TimerKey.FREEZE_IMMUNITY) && CombatSpells.ICE_BARRAGE.getSpell().canCast(playerBot, false);
+            }, [PrayerData.PROTECT_ITEM, PrayerData.MYSTIC_MIGHT]
+
+        ),
+        new EnemyDefenseAwareCombatSwitch([
+            new AttackStyleSwitch(
+                CombatType.MAGIC,
+                new MidCombatSwitch(
+                    [ItemIdentifiers.MASTER_WAND, ItemIdentifiers.SARADOMIN_CAPE, ItemIdentifiers.MYSTIC_ROBE_TOP, ItemIdentifiers.MYSTIC_ROBE_BOTTOM, ItemIdentifiers.SPIRIT_SHIELD],
+                    (playerBot: PlayerBot, enemy: Mobile) => {
+                        playerBot.getCombat().setCastSpell(CombatSpells.ICE_BARRAGE.getSpell());
+                        playerBot.getCombat().attack(enemy);
+                        return CombatSpells.ICE_BARRAGE.getSpell().canCast(playerBot, false);
+                    },
+                    [PrayerData.PROTECT_ITEM, PrayerData.AUGURY]
+                )
+            ),
+            new AttackStyleSwitch(
+                CombatType.RANGED,
+                new MidCombatSwitch(
+                    [ItemIdentifiers.RUNE_CROSSBOW, ItemIdentifiers.AVAS_ACCUMULATOR, ItemIdentifiers.RUNE_PLATELEGS, ItemIdentifiers.BLACK_DHIDE_BODY],
+                    (playerBot: PlayerBot, enemy: Mobile) => {
+                        playerBot.getCombat().setCastSpell(null);
+                        playerBot.setSpecialActivated(false);
+                        playerBot.getCombat().attack(enemy);
+                        return true;
+                    }
+                )
+            ),
+            new AttackStyleSwitch(
+                CombatType.MELEE,
+                new MidCombatSwitch(
+                    [ItemIdentifiers.ABYSSAL_WHIP, ItemIdentifiers.DRAGON_DEFENDER],
+                    (playerBot: PlayerBot, enemy: Mobile) => {
+                        playerBot.getCombat().setCastSpell(null);
+                        playerBot.getCombat().attack(enemy);
+                        return playerBot.getMovementQueue().getMobility().canMove() && enemy.getHitpointsAfterPendingDamage() <= 45;
+                    },
+                    [PrayerData.PROTECT_ITEM, PrayerData.PIETY]
+                )
+            ),
+        ], (playerBot: PlayerBot, enemy: Mobile) => {
+            return playerBot.getTimers().willEndIn(TimerKey.COMBAT_ATTACK, 1);
+        })
+    ]
+}
 
 
-        class EnemyDefenseAwareCombatSwitch {
-            constructor(public attackStyleSwitches: AttackStyleSwitch[]) { }
-        },
 
-        class AttackStyleSwitch {
-            constructor(public combatType: CombatType, public combatSwitch: CombatSwitch) { }
-        },
 
-        class CombatSwitch {
-            constructor(public equipment: number[], public prayers: PrayerData[]) { }
 
-            public shouldPerform(playerBot: PlayerBot, enemy: Mobile): boolean {
-                // logic here
-            }
 
-            public performAfterSwitch(playerBot: PlayerBot, enemy: Mobile): void {
-                // logic here
-            }
-        }
-    }
 
 
 

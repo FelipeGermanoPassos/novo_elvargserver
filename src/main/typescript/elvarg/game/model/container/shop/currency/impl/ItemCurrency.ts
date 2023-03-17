@@ -26,10 +26,10 @@ export class ItemCurrency implements ShopCurrency {
     }
 
     decrementForPlayer(player: Player, amount: number) {
-        player.getInventory().delete(this.itemDefinition.getId(), amount);
+        player.getInventory().deleteNumber(this.itemDefinition.getId(), amount);
     }
 
     incrementForPlayer(player: Player, amount: number) {
-        player.getInventory().add(this.itemDefinition.getId(), amount);
+        player.getInventory().adds(this.itemDefinition.getId(), amount);
     }
 }

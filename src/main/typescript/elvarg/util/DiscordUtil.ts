@@ -71,7 +71,7 @@ export class DiscordUtil {
 
 }
 
-class DiscordInfo {
-    public usernam: String; password: String;
-    public token: String;
+export class DiscordInfo {
+    public usernam: string; password: string;
+    public token: string;
 }

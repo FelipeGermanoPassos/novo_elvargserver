@@ -1,3 +1,6 @@
+import { Misc } from "./Misc";
+import { fs } from 'fs'
+
 export class PlayerPunishment {
     private static readonly BAN_DIRECTORY = "./data/saves/";
     private static readonly MUTE_DIRECTORY = "./data/saves/";

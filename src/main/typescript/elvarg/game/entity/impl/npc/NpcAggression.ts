@@ -1,10 +1,11 @@
-import { CombatFactory } from "../../../content/combat/CombatFactory";
+import { CombatFactory, CanAttackResponse } from "../../../content/combat/CombatFactory";
 import { CombatMethod } from "../../../content/combat/method/CombatMethod";
 import { NpcDefinition } from "../../../definition/NpcDefinition"
 import { Player } from "../player/Player";
 import { AreaManager } from "../../../model/areas/AreaManager";
 import { PrivateArea } from "../../../model/areas/impl/PrivateArea";
 import { Misc } from "../../../../util/Misc";
+import { NPC } from "./NPC";
 
 export class NpcAggression {
     public static NPC_TOLERANCE_SECONDS = 600; // 10 mins (Accurate to OSRS)
@@ -78,7 +79,7 @@ export class NpcAggression {
             let aggressionDistance = npc.aggressionDistance();
 
             if (distanceToPlayer < npcDefinition.getCombatFollowDistance() && distanceToPlayer <= aggressionDistance) {
-                if (CombatFactory.canAttack(npc, method, player) == CombatFactory.CanAttackResponse.CAN_ATTACK) {
+                if (CombatFactory.canAttack(npc, method, player) == CanAttackResponse.CAN_ATTACK) {
                     npc.getCombat().attack(player);
                     break;
                 }

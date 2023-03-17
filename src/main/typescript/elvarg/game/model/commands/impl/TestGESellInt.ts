@@ -6,9 +6,9 @@ import { ItemDefinition } from '../../../definition/ItemDefinition';
 export class TestGESellInt implements Command {
     execute(player: Player, command: string, parts: string[]) {
         player.getPacketSender().
-            sendItemOnInterface(24780, parseInt(parts[1]), 1).
-            sendString(24769, ItemDefinition.forId(parseInt(parts[1])).getName()).
-            sendString(24770, ItemDefinition.forId(parseInt(parts[1])).getExamine());
+            sendItemOnInterfaces(24780, parseInt(parts[1]), 1).
+            sendString(ItemDefinition.forId(parseInt(parts[1])).getName(), 24769).
+            sendString(ItemDefinition.forId(parseInt(parts[1])).getExamine(), 24770);
     }
     canUse(player: Player): boolean {
         let rights = player.getRights();

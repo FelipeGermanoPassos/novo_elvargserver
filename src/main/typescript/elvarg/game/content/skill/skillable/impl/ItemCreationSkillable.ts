@@ -1,4 +1,13 @@
-class ItemCreationSkillalble extends DefaultSkillable {
+import { DefaultSkillable } from "./DefaultSkillable";
+import { Skill } from "../../../../model/Skill";
+import { RequiredItem } from "../../../../model/RequiredItem";
+import { Item } from "../../../../model/Item";
+import { AnimationLoop } from "../../../../model/AnimationLoop";
+import { Player } from "../../../../entity/impl/player/Player";
+import { Misc } from "../../../../../util/Misc";
+import { PetHandler } from "../../../PetHandler";
+
+export class ItemCreationSkillable extends DefaultSkillable {
     private requiredItems: RequiredItem[];
     /**
      * The item we're making.
@@ -28,6 +37,7 @@ class ItemCreationSkillalble extends DefaultSkillable {
 
     constructor(requiredItems: RequiredItem[], product: Item, amount: number,
         animLoop: AnimationLoop | undefined, requiredLevel: number, experience: number, skill: Skill) {
+        super();
         this.requiredItems = requiredItems;
         this.product = product;
         this.amount = amount;
@@ -61,13 +71,13 @@ class ItemCreationSkillalble extends DefaultSkillable {
         }
 
         // Delete items required..
-        this.filterRequiredItems(r => r.isDelete()).forEach(r => player.getInventory().delete(r.getItem()));
+        this.filterRequiredItems(r => r.isDelete()).forEach(r => player.getInventory().deletes(r.getItem()));
 
         // Add product..
-        player.getInventory().add(this.product);
+        player.getInventory().addItem(this.product);
 
         // Add exp..
-        player.getSkillManager().addExperience(this.skill, this.experience);
+        player.getSkillManager().addExperiences(this.skill, this.experience);
 
         // Send message..
         let name = this.product.getDefinition().getName();
@@ -99,7 +109,7 @@ class ItemCreationSkillalble extends DefaultSkillable {
         // Check if we have the required ores..
         let hasItems = true;
         for (const item of this.requiredItems) {
-            if (!player.getInventory().contains(item.getItem())) {
+            if (!player.getInventory().containsItem(item.getItem())) {
                 let prefix = item.getItem().getAmount() > 1 ? item.getItem().getAmount().toString() : "some";
                 player.getPacketSender().sendMessage("You " + (!hasItems ? "also need" : "need") + " " + prefix + " "
                     + item.getItem().getDefinition().getName() + ".");

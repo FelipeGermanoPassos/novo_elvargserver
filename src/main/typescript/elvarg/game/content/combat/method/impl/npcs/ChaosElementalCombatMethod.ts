@@ -35,7 +35,8 @@ export class ChaosElementalCombatMethod extends CombatMethod {
 
     public start(character: Mobile, target: Mobile) {
         character.performAnimation(new Animation(character.getAttackAnim()));
-        new Projectile(character, target, ChaosElementalCombatMethod.currentAttack.projectileId, 40, 70, 31, 43).sendProjectile();
+        const projectile2 = Projectile.createProjectile(character, target, ChaosElementalCombatMethod.currentAttack, 40, 70, 31, 43);
+    projectile2.sendProjectile();
     }
 
     public attackDistance(character: Mobile): number {
@@ -48,19 +49,22 @@ export class ChaosElementalCombatMethod extends CombatMethod {
         } else if (Misc.getRandom(100) <= 10) {
             ChaosElementalCombatMethod.currentAttack = ChaosElementalAttackType.TELEPORT;
         }
-        ChaosElementalCombatMethod.combatType = CombatType.values()[Misc.getRandom(CombatType.values().length - 1)];
+        const keys = Object.keys(CombatType);
+        const randomIndex = Misc.getRandom(keys.length - 1);
+        const combatType = CombatType[keys[randomIndex]];
+        ChaosElementalCombatMethod.combatType = combatType;
     }
 
     static handleAfterHitEffects(hit: PendingHit) {
         if (hit.getTarget() != null) {
             switch (this.combatType) {
-                case MELEE:
+                case CombatType.MELEE:
                     hit.getTarget().performGraphic(ChaosElementalCombatMethod.MELEE_COMBAT_GFX);
                     break;
-                case RANGED:
+                case CombatType.RANGED:
                     hit.getTarget().performGraphic(ChaosElementalCombatMethod.RANGED_COMBAT_GFX);
                     break;
-                case MAGIC:
+                case CombatType.MAGIC:
                     hit.getTarget().performGraphic(ChaosElementalCombatMethod.MAGIC_COMBAT_GFX);
                     break;
             }
@@ -91,7 +95,7 @@ export class ChaosElementalCombatMethod extends CombatMethod {
             const toDisarm = player.getEquipment().getItems()[randomSlot];
             if (toDisarm.isValid()) {
                 player.getEquipment().set(randomSlot, new Item(-1, 0));
-                player.getInventory().add(toDisarm.clone());
+                player.getInventory().addItem(toDisarm.clone());
                 player.getPacketSender().sendMessage("You have been disarmed!");
                 WeaponInterfaces.assign(player);
                 BonusManager.update(player);

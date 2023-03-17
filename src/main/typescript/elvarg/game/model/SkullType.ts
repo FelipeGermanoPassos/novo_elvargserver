@@ -1,12 +1,10 @@
-export enum SkullTypes {
-    WHITE_SKULL = 0,
-    RED_SKULL = 1
-}
-
 export class SkullType {
+    public static readonly WHITE_SKULL = new SkullType(0);
+    public static readonly RED_SKULL = new SkullType (1);
+
     iconId: number;
 
-    SkullType(iconId: number) {
+    constructor(iconId: number) {
         this.iconId = iconId;
     }
 

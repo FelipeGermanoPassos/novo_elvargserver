@@ -1,7 +1,8 @@
 import { IsaacRandom } from "../security/IsaacRandom";
-import { Packet, PacketType } from "../packet/Packet";
+import { Packet } from "../packet/Packet";
 import { ByteBuf, Unpooled } from "netty";
-import { MessageToByteEncoder } from "netty";
+import { MessageToByteEncoder, ChannelHandlerContext } from "netty";
+import { PacketType } from "../packet/PacketType";
 
 export class PacketEncoder extends MessageToByteEncoder<Packet> {
     private encoder: IsaacRandom;
@@ -63,8 +64,8 @@ export class PacketEncoder extends MessageToByteEncoder<Packet> {
             case PacketType.VARIABLE:
                 buffer.writeByte(size);
                 break;
-            case VARIABLE_SHORT:
-                buffer.writeShort((short) size);
+            case PacketType.VARIABLE_SHORT:
+                buffer.writeShort(size);
                 break;
             default:
                 break;
@@ -76,7 +77,7 @@ export class PacketEncoder extends MessageToByteEncoder<Packet> {
         out.writeBytes(buffer);
     }
 
-    const CLIENT_PACKET_SIZES: number[] = [
+    CLIENTS_PACKET_SIZES: number[] = [
         0, 0, 0, 1, 6, 0, 0, 0, 4, 4, //0
         6, 2, -1, 1, 1, -1, 1, 0, 0, 0, // 10
         0, 0, 0, 0, 1, 0, 0, -1, 1, 1, //20

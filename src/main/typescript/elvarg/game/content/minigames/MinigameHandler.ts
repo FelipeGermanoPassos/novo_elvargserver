@@ -1,14 +1,30 @@
-import { Minigame } from "./Minigame";
 import { CastleWars } from "./impl/CastleWars";
+import { Player } from "../../entity/impl/player/Player";
+import { GameObject } from "../../entity/impl/object/GameObject";
+import { PestControl } from "./impl/pestcontrols/PestControl";
+import { PestControlBoat } from "./impl/pestcontrols/PestControlBoat";
+import { Minigame } from "./Minigame";
+
 export class MinigameHandler {
-    public static minigames = {
-        CASTLEWARS: {
-            name: "Castlewars",
-            minigame: new CastleWars()
-        }
+    public static readonly CASTLEWARS = new MinigameHandler("Castlewars", new CastleWars());
+    public static readonly PEST_CONTROL = new MinigameHandler("Pest Control", new PestControl(PestControlBoat.NOVICE));
+
+    private readonly name: String;
+    private readonly minigame: Minigame;
+
+    constructor(name: String, minigame: Minigame) {
+        this.name = name;
+        this.minigame = minigame;
     }
+
     public static getAll() {
-        return Object.values(this.minigames).filter(m => m.minigame != null).map(m => m.minigame);
+        return Object.values(MinigameHandler)
+          .filter(m => m instanceof MinigameHandler && m.minigame != null)
+          .map(m => m.minigame);
+    }
+
+    public  get(): Minigame {
+        return this.minigame;
     }
 
     public static firstClickObject(player: Player, object: GameObject): boolean {

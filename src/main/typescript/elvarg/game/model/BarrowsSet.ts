@@ -48,10 +48,10 @@ export class BarrowsSet {
         }
 
         for (let i of set.items) {
-            player.getInventory().delete(i, 1);
+            player.getInventory().deleteNumber(i, 1);
         }
 
-        player.getInventory().add(set.setId, 1);
+        player.getInventory().adds(set.setId, 1);
 
         player.getPacketSender().sendMessage("You've made a set our of your armor.");
         return true;

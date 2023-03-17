@@ -1,7 +1,7 @@
 import { Task } from "../Task";
 import { Mobile } from "../../entity/impl/Mobile";
 import { CombatSpecial } from "../../content/combat/CombatSpecial";
-class RestoreSpecialAttackTask extends Task {
+export class RestoreSpecialAttackTask extends Task {
     constructor(private character: Mobile) {
     super(50);
     this.character = character;

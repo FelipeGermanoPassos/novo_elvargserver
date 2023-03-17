@@ -1,11 +1,11 @@
 import { ChannelInboundHandlerAdapter } from 'netty';
-import { ByteBufUtils } from './util';
+import { ByteBufUtils } from '../ByteBufUtils';
 import { NetworkConstants } from './network';
 import { LoginDecoder } from './decoder';
 import { LoginResponses } from './login';
 import { Multiset } from 'google-collections';
+import { ChannelHandlerContext } from 'node-netty';
 
-@Sharable
 export class ChannelFilter extends ChannelInboundHandlerAdapter {
     private connections = new Multiset<string>();
 

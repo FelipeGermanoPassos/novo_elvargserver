@@ -2,7 +2,6 @@ import { GameBuilder } from "./game/GameBuilder";
 import { GameConstants } from "./game/GameConstants";
 import { NetworkBuilder } from "./net/NetworkBuilder";
 import { NetworkConstants } from "./net/NetworkConstants";
-import { ShutdownHook } from "./util/ShutdownHook";
 import { Flooder } from "./util/flood/Flooder";
 import { Logger } from 'logger'
 

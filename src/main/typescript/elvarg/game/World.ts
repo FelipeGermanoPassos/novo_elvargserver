@@ -23,7 +23,8 @@ import { produce } from 'immer';
 import { List } from 'list'
 import { TreeMap } from 'treemap'
 import { LinkedHashSet } from 'langx-js'
-import { GraphicHeight } from './model/GraphicHeight';
+import { Task } from './task/Task';
+import { GameSyncTask } from './entity/updating/sync/GameSyncTask';
 
 interface GameSyncTaskInterface {
     isParallel: boolean;
@@ -61,7 +62,7 @@ export class World {
     /**
      * The collection of {@link Players}s waiting to be added to the game.
      */
-    private static addNPCQueue = new Array<NPC>();
+    public static addNPCQueue = new Array<NPC>();
 
     /**
      * The collection of {@link Players}s waiting to be removed from the game.
@@ -86,7 +87,7 @@ export class World {
 
 
     public static getPlayerByName(username: string): Player | undefined {
-        return this.players.find(p => p !== null && p.getUsername().equals(Misc.formatText(username)));
+        return this.players.search(p => p !== null && p.getUsername() === Misc.formatText(username));
     }
 
     /**
@@ -167,26 +168,20 @@ export class World {
     }
 
     public static findCacheObject(player: Player, id: number, loc: Location): GameObject {
-        return MapObjects.get(player, id, loc);
+        return MapObjects.getPrivateArea(player, id, loc);
     }
 
-<<<<<<< Updated upstream
-    public static sendLocalGraphics(id: number, position: Location) {
-        const nearbyPlayers = players.filter(p => p !== null && p.getLocation().isWithinDistance(position, 32)) as Player[];
-        if (nearbyPlayers.length > 0) {
-            nearbyPlayers.forEach(p => p.getPacketSender().sendGraphic(new Graphic(id, 0), position));
-=======
-    public static sendLocalGraphics(id: number, position: Location, graphicHeight: GraphicHeight): void {
+
+    public static sendLocalGraphics(id: number, position: Location): void {
         for (const player of World.players) {
             if (player && player.getLocation().isWithinDistance(position, 32)) {
                 player.getPacketSender().sendGraphic(new Graphic(id), position);
             }
->>>>>>> Stashed changes
         }
     }
 
     public getPlayerByName(username: string): Player | undefined {
-        return World.players.find(p => p != null && p.getUsername().toLowerCase() === username.toLowerCase());
+        return World.players.search(p => p != null && p.getUsername().toLowerCase() === username.toLowerCase());
     }
 
     public sendMessage(message: string) {
@@ -257,7 +252,7 @@ export class World {
         }
 
         // Handle synchronization tasks.
-        World.executor.sync((index: number) => {
+        World.executor.sync(new GameTask(true, (index: number) => {
             let player = World.players.get(index);
             try {
                 player.process();
@@ -265,18 +260,18 @@ export class World {
                 console.error(e);
                 player.requestLogout();
             }
-        });
+        }, false));
 
-        World.executor.sync((index: number) => {
+        World.executor.sync(new GameTask(false, (index: number) => {
             let npc = World.npcs.get(index);
             try {
                 npc.process();
             } catch (e) {
                 console.error(e);
             }
-        });
+        }, false));
 
-        World.executor.sync((index: number) => {
+        World.executor.sync(new GameTask( true, (index: number) => {
             let player = World.players.get(index);
             try {
                 PlayerUpdating.update(player);
@@ -285,9 +280,9 @@ export class World {
                 console.error(e);
                 player.requestLogout();
             }
-        });
+        }));
 
-        World.executor.sync(new GameSyncTask(true, (index: number) => {
+        World.executor.sync(new GameTask(true, (index: number) => {
             let player = World.players.get(index);
             produce(player, draft => {
                 try {
@@ -301,7 +296,7 @@ export class World {
             });
         }));
 
-        World.executor.sync(new GameSyncTask(false, (index: number) => {
+        World.executor.sync(new GameTask(false, (index: number) => {
             let npc = World.npcs.get(index);
             produce(npc, draft => {
                 try {
@@ -356,7 +351,13 @@ class PlayerSyncTask implements GameSyncTaskInterface {
     }
 }
 
-class GameSyncTask {
-    constructor(private isPlayer: boolean, private execute: (index: number) => void) { }
+export class GameTask extends GameSyncTask{
+    constructor(b: boolean, private readonly execFunc: Function, c?:boolean){
+        super(b, c)
+    }
+    execute(): void {
+       this.execFunc();
+    }
+   
 }
 

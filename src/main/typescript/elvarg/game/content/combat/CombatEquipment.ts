@@ -1,11 +1,15 @@
+import { Player } from "../../entity/impl/player/Player";
+import { Equipment } from "../../model/container/impl/Equipment";
+import { CombatType } from "./CombatType";
+import { ItemIdentifiers } from "../../../util/ItemIdentifiers";
 export class CombatEquipment {
     public static readonly MAGE_VOID_HELM = 11663;
     public static readonly RANGED_VOID_HELM = 11664;
     public static readonly MELEE_VOID_HELM = 11665;
     public static readonly VOID_ARMOUR = [
-        { Equipment.BODY_SLOT, 8839},
-        { Equipment.LEG_SLOT, 8840},
-        { Equipment.HANDS_SLOT, 8842}
+        Equipment.BODY_SLOT, 8839,
+        Equipment.LEG_SLOT, 8840,
+        Equipment.HANDS_SLOT, 8842
     ];
     public static readonly OBSIDIAN_WEAPONS = [
         746, 747, 6523, 6525, 6526, 6527, 6528

@@ -1,16 +1,32 @@
-class SpellBookDialogue extends DynamicDialogueBuilder {
+import { DynamicDialogueBuilder } from "../DynamicDialogueBuilder";
+import { OptionDialogue } from "../../entries/impl/OptionDialogue";
+import { Player } from "../../../../entity/impl/player/Player";
+import { DialogueOption } from "../../DialogueOption";
+import { MagicSpellbook } from "../../../MagicSpellbook";
+import { DialogueOptionAction } from "../../DialogueOptionAction";
+
+class SpellDialogueAction implements DialogueOptionAction{
+    constructor(private readonly execFunc: Function){
+    }
+    executeOption(option: DialogueOption): void {
+        this.execFunc()
+    }
+
+}
+
+export class SpellBookDialogue extends DynamicDialogueBuilder {
     public build(player: Player) {
-        add(new OptionDialogue(0, (option: number) => {
+        this.add(new OptionDialogue(0, new SpellDialogueAction((option: number) => {
             switch (option) {
-                case FIRST_OPTION:
+                case DialogueOption.FIRST_OPTION:
                     player.getPacketSender().sendInterfaceRemoval();
                     MagicSpellbook.changeSpellbook(player, MagicSpellbook.NORMAL);
                     break;
-                case SECOND_OPTION:
+                case DialogueOption.SECOND_OPTION:
                     player.getPacketSender().sendInterfaceRemoval();
                     MagicSpellbook.changeSpellbook(player, MagicSpellbook.ANCIENT);
                     break;
-                case THIRD_OPTION:
+                case DialogueOption.THIRD_OPTION:
                     player.getPacketSender().sendInterfaceRemoval();
                     MagicSpellbook.changeSpellbook(player, MagicSpellbook.LUNAR);
                     break;
@@ -18,7 +34,7 @@ class SpellBookDialogue extends DynamicDialogueBuilder {
                     player.getPacketSender().sendInterfaceRemoval();
                     break;
             }
-        }, "Normal", "Ancient", "Lunar"));
+        }), "Normal", "Ancient", "Lunar"));
 
     }
 }

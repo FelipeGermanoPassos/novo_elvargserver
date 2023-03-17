@@ -238,7 +238,7 @@ Booleans to check if a team's flag is safe
                 && player.getLocation().getX() < CastleWars.COLLAPSE_ROCKS[cave][1]
                 && player.getLocation().getY() > CastleWars.COLLAPSE_ROCKS[cave][2]
                 && player.getLocation().getY() < CastleWars.COLLAPSE_ROCKS[cave][3]) {
-                const damage = player.getSkillManager().getCurrentLevel([Skill.HITPOINTS]);
+                const damage = player.getSkillManager().getCurrentLevel(Skill.HITPOINTS);
                 player.getCombat().getHitQueue().addPendingDamage([new HitDamage(damage, HitMask.RED)]);
             }
         });

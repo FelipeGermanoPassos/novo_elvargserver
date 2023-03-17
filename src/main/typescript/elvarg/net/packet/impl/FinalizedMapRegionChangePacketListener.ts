@@ -1,5 +1,6 @@
-import { Player } from "com.elvarg.game.entity.impl.player"
-import { Packet } from "com.elvarg.net.packet"
+import { Player } from "../../../game/entity/impl/player/Player"
+import { Packet } from "../Packet"
+import { PacketExecutor } from "../PacketExecutor"
 
 export class FinalizedMapRegionChangePacketListener implements PacketExecutor {
     execute(player: Player, packet: Packet): void {

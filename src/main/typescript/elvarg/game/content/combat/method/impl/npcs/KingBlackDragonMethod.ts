@@ -7,6 +7,9 @@ import { Projectile } from "../../../../../model/Projectile";
 import { PrayerHandler } from "../../../../PrayerHandler";
 import { CombatEquipment } from "../../../CombatEquipment";
 import { CombatFactory } from "../../../CombatFactory";
+import { PoisonType } from "../../../../../task/impl/CombatPoisonEffect";
+import { Player } from "../../../../../entity/impl/player/Player";
+import { Animation } from "../../../../../model/Animation";
 
 enum Breath {
     ICE, POISON, SHOCK, DRAGON
@@ -18,25 +21,25 @@ export class KingBlackDragonMethod extends CombatMethod {
 
     static start(character: Mobile, target: Mobile) {
         if (this.currentAttackType === CombatType.MAGIC) {
-            character.performAnimation({ animationId: 84 });
+            character.performAnimation(new Animation(84));
             switch (this.currentBreath) {
                 case Breath.DRAGON:
-                    new Projectile(character, target, 393, 40, 55, 31, 43).sendProjectile();
+                    Projectile.createProjectile(character, target, 393, 40, 55, 31, 43).sendProjectile;
                     break;
                 case Breath.ICE:
-                    new Projectile(character, target, 396, 40, 55, 31, 43).sendProjectile();
+                    Projectile.createProjectile(character, target, 396, 40, 55, 31, 43).sendProjectile();
                     break;
                 case Breath.POISON:
-                    new Projectile(character, target, 394, 40, 55, 31, 43).sendProjectile();
+                    Projectile.createProjectile(character, target, 394, 40, 55, 31, 43).sendProjectile();
                     break;
                 case Breath.SHOCK:
-                    new Projectile(character, target, 395, 40, 55, 31, 43).sendProjectile();
+                    Projectile.createProjectile(character, target, 395, 40, 55, 31, 43).sendProjectile();
                     break;
                 default:
                     break;
             }
         } else if (this.currentAttackType === CombatType.MELEE) {
-            character.performAnimation({ animationId: 91 });
+            character.performAnimation( new Animation(91));
         }
     }
 
@@ -52,7 +55,7 @@ export class KingBlackDragonMethod extends CombatMethod {
         return KingBlackDragonMethod.currentAttackType;
     }
 
-    hits(character: Mobile, target: Mobile): PendingHit[] {
+    hits(character: Mobile, target: Player): PendingHit[] {
         let hit = new PendingHit(character, target, this, 1);
         if (target.isPlayer()) {
             let p = target.getAsPlayer();
