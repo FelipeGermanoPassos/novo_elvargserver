@@ -71,8 +71,8 @@ export class CombatFactory {
             let p: Player = attacker.getAsPlayer();
             // Update player data..
             // Update ranged ammo / weapon
-            p.getCombat().setAmmunition(RangedData.Ammunition.getFor(p));
-            p.getCombat().setRangedWeapon(RangedData.RangedWeapon.getFor(p));
+            p.getCombat().setAmmunition(RangedWeapon.getFor(p));
+            p.getCombat().setRangedWeapon(RangedWeapon.getFor(p));
 
             // Check if player is maging..
             if (p.getCombat().getCastSpell() != null ||

@@ -1,8 +1,9 @@
 import { Dialogue } from "../entries/Dialogue";
 export abstract class DialogueBuilder {
-    private dialogues: Map<number, Dialogue> = new Map();
+    private readonly dialogues: Map<number, Dialogue>;
 
     constructor() {
+        this.dialogues = new Map();
     }
 
     public add(...dialogues: Dialogue[]) {

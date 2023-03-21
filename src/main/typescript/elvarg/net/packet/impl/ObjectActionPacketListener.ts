@@ -32,6 +32,17 @@ import { Location } from "../../../game/model/Location";
 import { Flag } from "../../../game/model/Flag";
 import { Graphic } from "../../../game/model/Graphic";
 import { Animation } from "../../../game/model/Animation";
+import { Action } from "../../../game/model/Action";
+
+class ObjectAction implements Action{
+    constructor(private readonly execFunc: Function){
+        
+    }
+    execute(): void {
+        this.execFunc();
+    }
+
+}
 
 export class ObjectActionPacketListener extends ObjectIdentifiers implements PacketExecutor {
     private static firstClick(player: Player, object: GameObject) {
@@ -231,13 +242,13 @@ export class ObjectActionPacketListener extends ObjectIdentifiers implements Pac
             return;
         }
 
-        player.getMovementQueue().walkToObject(object, new Action(() => {
+        player.getMovementQueue().walkToObject(object, new ObjectAction(() => {
             // Face object..
             player.setPositionToFace(location);
         
             // Areas
             if (player.getArea() != null) {
-                if (player.getArea().handleObjectClick(player, id, clickType)) {
+                if (player.getArea().handleObjectClick(player, object, clickType)) {
                     return;
                 }
             }

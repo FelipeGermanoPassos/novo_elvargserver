@@ -1,6 +1,6 @@
 import { ItemIdentifiers } from "../../../../util/ItemIdentifiers";
 import { Misc } from "../../../../util/Misc";
-import { ticks, TimerKey } from "../../../../util/timers/TimerKey";
+import { TimerKey } from "../../../../util/timers/TimerKey";
 import { Barricades } from "../../../entity/impl/npc/impl/Barricades";
 import { GameObject } from "../../../entity/impl/object/GameObject";
 import { ObjectManager } from "../../../entity/impl/object/ObjectManager";
@@ -69,7 +69,7 @@ class ThreadSafeList<T> {
 
 class CastleWarsTask extends Task {
     constructor(private readonly exeFunction: Function, player: Player) {
-        super(0, true, TaskType, player.getIndex())
+        super(0, true)
     }
 
     execute() {
@@ -171,7 +171,6 @@ export class CastleWars implements Minigame {
     ];
 
     /*
-
 Scores for saradomin and zamorak!
 /
 const scores: [number, number] = [0, 0];
@@ -308,7 +307,6 @@ Booleans to check if a team's flag is safe
     }
 
     /**
-
 Method to add score to scoring team
 @param player the player who scored
 @param wearItem banner id!
@@ -363,7 +361,6 @@ Method to add score to scoring team
     }
 
     /**
-
 Method that will capture a flag when being taken by the enemy team!
 @param player the player who returned the flag
 */
@@ -388,7 +385,6 @@ Method that will capture a flag when being taken by the enemy team!
     }
 
     /**
-
 Method that will add the flag to a player's weapon slot
 @param player the player who's getting the flag
 @param banner the banner Item.
@@ -400,7 +396,6 @@ Method that will add the flag to a player's weapon slot
     }
 
     /**
-
 Method we use to handle the flag dropping
 @param player the player who dropped the flag/died
 @param team the team that the flag belongs to
@@ -432,11 +427,8 @@ Method we use to handle the flag dropping
     }
 
     /**
-
 Method we use to pickup the flag when it was dropped/lost
-
 @param player the player who's picking it up
-
 @param object the flag object
 */
     public static pickupFlag(player: Player, object: GameObject) {
@@ -493,7 +485,6 @@ Method we use to pickup the flag when it was dropped/lost
     }
 
     /**
-
 Hint icons appear to your team when a enemy steals flag
 @param location the location of the flag hint
 */
@@ -505,7 +496,6 @@ Hint icons appear to your team when a enemy steals flag
     }
 
     /**
-
 The leaving method will be used on click object or log out
 @param player player who wants to leave
 */
@@ -519,7 +509,6 @@ The leaving method will be used on click object or log out
     }
 
     /*
-
 Method that will start the game when there's enough players.
 */
     public static startGame(): void {
@@ -545,7 +534,6 @@ Method that will start the game when there's enough players.
     }
 
     /*
-
 Method we use to end an ongoing cw game.
 */
     public static endGame(): void {
@@ -938,7 +926,6 @@ Method we use to end an ongoing cw game.
     }
 
     /**
-
 Processes all actions to keep the minigame running smoothly.
 */
     public process(): void {
@@ -1025,14 +1012,19 @@ Processes all actions to keep the minigame running smoothly.
                 const task = setInterval(() => {
                     ticks++;
                     if (ticks == 4) {
-                        World.sendLocalGraphics(303, destination, GraphicHeight.MIDDLE);
+                        World.sendLocalGraphics(303, destination);
                     }
                     if (ticks == 6) {
-                        const players = World.getPlayers().filter(p => p !== null && p.getLocation().isWithinDistance(destination, 5));
+                        const players = [];
+                        for (const player of World.getPlayers()) {
+                            if (player !== null && player.getLocation() !== null && player.getLocation().isWithinDistance(destination, 5)) {
+                                players.push(player);
+                            }
+                        }
                         if (Array.isArray(players)) {
                             players.forEach(p => p.getCombat().getHitQueue().addPendingDamage(new HitDamage(Misc.random(5, 15), HitMask.RED)));
                         }
-                        World.sendLocalGraphics(305, destination, GraphicHeight.MIDDLE);
+                        World.sendLocalGraphics(305, destination);
                         clearInterval(task);
                     }
                 }, 1);
@@ -1069,7 +1061,6 @@ Processes all actions to keep the minigame running smoothly.
     private static zamorak_catapult_location: Location = new Location(2384, 3117, 0);
 
     /**
-
 large doors - 4023-4024 -- 4025-4026
 @param player
 @param item
@@ -1169,19 +1160,19 @@ large doors - 4023-4024 -- 4025-4026
 
                     if (saradomin) {
                         if (CastleWars.saradominCatapult != CatapultState.BURNING) {
-                            CastleWars.changeCatapultState(this, fixed, CatapultState.FIXED, true);
+                            CastleWars.changeCatapultState(task, fixed, CatapultState.FIXED, true);
                             return;
                         }
                         if (ticks == 16) {//4385, 4386
-                            CastleWars.changeCatapultState(this, burnt, CatapultState.REPAIR, true);
+                            CastleWars.changeCatapultState(task, burnt, CatapultState.REPAIR, true);
                         }
                     } else {
                         if (CastleWars.zamorakCatapult != CatapultState.BURNING) {
-                            CastleWars.changeCatapultState(this, fixed, CatapultState.FIXED, false);
+                            CastleWars.changeCatapultState(task, fixed, CatapultState.FIXED, false);
                             return;
                         }
                         if (ticks == 16) {//4385, 4386
-                            CastleWars.changeCatapultState(this, burnt, CatapultState.REPAIR, false);
+                            CastleWars.changeCatapultState(task, burnt, CatapultState.REPAIR, false);
                         }
                     }
 
@@ -1235,7 +1226,7 @@ large doors - 4023-4024 -- 4025-4026
 
 }
 
-class Team {
+export class Team {
     public static readonly ZAMORAK = new Team(CastleWars.ZAMORAK_WAITING_AREA, new Location(2421, 9524), new Boundary(2368, 2376, 3127, 3135, 1))
     public static readonly SARADOMIN = new Team(CastleWars.SARADOMIN_WAITING_AREA, new Location(2381, 9489), new Boundary(2423, 2431, 3072, 3080, 1))
     public static readonly GUTHIX;
@@ -1328,6 +1319,3 @@ class Team {
     }
 
 }
-
-
-

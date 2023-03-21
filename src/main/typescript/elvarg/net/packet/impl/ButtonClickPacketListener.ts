@@ -8,7 +8,7 @@ import { Autocasting } from '../../../game/content/combat/magic/Autocasting';
 import { EffectSpells } from '../../../game/content/combat/magic/EffectSpells';
 import { MinigameHandler } from '../../../game/content/minigames/MinigameHandler';
 import { Presetables } from '../../../game/content/presets/Presetables';
-import { QuestHandler } from '../../../game/content/quests/QuestHandler';
+import { QuestHandler, Quests } from '../../../game/content/quests/QuestHandler';
 import { Smithing } from '../../../game/content/skill/skillable/impl/Smithing';
 import { Player } from '../../../game/entity/impl/player/Player';
 import { Bank } from '../../../game/model/container/impl/Bank';
@@ -109,7 +109,7 @@ export class ButtonClickPacketListener implements PacketExecutor {
     if (Presetables.handleButton(player, button)) {
       return true;
     }
-    if (QuestHandler.handleQuestButtonClick(player, button)) {
+    if (Quests.handleQuestButtonClick(player, button)) {
       return true;
     }
     if (MinigameHandler.handleButtonClick(player, button)) {

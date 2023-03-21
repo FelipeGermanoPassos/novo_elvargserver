@@ -6,6 +6,7 @@ import { Player } from '../../../entity/impl/player/Player';
 import { PlayerBot } from '../../../entity/impl/playerbot/PlayerBot';
 import { CanAttackResponse } from '../../../content/combat/CombatFactory';
 import { DuelState, DuelRule } from '../../../content/Duelling'
+import { GameObject } from '../../../entity/impl/object/GameObject';
 
 
 export class DuelArenaArea extends Area {
@@ -125,7 +126,7 @@ export class DuelArenaArea extends Area {
     defeated(player: Player, character: Mobile) {
     }
 
-    handleObjectClick(player: Player, objectId: number, type: number): boolean {
+    handleObjectClick(player: Player, objectId: GameObject, type: number): boolean {
         return false;
     }
 

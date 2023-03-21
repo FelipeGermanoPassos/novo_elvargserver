@@ -1,6 +1,7 @@
-import { Player, PlayerBot } from "../player/Player";
-import { PlayerPersistence } from "./PlayerPersistence";
-import { PlayerSave } from "./PlayerSave";
+import { Player } from "../../Player";
+import { PlayerBot } from "../../../playerbot/PlayerBot";
+import { PlayerPersistence } from "../PlayerPersistence";
+import { PlayerSave } from "../PlayerSave";
 import * as AWS from "aws-sdk";
 import { DynamoDbTable, DynamoDbEnhancedClient } from "aws-sdk-lib";
 import { PlayerSaveRecord } from "./PlayerSaveRecord";

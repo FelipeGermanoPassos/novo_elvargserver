@@ -1,17 +1,8 @@
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-import { Dialogue } from "../Dialogue";
-import { Player } from "../../../../entity/impl/player/Player";
 
->>>>>>> 252876145a1ec4af2cfd19a101625f14378734ce
-class ItemStatementDialogue extends Dialogue {
-=======
 import { Dialogue } from "../Dialogue";
 import { Player } from "../../../../entity/impl/player/Player";
 
 export class ItemStatementDialogue extends Dialogue {
->>>>>>> Stashed changes
     private static CHATBOX_INTERFACES = [4885, 4890, 4896, 4903];
     private title: string;
     private text: string[];

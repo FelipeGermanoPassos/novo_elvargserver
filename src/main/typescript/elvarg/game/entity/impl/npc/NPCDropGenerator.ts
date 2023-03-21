@@ -1,4 +1,4 @@
-import { DropTable, NpcDropDefinition, NPCDrop } from "../../../definition/NpcDropDefinition";
+import { DropTable, NpcDropDefinition, NPCDrop, RDT } from "../../../definition/NpcDropDefinition";
 import { ItemOnGroundManager } from "../grounditem/ItemOnGroundManager";
 import { Player } from "../player/Player";
 import { Item } from "../../../model/Item";
@@ -53,11 +53,11 @@ export class NPCDropGenerator {
         // There are 128 slots in the rdt, many empty. When a player is wearing ring of
         // wealth, the empty slots are not counted.
         if (this.def.getRdtChance() > 0 && Math.floor(Math.random() * this.def.getRdtChance()) == 0) {
-            let rdtLength = Object.keys(NpcDropDefinition.RDT).length / 2;
+            let rdtLength = Object.keys(RDT).length / 2;
             let slots = this.wearingRingOfWealth() ? rdtLength : 128;
             let slot = Math.floor(Math.random() * slots);
             if (slot < rdtLength) {
-                let rdtDrop = NpcDropDefinition.RDT[slot];
+                let rdtDrop = RDT[slot];
                 if (Math.floor(Math.random() * rdtDrop.getChance()) == 0) {
                     items.push(new Item(rdtDrop.getItemId(), rdtDrop.getAmount()));
                     return items;
@@ -67,22 +67,21 @@ export class NPCDropGenerator {
         // Handle unique drops..
         // The amount of items the player will receive from the unique drop tables.
         // Note: A player cannot receive multiple drops from the same drop table.
-        const rolls = 1 + random.getRandom().nextInt(3);
+        const rolls = 1 + Math.floor(random.getRandom() * 3);
         for (let i = 0; i < rolls; i++) {
             let table: DropTable | undefined;
 
             // Check if we should access the special drop table..
             if (this.def.getSpecialDrops() != null && !parsedTables.includes(DropTable.SPECIAL)) {
                 if (this.def.getSpecialDrops().length > 0) {
-                    let drop = this.def.getSpecialDrops()[random.get().nextInt(this.def.getSpecialDrops().length)];
-                    if (random.get().nextInt(drop.getChance()) == 0) {
-                        items.push(drop.toItem(random));
-                        parsedTables.push(DropTable.SPECIAL);
-                        continue;
-                    }
+                  const drop = this.def.getSpecialDrops()[Math.floor(random.getRandom() * this.def.getSpecialDrops().length)];
+                  if (Math.floor(random.getRandom() * drop.getChance()) === 0) {
+                    items.push(drop.toItem(random));
+                    parsedTables.push(DropTable.SPECIAL);
+                    continue;
+                  }
                 }
-            }
-
+              }
             // If we didn't get a special drop, attempt to find a different table..
             if (!table) {
                 let chance = Math.random() * 100;
@@ -121,7 +120,7 @@ export class NPCDropGenerator {
                         continue;
                     }
                     // Get a random drop from the table..
-                    let npcDrop = dropTableItems[random.getRandom().nextInt(dropTableItems.length)];
+                    let npcDrop = dropTableItems[Math.floor(random.getRandom() * dropTableItems.length)];
 
                     // Add the drop to the drop list.
                     items.push(npcDrop.toItem(random));

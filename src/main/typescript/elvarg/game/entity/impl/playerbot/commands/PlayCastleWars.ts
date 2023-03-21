@@ -6,6 +6,7 @@ import { Task } from "../../../../task/Task";
 import { Animation } from "../../../../model/Animation";
 import { CommandType } from "./CommandType";
 import { CastleWars } from "../../../../content/minigames/impl/CastleWars";
+import { Team } from "../../../../content/minigames/impl/CastleWars";
 
 class PlayCastleWarsTask extends Task{
     constructor(p: number, private readonly exeFunc: Function){
@@ -36,7 +37,7 @@ export class PlayCastleWars implements BotCommand {
 
         playerBot.performAnimation(PlayCastleWars.WAVE_ANIM);
 
-        TaskManager.submit(new PlayCastleWarsTask(playerBot.getIndex(), () => CastleWars.addToWaitRoom(playerBot, CastleWars.TEAM_GUTHIX)));
+        TaskManager.submit(new PlayCastleWarsTask(playerBot.getIndex(), () => CastleWars.addToWaitingRoom(playerBot, Team.GUTHIX)));
     }
 
     public stop(playerBot: PlayerBot): void {

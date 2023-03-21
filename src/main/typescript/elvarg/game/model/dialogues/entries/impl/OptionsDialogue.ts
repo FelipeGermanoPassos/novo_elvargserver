@@ -1,39 +1,16 @@
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-class OptionsDialogue extends Dialogue {
-=======
-import { Dialogue } from "../Dialogue";
-import { Player } from "../../../../entity/impl/player/Player";
-import { LinkedHashMap } from 'linkedHashMap'
-import { DialogueOptionAction } from ''
-
-export class OptionsDialogue extends Dialogue {
->>>>>>> Stashed changes
-=======
-import { Dialogue } from "../Dialogue";
-import { Player } from "../../../../entity/impl/player/Player";
 import { DialogueOptionsAction } from "../../DialogueOptionsAction";
+import { Dialogue } from "../Dialogue";
+import { Player } from "../../../../entity/impl/player/Player";
 
 export class OptionsDialogue extends Dialogue {
->>>>>>> 252876145a1ec4af2cfd19a101625f14378734ce
     private static CHATBOX_INTERFACES = [13760, 2461, 2471, 2482, 2494];
     private title: string;
-    private optionsMap: Record<string, DialogueOptionsAction>;
+    private optionsMap: Map<string, DialogueOptionsAction>;
 
-    constructor(
-        index: number,
-        titleOrOptionsMap?: string | Record<string, DialogueOptionsAction>,
-        optionsMap?: Record<string, DialogueOptionsAction>
-    ) {
+    constructor(index: number, title: string, optionsMap: Map<string, DialogueOptionsAction>) {
         super(index);
-
-        if (typeof titleOrOptionsMap === "string") {
-            this.title = titleOrOptionsMap;
-            this.optionsMap = optionsMap || {};
-        } else {
-            this.title = "Choose an Option";
-            this.optionsMap = titleOrOptionsMap || {};
-        }
+        this.title = title;
+        this.optionsMap = optionsMap;
     }
 
     execute(optionIndex: number, player: Player) {
@@ -49,8 +26,8 @@ export class OptionsDialogue extends Dialogue {
         const key = keys[index];
         return this.optionsMap[key];
     }
-      
-      send(player: Player) {
+
+    send(player: Player) {
         const keys = Object.keys(this.optionsMap);
         OptionsDialogue.send(player, this.title, keys);
     }

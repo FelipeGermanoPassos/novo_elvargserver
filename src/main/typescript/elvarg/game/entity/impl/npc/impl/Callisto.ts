@@ -14,8 +14,4 @@ export class Callisto extends NPC {
     public getCombatMethod(): CombatMethod {
         return Callisto.COMBAT_METHOD;
     }
-
-    getSize(): void {
-
-    }
 }

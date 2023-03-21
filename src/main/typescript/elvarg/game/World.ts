@@ -180,6 +180,8 @@ export class World {
         }
     }
 
+    
+
     public getPlayerByName(username: string): Player | undefined {
         return World.players.search(p => p != null && p.getUsername().toLowerCase() === username.toLowerCase());
     }

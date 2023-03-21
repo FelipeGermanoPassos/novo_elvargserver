@@ -94,7 +94,7 @@ export class EquipPacketListener implements PacketExecutor {
 				if (player.getDueling().inDuel()) {
 					for (let i: number = 11; i < player.getDueling().getRules().length; i++) {
 						if (player.getDueling().getRules()[i]) {
-							const duelRule = DuelRule.forId(i);
+							const duelRule = DuelRule.forButtonId(i);
 							if (equipmentSlot === duelRule.getEquipmentSlot() || (duelRule === DuelRule.NO_SHIELD && item.getDefinition().isDoubleHanded())) {
 							  // DialogueManager.sendStatement(player, "The rules that were set do not allow this item to be equipped.");
 							  return;
@@ -102,7 +102,7 @@ export class EquipPacketListener implements PacketExecutor {
 						  }
 					}
 					if (equipmentSlot == Equipment.WEAPON_SLOT || item.getDefinition().isDoubleHanded()) {
-						if (player.getDueling().getRules()[DuelRule.forId(0)]) {
+						if (player.getDueling().getRules()[DuelRule.forButtonId(0)]) {
 							////DialogueManager.sendStatement(player, "Weapons have been locked in this duel!");
 							return;
 						}

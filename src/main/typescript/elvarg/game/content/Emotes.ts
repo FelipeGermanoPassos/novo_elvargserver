@@ -4,7 +4,7 @@ import { Player } from "../entity/impl/player/Player";
 import { Animation } from "../model/Animation";
 import { Graphic } from "../model/Graphic";
 import { Skill } from "../model/Skill";
-import { Skillcape, Skillcapes } from "../model/Skillcape";
+import { Skillcape } from "../model/Skillcape";
 import { Equipment } from "../model/container/impl/Equipment";
 import { Misc } from "../../util/Misc";
 
@@ -23,10 +23,10 @@ export class Emotes {
             const cape: Skillcape | null =
                 Skillcape.forId(player.getEquipment().getItems()[Equipment.CAPE_SLOT].getId());
             if (cape != null) {
-                if (cape != Skillcapes.QUEST_POINT) {
-                    if (cape < Skillcapes.QUEST_POINT) {
+                if (cape != Skillcape.QUEST_POINT) {
+                    if (cape < Skillcape.QUEST_POINT) {
                         // Check if player is maxed in skill
-                        const skill: Skill = Skill.values()[cape.getOrdinal()];
+                        const skill: Skill = Object.values(Skill)[cape.getDelay()];
                         const level: number = SkillManager.getMaxAchievingLevel(skill);
                         if (player.getSkillManager().getMaxLevel(skill) < level) {
                             player.getPacketSender().sendMessage(

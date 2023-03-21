@@ -17,8 +17,4 @@ export class CrazyArchaeologist extends NPC {
         return CrazyArchaeologist.COMBAT_METHOD;
     }
 
-    getSize(): void {
-        
-    }
-
 }

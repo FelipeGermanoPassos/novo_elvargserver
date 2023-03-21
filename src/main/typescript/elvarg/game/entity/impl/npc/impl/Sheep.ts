@@ -36,7 +36,7 @@ class TaskSheep extends Task{
 }
 
 
-export class Sheep implements NPCInteraction extends NPC {
+export class Sheep extends NPC implements NPCInteraction  {
     private static readonly SHEARING = new Animation(893);
     private static readonly SHEEP_EATING = new Animation(5335);
     private static readonly ITEM_WOOL = new Item(ItemIdentifiers.WOOL);

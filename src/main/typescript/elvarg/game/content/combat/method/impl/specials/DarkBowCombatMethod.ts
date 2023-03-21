@@ -3,7 +3,7 @@ import { Animation } from "../../../../../model/Animation";
 import { Priority } from "../../../../../model/Priority";
 import { PendingHit } from "../../../hit/PendingHit";
 import { CombatSpecial } from "../../../CombatSpecial";
-import { RangedWeapon, Ammunitions } from "../../../ranged/RangedData";
+import { RangedWeapon, Ammunition } from "../../../ranged/RangedData";
 import { CombatFactory } from "../../../CombatFactory";
 import { Projectile } from "../../../../../model/Projectile";
 import { Graphic } from "../../../../../model/Graphic";
@@ -36,7 +36,7 @@ export class DarkBowCombatMethod extends RangedCombatMethod {
         CombatSpecial.drain(player, CombatSpecial.DARK_BOW.getDrainAmount());
         player.performAnimation(DarkBowCombatMethod.ANIMATION);
         let projectileId = 1099;
-        if (player.getCombat().getAmmunition() != Ammunitions.DRAGON_ARROW) {
+        if (player.getCombat().getAmmunition() != Ammunition.DRAGON_ARROW) {
             projectileId = 1101;
         }
         Projectile.createProjectile(player, target, projectileId, 40, 70, 43, 31).sendProjectile();

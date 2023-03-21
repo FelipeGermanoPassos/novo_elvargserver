@@ -1,4 +1,4 @@
-eimport { Command } from "../Command";
+import { Command } from "../Command";
 import { Player } from "../../../entity/impl/player/Player";
 import { World } from "../../../World";
 import { PlayerRights } from "../../rights/PlayerRights";

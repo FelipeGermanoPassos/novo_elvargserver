@@ -4,6 +4,7 @@ import { GameConstants } from '../../../GameConstants';
 import { FacingDirection } from '../../../model/FacingDirection';
 import { Location } from '../../../model/Location';
 import fs from "fs";
+import { Direction } from '../../../model/Direction';
 
 export class NPCSpawnDumper extends DefinitionLoader {
     async load(): Promise<void> {
@@ -27,7 +28,7 @@ export class NPCSpawnDumper extends DefinitionLoader {
             const y = parseInt(data[3]);
             const z = parseInt(data[4]);
 
-            w.write(JSON.stringify(new NpcSpawnDefinition(id, new Location(x, y), FacingDirection.SOUTH, 2)));
+            w.write(JSON.stringify(new NpcSpawnDefinition(id, new Location(x, y), Direction.SOUTH, 2)));
             w.write(",");
             w.write("\n");
         }

@@ -3,13 +3,14 @@ import {Player} from '../../../entity/impl/player/Player'
 import {GodwarsFollower} from '../../../entity/impl/npc/impl/GodwarsFollower'
 import {Boundary} from '../../../model/Boundary';
 import {Area} from '../../../model/areas/Area';
+import { GameObject } from '../../../entity/impl/object/GameObject';
 
 export class GodwarsDungeonArea extends Area {
     public static BOUNDARY = new Boundary(2800, 2950, 5200, 5400,0);
 
     constructor(){
         super([GodwarsDungeonArea.BOUNDARY]);
-}
+    }
     
     postEnter(character: Mobile) {
         if (character.isPlayer()) {
@@ -72,7 +73,7 @@ export class GodwarsDungeonArea extends Area {
         }
     }
 
-    handleObjectClick(player: Player, objectId: number, type: number) {
+    handleObjectClick(player: Player, objectId: GameObject, type: number) {
         return false;
     }
 

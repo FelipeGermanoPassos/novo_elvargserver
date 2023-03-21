@@ -1,4 +1,3 @@
-
 import { Misc } from "../../../../util/Misc";
 import { Mobile } from "../../../entity/impl/Mobile";
 import { Player } from "../../../entity/impl/player/Player";
@@ -75,7 +74,7 @@ export abstract class Spell {
                 let item: Item
                 for (item of suppressedItems) {
                     if (item !== null) {
-                        player.getInventory().delete(item);
+                        player.getInventory().deletes(item);
                     }
                 }
             }
@@ -83,8 +82,5 @@ export abstract class Spell {
 
         return true;
     }
-
-
-
 
 }

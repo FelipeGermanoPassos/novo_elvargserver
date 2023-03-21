@@ -180,7 +180,7 @@ export class AccuracyFormulasDpsCalc {
     }
 
     private static calcDefenseMeleeRoll(entity: Mobile, enemy: Mobile) {
-        let bonusType = (entity.isNpc() ? 3 /* Default case */ : entity.getAsPlayer().getFightType().getBonusType());
+        let bonusType = (entity.isNpc() ? 3 /* Default case */ : FightType.getBonusType());
 
         return AccuracyFormulasDpsCalc.defenseMeleeRoll(enemy, bonusType);
     }

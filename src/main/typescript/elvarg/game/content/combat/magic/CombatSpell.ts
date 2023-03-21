@@ -17,7 +17,7 @@ import { TaskType } from "../../../task/TaskType";
 
 class CombatSpellTask extends Task {
   constructor(private readonly execFunction: Function, cast: Mobile) {
-    super(2, false, null, cast,)
+    super(2, false, null)
   }
 
 

@@ -5,6 +5,7 @@ import { Item } from '../../../model/Item'
 import { FightCaves } from '../../../content/minigames/impl/FightCaves';
 import { PrivateArea } from '../impl/PrivateArea'
 import { NpcIdentifiers } from '../../../../util/NpcIdentifiers'
+import { GameObject } from '../../../entity/impl/object/GameObject';
 
 
 export class FightCavesArea extends PrivateArea {
@@ -67,7 +68,7 @@ export class FightCavesArea extends PrivateArea {
         return true;
     }
 
-    public handleObjectClick(player: Player, objectId: number, type: number): boolean {
+    public handleObjectClick(player: Player, objectId: GameObject, type: number): boolean {
         return false;
     }
 }

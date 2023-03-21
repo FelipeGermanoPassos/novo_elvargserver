@@ -2,7 +2,7 @@ import { CombatMethod } from "../CombatMethod";
 import { CombatType } from "../../CombatType";
 import { CombatFactory } from "../../CombatFactory";
 import { PendingHit } from "../../hit/PendingHit";
-import { Ammunitions, RangedWeapon, RangedWeaponType, } from "../../ranged/RangedData";
+import { Ammunition, RangedWeapon, RangedWeaponType, } from "../../ranged/RangedData";
 import { Mobile } from "../../../../entity/impl/Mobile";
 import { Animation } from "../../../../model/Animation";
 import { Projectile } from "../../../../model/Projectile";
@@ -85,7 +85,7 @@ export class RangedCombatMethod extends CombatMethod {
             heightStart = 40;
             heightEnd = 35;
         }
-        if (ammo === Ammunitions.TOKTZ_XIL_UL) {
+        if (ammo === Ammunition.TOKTZ_XIL_UL) {
             delay = 30;
             speed = 55;
         }

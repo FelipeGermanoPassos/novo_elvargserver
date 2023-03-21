@@ -45,8 +45,4 @@ export class RockCrab extends NPC {
         }
         return NpcIdentifiers.ROCK_CRAB;
     }
-
-    getSize(): void {
-        
-    }
 }

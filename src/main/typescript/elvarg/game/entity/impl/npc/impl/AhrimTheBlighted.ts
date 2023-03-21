@@ -13,8 +13,4 @@ export class AhrimTheBlighted extends NPC {
     public getCombatMethod(): CombatMethod {
         return CombatFactory.MAGIC_COMBAT;
     }
-
-    getSize(): void {
-
-    }
 }

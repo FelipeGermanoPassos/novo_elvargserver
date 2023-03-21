@@ -2,6 +2,7 @@ import { Area } from '../../../model/areas/Area';
 import { Boundary } from '../../../model/Boundary';
 import { Player } from '../../../entity/impl/player/Player'
 import { Mobile } from '../../../entity/impl/Mobile';
+import { GameObject } from '../../../entity/impl/object/GameObject';
 
 export class KingBlackDragonArea extends Area {
     public static BOUNDARY = new Boundary(2249, 2292, 4672, 4720, 0);
@@ -40,7 +41,7 @@ export class KingBlackDragonArea extends Area {
 
     defeated(player: Player, character: Mobile) { }
 
-    handleObjectClick(player: Player, objectId: number, type: number) {
+    handleObjectClick(player: Player, objectId: GameObject, type: number) {
         return false;
     }
 }

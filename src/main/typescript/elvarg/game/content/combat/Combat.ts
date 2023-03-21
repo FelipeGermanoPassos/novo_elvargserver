@@ -5,7 +5,7 @@ import { PendingHit } from "./hit/PendingHit";
 import { CombatSpell } from "./magic/CombatSpell";
 import { CombatMethod } from "./method/CombatMethod";
 import { GraniteMaulCombatMethod } from "./method/impl/specials/GraniteMaulCombatMethod";
-import { RangedData, RangedWeapon, Ammunitions } from "./ranged/RangedData";
+import { RangedData, RangedWeapon, Ammunition } from "./ranged/RangedData";
 import { Mobile } from "../../entity/impl/Mobile";
 import { Player } from "../../entity/impl/player/Player";
 import { SecondsTimer } from "../../model/SecondsTimer";
@@ -24,7 +24,9 @@ export class Combat {
     private teleblockTimer = new SecondsTimer();
     private prayerBlockTimer = new SecondsTimer();
     public rangedWeapon: RangedData;
+    public rangedData: RangedWeapon;
     public rangeAmmoData: RangedData;
+    public ammuntions: Ammunition;
     private target: Mobile;
     private attacker: Mobile;
     private method: CombatMethod;
@@ -338,16 +340,16 @@ export class Combat {
         this.previousCast = previousCast;
     }
 
-    public getRangedWeapon(): RangedData {
-        return this.rangedWeapon;
+    public getRangedWeapon(): RangedWeapon {
+        return this.rangedData;
     }
 
     public setRangedWeapon(rangedWeapon: RangedData) {
         this.rangedWeapon = rangedWeapon;
     }
 
-    public getAmmunition(): RangedData {
-        return this.rangeAmmoData;
+    public getAmmunition(): Ammunition {
+        return this.ammuntions;
     }
 
     public setAmmunition(rangeAmmoData: RangedData) {

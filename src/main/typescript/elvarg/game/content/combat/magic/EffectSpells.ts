@@ -1,6 +1,7 @@
 import { Mobile } from "../../../entity/impl/Mobile";
 import { Player } from "../../../entity/impl/player/Player";
 import { Animation } from "../../../model/Animation";
+import { EffectTimer } from "../../../model/EffectTimer";
 import { Graphic } from "../../../model/Graphic";
 import { GraphicHeight } from "../../../model/GraphicHeight";
 import { Item } from "../../../model/Item";
@@ -79,7 +80,7 @@ export class EffectSpells {
 
                     player.setHasVengeance(true);
                     player.getVengeanceTimer().start(30);
-                    player.getPacketSender().sendEffectTimer(30, EffectSpells.VENGEANCE)
+                    player.getPacketSender().sendEffectTimer(30, EffectTimer.VENGEANCE)
                         .sendMessage("You now have Vengeance's effect.");
                     player.getInventory().deleteItemSet(EffectSpells.getSpell().itemsRequired(player));
                     player.performAnimation(new Animation(4410));

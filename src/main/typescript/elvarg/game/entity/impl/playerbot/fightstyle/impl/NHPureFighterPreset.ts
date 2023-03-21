@@ -143,8 +143,3 @@ export class NHPureFighterPreset implements FighterPreset {
         return NHPureFighterPreset.COMBAT_ACTIONS;
     }
 }
-    
-
-
-
-}

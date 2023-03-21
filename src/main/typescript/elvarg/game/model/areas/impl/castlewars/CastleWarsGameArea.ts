@@ -15,6 +15,7 @@ import { Location } from "../../../Location";
 import { Flag } from "../../../Flag";
 import { StatementDialogue } from "../../../dialogues/entries/impl/StatementDialogue";
 import { Item } from "../../../Item";
+import { GameObject } from "../../../../entity/impl/object/GameObject";
 
 
 
@@ -110,7 +111,7 @@ export class CastleWarsGameArea extends Area {
         return true;
     }
 
-    canUnequipItem(player: any, slot: number, item: any) {
+    canUnequipItem(player: Player, slot: number, item: any) {
         if (slot == Equipment.CAPE_SLOT || slot == Equipment.HEAD_SLOT) {
         player.getPacketSender().sendMessage("You can't remove your team's colours.");
         return false;
@@ -118,8 +119,8 @@ export class CastleWarsGameArea extends Area {
             return true;
         }
         
-    handleObjectClick(player: any, objectId: number, type: number) {
-        switch (objectId) {
+    handleObjectClick(player: Player, objectId: GameObject, type: number) {
+        switch (objectId.getId()) {
             case ObjectIdentifiers.PORTAL_10:// Portals in team respawn room
             case ObjectIdentifiers.PORTAL_11:
                 player.moveTo(new Location(2440, 3089, 0));
@@ -137,7 +138,7 @@ export class CastleWarsGameArea extends Area {
             case Team.SARADOMIN:
             CastleWars.returnFlag(player, player.getEquipment().getSlot(Equipment.WEAPON_SLOT));
             return true;
-            case CastleWars.Team.ZAMORAK:
+            case Team.ZAMORAK:
             CastleWars.captureFlag(player, team);
             return true;
         }
@@ -154,7 +155,7 @@ export class CastleWarsGameArea extends Area {
             case Team.SARADOMIN:
                 CastleWars.captureFlag(player, team);
                 return true;
-            case CastleWars.Team.ZAMORAK:
+            case Team.ZAMORAK:
                 CastleWars.returnFlag(player, player.getEquipment().getSlot(Equipment.WEAPON_SLOT));
                 return true;
         }

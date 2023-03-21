@@ -198,7 +198,7 @@ export class BountyHunter {
                         // We found an emblem. Upgrade it!
                         // Double check that we have it inventory one more time
                         if (killer.getInventory().contains(inventoryEmblem.id)) {
-                            killer.getInventory().deleteNumber(inventoryEmblem.id, 1);
+                            killer.getInventory().delete(inventoryEmblem.id, 1);
 
                             let nextEmblemId = 1;
 

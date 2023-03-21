@@ -1,14 +1,4 @@
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-class Thieving {
-=======
-export class Thieving {
->>>>>>> 252876145a1ec4af2cfd19a101625f14378734ce
-    private static readonly THIEVING_ANIMATION = new Animation(881);
-    private static readonly STUNNED_GFX = new Graphic(254, GraphicHeight.HIGH);
-    private static readonly NPC_ATTACK_ANIMATION = new Animation(401);
-    private static readonly PLAYER_BLOCK_ANIMATION = new Animation(404);
-=======
+
 import { PetHandler } from "../../../PetHandler";
 import { CombatFactory } from "../../../combat/CombatFactory";
 import { HitDamage } from "../../../combat/hit/HitDamage";
@@ -27,12 +17,10 @@ import { TimedObjectReplacementTask } from "../../../../task/impl/TimedObjectRep
 import { ItemIdentifiers } from "../../../../../util/ItemIdentifiers";
 import { Misc } from "../../../../../util/Misc";
 import { TimerKey } from "../../../../../util/timers/TimerKey";
->>>>>>> Stashed changes
-
 
 class ThievingTask extends Task {
     constructor(private readonly execFunction: Function, player: Player) {
-        super(2, false, undefined, player);
+        super(2, false, undefined, );
     }
 
 
@@ -109,7 +97,7 @@ export default class Thieving extends ItemIdentifiers {
 
                     // Mark npc as immune for 5 seconds..
                     // This makes it so other players can't attack it.
-                    npc.getTimers().register(TimerKey.ATTACK_IMMUNITY, Misc.getTicks(5));
+                    npc.getTimers().registers(TimerKey.ATTACK_IMMUNITY, Misc.getTicks(5));
 
 
                     // Submit new task..
@@ -145,7 +133,7 @@ export default class Thieving extends ItemIdentifiers {
                             player.getPacketSender().sendMessage(`You steal ${loot.getAmount() > 1 ? loot.getAmount().toString() : Misc.anOrA(name)} ${name}.`);
 
                             // Add experience..
-                            player.getSkillManager().addExperience(Skill.THIEVING, Math.floor(Pickpocketable.get(npc.getId()).getExp()));
+                            player.getSkillManager().addExperiences(Skill.THIEVING, Math.floor(Pickpocketable.get(npc.getId()).getExp()));
                         } else {
                             // Make npc hit the player..
                             npc.setPositionToFace(player.getLocation());
@@ -180,7 +168,7 @@ export default class Thieving extends ItemIdentifiers {
             }
 
             // Check thieving level..
-            if (player.getSkillManager().getCurrentLevel([Skill.THIEVING]) < pickpocketable.getLevel()) {
+            if (player.getSkillManager().getCurrentLevel(Skill.THIEVING) < pickpocketable.getLevel()) {
                 // DialogueManager.sendStatement(player, "You need a Thieving level of at least " + Integer.toString(pickpocketable.getLevel()) + " to do this.");
                 return false;
             }
@@ -221,7 +209,7 @@ export default class Thieving extends ItemIdentifiers {
             if (p === Pickpocketable.FEMALE_HAM_MEMBER || p === Pickpocketable.MALE_HAM_MEMBER) {
                 // TODO: Handle ham clothing bonus chance of success
             }
-            let factor: number = Misc.getRandom(player.getSkillManager().getCurrentLevel([Skill.THIEVING]) + base);
+            let factor: number = Misc.getRandom(player.getSkillManager().getCurrentLevel(Skill.THIEVING) + base);
             let fluke: number = Misc.getRandom(p.getLevel());
             return factor > fluke;
         }
@@ -320,7 +308,7 @@ export class StallThieving {
         if (stall) {
 
             // Make sure we have the required thieving level..
-            if (player.getSkillManager().getCurrentLevel([Skill.THIEVING]) >= Stall.get(object.getId()).getReqLevel()) {
+            if (player.getSkillManager().getCurrentLevel(Skill.THIEVING) >= Stall.get(object.getId()).getReqLevel()) {
 
                 // Make sure we aren't spam clicking..
                 if (player.getClickDelay().elapsedTime(1000)) {

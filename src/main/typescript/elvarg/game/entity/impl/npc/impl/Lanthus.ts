@@ -19,13 +19,25 @@ import { PlayerDialogue } from "../../../../model/dialogues/entries/impl/PlayerD
 import { StatementDialogue } from "../../../../model/dialogues/entries/impl/StatementDialogue";
 import { ItemIdentifiers } from "../../../../../util/ItemIdentifiers";
 import { NpcIdentifiers } from "../../../../../util/NpcIdentifiers";
+import { DialogueOptionsAction } from "../../../../model/dialogues/DialogueOptionsAction";
+import { DialogueExpression } from "../../../../model/dialogues/DialogueExpression";
+
+class LanthusDialogue implements DialogueOptionsAction{
+    constructor(private readonly execFunc: Function){
+
+    }
+    execute(player: Player): void {
+        this.execFunc();
+    }
+
+}
 
 export class Lanthus extends NPC implements NPCInteraction {
     private dialogueBuilder: DialogueChainBuilder;
 
-    getSize() {
 
-    }
+    private player: Player
+
 
     private static readonly CASTLE_WARS_SHOP: Shop = new Shop(
         "Castle Wars Ticket Exchange",
@@ -50,7 +62,7 @@ export class Lanthus extends NPC implements NPCInteraction {
             new Item(ItemIdentifiers.CASTLEWARS_HOOD_2, Shop.INFINITY),
             new Item(ItemIdentifiers.CASTLEWARS_CLOAK_2, Shop.INFINITY),
         ],
-        ShopCurrencies.CASTLE_WARS_TICKET.get()
+        ShopCurrencies.CASTLE_WARS_TICKET
     );
 
     static {
@@ -75,6 +87,8 @@ export class Lanthus extends NPC implements NPCInteraction {
     }
 
     forthOptionClick(player: Player, npc: NPC): void { }
+    private message = "Lanthus gives you a Castlewars Manual.";
+
 
     useItemOnNpc(player: Player, npc: NPC, itemId: number, slot: number): void { }
 
@@ -83,20 +97,20 @@ export class Lanthus extends NPC implements NPCInteraction {
         this.dialogueBuilder.add(
             new NpcDialogue(0, NpcIdentifiers.LANTHUS, "Good day, how may I help you?"),
             new OptionsDialogue(
-                1,
+                1, null,
                 new Map([
                     [
                         "What is this place?",
-                        (player: Player) => player.getDialogueManager().startDialogue(2),
+                        new LanthusDialogue((player: Player) => player.getDialogueManager().startDialogue(2)),
                     ],
                     [
                         "What do you have for trade?",
-                        (player: Player) =>
-                            ShopManager.opens(player, Lanthus.CASTLE_WARS_SHOP.getId()),
+                        new LanthusDialogue((player: Player) => {
+                            ShopManager.opens(player, Lanthus.CASTLE_WARS_SHOP.getId())}),
                     ],
                     [
                         "Do you have a manual? I'd like to learn how to play!",
-                        (player: Player) => player.getDialogueManager().startDialogue(4),
+                        new LanthusDialogue((player: Player) => player.getDialogueManager().startDialogue(4)),
                     ],
                 ])
             ),
@@ -104,14 +118,18 @@ export class Lanthus extends NPC implements NPCInteraction {
             new NpcDialogue(3, NpcIdentifiers.LANTHUS,
                 "This is the great Castle Wars arena! Here you can " +
                 "fight for the glory of Saradomin or Zamorak.",
-                (Player => Player.getDialogueManager().start(this.dialogueBuilder, 1))),
-
+                (this.player.getDialogueManager().startDialog(this.dialogueBuilder, 1))),
             new PlayerDialogue(4, "Do you have a manual? I'd like to learn how to play!"),
-            new NpcDialogue(5, NpcIdentifiers.LANTHUS, "Sure, here you go.", (player) => {
-                player.getInventory().add(CastleWars.MANUAL);
-                ItemStatementDialogue.send(player, "", ["Lanthus gives you a Castlewars Manual."], CastleWars.MANUAL.getId(), 200);
-            }),
+            new NpcDialogue(5, NpcIdentifiers.LANTHUS, "Sure, here you go.", new ItemStatementDialogue.send(this.player, "", [this.message], CastleWars.MANUAL.getId(), 200),
+            ),
             new EndDialogue(6)
         )
+    }
+}
+
+
+class LanthusExpression extends DialogueExpression{
+    constructor(n1: number){
+        super(n1)
     }
 }

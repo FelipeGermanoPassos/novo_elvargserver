@@ -5,6 +5,7 @@ import { GameConstants } from "../../../game/GameConstants";
 import { ItemDefinition } from "../../../game/definition/ItemDefinition";
 import { Bank } from "../../../game/model/container/impl/Bank";
 import { Packet } from "../Packet";
+import { EnteredAmountAction } from "../../../game/model/EnteredAmountAction";
 
 export class SpawnItemPacketListener {
     static spawn(player: Player, item: number, amount: number, toBank: boolean) {
@@ -54,12 +55,22 @@ export class SpawnItemPacketListener {
             return;
         }
         if (spawnX) {
-            player.setEnteredAmountAction((amount) => {
+            player.setEnteredAmountAction(new SpawnEntered((amount) => {
                 SpawnItemPacketListener.spawn(player, item, amount, toBank);
-            });
+            }));
             player.getPacketSender().sendEnterAmountPrompt(`How many ${def.getName()} would you like to spawn?`);
         } else {
             SpawnItemPacketListener.spawn(player, item, 1, toBank);
         }
     }
+}
+
+class SpawnEntered implements EnteredAmountAction{
+    constructor(private readonly execFunc: Function){
+        
+    }
+    execute(amount: number): void {
+        this.execFunc();
+    }
+    
 }

@@ -1,13 +1,11 @@
-import { Player } from "../player/Player";
-import { Ids } from "../../../model/Ids";
 import { NPCInteraction } from "./NPCInteraction";
 import { NPC } from "./NPC";
-
+import { Player } from "../player/Player";
 
 export class NPCInteractionSystem {
     private static NPC_INTERACT_MAP: Map<number, NPCInteraction>;
 
-    public static handleFirstOption(player: any, npc: any): boolean {
+    public static handleFirstOption(player: Player, npc: NPC): boolean {
     if (!(npc instanceof NPCInteraction)) {
         return false;
     }
@@ -16,7 +14,7 @@ export class NPCInteractionSystem {
     return true;
 }
 
-public static handleSecondOption(player: any, npc: any): boolean {
+public static handleSecondOption(player: Player, npc: NPC): boolean {
     if (!(npc instanceof NPCInteraction)) {
         return false;
     }
@@ -25,7 +23,7 @@ public static handleSecondOption(player: any, npc: any): boolean {
     return true;
 }
 
-public static handleThirdOption(player: any, npc: any): boolean {
+public static handleThirdOption(player: Player, npc: NPC): boolean {
     if (!(npc instanceof NPCInteraction)) {
         return false;
     }
@@ -34,7 +32,7 @@ public static handleThirdOption(player: any, npc: any): boolean {
     return true;
 }
 
-public static handleForthOption(player: any, npc: any): boolean {
+public static handleForthOption(player: Player, npc: NPC): boolean {
     if (!(npc instanceof NPCInteraction)) {
         return false;
     }
@@ -43,7 +41,7 @@ public static handleForthOption(player: any, npc: any): boolean {
     return true;
 }
 
-public static handleUseItem(player: any, npc: any, itemId: number, slot: number): boolean {
+public static handleUseItem(player: Player, npc: NPC, itemId: number, slot: number): boolean {
     if (!(npc instanceof NPCInteraction)) {
         return false;
     }

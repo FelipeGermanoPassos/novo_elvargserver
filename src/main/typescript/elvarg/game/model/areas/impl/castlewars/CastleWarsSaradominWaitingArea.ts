@@ -1,25 +1,24 @@
 import {PlayerBot} from '../../../../entity/impl/playerbot/PlayerBot';
 import {Player} from '../../../../entity/impl/player/Player'
 import {Mobile} from '../../../../entity/impl/Mobile'
-import {Arrays} from 'collections'
 import {Boundary} from '../../../../model/Boundary';
 import {CastleWars} from '../../../../content/minigames/impl/CastleWars';
 import {ObjectIdentifiers} from '../../../../../util/ObjectIdentifiers';
 import { Misc } from '../../../../../util/Misc';
 import {Area} from '../../../../model/areas/Area';
-import * as from 'random';
 import {Item} from '../../../../model/Item';
 import { TaskManager } from '../../../../task/TaskManager';
 import { Equipment } from '../../../container/impl/Equipment';
 import { Flag } from '../../../Flag';
 import { Location } from '../../../Location';
+import { GameObject } from '../../../../entity/impl/object/GameObject';
 
 
 
 
 export class CastleWarsSaradominWaitingArea extends Area {
     constructor() {
-        super(Arrays.asList(new Boundary(2368, 2392, 9481, 9497,0)));
+        super([new Boundary(2368, 2392, 9481, 9497,0)]);
     }
 
     public getName(): string {
@@ -80,8 +79,8 @@ export class CastleWarsSaradominWaitingArea extends Area {
         // TODO: Un-transform player if they were transformed
     }
 
-    public handleObjectClick(player: Player, objectId: number, type: number): boolean {
-        switch (objectId) {
+    public handleObjectClick(player: Player, objectId: GameObject, type: number): boolean {
+        switch (objectId.getId()) {
             case ObjectIdentifiers.PORTAL_8:
                 player.moveTo(new Location(2439 + Misc.randoms(4),
                 3085 + Misc.randoms(5), 0));

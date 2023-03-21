@@ -15,8 +15,4 @@ export class ChaosFanatic extends NPC {
     public getCombatMethod(): CombatMethod {
         return ChaosFanatic.COMBAT_METHOD;
     }
-
-    getSize(): void {
-
-    }
 }

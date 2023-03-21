@@ -1,5 +1,5 @@
 import { GameConstants } from '../../../GameConstants'
-import { World } from '../../../Worlds'
+import { World } from '../../../World'
 import { Presetables } from '../../../content/presets/Presetables'
 import { PlayerBotDefinition } from '../../../definition/PlayerBotDefinition'
 import { Mobile } from '../Mobile'

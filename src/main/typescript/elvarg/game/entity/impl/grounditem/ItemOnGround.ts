@@ -4,9 +4,6 @@ import { Player } from "../player/Player"
 import { Item } from "../../../model/Item"
 import { Location } from "../../../model/Location"
 import { PrivateArea } from "../../../model/areas/impl/PrivateArea";
-//import { Optional } from 'optional'
-
-
 
 export class ItemOnGround {
     position: Location;

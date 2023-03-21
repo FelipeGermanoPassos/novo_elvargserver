@@ -8,7 +8,7 @@ import { FightCavesArea } from "../../../../model/areas/impl/FightCavesArea"
 export class TztokJad extends NPC {
     private static readonly COMBAT_METHOD: CombatMethod = new JadCombatMethod();
 
-constructor(private player: Player, private area: FightCavesArea, private id: number, private position: Location) {
+constructor( player: Player, area: FightCavesArea, id: number, position: Location) {
     super(id, position);
     this.setOwner(player);
     area.add(this);

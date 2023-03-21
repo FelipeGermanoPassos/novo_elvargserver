@@ -737,6 +737,14 @@ export class Player extends Mobile {
         return this;
     }
 
+    public castlewarsKills: number;
+    castlewarsDeaths: number;
+    castlewarsIdleTime: number;
+
+    public resetCastlewarsIdleTime(): void {
+		this.castlewarsIdleTime = 200;
+	}
+
     public getPasswordHashWithSalt(): string {
         return this.passwordHashWithSalt;
     }

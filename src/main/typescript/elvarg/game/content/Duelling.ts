@@ -388,7 +388,7 @@ export class Dueling {
             interact_.getPacketSender().sendString( `${this.player.getUsername()} has accepted.`, Dueling.STATUS_FRAME_1);
 
             // Check if both have accepted..
-            if (this.state === DuelState.ACCEPTED_DUEL_SCREEN && t_state === DuelState.ACCEPTED_DUEL_SCREEN) {
+            if (t_state === DuelState.ACCEPTED_DUEL_SCREEN) {
 
                 // Technically here, both have accepted.
                 // Go into confirm screen!
@@ -408,7 +408,7 @@ export class Dueling {
             interact_.getPacketSender().sendString(`${this.player.getUsername()} has accepted. Do you wish to do the same?`, Dueling.STATUS_FRAME_2);
 
             // Check if both have accepted..
-            if (this.state === DuelState.ACCEPTED_CONFIRM_SCREEN && t_state === DuelState.ACCEPTED_CONFIRM_SCREEN) {
+            if (t_state === DuelState.ACCEPTED_CONFIRM_SCREEN) {
                 // Both accepted, start duel
 
                 // Decide where they will spawn in the arena..

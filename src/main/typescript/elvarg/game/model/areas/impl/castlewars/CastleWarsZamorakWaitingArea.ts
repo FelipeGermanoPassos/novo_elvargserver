@@ -1,7 +1,7 @@
 import { PlayerBot } from '../../../../entity/impl/playerbot/PlayerBot';
 import { Player } from '../../../../entity/impl/player/Player'
 import { Mobile } from '../../../../entity/impl/Mobile'
-import { Arrays } from 'collections'
+
 import { Boundary } from '../../../../model/Boundary';
 import { CastleWars } from '../../../../content/minigames/impl/CastleWars';
 import { Item } from '../../../../model/Item';
@@ -13,10 +13,11 @@ import { Equipment } from '../../../container/impl/Equipment';
 import { ItemContainer } from '../../../container/ItemContainer';
 import { Location } from '../../../Location';
 import { Flag } from '../../../Flag';
+import { GameObject } from '../../../../entity/impl/object/GameObject';
 
 export class CastleWarsZamorakWaitingArea extends Area {
     constructor() {
-        super(Arrays.asList(new Boundary(2408, 2432, 9512, 9535,0)));
+        super([new Boundary(2408, 2432, 9512, 9535,0)]);
     }
 
     public getName(): string {
@@ -75,8 +76,8 @@ export class CastleWarsZamorakWaitingArea extends Area {
         // TODO: Un-transform player if they were transformed
     }
 
-    handleObjectClick(player: Player, objectId: number, type: number): boolean {
-        switch (objectId) {
+    handleObjectClick(player: Player, objectId: GameObject, type: number): boolean {
+        switch (objectId.getId()) {
             case ObjectIdentifiers.PORTAL_9:
                 player.moveTo(new Location(2439 + Misc.randoms(4),
                 3085 + Misc.randoms(5), 0));

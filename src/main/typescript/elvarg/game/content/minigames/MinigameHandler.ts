@@ -23,7 +23,7 @@ export class MinigameHandler {
           .map(m => m.minigame);
     }
 
-    public  get(): Minigame {
+    public get(): Minigame {
         return this.minigame;
     }
 

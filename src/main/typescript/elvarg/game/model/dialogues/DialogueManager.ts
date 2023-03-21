@@ -6,6 +6,7 @@ import { TestStaticDialogue } from '../../model/dialogues/builders/impl/TestStat
 import { DialogueOption } from "./DialogueOption";
 import { OptionsDialogue } from "./entries/impl/OptionsDialogue";
 import { OptionDialogue } from "./entries/impl/OptionDialogue";
+import { DialogueExpression } from "./DialogueExpression";
 
 export class DialogueManager {
     public static STATIC_DIALOGUES: Map<number, DialogueBuilder> = new Map<number, DialogueBuilder>();
@@ -23,7 +24,7 @@ export class DialogueManager {
 
     /**
      * The current dialogue's index.
-     */ 
+     */
     private index: number;
 
     /**
@@ -55,7 +56,7 @@ export class DialogueManager {
         }
 
         let continueAction = current.getContinueAction();
-        if(continueAction != null) {
+        if (continueAction != null) {
             // This dialogue has a custom continue action
             continueAction.execute(this.player);
             this.reset();
@@ -65,30 +66,32 @@ export class DialogueManager {
         this.startDialogue(this.index + 1);
     }
 
-    public startDialogue(index: number): void {
+    public startDialogue(index: number) {
         this.index = index;
         this.startDialogueOption();
     }
-    
-    public startStaticDialogue(id: number): void {
+
+    public startStaticDialogue(id: number) {
         const builder = DialogueManager.STATIC_DIALOGUES.get(id);
         if (builder) {
             this.startDialogueOption();
         }
     }
-    
-    public startDialogues(builder: DialogueBuilder): void {
+
+    public startDialogues(builder: DialogueBuilder) {
         this.startDialogue(0);
     }
-    
-    public startDialog(builder: DialogueBuilder, index: number): void {
+
+    public startDialog(builder: DialogueBuilder, index: number): DialogueExpression {
         if (builder instanceof DynamicDialogueBuilder) {
             (builder as DynamicDialogueBuilder).build(this.player);
         }
         this.startDialogueMap(builder.getDialogues(), index);
+
+        return new DialogueExpression(index);
     }
-    
-    private startDialogueMap(entries: Map<number, Dialogue>, index: number): void {
+
+    private startDialogueMap(entries: Map<number, Dialogue>, index: number) {
         this.reset();
         this.dialogues.clear();
         entries.forEach((value, key) => {
@@ -96,8 +99,8 @@ export class DialogueManager {
         });
         this.startDialogueOption();
     }
-    
-    private startDialogueOption(): void {
+
+    private startDialogueOption() {
         const dialogue = this.dialogues.get(this.index);
         if (!dialogue) {
             this.player.getPacketSender().sendInterfaceRemoval();
@@ -105,18 +108,18 @@ export class DialogueManager {
         }
         dialogue.send(this.player);
     }
-    
+
     public handleOption(option: DialogueOption): void {
         const dialogue = this.dialogues.get(this.index);
         if (dialogue instanceof OptionsDialogue) {
             (dialogue as OptionsDialogue).execute(option, this.player);
             return;
-          }
+        }
         if (!(dialogue instanceof OptionDialogue)) {
             this.player.getPacketSender().sendInterfaceRemoval();
             return;
         }
         (dialogue as OptionDialogue).execute(option);
     }
-    
+
 }

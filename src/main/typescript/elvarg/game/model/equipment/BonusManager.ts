@@ -2,7 +2,7 @@ import { Player } from "../../entity/impl/player/Player";
 import { ItemDefinition } from "../../definition/ItemDefinition";
 import { DamageFormulas } from "../../content/combat/formula/DamageFormulas";
 import { RangedWeapon } from "../../content/combat/ranged/RangedData";
-import { Ammunitions } from "../../content/combat/ranged/RangedData";
+import { Ammunition } from "../../content/combat/ranged/RangedData";
 
 export class BonusManager {
     public static readonly ATTACK_STAB = 0;
@@ -85,7 +85,7 @@ export class BonusManager {
 
             // Update some combat data first,
             // including ranged ammunition/weapon
-            player.getCombat().setAmmunition(Ammunitions.getFor(player));
+            player.getCombat().setAmmunition(Ammunition.getFor(player));
             player.getCombat().setRangedWeapon(RangedWeapon.getFor(player));
 
             player.getPacketSender().sendString("Melee maxhit: " + this.getDamageString(DamageFormulas.calculateMaxMeleeHit(player)), BonusManager.MELEE_MAXHIT_FRAME);

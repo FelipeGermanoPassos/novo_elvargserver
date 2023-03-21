@@ -16,7 +16,4 @@ export class ChaosElemental extends NPC {
         return ChaosElemental.COMBAT_METHOD;
     }
 
-    getSize(): void {
-
-    }
 }

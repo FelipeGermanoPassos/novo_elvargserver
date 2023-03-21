@@ -207,7 +207,7 @@ class Fish {
     getExperience(): number {
         return this.experience;
     }
-
+    
     getName(): string{
         return this.name;
     }

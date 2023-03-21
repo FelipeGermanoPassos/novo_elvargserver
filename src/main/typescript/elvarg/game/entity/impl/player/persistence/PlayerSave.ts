@@ -12,11 +12,10 @@ import { Bank } from "../../../../model/container/impl/Bank";
 import { DonatorRights } from "../../../../model/rights/DonatorRights";
 import { PlayerRights } from "../../../../model/rights/PlayerRights";
 import { ItemContainer } from "../../../../model/container/ItemContainer";
-
+import { StackType } from "../../../../model/container/StackType";
 
 export class PlayerSave {
     private passwordHashWithSalt: string;
-    private ItemContainer = new ItemContainer();
     private isDiscordLogin: boolean;
     private cachedDiscordAccessToken: string;
     private title: string;

@@ -254,27 +254,27 @@ export class LightableLog {
 
     private static lightableLogs: { [key: number]: LightableLog } = {};
 
-    getExperience() {
+    getExperience(): number {
         return this.experience;
     }
 
-    getLogId() {
+    getLogId(): number {
         return this.logId;
     }
 
-    getLevel() {
+    getLevel(): number {
         return this.level;
     }
 
-    getCycles() {
+    getCycles(): number {
         return this.cycles;
     }
 
-    getRespawnTimer() {
+    getRespawnTimer(): number {
         return this.respawnTimer;
     }
 
-    public static getForItem(item: number) {
+    public static getForItem(item: number): LightableLog {
         return LightableLog.lightableLogs[item] ? LightableLog.lightableLogs[item] : null;
     }
 

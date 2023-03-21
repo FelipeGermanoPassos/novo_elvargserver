@@ -11,6 +11,11 @@ import {WildernessArea} from '../../model/areas/impl/WildernessArea'
 import { Area } from "./Area";
 import { CanAttackResponse } from "../../content/combat/CombatFactory";
 import { Boundary } from "../Boundary";
+import { PestControl } from "../../content/minigames/impl/pestcontrols/PestControl";
+import { CastleWarsZamorakWaitingArea } from "./impl/castlewars/CastleWarsZamorakWaitingArea";
+import { CastleWarsSaradominWaitingArea } from "./impl/castlewars/CastleWarsSaradominWaitingArea";
+import { CastleWarsGameArea } from "./impl/castlewars/CastleWarsGameArea";
+import { CastleWarsLobbyArea } from "./impl/castlewars/CastleWarsLobbyArea";
 
 export class AreaManager {
 
@@ -22,10 +27,13 @@ export class AreaManager {
         AreaManager.areas.push(new WildernessArea());
         AreaManager.areas.push(new KingBlackDragonArea());
         AreaManager.areas.push(new GodwarsDungeonArea());
-        AreaManager.areas.push(CastleWars.LOBBY_AREA);
-        AreaManager.areas.push(CastleWars.ZAMORAK_WAITING_AREA);
-        AreaManager.areas.push(CastleWars.SARADOMIN_WAITING_AREA);
-        AreaManager.areas.push(CastleWars.GAME_AREA);
+        AreaManager.areas.push(new CastleWarsLobbyArea());
+        AreaManager.areas.push(new CastleWarsZamorakWaitingArea());
+        AreaManager.areas.push(new CastleWarsSaradominWaitingArea());
+        AreaManager.areas.push(new CastleWarsGameArea());
+        AreaManager.areas.push(PestControl.GAME_AREA);
+        AreaManager.areas.push(PestControl.NOVICE_BOAT_AREA);
+        AreaManager.areas.push(PestControl.OUTPOST_AREA);
     }
 
     /**

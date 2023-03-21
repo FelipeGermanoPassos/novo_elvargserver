@@ -2,11 +2,12 @@ import {CastleWars} from '../../../../content/minigames/impl/CastleWars';
 import {Lanthus} from '../../../../entity/impl/npc/impl/Lanthus';
 import {Player} from '../../../../entity/impl/player/Player'
 import {PlayerBot} from '../../../../entity/impl/playerbot/PlayerBot'
-import {Arrays} from 'collections'
+
 import {Boundary} from '../../../../model/Boundary';
 import {Area} from '../../../../model/areas/Area';
 import {ObjectIdentifiers} from  '../../../../../util/ObjectIdentifiers';
 import { Team } from '../../../../content/minigames/impl/CastleWars';
+import { GameObject } from '../../../../entity/impl/object/GameObject';
 
 
 
@@ -14,15 +15,15 @@ export class CastleWarsLobbyArea extends Area {
     private lanthus: Lanthus;
 
     constructor() {
-        super(Arrays.asList(new Boundary(2435, 2446, 3081, 3098,0)));
+        super([new Boundary(2435, 2446, 3081, 3098,0)]);
     }
 
     public getName(): string {
         return "the Castle Wars Lobby";
     }
 
-    public handleObjectClick(player: Player, objectId: number, type: number): boolean {
-        switch (objectId) {
+    public handleObjectClick(player: Player, objectId: GameObject, type: number): boolean {
+        switch (objectId.getId()) {
             case ObjectIdentifiers.ZAMORAK_PORTAL:
                 CastleWars.addToWaitingRoom(player, Team.ZAMORAK);
                 return true;

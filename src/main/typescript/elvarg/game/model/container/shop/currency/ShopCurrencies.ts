@@ -12,7 +12,7 @@ export class ShopCurrencies {
     public static readonly CASTLE_WARS_TICKET = (new CastleWarsTicketCurrency());
     public static readonly POINTS = (new PointsCurrency());
 
-    private readonly currency: ShopCurrency;
+    public readonly currency: ShopCurrency;
 
     constructor (currency: ShopCurrency) {
         this.currency = currency;

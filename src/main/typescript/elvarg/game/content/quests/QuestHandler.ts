@@ -136,14 +136,14 @@ export class Quests {
         player.getPacketSender().sendInterface(12140);
     }
 
-    public handleQuestButtonClick(player: Player, buttonId: number): boolean {
+    public static handleQuestButtonClick(player: Player, buttonId: number): boolean {
         let quest = Quests.forButton(buttonId);
         if (quest == null) {
             // There is no quest for this button ID
             return false;
         }
 
-        const status = player.getQuestProgress().get();
+        const status: number = player.getQuestProgress().get(quest.getQuestProgress(player, buttonId));
         quest.get().showQuestLog(player, status);
         return true;
     }

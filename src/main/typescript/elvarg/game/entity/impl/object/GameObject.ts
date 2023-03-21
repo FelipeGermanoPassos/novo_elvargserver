@@ -9,6 +9,7 @@ import { PrivateArea } from "../../../model/areas/impl/PrivateArea"
 
 
 export class GameObject extends Entity {
+
     private id: number;
     private type: number;
     private face: number;
@@ -39,9 +40,6 @@ export class GameObject extends Entity {
 
     public getFace(): number {
         return this.face;
-    }
-    public getSize(): void {
-
     }
 
     public setFace(face: number): void {
@@ -82,7 +80,7 @@ export class GameObject extends Entity {
         }
     }
 
-    public size(): number {
+    public getSize(): number {
         const definition: ObjectDefinition = this.getDefinition();
         if (definition == null) {
             return 1;

@@ -8,6 +8,7 @@ import { CanAttackResponse } from "../../../content/combat/CombatFactory";
 import { Player } from "../../../entity/impl/player/Player";
 import { PlayerBot } from "../../../entity/impl/playerbot/PlayerBot";
 import { PlayerRights } from "../../rights/PlayerRights";
+import { GameObject } from "../../../entity/impl/object/GameObject";
 
 export class WildernessArea extends Area {
     getName(): string {
@@ -143,8 +144,8 @@ export class WildernessArea extends Area {
         return true;
     }
 
-    public handleObjectClick(player: Player, objectId: number, type: number): boolean {
-        if (Obelisks.activate(objectId)) {
+    public handleObjectClick(player: Player, objectId: GameObject, type: number): boolean {
+        if (Obelisks.activate(objectId.getId())) {
             return true;
         }
         return false;
