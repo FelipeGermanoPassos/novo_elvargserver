@@ -3,7 +3,7 @@ import { NpcSpawnDefinition } from "../../NpcSpawnDefinition"
 import { GameConstants } from '../../../GameConstants';
 import { FacingDirection } from '../../../model/FacingDirection';
 import { Location } from '../../../model/Location';
-import fs from "fs";
+import fs from "fs-extra";
 import { Direction } from '../../../model/Direction';
 
 export class NPCSpawnDumper extends DefinitionLoader {
@@ -11,13 +11,13 @@ export class NPCSpawnDumper extends DefinitionLoader {
         const r = fs.createReadStream(this.file(), { encoding: 'utf-8' });
         let s: string;
 
-        const path = require('path');
+        const path = fs.require('path');
         const file = path.join(GameConstants.DEFINITIONS_DIRECTORY, "gay.json");
         fs.mkdirSync(path.dirname(file), { recursive: true });
         const w = fs.createWriteStream(file, { flags: 'a' });
         const builder = JSON.stringify(JSON.stringify({ }, null, 2));
 
-        const lineReader = require('readline').createInterface({ input: r });
+        const lineReader = fs.require('readline').createInterface({ input: r });
         for await (const line of lineReader) {
             s = line;
             if (s.startsWith("/"))

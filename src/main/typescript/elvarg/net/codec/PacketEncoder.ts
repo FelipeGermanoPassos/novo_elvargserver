@@ -1,7 +1,7 @@
 import { IsaacRandom } from "../security/IsaacRandom";
 import { Packet } from "../packet/Packet";
-import { ByteBuf, Unpooled } from "netty";
-import { MessageToByteEncoder, ChannelHandlerContext } from "netty";
+import { ByteBuf, Unpooled } from "socket.io";
+import { MessageToByteEncoder, ChannelHandlerContext } from "socket.io";
 import { PacketType } from "../packet/PacketType";
 
 export class PacketEncoder extends MessageToByteEncoder<Packet> {

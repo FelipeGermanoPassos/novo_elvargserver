@@ -1,8 +1,9 @@
-import { ChannelHandlerContext } from 'netty';
+import { ChannelHandlerContext } from 'socket.io'
 import { NetworkConstants } from '../NetworkConstants';
 import { World } from '../../game/World';
 
 export class ChannelEventHandler {
+
     public channelInactive(ctx: ChannelHandlerContext) {
         let session = ctx.channel().attr(NetworkConstants.SESSION_KEY).get();
 
@@ -23,7 +24,7 @@ export class ChannelEventHandler {
                 player.getForcedLogoutTimer().start(60);
 
                 // Add player to logout queue.
-                World.getRemovePlayerQueue().add(player);
+                World.getRemovePlayerQueue().push(player);
             }
         }
     }

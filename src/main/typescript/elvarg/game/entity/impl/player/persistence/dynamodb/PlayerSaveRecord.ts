@@ -1,9 +1,9 @@
 import { PlayerSave } from '../PlayerSave';
 import { PlayerSaveConverter } from '../PlayerSaveConverter';
 export class PlayerSaveRecord {
-    private username: string;
-    private playerSave: PlayerSave;
-    private updatedAt: Date;
+    public username: string;
+    public playerSave: PlayerSave;
+    public updatedAt: Date;
 
     constructor(username: string, playerSave: PlayerSave, updatedAt: Date) {
         this.username = username;

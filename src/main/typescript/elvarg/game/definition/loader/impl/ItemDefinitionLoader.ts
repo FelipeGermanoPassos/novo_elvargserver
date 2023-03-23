@@ -1,7 +1,7 @@
 import { GameConstants } from "../../../GameConstants";
 import { ItemDefinition } from "../../ItemDefinition";
 import { DefinitionLoader } from "../DefinitionLoader";
-import fs from "fs";
+import fs from "fs-extra";
 
 export class ItemDefinitionLoader extends DefinitionLoader {
     load() {

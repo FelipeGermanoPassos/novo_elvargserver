@@ -1,7 +1,7 @@
 import { GameConstants } from "../../../GameConstants";
 import { NpcDefinition } from "../../NpcDefinition";
 import { DefinitionLoader } from "../DefinitionLoader";
-import { fs } from "fs";
+import { fs } from "fs-extra";
 
 export class NpcDefinitionLoader extends DefinitionLoader {
     load() {

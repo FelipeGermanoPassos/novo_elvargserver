@@ -2,7 +2,7 @@ import { ExecutorService} from 'executor-service'
 import { Runnable } from 'runnable';
 import { Collection } from 'collections'
 import { ArrayDeque } from 'collections';
-import {ThreadFactoryBuilder} from 'java.js/java.util.concurrent'
+import {ThreadFactoryBuilder} from 'java.js/java.util.concurrent' // não precisa de threadfactoribuilder para typescript.
 import {TimeUnit} from 'timeunit'
 
 export class BackgroundLoader {

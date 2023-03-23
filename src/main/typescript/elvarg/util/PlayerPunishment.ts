@@ -1,5 +1,5 @@
 import { Misc } from "./Misc";
-import { fs } from 'fs'
+import { fs } from 'fs-extra';
 
 export class PlayerPunishment {
     private static readonly BAN_DIRECTORY = "./data/saves/";

@@ -3,7 +3,7 @@ import { GameConstants } from '../../../GameConstants';
 import { ObjectSpawnDefinition } from '../../ObjectSpawnDefinition';
 import { GameObject } from '../../../entity/impl/object/GameObject';
 import { ObjectManager } from '../../../entity/impl/object/ObjectManager';
-import fs from "fs"
+import fs from "fs-extra";
 
 export class ObjectSpawnDefinitionLoader extends DefinitionLoader {
     load() {

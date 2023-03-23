@@ -81,7 +81,7 @@ export class MagicCombatMethod extends CombatMethod {
             return false;
         }
 
-        return character.getCombat().getCastSpell().canCast(character.getAsPlayer());
+        return character.getCombat().getCastSpell().canCast(character.getAsPlayer(), true);
     }
 
     public start(character: Mobile, target: Mobile): void {

@@ -1,4 +1,4 @@
-import { ChannelHandlerContext, MessageToByteEncoder, ByteBuf } from 'netty';
+import { ChannelHandlerContext, MessageToByteEncoder, ByteBuf } from 'socket.io';
 import { LoginResponsePacket } from '../login/LoginResponsePacket';
 import { LoginResponses } from '../login/LoginResponses';
 

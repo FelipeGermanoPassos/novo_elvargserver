@@ -1,4 +1,4 @@
-import { Misc } from 'misc';
+import { Misc } from "./Misc";
 
 export class Chance {
     public static readonly ALWAYS = new Chance(100);

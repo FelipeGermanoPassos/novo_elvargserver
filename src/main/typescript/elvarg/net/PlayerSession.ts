@@ -12,7 +12,7 @@ import { Misc } from '../util/Misc';
 import { NetworkConstants } from './NetworkConstants';
 import { SocketIO } from 'socket.io';
 import { PlayerRights } from '../game/model/rights/PlayerRights';
-import { Channel } from 'netty'
+import { Channel } from 'socket.io'
 
 export class PlayerSession {
     private packetsQueue: Packet[] = [];

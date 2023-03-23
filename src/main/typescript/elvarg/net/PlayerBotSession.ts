@@ -1,6 +1,6 @@
 import { PlayerSession } from "./PlayerSession";
 import { Player } from "../game/entity/impl/player/Player";
-import { Channel, ByteBufAllocator, ChannelFuture, ChannelId, ChannelMetadata, ChannelPipeline, ChannelProgressivePromise, ChannelPromise, DefaultAttributeMap, EventLoop, InetSocketAddress, SocketAddress, SocketChannel, SocketChannelConfig, Attribute, AttributeKey, Unsafe, ServerSocketChannel } from "netty";
+import { Channel, ByteBufAllocator, ChannelFuture, ChannelId, ChannelMetadata, ChannelPipeline, ChannelProgressivePromise, ChannelPromise, DefaultAttributeMap, EventLoop, InetSocketAddress, SocketAddress, SocketChannel, SocketChannelConfig, Attribute, AttributeKey, Unsafe, ServerSocketChannel } from "socket.io";
 import { LoginDetailsMessage } from "./login/LoginDetailsMessage";
 import { Packet } from "./packet/Packet";
 import { PacketBuilder } from "./packet/PacketBuilder";

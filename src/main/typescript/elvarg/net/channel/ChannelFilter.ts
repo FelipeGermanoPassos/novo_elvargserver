@@ -1,10 +1,10 @@
-import { ChannelInboundHandlerAdapter } from 'netty';
+import { ChannelInboundHandlerAdapter } from 'socket.io';
 import { ByteBufUtils } from '../ByteBufUtils';
-import { NetworkConstants } from './network';
-import { LoginDecoder } from './decoder';
-import { LoginResponses } from './login';
+import { NetworkConstants } from '../NetworkConstants';
+import { LoginDecoder } from '../codec/LoginDecoder';
+import { LoginResponses } from '../login/LoginResponses';
 import { Multiset } from 'google-collections';
-import { ChannelHandlerContext } from 'node-netty';
+import { ChannelHandlerContext } from 'socket.io';
 
 export class ChannelFilter extends ChannelInboundHandlerAdapter {
     private connections = new Multiset<string>();

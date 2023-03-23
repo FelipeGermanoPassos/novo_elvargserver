@@ -23,7 +23,9 @@ export class JSONFilePlayerPersistence {
 
         try {
         const fileReader: FileReader = new FileReader(file);
-        return JSONFilePlayerPersistence.BUILDER.fromJson(fileReader, PlayerSave);
+        const jsonConverter = new JsonConvert();
+        const playerSave: PlayerSave = jsonConverter.deserializeObject(fileReader, PlayerSave);
+        return playerSave;
         } catch (e) {
         throw new Error(e);
         }

@@ -2,7 +2,7 @@ import { GameConstants } from "../GameConstants";
 import { Buffer } from "../collision/Buffer";
 import { FileUtil } from "../../util/FileUtil"
 import { ObjectIdentifiers } from "../../util/ObjectIdentifiers";
-import fs from "fs";
+import fs from "fs-extra";
 
 export class ObjectDefinition extends ObjectIdentifiers {
     static OBELISK_IDS = [14829, 14830, 14827, 14828, 14826, 14831];

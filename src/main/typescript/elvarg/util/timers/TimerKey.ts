@@ -1,4 +1,4 @@
-import { Misc } from 'misc';
+import { Misc } from "../Misc";
 
 export class TimerKey {
 	public static readonly FOOD = new TimerKey();

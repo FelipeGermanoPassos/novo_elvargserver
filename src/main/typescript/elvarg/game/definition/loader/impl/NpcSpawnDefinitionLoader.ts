@@ -1,4 +1,4 @@
-import fs from "fs"
+import fs from "fs-extra"
 import { GameConstants } from "../../../GameConstants";
 import { World } from "../../../World";
 import { NpcSpawnDefinition } from "../../NpcSpawnDefinition";

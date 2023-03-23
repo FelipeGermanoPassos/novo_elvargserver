@@ -1,7 +1,7 @@
 import { GameConstants } from "../../../GameConstants";
 import { DefinitionLoader } from "../DefinitionLoader";
 import { NpcDropDefinition } from "../../NpcDropDefinition";
-import { fs } from "fs"
+import { fs } from "fs-extra"
 
 export class NpcDropDefinitionLoader extends DefinitionLoader {
     load() {

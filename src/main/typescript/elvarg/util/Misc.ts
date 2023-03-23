@@ -4,7 +4,7 @@ import { Player } from '../game/entity/impl/player/Player';
 import { RandomGen } from '../util/RandomGen'
 import { SecureRandom } from 'securerandom';
 import { ZonedDateTime} from 'js-joda'
-import { fs, readFileSync, existsSync   } from 'fs'
+import { fs, readFileSync, existsSync   } from 'fs-extra';
 import * as path from 'path';
 import { resolve } from 'path'
 import * as zlib from 'zlib';

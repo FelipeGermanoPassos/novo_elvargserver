@@ -1,9 +1,9 @@
-import { ThreadFactoryBuilder } from 'com.google.common.util.concurrent';
-import { ScheduledExecutorService, Executors } from 'java.util.concurrent';
-import { ClanChatManager } from 'com.elvarg.game.content.clan';
+import * as schedule from 'node-schedule';
+
+import { ClanChatManager } from './content/clan/ClanChatManager';
 import { GameConstants } from './GameConstants';
-import { TimeUnit } from 'timeunit';
 import { World } from '../game/World';
+
 
 /**
  * The engine which processes the game.
@@ -11,14 +11,14 @@ import { World } from '../game/World';
  * @author Professor Oak
  */
 export class GameEngine  {
-    private executorService = new ScheduledExecutorService();
+    private scheduler: schedule.Job;
     
     constructor() {
-        this.executorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("GameThread").build());
+        // ...
     }
     
     public init() {
-        this.executorService.scheduleAtFixedRate(this.run.bind(this), 0, GameConstants.GAME_ENGINE_PROCESSING_CYCLE_RATE, TimeUnit.MILLISECONDS);
+        this.scheduler = schedule.scheduleJob(`*/${GameConstants.GAME_ENGINE_PROCESSING_CYCLE_RATE} * * * * *`, this.run.bind(this));
     }
     
     public async run() {

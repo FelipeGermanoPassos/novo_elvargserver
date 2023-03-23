@@ -3,9 +3,11 @@ import { PlayerBot } from "../../../playerbot/PlayerBot";
 import { PlayerPersistence } from "../PlayerPersistence";
 import { PlayerSave } from "../PlayerSave";
 import * as AWS from "aws-sdk";
-import { DynamoDbTable, DynamoDbEnhancedClient } from "aws-sdk-lib";
+import { DynamoDbEnhancedClient, DynamoDbTable } from 'dynamodb-enhanced'
 import { PlayerSaveRecord } from "./PlayerSaveRecord";
-import { TableSchema } from 'tableschema'
+import { Schema } from '@aws/dynamodb-data-marshaller';
+
+
 
 export class DynamoDBPlayerPersistence extends PlayerPersistence {
     private static dynamoDbClient = new AWS.DynamoDB({ region: "eu-west-1" });
@@ -13,6 +15,7 @@ export class DynamoDBPlayerPersistence extends PlayerPersistence {
     private static playerTableName = process.env.PLAYER_TABLE_NAME;
 
     private static readonly PLAYER_SAVE_TABLE_SCHEMA = TableSchema.fromObject(PlayerSaveRecord);
+    
 
     public save(player: Player): void {
         if (player instanceof PlayerBot) {
@@ -20,7 +23,7 @@ export class DynamoDBPlayerPersistence extends PlayerPersistence {
         }
 
         const playerSave = PlayerSave.fromPlayer(player);
-        const playerTable: DynamoDbTable<PlayerSaveRecord> = DynamoDBPlayerPersistence.enhancedClient.table(
+        const playerTable: typeof DynamoDbTable = DynamoDBPlayerPersistence.enhancedClient.table(
             DynamoDBPlayerPersistence.playerTableName,
             DynamoDBPlayerPersistence.PLAYER_SAVE_TABLE_SCHEMA
         );
@@ -33,7 +36,7 @@ export class DynamoDBPlayerPersistence extends PlayerPersistence {
     }
 
     public load(username: string): PlayerSave | null {
-        const playerTable: DynamoDbTable<PlayerSaveRecord> = DynamoDBPlayerPersistence.enhancedClient.table(
+        const playerTable: typeof DynamoDbTable = DynamoDBPlayerPersistence.enhancedClient.table(
             DynamoDBPlayerPersistence.playerTableName,
             DynamoDBPlayerPersistence.PLAYER_SAVE_TABLE_SCHEMA
         );

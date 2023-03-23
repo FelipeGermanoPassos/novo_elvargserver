@@ -17,12 +17,10 @@ import { Location } from './model/Location';
 import { Players } from './model/commands/impl/Players';
 import { TaskManager } from './task/TaskManager';
 import { GameConstants } from '../game/GameConstants'
-import { Queue } from 'queue'
 import { Misc } from '../util/Misc';
 import { produce } from 'immer';
 import { List } from 'list'
 import { TreeMap } from 'treemap'
-import { LinkedHashSet } from 'langx-js'
 import { Task } from './task/Task';
 import { GameSyncTask } from './entity/updating/sync/GameSyncTask';
 
@@ -47,7 +45,7 @@ export class World {
     /**
      * The collection of removed {@link GameObject}s..
      */
-    private static removedObjects = new Set<GameObject>();
+    private static removedObjects: GameObject[];
 
     /**
      * The collection of {@link Players}s waiting to be added to the game.
@@ -135,31 +133,30 @@ export class World {
         return this.playerBots;
     }
 
-    public static getItems(): List<ItemOnGround> {
+    public static getItems(): ItemOnGround[] {
         return this.items;
     }
 
-    public static getObjects(): List<GameObject> {
+    public static getObjects(): GameObject[] {
         return this.objects;
     }
 
-    public static getRemovedObjects(): LinkedHashSet<GameObject> {
+    public static getRemovedObjects(): GameObject[] {
         return this.removedObjects;
     }
 
-    public static getAddPlayerQueue(): Queue<Player> {
-        return this.addPlayerQueue
-        Queue;
+    public static getAddPlayerQueue(): Player[] {
+        return this.addPlayerQueue;
     }
-    public static getRemovePlayerQueue(): Queue<Player> {
+    public static getRemovePlayerQueue(): Player[] {
         return this.removePlayerQueue;
     }
 
-    public static getAddNPCQueue(): Queue<NPC> {
+    public static getAddNPCQueue(): NPC[] {
         return this.addNPCQueue;
     }
 
-    public static getRemoveNPCQueue(): Queue<NPC> {
+    public static getRemoveNPCQueue(): NPC[] {
         return this.removeNPCQueue;
     }
 
@@ -180,7 +177,7 @@ export class World {
         }
     }
 
-    
+
 
     public getPlayerByName(username: string): Player | undefined {
         return World.players.search(p => p != null && p.getUsername().toLowerCase() === username.toLowerCase());
@@ -273,7 +270,7 @@ export class World {
             }
         }, false));
 
-        World.executor.sync(new GameTask( true, (index: number) => {
+        World.executor.sync(new GameTask(true, (index: number) => {
             let player = World.players.get(index);
             try {
                 PlayerUpdating.update(player);
@@ -353,13 +350,13 @@ class PlayerSyncTask implements GameSyncTaskInterface {
     }
 }
 
-export class GameTask extends GameSyncTask{
-    constructor(b: boolean, private readonly execFunc: Function, c?:boolean){
+export class GameTask extends GameSyncTask {
+    constructor(b: boolean, private readonly execFunc: Function, c?: boolean) {
         super(b, c)
     }
     execute(): void {
-       this.execFunc();
+        this.execFunc();
     }
-   
+
 }
 

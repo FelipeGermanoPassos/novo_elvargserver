@@ -7,7 +7,7 @@ import { NpcDefinition } from '../../../definition/NpcDefinition';
 import { Location } from '../../Location';
 import { NpcSpawnDefinition } from '../../../definition/NpcSpawnDefinition';
 import { GameConstants } from '../../../GameConstants';
-import { fs } from 'fs'
+import { fs } from 'fs-extra'
 import { Direction } from '../../Direction';
 
 export class SpawnPermanentNPCCommand implements Command {

@@ -1,4 +1,4 @@
-import { fs } from 'fs';
+import { fs } from 'fs-extra';
 import { createGunzip } from 'zlib';
 import { promisify } from 'util';
 import { gunzip } from 'zlib';

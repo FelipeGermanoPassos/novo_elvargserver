@@ -1,4 +1,4 @@
-import * as crypto from 'crypto';
+import * as crypto from 'crypto-browserify'
 
 import { PrayerHandler } from "../../../content/PrayerHandler";
 import { CombatFactory } from "../CombatFactory";

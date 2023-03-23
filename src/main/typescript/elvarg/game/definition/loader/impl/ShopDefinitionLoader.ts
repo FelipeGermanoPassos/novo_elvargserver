@@ -3,7 +3,7 @@ import { ShopDefinition } from '../../ShopDefinition';
 import { GameConstants } from '../../../GameConstants';
 import { ShopManager } from "../../../model/container/shop/ShopManager"
 import { Shop } from "../../../model/container/shop/Shop"
-import fs from "fs"
+import fs from "fs-extra";
 
 
 export class ShopDefinitionLoader extends DefinitionLoader {

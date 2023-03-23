@@ -1,4 +1,4 @@
-import { ByteToMessageDecoder, ChannelHandlerContext, ChannelFutureListener, Unpooled, ByteBuf } from 'netty';
+import { ByteToMessageDecoder, ChannelHandlerContext, ChannelFutureListener, Unpooled, ByteBuf } from 'socket.io';
 import { Server } from '../../Server';
 import { GameConstants } from '../../game/GameConstants';
 import { ByteBufUtils } from '../ByteBufUtils';
@@ -8,7 +8,7 @@ import { LoginResponses } from '../login/LoginResponses';
 import { IsaacRandom } from '../security/IsaacRandom';
 import { Misc } from '../../util/Misc';
 import { DiscordUtil } from '../../util/DiscordUtil';
-import { BigInteger } from 'big-integer';
+import BigInteger from 'big-integer';
 import { Random } from 'random';
 
 enum LoginDecoderState {
@@ -72,7 +72,7 @@ export class LoginDecoder extends ByteToMessageDecoder {
         // Send information to the client
         let buf = Unpooled.buffer(1 + 8);
         buf.writeByte(0); // 0 = continue login
-        buf.writeLong(LoginDecoder.random.nextLong()); // This long will be used for encryption later on
+        buf.writeLong(LoginDecoder.random.next); // This long will be used for encryption later on
         ctx.writeAndFlush(buf);
 
         this.state = LoginDecoderState.LOGIN_TYPE;
@@ -130,8 +130,8 @@ export class LoginDecoder extends ByteToMessageDecoder {
             let rsaBytes = new Uint8Array(length);
             buffer.readBytes(rsaBytes);
 
-            let rsaBuffer = Unpooled.wrappedBuffer(new BigInteger(rsaBytes)
-                .modPow(NetworkConstants.RSA_EXPONENT, NetworkConstants.RSA_MODULUS).toByteArray());
+            let rsaBuffer = Unpooled.wrappedBuffer( BigInteger(rsaBytes)
+                .modPow(NetworkConstants.RSA_EXPONENT, NetworkConstants.RSA_MODULUS).toArray);
 
             let securityId = rsaBuffer.readByte();
             if (securityId != 10 && securityId != 11) {

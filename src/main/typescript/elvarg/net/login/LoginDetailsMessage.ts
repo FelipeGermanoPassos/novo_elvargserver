@@ -1,5 +1,5 @@
 import {IsaacRandom} from '../security/IsaacRandom';
-import { ChannelHandlerContext } from 'netty'
+import { ChannelHandlerContext } from 'socket.io'
 
 export class LoginDetailsMessage {
     private readonly context: ChannelHandlerContext;

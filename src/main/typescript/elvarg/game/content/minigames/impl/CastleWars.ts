@@ -28,7 +28,7 @@ import { Edible, Food } from "../../Food";
 import { Minigame } from "../Minigame";
 import { Location } from "../../../model/Location";
 import { CountdownTask } from "../../../task/impl/CountdownTask";
-import { ReadWriteLock } from "jssync";
+import { ReadWriteLock } from "async-lock"
 import { ObjectIdentifiers } from "../../../../util/ObjectIdentifiers";
 import { Animation } from "../../../model/Animation";
 import { cloneDeep } from 'lodash';

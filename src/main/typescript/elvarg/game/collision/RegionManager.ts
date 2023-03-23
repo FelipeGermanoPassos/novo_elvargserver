@@ -6,7 +6,7 @@ import { MapObjects } from '../entity/impl/object/MapObjects'
 import { Direction } from '../model/Direction'
 import { Location } from '../model/Location'
 import { PrivateArea } from '../model/areas/impl/PrivateArea'
-import fs from "fs"
+import { fs } from "fs-extra"
 import { Buffer } from './Buffer'
 import { Region } from './Region'
 import pako from 'pako';

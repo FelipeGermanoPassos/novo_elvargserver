@@ -1,4 +1,4 @@
-import { ByteToMessageDecoder, ChannelHandlerContext, ByteBuf } from 'netty'
+import { ByteToMessageDecoder, ChannelHandlerContext, ByteBuf } from 'socket.io'
 import { Packet } from '../packet/Packet';
 import { IsaacRandom } from '../security/IsaacRandom'
 import { NetworkConstants } from '../NetworkConstants'

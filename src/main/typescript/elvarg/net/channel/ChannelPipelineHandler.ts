@@ -1,12 +1,12 @@
-import { ChannelInitializer, socket } from 'netty';
-import { NetworkConstants } from './network';
-import { PlayerSession } from './session';
+import { ChannelInitializer, socket } from 'socket.io'
+import { NetworkConstants } from '../NetworkConstants';
+import { PlayerSession } from '../PlayerSession';
 import { LoginDecoder } from './decoder';
-import { LoginEncoder } from './encoder';
-import { IdleStateHandler } from 'netty';
+import { LoginEncoder } from '../codec/LoginEncoder';
+import { IdleStateHandler } from 'socket.io'
 import { ChannelFilter } from './ChannelFilter';
 import { ChannelEventHandler } from './ChannelEventHandler';
-import { SocketChannel } from 'netty';
+import { SocketChannel } from 'socket.io'
 
 export class ChannelPipelineHandler extends ChannelInitializer<SocketChannel> {
     private readonly FILTER = new ChannelFilter();

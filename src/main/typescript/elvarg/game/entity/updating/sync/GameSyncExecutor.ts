@@ -1,7 +1,7 @@
-import { ThreadPoolExecutor, Executors } from 'some-library';
+import { ThreadPoolExecutor } from 'async';
 import { GameConstants } from '../../../GameConstants';
 import { GameSyncTask } from './GameSyncTask';
-import Phaser from 'phaser';
+import * as Phaser from 'phaser';
 
 export class GameSyncExecutor {
 
@@ -23,7 +23,7 @@ export class GameSyncExecutor {
    */
   constructor() {
     this.service = GameConstants.CONCURRENCY ? this.create(navigator.hardwareConcurrency) : null;
-    this.phaser = GameConstants.CONCURRENCY ? new Phaser(1) : null;
+    this.phaser = GameConstants.CONCURRENCY ? new Phaser.Game({}) : null;
   }
 
   /**

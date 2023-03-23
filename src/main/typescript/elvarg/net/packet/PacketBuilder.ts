@@ -1,4 +1,4 @@
-import { ByteBuf, Unpooled } from 'io.netty.buffer';
+import { ByteBuf, Unpooled } from 'socket.io';
 import { PacketType } from './PacketType';
 import { ByteOrder } from './ByteOrder';
 import { Packet } from './Packet';
