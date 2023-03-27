@@ -1,6 +1,5 @@
 import { PlayerSession } from "./PlayerSession";
 import { Player } from "../game/entity/impl/player/Player";
-import { Channel, ByteBufAllocator, ChannelFuture, ChannelId, ChannelMetadata, ChannelPipeline, ChannelProgressivePromise, ChannelPromise, DefaultAttributeMap, EventLoop, InetSocketAddress, SocketAddress, SocketChannel, SocketChannelConfig, Attribute, AttributeKey, Unsafe, ServerSocketChannel } from "ws";
 import { LoginDetailsMessage } from "./login/LoginDetailsMessage";
 import { Packet } from "./packet/Packet";
 import { PacketBuilder } from "./packet/PacketBuilder";
@@ -110,7 +109,7 @@ export class PlayerBotSession extends PlayerSession {
         this.player = player;
     }
 
-    public getChannel(): Channel {
+    public getChannel() {
         return null;
     }
 }
