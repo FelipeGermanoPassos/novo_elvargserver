@@ -1,4 +1,4 @@
-import { ChannelHandlerContext, MessageToByteEncoder, ByteBuf } from 'ws';
+import {Socket, Server} from 'socket.io';
 import { LoginResponsePacket } from '../login/LoginResponsePacket';
 import { LoginResponses } from '../login/LoginResponses';
 
@@ -6,13 +6,17 @@ import { LoginResponses } from '../login/LoginResponses';
 Encodes login.
 @author Swiffy
 */
-export class LoginEncoder extends MessageToByteEncoder<LoginResponsePacket> {
 
-    protected encode(ctx: ChannelHandlerContext, msg: LoginResponsePacket, out: ByteBuf) {
-        out.writeByte(msg.getResponse());
+const io = new Server();
+export class LoginEncoder {
 
-        if (msg.getResponse() == LoginResponses.LOGIN_SUCCESSFUL) {
-            out.writeByte(msg.getRights());
-        }
+    protected encode(msg: LoginResponsePacket) {
+        io.on('connection', (socket: Socket) => {
+            socket.emit('message', msg.getResponse());
+
+            if (msg.getResponse() == LoginResponses.LOGIN_SUCCESSFUL) {
+                socket.emit('message', msg.getRights());
+            }
+        })
     }
 }

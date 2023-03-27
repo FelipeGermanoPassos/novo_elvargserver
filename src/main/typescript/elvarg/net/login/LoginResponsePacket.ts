@@ -12,7 +12,6 @@ export class LoginResponsePacket {
         }
     }
 
-
     public getResponse(): number {
         return this.response;
     }
