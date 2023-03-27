@@ -120,7 +120,7 @@ export class EquipPacketListener implements PacketExecutor {
 				} else {
 					if (item.getDefinition().isDoubleHanded() && equipmentSlot == Equipment.WEAPON_SLOT) {
 
-						let slotsRequired: Number= player.getEquipment().isSlotOccupied(Equipment.SHIELD_SLOT)
+						let slotsRequired: number= player.getEquipment().isSlotOccupied(Equipment.SHIELD_SLOT)
 							&& player.getEquipment().isSlotOccupied(Equipment.WEAPON_SLOT) ? 1 : 0;
 						if (player.getInventory().getFreeSlots() < slotsRequired) {
 							player.getInventory().full();

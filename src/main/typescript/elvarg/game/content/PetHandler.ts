@@ -48,7 +48,7 @@ export class PetHandler {
                 npc.setFollowing(player);
                 npc.setMobileInteraction(player);
                 npc.setArea(player.getArea());
-                World.getAddNPCQueue().add(npc);
+                World.getAddNPCQueue().push(npc);
 
                 // Set the player's current pet to this one.
                 player.setCurrentPet(npc);
@@ -100,7 +100,7 @@ export class PetHandler {
             player.performAnimation(PetHandler.INTERACTION_ANIM);
 
             // Remove the npc from the world
-            World.getRemoveNPCQueue().add(player.getCurrentPet());
+            World.getRemoveNPCQueue().push(player.getCurrentPet());
 
             // Add pet to inventory or bank
             if (!player.getInventory().isFull()) {

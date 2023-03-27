@@ -1,5 +1,5 @@
 import {IsaacRandom} from '../security/IsaacRandom';
-import { ChannelHandlerContext } from 'socket.io'
+import { ChannelHandlerContext } from 'ws'
 
 export class LoginDetailsMessage {
     private readonly context: ChannelHandlerContext;

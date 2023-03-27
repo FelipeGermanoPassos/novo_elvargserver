@@ -7,7 +7,7 @@ import { NPC } from '../../../entity/impl/npc/NPC';
 export class SpawnNPCCommand implements Command {
     execute(player: Player, command: string, parts: string[]) {
     let npc = NPC.create(parseInt(parts[1]), player.getLocation().clone());
-    World.getAddNPCQueue().add(npc);
+    World.getAddNPCQueue().push(npc);
     if (player.getPrivateArea() != null) {
     player.getPrivateArea().add(npc);
     }

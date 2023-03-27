@@ -1,6 +1,6 @@
 import { Misc } from '../Misc';
 import { Client } from '../flood/Client'
-import { Lock } from 'lock'
+import { Lock } from 'async-lock';
 
 export class Flooder {
     clients: Map<string, Client> = new Map<string, Client>();

@@ -1,4 +1,3 @@
-import { Promise } from 'es6-promise';
 import { v4 as uuidv4 } from 'uuid';
 
 export class DiscordUtil {
@@ -12,13 +11,7 @@ export class DiscordUtil {
         USERNAME_CACHED_TOKEN: "cached_token"
     };
 
-    static DiscordInfo = {
-        username: '',
-        password: '',
-        token: ''
-    };
-
-    static async getAccessToken(code: string): Promise<{ access_token: string }> {
+    static async getAccessToken(code: string): Promise<{ access_token: string; }> {
         let formBody = new FormData();
         formBody.append("client_id", DiscordUtil.DiscordConstants.CLIENT_ID);
         formBody.append("client_secret", DiscordUtil.DiscordConstants.CLIENT_SECRET);
@@ -46,22 +39,22 @@ export class DiscordUtil {
 
     static async isTokenValid(token: string): Promise<boolean> {
         let response = await fetch(DiscordUtil.DiscordConstants.OAUTH_IDENTITY_ENDPOINT, {
-          headers: {
-            Authorization: "Bearer " + token
-          }
+            headers: {
+                Authorization: "Bearer " + token
+            }
         });
         return response.ok;
-      }
-    
-      static async getDiscordInfoWithCode(code: string): Promise<DiscordInfo> {
+    }
+
+    static async getDiscordInfoWithCode(code: string): Promise<DiscordInfo> {
         let token = await DiscordUtil.getAccessToken(code);
         return DiscordUtil.getDiscordInfoWithToken(token.access_token);
-      }
+    }
 
     static async getDiscordInfoWithToken(token: string): Promise<DiscordInfo> {
         let userInfo = await DiscordUtil.getUserInfo(token);
 
-        let ret = DiscordUtil.DiscordInfo;
+        let ret = new DiscordInfo();
         ret.username = userInfo.username + "_" + userInfo.discriminator;
         ret.password = uuidv4();
         ret.token = token;
@@ -72,6 +65,7 @@ export class DiscordUtil {
 }
 
 export class DiscordInfo {
-    public usernam: string; password: string;
+    public username: string;
+    public password: string;
     public token: string;
 }

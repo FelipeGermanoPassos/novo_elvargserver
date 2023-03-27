@@ -1,26 +1,38 @@
-import { ChannelInitializer, socket } from 'socket.io'
-import { NetworkConstants } from '../NetworkConstants';
-import { PlayerSession } from '../PlayerSession';
-import { LoginDecoder } from './decoder';
-import { LoginEncoder } from '../codec/LoginEncoder';
-import { IdleStateHandler } from 'socket.io'
-import { ChannelFilter } from './ChannelFilter';
-import { ChannelEventHandler } from './ChannelEventHandler';
-import { SocketChannel } from 'socket.io'
+import { PlayerSession } from "../PlayerSession"; 
+import { ChannelFilter } from "./ChannelFilter";
+import { ChannelEventHandler } from "./ChannelEventHandler";
+import { LoginDecoder } from "../codec/LoginDecoder";
+import { LoginEncoder } from "../codec/LoginEncoder";
+import * as websocket from "ws";
+import { NetworkConstants } from "../NetworkConstants";
 
-export class ChannelPipelineHandler extends ChannelInitializer<SocketChannel> {
-    private readonly FILTER = new ChannelFilter();
-    private readonly HANDLER = new ChannelEventHandler();
+/**
 
-    protected initChannel(channel: socket.SocketChannel) {
-        let pipeline = channel.pipeline();
+Handles a channel's events.
+*/
+export class ChannelPipelineHandler {
+    /*
+    The part of the pipeline that limits connections and checks for any banned hosts.
+    */
+    private readonly FILTER: ChannelFilter = new ChannelFilter();
+
+
+    /**
+    
+    The part of the pipeline that handles exceptions caught, channels being read, inactive
+    channels, and channel-triggered events.
+    */
+    private readonly HANDLER: ChannelEventHandler = new ChannelEventHandler(websocket);
+    public async initChannel(channel: any): Promise<void> {
+        const pipeline = channel.pipeline();
+
 
         channel.attr(NetworkConstants.SESSION_KEY).setIfAbsent(new PlayerSession(channel));
 
         pipeline.addLast("channel-filter", this.FILTER);
         pipeline.addLast("decoder", new LoginDecoder());
         pipeline.addLast("encoder", new LoginEncoder());
-        pipeline.addLast("timeout", new IdleStateHandler(NetworkConstants.SESSION_TIMEOUT, 0, 0));
+        pipeline.addLast("timeout", new websocket.IdleStateHandler(NetworkConstants.SESSION_TIMEOUT, 0, 0));
         pipeline.addLast("channel-handler", this.HANDLER);
     }
 }

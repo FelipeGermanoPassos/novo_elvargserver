@@ -65,6 +65,6 @@ export class NPCDeathTask extends Task {
         if (this.npc.isBarricade()) {
             Barricades.checkTile(this.npc.getLocation());
         }
-        World.getRemoveNPCQueue().add(this.npc);
+        World.getRemoveNPCQueue().push(this.npc);
     }
 }

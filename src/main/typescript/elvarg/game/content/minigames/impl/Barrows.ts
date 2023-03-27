@@ -140,7 +140,7 @@ export class Barrows {
     public static brotherDespawn(player: Player) {
         const brother = player.getCurrentBrother();
         if (brother && brother.isRegistered() && !brother.isDyingFunction()) {
-            World.getRemoveNPCQueue().add(brother);
+            World.getRemoveNPCQueue().push(brother);
             player.setCurrentBrother(null);
             player.getPacketSender().sendEntityHintRemoval(false);
         }
@@ -208,7 +208,7 @@ export class Barrows {
             npc.getCombat().attack(player);
             player.getPacketSender().sendEntityHint(npc);
         };
-        World.getAddNPCQueue().add(npc);
+        World.getAddNPCQueue().push(npc);
         player.setCurrentBrother(npc);
     }
     

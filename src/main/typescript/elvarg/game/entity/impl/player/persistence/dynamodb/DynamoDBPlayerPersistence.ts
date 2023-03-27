@@ -6,6 +6,7 @@ import * as AWS from "aws-sdk";
 import { DynamoDbEnhancedClient, DynamoDbTable } from 'dynamodb-enhanced'
 import { PlayerSaveRecord } from "./PlayerSaveRecord";
 import { Schema } from '@aws/dynamodb-data-marshaller';
+import { TableSchema } from 'tableschema'
 
 
 
@@ -15,7 +16,7 @@ export class DynamoDBPlayerPersistence extends PlayerPersistence {
     private static playerTableName = process.env.PLAYER_TABLE_NAME;
 
     private static readonly PLAYER_SAVE_TABLE_SCHEMA = TableSchema.fromObject(PlayerSaveRecord);
-    
+
 
     public save(player: Player): void {
         if (player instanceof PlayerBot) {

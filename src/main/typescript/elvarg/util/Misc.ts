@@ -1,4 +1,4 @@
-import { DecimalFormat } from 'decimal-format'
+import  DecimalFormat  from 'decimal-format'
 import { Location } from '../game/model/Location';
 import { Player } from '../game/entity/impl/player/Player';
 import { RandomGen } from '../util/RandomGen'
@@ -62,9 +62,9 @@ export class Misc {
 
     public static getCurrentServerTime(): string {
         this.zonedDateTime = ZonedDateTime.now();
-        let hour = this.zonedDateTime.getHour();
+        let hour = this.zonedDateTime.hour();
         let hourPrefix = hour < 10 ? "0" + hour + "" : "" + hour + "";
-        let minute = this.zonedDateTime.getMinute();
+        let minute = this.zonedDateTime.minute();
         let minutePrefix = minute < 10 ? "0" + minute + "" : "" + minute + "";
         return "" + hourPrefix + ":" + minutePrefix + "";
     }

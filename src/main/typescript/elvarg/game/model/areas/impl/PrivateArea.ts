@@ -50,7 +50,7 @@ export abstract class PrivateArea extends Area {
         }
         for (let npc of this.getNpcs()) {
             if (npc.isRegistered()) {
-                World.getRemoveNPCQueue().add(npc);
+                World.getRemoveNPCQueue().push(npc);
             }
         }
         for (let object of this.getObjects()) {

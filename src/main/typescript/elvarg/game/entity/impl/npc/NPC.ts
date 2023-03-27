@@ -57,7 +57,7 @@ export class NPC extends Mobile {
                     Barricades.checkTile(this.getLocation());
                 }
                 this.barricadeOnFire = false;
-                World.getRemoveNPCQueue().add(this);
+                World.getRemoveNPCQueue().push(this);
             }
         }
     }

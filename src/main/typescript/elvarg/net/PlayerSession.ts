@@ -10,9 +10,9 @@ import { PacketBuilder } from './packet/PacketBuilder';
 import { PacketConstants } from './packet/PacketConstants';
 import { Misc } from '../util/Misc';
 import { NetworkConstants } from './NetworkConstants';
-import { SocketIO } from 'socket.io';
+import { SocketIO } from 'ws';
 import { PlayerRights } from '../game/model/rights/PlayerRights';
-import { Channel } from 'socket.io'
+import { Channel } from 'ws'
 
 export class PlayerSession {
     private packetsQueue: Packet[] = [];

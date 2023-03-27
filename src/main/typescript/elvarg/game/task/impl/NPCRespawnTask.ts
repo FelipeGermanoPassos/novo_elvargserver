@@ -11,7 +11,7 @@ export class NPCRespawnTask extends Task {
     
     public execute() {
         // Register the new entity..
-        World.getAddNPCQueue().add(this.npc.clone());
+        World.getAddNPCQueue().push(this.npc.clone());
     
         // Stop the task
         this.stop();
