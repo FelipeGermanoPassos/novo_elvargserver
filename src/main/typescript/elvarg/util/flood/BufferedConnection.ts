@@ -1,12 +1,34 @@
-import { Socket } from 'socket.io'
+import * as io from 'socket.io-client'
 import * as fs from 'fs'
-import { OutputStream } from 'node-js'
-import { Mutex } from "stoppable-lock";
-import { InputStream } from 'node-js'
-import { Runnable } from 'runnable'
+import { Mutex } from 'async-mutex'
+
+
+interface Runnable {
+    run(): void;
+}
+
+interface InputStream {
+    available(): number;
+    close(): void;
+    mark(readlimit: number): void;
+    markSupported(): boolean;
+    read(): number;
+    read(b: Uint8Array, off: number, len: number): number;
+    reset(): void;
+    skip(n: number): number;
+}
+
+interface OutputStream {
+    close(): void;
+    flush(): void;
+    write(b: number): void;
+    write(b: Uint8Array, off: number, len: number): void;
+}
+
+
 
 export class BufferedConnection implements Runnable {
-    private socket: Socket;
+    private socket: io.Socket;
     private inputStream: InputStream;
     private outputStream: OutputStream;
     private closed: boolean;
@@ -16,15 +38,15 @@ export class BufferedConnection implements Runnable {
     private isWriter: boolean;
     private hasIOError: boolean;
 
-    constructor(socket1: Socket) {
+    constructor(socket1: io.Socket) {
         closed = false;
         this.isWriter = false;
         this.hasIOError = false;
         this.socket = socket1;
-        this.socket.setTimeout(30000);
-        this.socket.setNoDelay(true);
-        this.inputStream = this.socket.getInputStream();
-        this.outputStream = this.socket.getOutputStream();
+        this.socket.timeout(30000);
+        const socket = io.io('http://localhost:3000', {
+            transports: ['websocket']
+        }); 
     }
 
     public close(): void {
@@ -108,28 +130,6 @@ export class BufferedConnection implements Runnable {
             let i;
             let j;
             let lock = new Mutex();
-            async function readData() {
-                await lock.acquire();
-                try {
-                    if (this.buffIndex === this.writeIndex) {
-                        await lock.release();
-                        await lock.acquire();
-                    }
-            
-                    if (!this.isWriter) {
-                        lock.release();
-                        return;
-                    }
-                    j = this.writeIndex;
-                    if (this.buffIndex >= this.writeIndex) {
-                        i = this.buffIndex - this.writeIndex;
-                    } else {
-                        i = 5000 - this.writeIndex;
-                    }
-                } finally {
-                    lock.release();
-                }
-            }
             if (i > 0) {
                 try {
                     this.outputStream.write(this.buffer, j, i);

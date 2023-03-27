@@ -106,7 +106,7 @@ export class Barricades {
         RegionManager.addClipping(tile.getX(), tile.getY(), tile.getZ(), 0x200000, player.getPrivateArea());
         player.getInventory().deleteNumber(this.ITEM_ID, 1);
         this.barricades.push(tile);
-        World.getAddNPCQueue().add(new NPC(this.NPC_ID, tile.clone()));
+        World.getAddNPCQueue().push(new NPC(this.NPC_ID, tile.clone()));
         Sounds.sendSound(player, Sound.PICK_UP_ITEM);
     }
 

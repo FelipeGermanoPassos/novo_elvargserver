@@ -101,7 +101,7 @@ export class Skill {
     @return The {@link Skill}'s name in a suitable format.
     */
     public getName(): string {
-        return Misc.FORMATTER(this.toString().toLowerCase());
+        return Misc.FORMATTER.format(this.toString().toLowerCase());
     }
 }
 

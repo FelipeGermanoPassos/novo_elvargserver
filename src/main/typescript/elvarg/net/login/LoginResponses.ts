@@ -62,20 +62,20 @@ export class LoginResponses {
 
     }
 
-    private static getDiscordResult(player: Player, msg: LoginDetailsMessage): number {
+    private static async getDiscordResult(player: Player, msg: LoginDetailsMessage): Promise<number> {
         try {
             let discordInfo: DiscordInfo;
             if (msg.getUsername() === DiscordUtil.DiscordConstants.USERNAME_AUTHZ_CODE) {
-                discordInfo = DiscordUtil.getDiscordInfoWithCode(msg.getPassword());
+                discordInfo = await DiscordUtil.getDiscordInfoWithCode(msg.getPassword());
             } else if (msg.getUsername() === DiscordUtil.DiscordConstants.USERNAME_CACHED_TOKEN) {
                 if (!DiscordUtil.isTokenValid(msg.getPassword())) return LoginResponses.LOGIN_INVALID_CREDENTIALS;
-                discordInfo = DiscordUtil.getDiscordInfoWithToken(msg.getPassword());
+                discordInfo = await DiscordUtil.getDiscordInfoWithToken(msg.getPassword());
             } else {
                 return LoginResponses.LOGIN_INVALID_CREDENTIALS;
             }
-
-            player.setUsername(discordInfo.usernam);
-
+    
+            player.setUsername(discordInfo.username);
+    
             let playerSave = GameConstants.PLAYER_PERSISTENCE.load(player.getUsername());
             if (!playerSave) {
                 player.setDiscordLogin(true);
@@ -83,15 +83,17 @@ export class LoginResponses {
                 player.setPasswordHashWithSalt(discordInfo.password);
                 return LoginResponses.NEW_ACCOUNT;
             }
-
+    
             playerSave.applyToPlayer(player);
             return LoginResponses.LOGIN_SUCCESSFUL;
-
+    
         } catch (ex) {
+            // Adicione um tratamento de erro adequado aqui
         }
-
+    
         return LoginResponses.LOGIN_INVALID_CREDENTIALS;
     }
+    
 
     private static async getPlayerResult(player: Player, msg: LoginDetailsMessage) {
         let plainPassword = msg.getPassword();

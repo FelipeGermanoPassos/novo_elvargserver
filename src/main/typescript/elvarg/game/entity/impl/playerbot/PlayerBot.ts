@@ -64,8 +64,8 @@ export class PlayerBot extends Player {
         this.interactingWith.setAuguryUnlocked(true);
         this.interactingWith.setAutoRetaliate(true);
 
-        if (!World.getAddPlayerQueue().contains(this)) {
-            World.getAddPlayerQueue().add(this);
+        if (!World.getAddPlayerQueue().includes(this)) {
+            World.getAddPlayerQueue().push(this);
         }
     }
 

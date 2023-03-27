@@ -1,4 +1,4 @@
-import { ByteBuf } from 'socket.io';
+import { ByteBuf } from 'ws';
 import { PacketType } from './PacketType';
 import { ValueType } from './ValueType';
 import { StringBuilder } from 'stringbuilder'

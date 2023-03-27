@@ -1,4 +1,4 @@
-import { ByteToMessageDecoder, ChannelHandlerContext, ChannelFutureListener, Unpooled, ByteBuf } from 'socket.io';
+import { ByteToMessageDecoder, ChannelHandlerContext, ChannelFutureListener, Unpooled, ByteBuf } from 'ws';
 import { Server } from '../../Server';
 import { GameConstants } from '../../game/GameConstants';
 import { ByteBufUtils } from '../ByteBufUtils';
@@ -9,7 +9,7 @@ import { IsaacRandom } from '../security/IsaacRandom';
 import { Misc } from '../../util/Misc';
 import { DiscordUtil } from '../../util/DiscordUtil';
 import BigInteger from 'big-integer';
-import { Random } from 'random';
+import * as Random from 'seedrandom'
 
 enum LoginDecoderState {
     LOGIN_REQUEST,
@@ -130,8 +130,13 @@ export class LoginDecoder extends ByteToMessageDecoder {
             let rsaBytes = new Uint8Array(length);
             buffer.readBytes(rsaBytes);
 
-            let rsaBuffer = Unpooled.wrappedBuffer( BigInteger(rsaBytes)
-                .modPow(NetworkConstants.RSA_EXPONENT, NetworkConstants.RSA_MODULUS).toArray);
+            let rsaBuffer = Unpooled.wrappedBuffer(
+                BigInteger(Buffer.from(rsaBytes).toString('hex'), 16)
+                    .modPow(NetworkConstants.RSA_EXPONENT, NetworkConstants.RSA_MODULUS)
+                    .toArray(256)
+            );
+
+
 
             let securityId = rsaBuffer.readByte();
             if (securityId != 10 && securityId != 11) {

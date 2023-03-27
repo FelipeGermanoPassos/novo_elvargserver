@@ -32,7 +32,7 @@ export class FightCaves {
                 if (area.isDestroyed()) {
                     return;
                 }
-                World.getAddNPCQueue().add(new TztokJad(player, area, FightCaves.JAD_NPC_ID, FightCaves.JAD_SPAWN_POS.clone()));
+                World.getAddNPCQueue().push(new TztokJad(player, area, FightCaves.JAD_NPC_ID, FightCaves.JAD_SPAWN_POS.clone()));
             };
         }));
     }

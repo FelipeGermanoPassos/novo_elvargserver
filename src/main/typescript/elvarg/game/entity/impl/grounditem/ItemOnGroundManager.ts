@@ -20,15 +20,17 @@ export class ItemOnGroundManager {
 
     public static process(): void {
         for (let item of World.getItems()) {
-            item.process()
+            item.process();
             if (item.isPendingRemoval()) {
                 if (item.respawns()) {
-                    TaskManager.submit(new GroundItemRespawnTask(item, item.getRespawnTimer()))
+                    TaskManager.submit(new GroundItemRespawnTask(item, item.getRespawnTimer()));
                 }
-                World.getItems().delete(item)
+                const index = World.getItems().indexOf(item);
+                World.getItems().splice(index, 1);
             }
         }
     }
+    
 
     public static perform(item: ItemOnGround, type: OperationType): void {
         switch (item.getState()) {
@@ -97,12 +99,12 @@ export class ItemOnGroundManager {
 
         // We didn't need to modify a previous item.
         // Simply register the given item to the world..
-        World.getItems().add(item);
+        World.getItems().push(item);
         ItemOnGroundManager.perform(item, OperationType.CREATE);
     }
 
     public static merge(item: ItemOnGround): boolean {
-        let iterator = World.getItems().iterator();
+        let iterator = World.getItems().values();
         for (let item_ of iterator) {
             if (item_ == null || item_.isPendingRemoval() || item_ === item) {
                 continue;
@@ -166,7 +168,7 @@ export class ItemOnGroundManager {
     }
 
     public static getGroundItem(owner: string | null, id: number, position: Location): ItemOnGround | null {
-        let iterator = World.getItems().iterator();
+        let iterator = World.getItems().values();
         for (let item of iterator) {
             if (item == null || item.isPendingRemoval()) {
                 continue;

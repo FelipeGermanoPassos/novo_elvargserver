@@ -26,7 +26,7 @@ export class SpawnPermanentNPCCommand implements Command {
         }
     
         let npc = NPC.create(parseInt(parts[1]), player.getLocation().clone());
-        World.getAddNPCQueue().add(npc);
+        World.getAddNPCQueue().push(npc);
         if (player.getPrivateArea() != null) {
             player.getPrivateArea().add(npc);
         }

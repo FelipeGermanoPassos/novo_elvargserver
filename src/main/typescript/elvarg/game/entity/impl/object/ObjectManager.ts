@@ -30,10 +30,10 @@ export class ObjectManager {
         }
     }
     public static deregister(object: GameObject, playerUpdate: boolean) {
-        World.getObjects().removeIf(o => o.equals(object));
+        World.getObjects().filter(o => o.equals(object));
         ObjectManager.perform(object, OperationType.DESPAWN);
 
-        World.getRemovedObjects().add(object);
+        World.getRemovedObjects().push(object);
     }
 
     /**

@@ -1,8 +1,9 @@
-import { ScheduledExecutorService, ScheduledThreadPoolExecutor, Executors, CallerRunsPolicy } from 'java.util.concurrent';
 import { TimeUnit } from 'timeunit'
+import schedule from 'node-schedule';
+
 
 export class GameLogic {
-    private static logicService: ScheduledExecutorService = GameLogic.createLogicService();
+    private static logicService: schedule = GameLogic.createLogicService();
 
     public static async submit(t: () => void) {
         try {
@@ -12,11 +13,11 @@ export class GameLogic {
         }
     }
 
-    private static createLogicService(): ScheduledExecutorService {
-        const executor = new ScheduledThreadPoolExecutor(1);
-        executor.setRejectedExecutionHandler(new CallerRunsPolicy());
+    private static createLogicService(): schedule {
+        const executor = new schedule(1);
+        executor.setRejectedExecutionHandler(new schedule());
         executor.setKeepAliveTime(45, TimeUnit.SECONDS);
         executor.allowCoreThreadTimeOut(true);
-        return Executors.unconfigurableScheduledExecutorService(executor);
+        return schedule.unconfigurableScheduledExecutorService(executor);
     }
 }

@@ -56,7 +56,7 @@ export class Vetion extends NPC {
             const hellhound = NPC.create(hellhoundId, this.getLocation()) as VetionHellhound;
             hellhound.setVetion(this);
             this.hellhounds.push(hellhound);
-            World.getAddNPCQueue().add(hellhound);
+            World.getAddNPCQueue().push(hellhound);
         }
     }
 
@@ -65,7 +65,7 @@ export class Vetion extends NPC {
     }
     public appendDeath() {
         for (const npc of this.hellhounds) {
-            World.getRemoveNPCQueue().add(npc);
+            World.getRemoveNPCQueue().push(npc);
         }
         this.hellhounds = [];
         this.spawnedHellhounds = false;

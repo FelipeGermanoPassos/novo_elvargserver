@@ -232,7 +232,7 @@ export class PestControl implements Minigame {
         }
         this.area.add(npc);
         this.spawned_npcs.push(npc);
-        World.getAddNPCQueue().add(npc);
+        World.getAddNPCQueue().push(npc);
     }
 
     public static spawnPortal(id: number, pos: Location): void {
@@ -242,7 +242,7 @@ export class PestControl implements Minigame {
         npc.getDefinition().setMaxHitpoints(hitPoints);
         this.area.add(npc);
         this.spawned_npcs.push(npc);
-        World.getAddNPCQueue().add(npc);
+        World.getAddNPCQueue().push(npc);
     }
     
     public static isPortalsDead(): boolean {
