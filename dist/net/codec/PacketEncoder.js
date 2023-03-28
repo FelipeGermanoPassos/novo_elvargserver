@@ -1,29 +1,10 @@
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PacketEncoder = void 0;
-var ws_1 = require("ws");
-var ws_2 = require("ws");
 var PacketType_1 = require("../packet/PacketType");
-var PacketEncoder = /** @class */ (function (_super) {
-    __extends(PacketEncoder, _super);
+var PacketEncoder = /** @class */ (function () {
     function PacketEncoder(encoder) {
-        var _this = _super.call(this) || this;
-        _this.CLIENTS_PACKET_SIZES = [
+        this.CLIENTS_PACKET_SIZES = [
             0, 0, 0, 1, 6, 0, 0, 0, 4, 4,
             6, 2, -1, 1, 1, -1, 1, 0, 0, 0,
             0, 0, 0, 0, 1, 0, 0, -1, 1, 1,
@@ -51,33 +32,32 @@ var PacketEncoder = /** @class */ (function (_super) {
             2, -2, 0, 0, -1, 0, 6, 0, 4, 3,
             -1, 0, -1, -1, 6, 0, 0 //250
         ];
-        _this.encoder = encoder;
-        _this.CLIENT_PACKET_SIZES = [];
-        return _this;
+        this.encoder = encoder;
+        this.CLIENT_PACKET_SIZES = [];
     }
-    PacketEncoder.prototype.encode = function (ctx, packet, out) {
-        var opcode = (packet.getOpcode() + this.encoder.nextInt()) & 0xFF;
+    PacketEncoder.prototype.encode = function (packet) {
+        var opcode = (packet.getOpcode() + this.encoder.nextInt()) & 0xff;
         var type = packet.getType();
         var size = packet.getSize();
         if (type === PacketType_1.PacketType.FIXED) {
             var currSize = this.CLIENT_PACKET_SIZES[packet.getOpcode()];
             if (size !== currSize) {
                 console.error("{PacketEncoder} Opcode ".concat(packet.getOpcode(), " has defined size ").concat(currSize, " but is actually ").concat(size, "."));
-                return;
+                return null;
             }
         }
         else if (type === PacketType_1.PacketType.VARIABLE) {
             var currSize = this.CLIENT_PACKET_SIZES[packet.getOpcode()];
             if (currSize !== -1) {
                 console.error("{PacketEncoder} Opcode ".concat(packet.getOpcode(), "'s size needs to be -1, it's currently ").concat(currSize, "."));
-                return;
+                return null;
             }
         }
         else if (type === PacketType_1.PacketType.VARIABLE_SHORT) {
             var currSize = this.CLIENT_PACKET_SIZES[packet.getOpcode()];
             if (currSize !== -2) {
                 console.error("{PacketEncoder} Opcode ".concat(packet.getOpcode(), "'s size needs to be -2, it's currently ").concat(currSize, "."));
-                return;
+                return null;
             }
         }
         var finalSize = size + 1;
@@ -97,24 +77,23 @@ var PacketEncoder = /** @class */ (function (_super) {
             default:
                 break;
         }
-        var buffer = ws_1.Unpooled.buffer(finalSize);
-        buffer.writeByte(opcode);
+        var buffer = Buffer.allocUnsafe(finalSize);
+        buffer.writeUInt8(opcode);
         switch (type) {
             case PacketType_1.PacketType.VARIABLE:
-                buffer.writeByte(size);
+                buffer.writeUInt8(size, 1);
                 break;
             case PacketType_1.PacketType.VARIABLE_SHORT:
-                buffer.writeShort(size);
+                buffer.writeUInt16BE(size, 1);
                 break;
             default:
                 break;
         }
         // Write packet
-        buffer.writeBytes(packet.getBuffer());
-        // Write the packet to the out buffer
-        out.writeBytes(buffer);
+        buffer.set(packet.getBuffer(), finalSize - size - 1);
+        return buffer;
     };
     return PacketEncoder;
-}(ws_2.MessageToByteEncoder));
+}());
 exports.PacketEncoder = PacketEncoder;
 //# sourceMappingURL=PacketEncoder.js.map

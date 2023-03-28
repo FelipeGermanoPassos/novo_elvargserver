@@ -37,6 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BufferedConnection = void 0;
+var io = require("socket.io-client");
 var async_mutex_1 = require("async-mutex");
 var BufferedConnection = /** @class */ (function () {
     function BufferedConnection(socket1) {
@@ -44,10 +45,10 @@ var BufferedConnection = /** @class */ (function () {
         this.isWriter = false;
         this.hasIOError = false;
         this.socket = socket1;
-        this.socket.setTimeout(30000);
-        this.socket.setNoDelay(true);
-        this.inputStream = this.socket.getInputStream();
-        this.outputStream = this.socket.getOutputStream();
+        this.socket.timeout(30000);
+        var socket = io.io('http://localhost:3000', {
+            transports: ['websocket']
+        });
     }
     BufferedConnection.prototype.close = function () {
         closed = true;

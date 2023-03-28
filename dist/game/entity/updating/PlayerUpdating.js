@@ -85,10 +85,10 @@ var PlayerUpdating = exports.PlayerUpdating = /** @class */ (function () {
             }
             finally { if (e_2) throw e_2.error; }
         }
-        if (update.buffer().writerIndex > 0) {
+        if (update.buffer().length > 0) {
             packet.putBits(11, 2047);
             packet.initializeAccess(PacketBuilder_1.AccessType.BYTE);
-            packet.putBytes(update.buffer());
+            packet.putBytes(update.getBuffer());
         }
         else {
             packet.initializeAccess(PacketBuilder_1.AccessType.BYTE);
@@ -479,8 +479,8 @@ var PlayerUpdating = exports.PlayerUpdating = /** @class */ (function () {
         properties.put(target.getSkillManager().getCombatLevel());
         properties.put(target.getRights().getSpriteId());
         properties.putString(target.getLoyaltyTitle());
-        out.puts(properties.buffer().writerIndex(), PacketBuilder_1.ValueType.C);
-        out.putBytes(properties.buffer());
+        out.puts(properties.getBuffer().length, PacketBuilder_1.ValueType.C);
+        out.putBytes(properties.getBuffer());
     };
     PlayerUpdating.MAX_NEW_PLAYERS_PER_CYCLE = 25;
     return PlayerUpdating;

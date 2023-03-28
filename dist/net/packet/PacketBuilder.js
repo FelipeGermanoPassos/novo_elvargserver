@@ -12,7 +12,6 @@ var __values = (this && this.__values) || function(o) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PacketBuilder = exports.AccessType = exports.ValueType = void 0;
-var ws_1 = require("ws");
 var PacketType_1 = require("./PacketType");
 var ByteOrder_1 = require("./ByteOrder");
 var Packet_1 = require("./Packet");
@@ -30,7 +29,8 @@ var AccessType;
 })(AccessType = exports.AccessType || (exports.AccessType = {}));
 var PacketBuilder = exports.PacketBuilder = /** @class */ (function () {
     function PacketBuilder(opcodeOrType, type) {
-        this.buffers = ws_1.Unpooled.buffer();
+        this.buffers = Buffer.alloc(10);
+        this._buffer = Buffer.from('my string', 'utf-8');
         if (typeof opcodeOrType === 'number') {
             this.opcode = opcodeOrType;
             this.type = type !== null && type !== void 0 ? type : PacketType_1.PacketType.FIXED;
@@ -41,11 +41,11 @@ var PacketBuilder = exports.PacketBuilder = /** @class */ (function () {
         }
     }
     PacketBuilder.prototype.writeBuffer = function (buffer) {
-        this.buffers.writeBytes(buffer);
+        this.buffers.write(buffer);
         return this;
     };
-    PacketBuilder.prototype.writePutBytes = function (from, size) {
-        this.buffers.writeBytes(from, 0, size);
+    PacketBuilder.prototype.writePutBytes = function (buffer) {
+        this.buffers.write(buffer);
         return this;
     };
     PacketBuilder.prototype.putBytesReverse = function (data) {
@@ -55,16 +55,14 @@ var PacketBuilder = exports.PacketBuilder = /** @class */ (function () {
         return this;
     };
     PacketBuilder.prototype.writeByteArray = function (bytes) {
-        this.buffers.writeBytes(bytes);
+        this.buffers.write(bytes);
         return this;
     };
     PacketBuilder.prototype.writePutBits = function (numBits, value) {
-        if (!this.buffers.hasArray()) {
+        if (!this.buffers.buffer) {
             throw new Error("The ByteBuf implementation must support array() for bit usage.");
         }
-        var bytes = Math.ceil(numBits / 8) + 1;
-        this.buffers.ensureWritable((this.bitPosition + 7) / 8 + bytes);
-        var buffer = this.buffers.array();
+        var buffer = this.buffers.buffer;
         var bytePos = this.bitPosition >> 3;
         var bitOffset = 8 - (this.bitPosition & 7);
         this.bitPosition += numBits;
@@ -90,10 +88,10 @@ var PacketBuilder = exports.PacketBuilder = /** @class */ (function () {
     PacketBuilder.prototype.initializesAccess = function (type) {
         switch (type) {
             case AccessType.BIT:
-                this.bitPosition = this.buffers.writerIndex() * 8;
+                this.bitPosition = this.buffers.length * 8;
                 break;
             case AccessType.BYTE:
-                this.buffers.writerIndex((this.bitPosition + 7) / 8);
+                this.buffers.writeUInt32BE((this.bitPosition + 7) / 8);
                 break;
         }
         return this;
@@ -162,30 +160,28 @@ var PacketBuilder = exports.PacketBuilder = /** @class */ (function () {
         return this;
     };
     PacketBuilder.prototype.putBytes = function (from) {
-        for (var i = 0; i < from.writerIndex(); i++) {
-            this.put(from.getByte(i));
+        for (var i = 0; i < from.length; i++) {
+            this.put(from.readInt8(i));
         }
         return this;
     };
     PacketBuilder.prototype.putsBytes = function (from) {
-        this.buffers.writeBytes(from);
+        this.buffers.write(from);
         return this;
     };
     PacketBuilder.prototype.writeByteArrays = function (bytes, offset, length) {
-        this.buffers.writeBytes(bytes, offset, length);
+        this.buffers.write(bytes, offset, length);
         return this;
     };
     PacketBuilder.prototype.writeBytesArray = function (bytes) {
-        this.buffers.writeBytes(bytes);
+        this.buffers.write(bytes);
         return this;
     };
     PacketBuilder.prototype.putBits = function (numBits, value) {
-        if (!this.buffers.hasArray()) {
+        if (!this.buffers.buffer) {
             throw new Error("The ByteBuf implementation must support array() for bit usage.");
         }
-        var bytes = Math.ceil((numBits / 8)) + 1;
-        this.buffers.ensureWritable((this.bitPosition + 7) / 8 + bytes);
-        var buffer = this.buffers.array();
+        var buffer = this.buffers.buffer;
         var bytePos = this.bitPosition >> 3;
         var bitOffset = 8 - (this.bitPosition & 7);
         this.bitPosition += numBits;
@@ -208,10 +204,10 @@ var PacketBuilder = exports.PacketBuilder = /** @class */ (function () {
     PacketBuilder.prototype.initializeAccess = function (type) {
         switch (type) {
             case AccessType.BIT:
-                this.bitPosition = this.buffers.writerIndex() * 8;
+                this.bitPosition = this.buffers.length * 8;
                 break;
             case AccessType.BYTE:
-                this.buffers.writerIndex((this.bitPosition + 7) / 8);
+                this.buffers.writeUInt32BE((this.bitPosition + 7) / 8);
                 break;
         }
         return this;
@@ -234,7 +230,7 @@ var PacketBuilder = exports.PacketBuilder = /** @class */ (function () {
             case ValueType.STANDARD:
                 break;
         }
-        this.buffers.writeByte(value);
+        this.buffers.writeUInt8(value);
         return this;
     };
     PacketBuilder.prototype.putShort = function (value, type, order) {
@@ -413,7 +409,7 @@ var PacketBuilder = exports.PacketBuilder = /** @class */ (function () {
      * @return the packets size.
      */
     PacketBuilder.prototype.getSize = function () {
-        return this.buffers.readableBytes();
+        return this.buffers.length;
     };
     /**
      * Gets the backing byte buffer used to read and write data.
@@ -423,13 +419,16 @@ var PacketBuilder = exports.PacketBuilder = /** @class */ (function () {
     PacketBuilder.prototype.buffer = function () {
         return this.buffer;
     };
+    PacketBuilder.prototype.getBuffer = function () {
+        return this._buffer;
+    };
     /**
      * Creates the actual packet from this builder
      *
      * @return
      */
     PacketBuilder.prototype.toPacket = function () {
-        return new Packet_1.Packet(this.opcode, this.type, this.buffer);
+        return new Packet_1.Packet(this.opcode, this.type, this.buffers);
     };
     PacketBuilder.prototype.getType = function () {
         return this.type;

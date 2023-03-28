@@ -54,6 +54,9 @@ var World = exports.World = /** @class */ (function () {
         this.addNPCQueue = new Array();
         this.removeNPCQueue = new Array();
     }
+    World.getPlayerById = function (id) {
+        return this.playerArray.find(function (player) { return player.id === id; });
+    };
     World.getPlayerByName = function (username) {
         return this.players.search(function (p) { return p !== null && p.getUsername() === Misc_1.Misc.formatText(username); });
     };
@@ -264,6 +267,7 @@ var World = exports.World = /** @class */ (function () {
     World.playerBots = new Map();
     World.npcs = new MobileList_1.MobileList(5000);
     World.items = [];
+    World.playerArray = [];
     /**
      * The collection of active {@link GameObject}s..
      */

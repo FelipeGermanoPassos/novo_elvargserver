@@ -37,8 +37,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameLogic = void 0;
-var ws_1 = require("ws");
 var timeunit_1 = require("timeunit");
+var node_schedule_1 = require("node-schedule");
 var GameLogic = exports.GameLogic = /** @class */ (function () {
     function GameLogic() {
     }
@@ -63,11 +63,11 @@ var GameLogic = exports.GameLogic = /** @class */ (function () {
         });
     };
     GameLogic.createLogicService = function () {
-        var executor = new ws_1.ScheduledThreadPoolExecutor(1);
-        executor.setRejectedExecutionHandler(new ws_1.CallerRunsPolicy());
+        var executor = new node_schedule_1.default(1);
+        executor.setRejectedExecutionHandler(new node_schedule_1.default());
         executor.setKeepAliveTime(45, timeunit_1.TimeUnit.SECONDS);
         executor.allowCoreThreadTimeOut(true);
-        return ws_1.Executors.unconfigurableScheduledExecutorService(executor);
+        return node_schedule_1.default.unconfigurableScheduledExecutorService(executor);
     };
     GameLogic.logicService = GameLogic.createLogicService();
     return GameLogic;

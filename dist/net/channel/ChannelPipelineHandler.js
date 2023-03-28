@@ -42,7 +42,7 @@ var ChannelFilter_1 = require("./ChannelFilter");
 var ChannelEventHandler_1 = require("./ChannelEventHandler");
 var LoginDecoder_1 = require("../codec/LoginDecoder");
 var LoginEncoder_1 = require("../codec/LoginEncoder");
-var websocket = require("ws");
+var io = require("socket.io");
 var NetworkConstants_1 = require("../NetworkConstants");
 /**
 
@@ -54,12 +54,13 @@ var ChannelPipelineHandler = /** @class */ (function () {
         The part of the pipeline that limits connections and checks for any banned hosts.
         */
         this.FILTER = new ChannelFilter_1.ChannelFilter();
+        this.socketServer = new io(); // Criar um objeto socket.Server
         /**
         
         The part of the pipeline that handles exceptions caught, channels being read, inactive
         channels, and channel-triggered events.
         */
-        this.HANDLER = new ChannelEventHandler_1.ChannelEventHandler(websocket);
+        this.HANDLER = new ChannelEventHandler_1.ChannelEventHandler(this.socketServer);
     }
     ChannelPipelineHandler.prototype.initChannel = function (channel) {
         return __awaiter(this, void 0, void 0, function () {
@@ -70,7 +71,7 @@ var ChannelPipelineHandler = /** @class */ (function () {
                 pipeline.addLast("channel-filter", this.FILTER);
                 pipeline.addLast("decoder", new LoginDecoder_1.LoginDecoder());
                 pipeline.addLast("encoder", new LoginEncoder_1.LoginEncoder());
-                pipeline.addLast("timeout", new websocket.IdleStateHandler(NetworkConstants_1.NetworkConstants.SESSION_TIMEOUT, 0, 0));
+                pipeline.addLast("timeout", new io.Server({ pingTimeout: NetworkConstants_1.NetworkConstants.SESSION_TIMEOUT }));
                 pipeline.addLast("channel-handler", this.HANDLER);
                 return [2 /*return*/];
             });

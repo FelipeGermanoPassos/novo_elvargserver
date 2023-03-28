@@ -52,10 +52,10 @@ export class PlayerUpdating {
             playersAdded++;
         }
 
-        if (update.buffer().writerIndex > 0) {
+        if (update.buffer().length > 0) {
             packet.putBits(11, 2047);
             packet.initializeAccess(AccessType.BYTE);
-            packet.putBytes(update.buffer());
+            packet.putBytes(update.getBuffer());
         } else {
             packet.initializeAccess(AccessType.BYTE);
         }
@@ -446,7 +446,7 @@ export class PlayerUpdating {
         properties.put(target.getRights().getSpriteId());
         properties.putString(target.getLoyaltyTitle());
 
-        out.puts(properties.buffer().writerIndex(), ValueType.C);
-        out.putBytes(properties.buffer());
+        out.puts(properties.getBuffer().length, ValueType.C);
+        out.putBytes(properties.getBuffer());
     }
 }

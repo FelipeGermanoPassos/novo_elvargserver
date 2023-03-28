@@ -1,54 +1,42 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChannelEventHandler = void 0;
-var NetworkConstants_1 = require("../NetworkConstants");
 var World_1 = require("../../game/World");
 var ChannelEventHandler = /** @class */ (function () {
-    function ChannelEventHandler(socket) {
-        this.socket = socket;
-        this.socket.on('message', this.onMessage.bind(this));
-        this.socket.on('close', this.onClose.bind(this));
-        this.socket.on('error', this.onError.bind(this));
+    function ChannelEventHandler(sckt) {
+        this.io = sckt;
     }
-    ChannelEventHandler.prototype.onMessage = function (data) {
-        try {
-            var session = this.socket[NetworkConstants_1.NetworkConstants.SESSION_KEY];
-            if (!session) {
-                return;
-            }
-            if (typeof data === 'string') {
-                // Handle string messages
-            }
-            else {
-                // Handle binary messages
-            }
-        }
-        catch (e) {
-            console.error(e);
-        }
-    };
-    ChannelEventHandler.prototype.onClose = function () {
-        var session = this.socket[NetworkConstants_1.NetworkConstants.SESSION_KEY];
-        if (!session || !session.getPlayer()) {
+    ChannelEventHandler.prototype.channelInactive = function (playerId) {
+        var player = World_1.World.getPlayerById(playerId);
+        if (!player || !player.isRegistered() || World_1.World.getRemovePlayerQueue().includes(player)) {
             return;
         }
-        var player = session.getPlayer();
-        if (player.isRegistered()) {
-            if (!World_1.World.getRemovePlayerQueue().includes(player)) {
-                // Close all open interfaces..
-                if (player.busy()) {
-                    player.getPacketSender().sendInterfaceRemoval();
-                }
-                // After 60 seconds, force a logout.
-                player.getForcedLogoutTimer().start(60);
-                // Add player to logout queue.
-                World_1.World.getRemovePlayerQueue().push(player);
-            }
+        // Close all open interfaces..
+        if (player.busy()) {
+            player.getPacketSender().sendInterfaceRemoval();
+        }
+        // After 60 seconds, force a logout.
+        player.getForcedLogoutTimer().start(60);
+        // Add player to logout queue.
+        World_1.World.getRemovePlayerQueue().push(player);
+        // Enviar uma mensagem para o cliente usando o socket.io
+        var client = this.io.sockets.sockets.get(player.id.toString());
+        if (client) {
+            client.emit('canalInativo', { player: player.name });
         }
     };
-    ChannelEventHandler.prototype.onError = function (error) {
-        console.error(error);
-        this.socket.close();
+    ChannelEventHandler.prototype.exceptionCaught = function (playerId, t) {
+        if (!(t instanceof Error)) {
+            console.log(t);
+        }
+        var player = World_1.World.getPlayerById(playerId);
+        if (player) {
+            // Enviar uma mensagem para o cliente usando o socket.io
+            var client = this.io.sockets.sockets.get(player.id.toString());
+            if (client) {
+                client.emit('excecaoCapturada', { message: t.message });
+            }
+        }
     };
     return ChannelEventHandler;
 }());

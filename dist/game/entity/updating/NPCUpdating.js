@@ -91,10 +91,10 @@ var NPCUpdating = /** @class */ (function () {
             }
             finally { if (e_2) throw e_2.error; }
         }
-        if (update.buffer().writerIndex() > 0) {
+        if (update.getBuffer().length > 0) {
             packet.putBits(14, 16383);
             packet.initializeAccess(PacketBuilder_1.AccessType.BYTE);
-            packet.writeBuffer(update.buffer());
+            packet.writeBuffer(update.getBuffer().toString());
         }
         else {
             packet.initializeAccess(PacketBuilder_1.AccessType.BYTE);

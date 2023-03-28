@@ -1,27 +1,28 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NetworkBuilder = void 0;
-var ws_1 = require("ws");
-var ws_2 = require("ws");
-var ws_3 = require("ws");
-var ws_4 = require("ws");
-var ws_5 = require("ws");
+var socket_io_1 = require("socket.io");
+var http_1 = require("http");
 var ChannelPipelineHandler_1 = require("../net/channel/ChannelPipelineHandler");
 var NetworkBuilder = /** @class */ (function () {
     function NetworkBuilder() {
-        this.bootstrap = new ws_1.ServerBootstrap();
-        this.loopGroup = new ws_2.NioEventLoopGroup();
+        var _this = this;
         this.channelInitializer = new ChannelPipelineHandler_1.ChannelPipelineHandler();
+        var httpServer = (0, http_1.createServer)();
+        this.io = new socket_io_1.Server(httpServer, {
+        /* opções do servidor */
+        });
+        this.io.on("connection", function (socket) {
+            _this.channelInitializer.initChannel(socket);
+        });
     }
     NetworkBuilder.prototype.initialize = function (port) {
-        ws_4.ResourceLeakDetector.setLevel(ws_5.Level.DISABLED);
-        this.bootstrap.group(this.loopGroup);
-        this.bootstrap.channel(ws_3.NioServerSocketChannel);
-        this.bootstrap.childHandler(this.channelInitializer);
-        this.bootstrap.bind(port).syncUninterruptibly();
+        var httpServer = (0, http_1.createServer)();
+        httpServer.listen(port, function () {
+            console.log("Servidor iniciado na porta ".concat(port));
+        });
     };
     return NetworkBuilder;
 }());
 exports.NetworkBuilder = NetworkBuilder;
-//TODO: Trocar Netty pelo socket.io
 //# sourceMappingURL=NetworkBuilder.js.map

@@ -23,15 +23,15 @@ var Packet = /** @class */ (function () {
         return this.buffer;
     };
     Packet.prototype.getSize = function () {
-        return this.buffer.readableBytes();
+        return this.buffer.length;
     };
     Packet.prototype.getLength = function () {
-        return this.buffer.capacity();
+        return this.buffer.length;
     };
     Packet.prototype.readByte = function () {
         var b = 0;
         try {
-            b = this.buffer.readByte();
+            b = this.buffer.readUInt8();
         }
         catch (e) {
         }
@@ -78,10 +78,10 @@ var Packet = /** @class */ (function () {
         return bytes;
     };
     Packet.prototype.readUnsignedByte = function () {
-        return this.buffer.readUnsignedByte();
+        return this.buffer.readUInt8();
     };
     Packet.prototype.readShort = function () {
-        return this.buffer.readShort();
+        return this.buffer.readUInt8();
     };
     Packet.prototype.readShortA = function () {
         var value = ((this.readByte() & 0xFF) << 8) | (this.readByte() - 128 & 0xFF);
@@ -97,7 +97,7 @@ var Packet = /** @class */ (function () {
         return value > 32767 ? value - 0x10000 : value;
     };
     Packet.prototype.readUnsignedShort = function () {
-        return this.buffer.readUnsignedShort();
+        return this.buffer.readUInt8();
     };
     Packet.prototype.readUnsignedShortA = function () {
         var value = 0;
@@ -106,7 +106,7 @@ var Packet = /** @class */ (function () {
         return value;
     };
     Packet.prototype.readInt = function () {
-        return this.buffer.readInt();
+        return this.buffer.readUInt8();
     };
     Packet.prototype.readSingleInt = function () {
         var firstByte = this.readByte(), secondByte = this.readByte(), thirdByte = this.readByte(), fourthByte = this.readByte();
@@ -120,13 +120,13 @@ var Packet = /** @class */ (function () {
         return ((this.readByte() << 16) & 0xFF) | ((this.readByte() << 8) & 0xFF) | (this.readByte() & 0xFF);
     };
     Packet.prototype.readLong = function () {
-        return this.buffer.readLong();
+        return this.buffer.readUInt8();
     };
     Packet.prototype.getBytesReverse = function (amount, type) {
         var data = new Array(amount);
         var dataPosition = 0;
-        for (var i = this.buffer.writerIndex() + amount - 1; i >= this.buffer.writerIndex(); i--) {
-            var value = this.buffer.getByte(i);
+        for (var i = this.buffer.length + amount - 1; i >= this.buffer.length; i--) {
+            var value = this.buffer.readInt8(i);
             switch (type) {
                 case ValueType_1.ValueType.A:
                     value -= 128;
@@ -147,16 +147,16 @@ var Packet = /** @class */ (function () {
     Packet.prototype.readString = function () {
         var builder = new stringbuilder_1.StringBuilder();
         var value;
-        while (this.buffer.isReadable() && (value = this.buffer.readByte()) != 10) {
+        while (this.buffer.readUInt8() && (value = this.buffer.readInt8()) != 10) {
             builder.append(String.fromCharCode(value));
         }
         return builder.toString();
     };
     Packet.prototype.readSmart = function () {
-        return this.buffer.getByte(this.buffer.readerIndex()) < 128 ? this.readByte() & 0xFF : (this.readShort() & 0xFFFF) - 32768;
+        return this.buffer.readInt8(this.buffer.readInt8()) < 128 ? this.readByte() & 0xFF : (this.readShort() & 0xFFFF) - 32768;
     };
     Packet.prototype.readSignedSmart = function () {
-        return this.buffer.getByte(this.buffer.readerIndex()) < 128 ? (this.readByte() & 0xFF) - 64 : (this.readShort() & 0xFFFF) - 49152;
+        return this.buffer.readInt8(this.buffer.readInt8()) < 128 ? (this.readByte() & 0xFF) - 64 : (this.readShort() & 0xFFFF) - 49152;
     };
     Packet.prototype.toString = function () {
         return "Packet - [opcode, size] : [".concat(this.getOpcode(), ", ").concat(this.getSize(), "]");

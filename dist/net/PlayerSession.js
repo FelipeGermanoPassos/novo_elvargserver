@@ -40,7 +40,6 @@ exports.PlayerSession = void 0;
 var Player_1 = require("../game/entity/impl/player/Player");
 var World_1 = require("../game/World");
 var PacketDecoder_1 = require("./codec/PacketDecoder");
-var PacketEncoder_1 = require("./codec/PacketEncoder");
 var LoginResponsePacket_1 = require("./login/LoginResponsePacket");
 var LoginResponses_1 = require("./login/LoginResponses");
 var PacketConstants_1 = require("./packet/PacketConstants");
@@ -56,6 +55,7 @@ var PlayerSession = /** @class */ (function () {
     PlayerSession.prototype.finalizeLogin = function (msg) {
         return __awaiter(this, void 0, void 0, function () {
             var response;
+            var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, LoginResponses_1.LoginResponses.evaluate(this.player, msg)];
@@ -68,8 +68,12 @@ var PlayerSession = /** @class */ (function () {
                             return [2 /*return*/];
                         }
                         // Replace decoder/encoder to packets
-                        this.channel.pipeline().replace("encoder", "encoder", new PacketEncoder_1.PacketEncoder(msg.getEncryptor()));
-                        this.channel.pipeline().replace("decoder", "decoder", new PacketDecoder_1.PacketDecoder(msg.getDecryptor()));
+                        this.channel.removeAllListeners("packet");
+                        this.channel.on("packet", function (data) {
+                            var packetDecoder = new PacketDecoder_1.PacketDecoder(msg.getDecryptor());
+                            var packet = packetDecoder.onConnection(data);
+                            _this.queuePacket(packet);
+                        });
                         // Queue the login
                         if (!World_1.World.getAddPlayerQueue().includes(this.player)) {
                             World_1.World.getAddPlayerQueue().push(this.player);
@@ -112,7 +116,7 @@ var PlayerSession = /** @class */ (function () {
                 console.error(e);
             }
             finally {
-                packet.getBuffer().release();
+                packet.getBuffer();
             }
         }
     };

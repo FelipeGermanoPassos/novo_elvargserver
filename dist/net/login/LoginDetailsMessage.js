@@ -2,18 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LoginDetailsMessage = void 0;
 var LoginDetailsMessage = /** @class */ (function () {
-    function LoginDetailsMessage(context, username, password, host, encryptor, decryptor) {
+    function LoginDetailsMessage(username, password, host, encryptor, decryptor) {
         this.isDiscord = false;
-        this.context = context;
         this.username = username;
         this.password = password;
         this.host = host;
         this.encryptor = encryptor;
         this.decryptor = decryptor;
     }
-    LoginDetailsMessage.prototype.getContext = function () {
-        return this.context;
-    };
     LoginDetailsMessage.prototype.getUsername = function () {
         return this.username;
     };

@@ -6,7 +6,7 @@ var ByteBuffer_1 = require("../flood/ByteBuffer");
 var BufferedConnection_1 = require("../flood/BufferedConnection");
 var IsaacRandom_1 = require("../../net/security/IsaacRandom");
 var NetworkConstants_1 = require("../../net/NetworkConstants");
-var net = require("net");
+var socket_io_client_1 = require("socket.io-client");
 var GameConstants_1 = require("../../game/GameConstants");
 var LoginResponses_1 = require("../../net/login/LoginResponses");
 var Server_1 = require("../../Server");
@@ -17,10 +17,14 @@ var Client = /** @class */ (function () {
         this.password = password;
     }
     Client.prototype.openSocket = function (port) {
-        return net.createConnection({
-            host: 'localhost',
-            port: port
+        var socket = (0, socket_io_client_1.default)("http://localhost:".concat(port));
+        socket.on('connect', function () {
+            console.log('Conectado ao servidor');
         });
+        socket.on('disconnect', function () {
+            console.log('Desconectado do servidor');
+        });
+        return socket;
     };
     Client.prototype.attemptLogin = function () {
         this.login = Buffer_1.Buffer.create();

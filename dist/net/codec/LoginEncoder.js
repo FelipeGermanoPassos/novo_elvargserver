@@ -1,39 +1,25 @@
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LoginEncoder = void 0;
-var ws_1 = require("ws");
+var socket_io_1 = require("socket.io");
 var LoginResponses_1 = require("../login/LoginResponses");
 /**
 Encodes login.
 @author Swiffy
 */
-var LoginEncoder = /** @class */ (function (_super) {
-    __extends(LoginEncoder, _super);
+var io = new socket_io_1.Server();
+var LoginEncoder = /** @class */ (function () {
     function LoginEncoder() {
-        return _super !== null && _super.apply(this, arguments) || this;
     }
-    LoginEncoder.prototype.encode = function (ctx, msg, out) {
-        out.writeByte(msg.getResponse());
-        if (msg.getResponse() == LoginResponses_1.LoginResponses.LOGIN_SUCCESSFUL) {
-            out.writeByte(msg.getRights());
-        }
+    LoginEncoder.prototype.encode = function (msg) {
+        io.on('connection', function (socket) {
+            socket.emit('message', msg.getResponse());
+            if (msg.getResponse() == LoginResponses_1.LoginResponses.LOGIN_SUCCESSFUL) {
+                socket.emit('message', msg.getRights());
+            }
+        });
     };
     return LoginEncoder;
-}(ws_1.MessageToByteEncoder));
+}());
 exports.LoginEncoder = LoginEncoder;
 //# sourceMappingURL=LoginEncoder.js.map
