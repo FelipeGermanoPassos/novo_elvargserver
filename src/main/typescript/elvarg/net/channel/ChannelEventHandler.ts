@@ -1,45 +1,16 @@
 import WebSocket from 'ws';
-import { NetworkConstants } from '../NetworkConstants';
 import { World } from '../../game/World';
 
 export class ChannelEventHandler {
 
-    private socket: WebSocket;
-
-    constructor(socket: WebSocket) {
-        this.socket = socket;
-        this.socket.on('message', this.onMessage.bind(this));
-        this.socket.on('close', this.onClose.bind(this));
-        this.socket.on('error', this.onError.bind(this));
-    }
-
-    private onMessage(data: WebSocket.Data) {
-        try {
-            const session = this.socket[NetworkConstants.SESSION_KEY];
-
-            if (!session) {
-                return;
-            }
-
-            if (typeof data === 'string') {
-                // Handle string messages
-            } else {
-                // Handle binary messages
-            }
-
-        } catch (e) {
-            console.error(e);
-        }
-    }
-
-    private onClose() {
-        const session = this.socket[NetworkConstants.SESSION_KEY];
+    public channelInactive(ctx: ChannelHandlerContext) {
+        let session = ctx.channel().attr(NetworkConstants.SESSION_KEY).get();
 
         if (!session || !session.getPlayer()) {
             return;
         }
 
-        const player = session.getPlayer();
+        let player = session.getPlayer();
 
         if (player.isRegistered()) {
             if (!World.getRemovePlayerQueue().includes(player)) {
@@ -57,9 +28,13 @@ export class ChannelEventHandler {
         }
     }
 
-    private onError(error: Error) {
-        console.error(error);
-        this.socket.close();
-    }
+    public exceptionCaught(ctx: ChannelHandlerContext, t: Error) {
+        if (!(t instanceof Error)) {
+            console.log(t);
+        }
 
+        try {
+            ctx.channel().close();
+        } catch (e) { }
+    }
 }
