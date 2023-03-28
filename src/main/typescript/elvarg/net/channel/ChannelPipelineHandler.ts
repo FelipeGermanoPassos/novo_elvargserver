@@ -1,4 +1,4 @@
-import { PlayerSession } from "../PlayerSession"; 
+import { PlayerSession } from "../PlayerSession";
 import { ChannelFilter } from "./ChannelFilter";
 import { ChannelEventHandler } from "./ChannelEventHandler";
 import { LoginDecoder } from "../codec/LoginDecoder";
@@ -23,17 +23,17 @@ export class ChannelPipelineHandler {
     The part of the pipeline that handles exceptions caught, channels being read, inactive
     channels, and channel-triggered events.
     */
-    private readonly HANDLER: ChannelEventHandler = new ChannelEventHandler(io);
+    private readonly HANDLER: ChannelEventHandler = new ChannelEventHandler();
     public async initChannel(channel: any): Promise<void> {
         const pipeline = channel.pipeline();
-
 
         channel.attr(NetworkConstants.SESSION_KEY).setIfAbsent(new PlayerSession(channel));
 
         pipeline.addLast("channel-filter", this.FILTER);
         pipeline.addLast("decoder", new LoginDecoder());
         pipeline.addLast("encoder", new LoginEncoder());
-        pipeline.addLast("timeout", new websocket.IdleStateHandler(NetworkConstants.SESSION_TIMEOUT, 0, 0));
+        pipeline.addLast("timeout", new io.Server({ pingTimeout: NetworkConstants.SESSION_TIMEOUT }));
         pipeline.addLast("channel-handler", this.HANDLER);
     }
+
 }
