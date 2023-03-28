@@ -1,4 +1,3 @@
-import { ByteBuf, Unpooled } from 'ws';
 import { PacketType } from './PacketType';
 import { ByteOrder } from './ByteOrder';
 import { Packet } from './Packet';
@@ -23,7 +22,7 @@ export class PacketBuilder {
     private opcode: number;
     private type: PacketType;
     private bitPosition: number;
-    private buffers = Unpooled.buffer();
+    private buffers = Buffer.alloc(10);
     
   constructor(opcodeOrType?: number | PacketType, type?: PacketType) {
     if (typeof opcodeOrType === 'number') {
@@ -35,13 +34,13 @@ export class PacketBuilder {
     }
   }
 
-  public writeBuffer(buffer: ByteBuf): PacketBuilder {
-    this.buffers.writeBytes(buffer);
+  public writeBuffer(buffer: string): PacketBuilder {
+    this.buffers.write(buffer);
     return this;
     }
 
-    public writePutBytes(from: Uint8Array, size: number): PacketBuilder {
-        this.buffers.writeBytes(from, 0, size);
+    public writePutBytes(buffer: string): PacketBuilder {
+        this.buffers.write(buffer);
         return this;
     }
 
@@ -52,20 +51,17 @@ export class PacketBuilder {
         return this;
     }
 
-    public writeByteArray(bytes: Uint8Array): PacketBuilder {
-        this.buffers.writeBytes(bytes);
+    public writeByteArray(bytes: string): PacketBuilder {
+        this.buffers.write(bytes);
         return this;
     }
 
 
     public writePutBits(numBits: number, value: number): PacketBuilder {
-        if (!this.buffers.hasArray()) {
+        if (!this.buffers.buffer) {
             throw new Error("The ByteBuf implementation must support array() for bit usage.");
         }
-        let bytes = Math.ceil(numBits / 8) + 1;
-        this.buffers.ensureWritable((this.bitPosition + 7) / 8 + bytes);
-
-        let buffer = this.buffers.array();
+        let buffer = this.buffers.buffer;
 
         let bytePos = this.bitPosition >> 3;
         let bitOffset = 8 - (this.bitPosition & 7);
@@ -94,10 +90,10 @@ export class PacketBuilder {
     public initializesAccess(type: AccessType) {
         switch (type) {
             case AccessType.BIT:
-                this.bitPosition = this.buffers.writerIndex() * 8;
+                this.bitPosition = this.buffers.length * 8;
                 break;
             case AccessType.BYTE:
-                this.buffers.writerIndex((this.bitPosition + 7) / 8);
+                this.buffers.writeUInt32BE((this.bitPosition + 7) / 8);
                 break;
         }
         return this;
@@ -168,37 +164,33 @@ export class PacketBuilder {
         return this;
     }
 
-    putBytes(from: ByteBuf): PacketBuilder {
-        for (let i = 0; i < from.writerIndex(); i++) {
-            this.put(from.getByte(i));
+    putBytes(from: Buffer): PacketBuilder {
+        for (let i = 0; i < from.length; i++) {
+            this.put(from.readInt8(i));
         }
         return this;
     }
 
-    public putsBytes(from: Uint8Array): PacketBuilder {
-        this.buffers.writeBytes(from);
+    public putsBytes(from: string): PacketBuilder {
+        this.buffers.write(from);
         return this;
     }
 
-    public writeByteArrays(bytes: Uint8Array, offset: number, length: number): PacketBuilder {
-        this.buffers.writeBytes(bytes, offset, length);
+    public writeByteArrays(bytes: string, offset: number, length: number): PacketBuilder {
+        this.buffers.write(bytes, offset, length);
         return this;
     }
 
-    public writeBytesArray(bytes: number[]): PacketBuilder {
-        this.buffers.writeBytes(bytes);
+    public writeBytesArray(bytes: string): PacketBuilder {
+        this.buffers.write(bytes);
         return this;
     }
 
     public putBits(numBits: number, value: number): PacketBuilder {
-        if (!this.buffers.hasArray()) {
+        if (!this.buffers.buffer) {
             throw new Error("The ByteBuf implementation must support array() for bit usage.");
         }
-
-        let bytes: number = Math.ceil((numBits / 8)) + 1;
-        this.buffers.ensureWritable((this.bitPosition + 7) / 8 + bytes);
-
-        let buffer: number[] = this.buffers.array();
+       let buffer = this.buffers.buffer;
 
         let bytePos: number = this.bitPosition >> 3;
         let bitOffset: number = 8 - (this.bitPosition & 7);
@@ -224,10 +216,10 @@ export class PacketBuilder {
     public initializeAccess(type: AccessType) {
         switch (type) {
             case AccessType.BIT:
-                this.bitPosition = this.buffers.writerIndex() * 8;
+                this.bitPosition = this.buffers.length * 8;
                 break;
             case AccessType.BYTE:
-                this.buffers.writerIndex((this.bitPosition + 7) / 8);
+                this.buffers.writeUInt32BE((this.bitPosition + 7) / 8);
                 break;
         }
         return this;
@@ -252,7 +244,7 @@ export class PacketBuilder {
             case ValueType.STANDARD:
                 break;
         }
-        this.buffers.writeByte(value as any);
+        this.buffers.writeUInt8(value as any);
         return this;
     }
 
@@ -426,7 +418,7 @@ export class PacketBuilder {
      * @return the packets size.
      */
     public getSize(): number {
-        return this.buffers.readableBytes();
+        return this.buffers.length;
     }
 
     /**
@@ -434,7 +426,7 @@ export class PacketBuilder {
      *
      * @return the backing byte buffer.
      */
-    public buffer(): ByteBuf {
+    public buffer() {
         return this.buffer;
     }
 
@@ -443,8 +435,8 @@ export class PacketBuilder {
      *
      * @return
      */
-    public toPacket(): Packet {
-        return new Packet(this.opcode, this.type, this.buffer);
+    public toPacket() {
+        return new Packet(this.opcode, this.type, this.buffers);
     }
 
     public getType(): PacketType {
