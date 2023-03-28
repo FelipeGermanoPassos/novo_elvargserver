@@ -1,13 +1,13 @@
 import { World } from '../../game/World';
 import { NetworkConstants } from '../NetworkConstants';
-import * as io from 'socket.io';
+import * as socket from 'socket.io';
 import { PlayerSession } from '../PlayerSession';
 
 export class ChannelEventHandler {
-    private io: io.Server;
+    private io: socket.Server;
 
-    constructor(io: io.Server) {
-        this.io = io;
+    constructor(sckt: socket.Server) {
+        this.io = sckt;
     }
 
     public channelInactive(playerId: number) {

@@ -3,7 +3,6 @@ import { ChannelFilter } from "./ChannelFilter";
 import { ChannelEventHandler } from "./ChannelEventHandler";
 import { LoginDecoder } from "../codec/LoginDecoder";
 import { LoginEncoder } from "../codec/LoginEncoder";
-import * as websocket from "ws";
 import * as io from 'socket.io';
 import { NetworkConstants } from "../NetworkConstants";
 
@@ -17,13 +16,15 @@ export class ChannelPipelineHandler {
     */
     private readonly FILTER: ChannelFilter = new ChannelFilter();
 
+    private socketServer = new io(); // Criar um objeto socket.Server
+
 
     /**
     
     The part of the pipeline that handles exceptions caught, channels being read, inactive
     channels, and channel-triggered events.
     */
-    private readonly HANDLER: ChannelEventHandler = new ChannelEventHandler();
+    private readonly HANDLER: ChannelEventHandler = new ChannelEventHandler(this.socketServer);
     public async initChannel(channel: any): Promise<void> {
         const pipeline = channel.pipeline();
 

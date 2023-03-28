@@ -10,17 +10,16 @@ import { PacketBuilder } from './packet/PacketBuilder';
 import { PacketConstants } from './packet/PacketConstants';
 import { Misc } from '../util/Misc';
 import { NetworkConstants } from './NetworkConstants';
-import { SocketIO } from 'ws';
 import { PlayerRights } from '../game/model/rights/PlayerRights';
-import { Channel } from 'ws'
+import { Server, Socket } from 'socket.io';
 
 export class PlayerSession {
     private packetsQueue: Packet[] = [];
     private lastPacketOpcodeQueue: number[] = [];
-    private channel: SocketIO.Socket;
+    private channel: Socket;
     public player: Player;
 
-    constructor(channel: SocketIO.Socket) {
+    constructor(channel: Socket) {
         this.channel = channel;
         this.player = new Player(this);
     }
@@ -38,8 +37,12 @@ export class PlayerSession {
         }
 
         // Replace decoder/encoder to packets
-        this.channel.pipeline().replace("encoder", "encoder", new PacketEncoder(msg.getEncryptor()));
-        this.channel.pipeline().replace("decoder", "decoder", new PacketDecoder(msg.getDecryptor()));
+        this.channel.removeAllListeners("packet");
+        this.channel.on("packet", (data: any) => {
+            const packetDecoder = new PacketDecoder(msg.getDecryptor());
+            const packet = packetDecoder.decode(data, 0, data.length);
+            this.queuePacket(packet);
+        });
 
         // Queue the login
         if (!World.getAddPlayerQueue().includes(this.player)) {
@@ -82,7 +85,7 @@ export class PlayerSession {
                 console.log("processedPackets: " + this.lastPacketOpcodeQueue);
                 console.error(e);
             } finally {
-                packet.getBuffer().release();
+                packet.getBuffer();
             }
         }
     }
@@ -106,6 +109,7 @@ export class PlayerSession {
         this.channel.flush();
     }
 
+
     public getPlayer(): Player {
         return this.player;
     }
@@ -114,7 +118,7 @@ export class PlayerSession {
         this.player = player;
     }
 
-    public getChannel(): Channel {
+    public getChannel(): Socket {
         return this.channel;
     }
 }
