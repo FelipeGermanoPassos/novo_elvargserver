@@ -4,12 +4,12 @@ import { IsaacRandom } from '../security/IsaacRandom'
 import { NetworkConstants } from '../NetworkConstants'
 
 export class PacketDecoder extends ByteToMessageDecoder {
-     constructor(random: IsaacRandom) {
+    constructor(random: IsaacRandom) {
         super();
-         this.random = random;
-         this.opcode = -1;
-         this.size = -1;
-     }
+        this.random = random;
+        this.opcode = -1;
+        this.size = -1;
+    }
     private readonly random: IsaacRandom;
     private opcode: number;
     private size: number;
@@ -32,7 +32,7 @@ export class PacketDecoder extends ByteToMessageDecoder {
         0, 0, 1, 2, 0, 2,
     ]
 
-    protected decode(ctx: ChannelHandlerContext, buffer: ByteBuf, out: any[]) {
+    public decode(ctx: ChannelHandlerContext, buffer: ByteBuf, out: any[]): Packet {
         let session = ctx.channel().attr(NetworkConstants.SESSION_KEY).get();
         if (session == null || session.getPlayer() == null) {
             return;
@@ -69,7 +69,7 @@ export class PacketDecoder extends ByteToMessageDecoder {
             buffer.readBytes(data);
             this.opcode = -1;
             this.size = -1;
-            out.push(new Packet(opcode, data));
+            out.push(new Packet(opcode, Buffer.from(data)));
         }
     }
 }
