@@ -61,10 +61,10 @@ export class NPCUpdating {
             }
         }
 
-        if (update.buffer().writerIndex() > 0) {
+        if (update.getBuffer().length > 0) {
             packet.putBits(14, 16383);
             packet.initializeAccess(AccessType.BYTE);
-            packet.writeBuffer(update.buffer());
+            packet.writeBuffer(update.getBuffer().toString());
         } else {
             packet.initializeAccess(AccessType.BYTE);
         }
@@ -215,7 +215,7 @@ export class NPCUpdating {
      * @param npc     The npc to update animation for.
      * @return The NPCUpdating instance.
      */
-    
+
     private static updateAnimation(builder: PacketBuilder, npc: NPC) {
 
         builder.putShorts(npc.getAnimation().getId(), ByteOrder.LITTLE);
@@ -248,7 +248,7 @@ export class NPCUpdating {
         builder.put(npc.getPrimaryHit().getHitmask());
         builder.putShort(npc.getHitpoints());
         builder.putShort(npc.getDefinition().getHitpoints());
-      }
+    }
 
     /**
      * Updates the npc's double hit.
@@ -263,6 +263,6 @@ export class NPCUpdating {
         builder.put(npc.getSecondaryHit().getHitmask());
         builder.putShort(npc.getHitpoints());
         builder.putShort(npc.getDefinition().getHitpoints());
-      }
+    }
 }
 

@@ -23,20 +23,20 @@ export class PacketBuilder {
     private type: PacketType;
     private bitPosition: number;
     private buffers = Buffer.alloc(10);
-    
-  constructor(opcodeOrType?: number | PacketType, type?: PacketType) {
-    if (typeof opcodeOrType === 'number') {
-      this.opcode = opcodeOrType;
-      this.type = type ?? PacketType.FIXED;
-    } else {
-      this.opcode = -1;
-      this.type = PacketType.FIXED;
-    }
-  }
 
-  public writeBuffer(buffer: string): PacketBuilder {
-    this.buffers.write(buffer);
-    return this;
+    constructor(opcodeOrType?: number | PacketType, type?: PacketType) {
+        if (typeof opcodeOrType === 'number') {
+            this.opcode = opcodeOrType;
+            this.type = type ?? PacketType.FIXED;
+        } else {
+            this.opcode = -1;
+            this.type = PacketType.FIXED;
+        }
+    }
+
+    public writeBuffer(buffer: string): PacketBuilder {
+        this.buffers.write(buffer);
+        return this;
     }
 
     public writePutBytes(buffer: string): PacketBuilder {
@@ -190,7 +190,7 @@ export class PacketBuilder {
         if (!this.buffers.buffer) {
             throw new Error("The ByteBuf implementation must support array() for bit usage.");
         }
-       let buffer = this.buffers.buffer;
+        let buffer = this.buffers.buffer;
 
         let bytePos: number = this.bitPosition >> 3;
         let bitOffset: number = 8 - (this.bitPosition & 7);
@@ -428,6 +428,12 @@ export class PacketBuilder {
      */
     public buffer() {
         return this.buffer;
+    }
+
+    private _buffer: Buffer = Buffer.from('my string', 'utf-8');
+
+    public getBuffer(): Buffer {
+        return this._buffer;
     }
 
     /**

@@ -722,7 +722,7 @@ export class PacketSender {
         out.putInt(target.getRelations().getPrivateMessageId());
         out.put(target.getRights().getSpriteId());
         out.put(DonatorRights.getSpriteId(0));
-        out.writePutBytes(message, size);
+        out.writePutBytes(message.toString());
         this.player.getSession().write(out);
         return this;
     }

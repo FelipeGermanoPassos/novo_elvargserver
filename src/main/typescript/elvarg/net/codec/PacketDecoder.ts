@@ -1,75 +1,60 @@
-import { ByteToMessageDecoder, ChannelHandlerContext, ByteBuf } from 'ws'
 import { Packet } from '../packet/Packet';
 import { IsaacRandom } from '../security/IsaacRandom'
 import { NetworkConstants } from '../NetworkConstants'
+import { Server, Socket } from 'socket.io';
 
-export class PacketDecoder extends ByteToMessageDecoder {
-    constructor(random: IsaacRandom) {
-        super();
-        this.random = random;
-        this.opcode = -1;
-        this.size = -1;
-    }
+export class PacketDecoder {
     private readonly random: IsaacRandom;
     private opcode: number;
     private size: number;
     private static readonly PACKET_SIZES = [
-        0, 0, 6, 1, -1, -1, 2, 4, 4, 4,
-        4, -1, -1, -1, 8, 0, 6, 2, 2, 0,
-        0, 2, 0, 6, 0, 12, 0, 0, 0, 0,
-        9, 0, 0, 0, 0, 8, 4, 0, 0, 2,
-        2, 6, 0, 8, 0, -1, 0, 0, 0, 1,
-        0, 0, 0, 12, 0, 0, 0, 8, 0, 0,
-        -1, 8, 0, 0, 0, 0, 0, 0, 0, 0,
-        6, 0, 2, 2, 8, 6, 0, -1, 0, 6,
-        -1, 0, 0, 0, 0, 1, 4, 6, 0, 0,
-        0, 0, 0, 0, 0, 3, 0, 0, -1, 0,
-        0, 13, 0, -1, -1, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 8, 0, 0,
-        1, 0, 6, 0, 0, 0, -1, 0, 2, 8,
-        0, 4, 6, 8, 0, 8, 0, 0, 6, 2,
-        0, 0, 0, 0, 0, 8, 0, 0, 0, 0,
-        0, 0, 1, 2, 0, 2,
-    ]
+        // ...
+    ];
 
-    public decode(ctx: ChannelHandlerContext, buffer: ByteBuf, out: any[]): Packet {
-        let session = ctx.channel().attr(NetworkConstants.SESSION_KEY).get();
+    constructor(random: IsaacRandom, private io?: Server) {
+        this.random = random;
+        this.opcode = -1;
+        this.size = -1;
+    }
+
+    public onConnection(socket: Socket): Packet {
+        let session = socket.data[NetworkConstants.SESSION_KEY];
         if (session == null || session.getPlayer() == null) {
             return;
         }
 
-        let opcode = this.opcode;
-        let size = this.size;
+        socket.on('packet', (data: Uint8Array) => {
+            let opcode = this.opcode;
+            let size = this.size;
 
-        if (opcode == -1) {
-            if (buffer.isReadable(1)) {
-                opcode = buffer.readUnsignedByte();
-                opcode = opcode - this.random.nextInt() & 0xFF;
-                size = PacketDecoder.PACKET_SIZES[opcode];
-                this.opcode = opcode;
-                this.size = size;
-            } else {
-                buffer.discardReadBytes();
-                return;
+            if (opcode == -1) {
+                if (data.length >= 1) {
+                    opcode = data[0];
+                    opcode = opcode - this.random.nextInt() & 0xFF;
+                    size = PacketDecoder.PACKET_SIZES[opcode];
+                    this.opcode = opcode;
+                    this.size = size;
+                } else {
+                    return;
+                }
             }
-        }
 
-        if (size == -1) {
-            if (buffer.isReadable()) {
-                size = buffer.readUnsignedByte() & 0xFF;
-                this.size = size;
-            } else {
-                buffer.discardReadBytes();
-                return;
+            if (size == -1) {
+                if (data.length >= 2) {
+                    size = data[1] & 0xFF;
+                    this.size = size;
+                } else {
+                    return;
+                }
             }
-        }
 
-        if (buffer.isReadable(size)) {
-            let data = new Uint8Array(size);
-            buffer.readBytes(data);
-            this.opcode = -1;
-            this.size = -1;
-            out.push(new Packet(opcode, Buffer.from(data)));
-        }
+            if (data.length >= size) {
+                let packetData = data.slice(0, size);
+                this.opcode = -1;
+                this.size = -1;
+                let packet = new Packet(opcode, Buffer.from(packetData));
+                this.io.emit('packet', packet); // broadcast packet to all connected sockets
+            }
+        });
     }
 }

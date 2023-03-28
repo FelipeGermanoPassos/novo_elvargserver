@@ -1,21 +1,18 @@
 import { IsaacRandom } from "../security/IsaacRandom";
 import { Packet } from "../packet/Packet";
-import { ByteBuf, Unpooled } from "ws";
-import { MessageToByteEncoder, ChannelHandlerContext } from "ws";
 import { PacketType } from "../packet/PacketType";
 
-export class PacketEncoder extends MessageToByteEncoder<Packet> {
+export class PacketEncoder {
     private encoder: IsaacRandom;
     private CLIENT_PACKET_SIZES: number[];
 
     constructor(encoder: IsaacRandom) {
-        super();
         this.encoder = encoder;
         this.CLIENT_PACKET_SIZES = [];
     }
 
-    protected encode(ctx: ChannelHandlerContext, packet: Packet, out: ByteBuf): void {
-        const opcode = (packet.getOpcode() + this.encoder.nextInt()) & 0xFF;
+    public encode(packet: Packet): Buffer {
+        const opcode = (packet.getOpcode() + this.encoder.nextInt()) & 0xff;
         const type = packet.getType();
         const size = packet.getSize();
 
@@ -23,19 +20,19 @@ export class PacketEncoder extends MessageToByteEncoder<Packet> {
             const currSize = this.CLIENT_PACKET_SIZES[packet.getOpcode()];
             if (size !== currSize) {
                 console.error(`{PacketEncoder} Opcode ${packet.getOpcode()} has defined size ${currSize} but is actually ${size}.`);
-                return;
+                return null;
             }
         } else if (type === PacketType.VARIABLE) {
             const currSize = this.CLIENT_PACKET_SIZES[packet.getOpcode()];
             if (currSize !== -1) {
                 console.error(`{PacketEncoder} Opcode ${packet.getOpcode()}'s size needs to be -1, it's currently ${currSize}.`);
-                return;
+                return null;
             }
         } else if (type === PacketType.VARIABLE_SHORT) {
             const currSize = this.CLIENT_PACKET_SIZES[packet.getOpcode()];
             if (currSize !== -2) {
                 console.error(`{PacketEncoder} Opcode ${packet.getOpcode()}'s size needs to be -2, it's currently ${currSize}.`);
-                return;
+                return null;
             }
         }
 
@@ -57,25 +54,26 @@ export class PacketEncoder extends MessageToByteEncoder<Packet> {
                 break;
         }
 
-        const buffer = Unpooled.buffer(finalSize);
-        buffer.writeByte(opcode);
+        const buffer = Buffer.allocUnsafe(finalSize);
+        buffer.writeUInt8(opcode);
 
         switch (type) {
             case PacketType.VARIABLE:
-                buffer.writeByte(size);
+                buffer.writeUInt8(size, 1);
                 break;
             case PacketType.VARIABLE_SHORT:
-                buffer.writeShort(size);
+                buffer.writeUInt16BE(size, 1);
                 break;
             default:
                 break;
         }
-        // Write packet
-        buffer.writeBytes(packet.getBuffer());
 
-        // Write the packet to the out buffer
-        out.writeBytes(buffer);
+        // Write packet
+        buffer.set(packet.getBuffer(), finalSize - size - 1);
+
+        return buffer;
     }
+
 
     CLIENTS_PACKET_SIZES: number[] = [
         0, 0, 0, 1, 6, 0, 0, 0, 4, 4, //0

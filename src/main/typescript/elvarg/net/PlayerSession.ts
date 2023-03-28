@@ -40,7 +40,7 @@ export class PlayerSession {
         this.channel.removeAllListeners("packet");
         this.channel.on("packet", (data: any) => {
             const packetDecoder = new PacketDecoder(msg.getDecryptor());
-            const packet = packetDecoder.decode(data, 0, data.length);
+            const packet = packetDecoder.onConnection(data);
             this.queuePacket(packet);
         });
 
