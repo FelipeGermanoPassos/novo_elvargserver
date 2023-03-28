@@ -1,4 +1,4 @@
-import { WebSocketServer } from 'ws';
+import * as io from 'socket.io'
 import { ByteBufUtils } from '../ByteBufUtils';
 import { NetworkConstants } from '../NetworkConstants';
 import { LoginDecoder } from '../codec/LoginDecoder';
@@ -7,17 +7,25 @@ import { Multiset } from 'multiset';
 
 export class ChannelFilter {
     private connections = new Multiset<string>();
-    private server: WebSocketServer;
+    private server: io.Server;
 
     constructor() {
-        this.server = new WebSocketServer({ port: 8080 });
+        const options = {
+            cors: {
+                origin: "http://localhost:3000",
+                methods: ["GET", "POST"]
+            }
+        };
+
+        const io = require("socket.io")(this.server, options);
+
         this.server.on('connection', (socket) => {
             this.onConnection(socket);
         });
     }
 
     private onConnection(socket) {
-        let host = ByteBufUtils.getHost(socket._socket);
+        let host = ByteBufUtils.getHost(socket.conn.remoteAddress);
 
         // if this local then, do nothing and proceed to next handler in the pipeline.
         if (host.toLowerCase() === "127.0.0.1") {
@@ -29,7 +37,7 @@ export class ChannelFilter {
 
         // evaluate the amount of connections from this host.
         if (this.connections.count(host) > NetworkConstants.CONNECTION_LIMIT) {
-            LoginDecoder.sendLoginResponse(socket, LoginResponses.LOGIN_CONNECTION_LIMIT);
+            LoginDecoder.sendLoginResponse(LoginResponses.LOGIN_CONNECTION_LIMIT);
             return;
         }
 
