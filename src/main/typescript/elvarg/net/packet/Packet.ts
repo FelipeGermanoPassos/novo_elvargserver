@@ -1,45 +1,44 @@
-import { ByteBuf } from 'ws';
 import { PacketType } from './PacketType';
 import { ValueType } from './ValueType';
 import { StringBuilder } from 'stringbuilder'
 
 export class Packet {
-    constructor(opcode: number, buffer: ByteBuf);
-    constructor(opcode: number, type: PacketType, buffer: ByteBuf);
-    constructor(opcode: number, arg2: PacketType | ByteBuf, arg3?: ByteBuf) {
+    constructor(opcode: number, buffer: Buffer);
+    constructor(opcode: number, type: PacketType, buffer: Buffer);
+    constructor(opcode: number, arg2: PacketType | Buffer, arg3?: Buffer) {
         this.opcode = opcode;
         if (arg3 !== undefined) {
             this.type = arg2 as PacketType;
             this.buffer = arg3;
         } else {
             this.type = PacketType.FIXED;
-            this.buffer = arg2 as ByteBuf;
+            this.buffer = arg2 as Buffer;
         }
     }
 
     private opcode: number;
     public type: PacketType;
-    private buffer: ByteBuf;
+    private buffer: Buffer;
 
     public getOpcode(): number {
         return this.opcode;
     }
 
-    public getBuffer(): ByteBuf {
+    public getBuffer(): Buffer {
         return this.buffer;
     }
     public getSize(): number {
-        return this.buffer.readableBytes();
+        return this.buffer.length;
     }
 
     public getLength(): number {
-        return this.buffer.capacity();
+        return this.buffer.length;
     }
 
     public readByte(): number {
         let b: number = 0;
         try {
-            b = this.buffer.readByte();
+            b = this.buffer.readUInt8();
         } catch (e) {
         }
         return b;
@@ -94,11 +93,11 @@ export class Packet {
     }
 
     public readUnsignedByte(): number {
-        return this.buffer.readUnsignedByte();
+        return this.buffer.readUInt8();
     }
 
     public readShort(): number {
-        return this.buffer.readShort();
+        return this.buffer.readUInt8();
     }
 
     public readShortA(): number {
@@ -118,7 +117,7 @@ export class Packet {
     }
 
     public readUnsignedShort(): number {
-        return this.buffer.readUnsignedShort();
+        return this.buffer.readUInt8();
     }
 
     public readUnsignedShortA(): number {
@@ -129,7 +128,7 @@ export class Packet {
     }
 
     public readInt(): number {
-        return this.buffer.readInt();
+        return this.buffer.readUInt8();
     }
 
     public readSingleInt(): number {
@@ -147,14 +146,14 @@ export class Packet {
     }
 
     public readLong(): number {
-        return this.buffer.readLong();
+        return this.buffer.readUInt8();
     }
 
     public getBytesReverse(amount: number, type: ValueType): number[] {
         let data = new Array(amount);
         let dataPosition = 0;
-        for (let i = this.buffer.writerIndex() + amount - 1; i >= this.buffer.writerIndex(); i--) {
-            let value = this.buffer.getByte(i);
+        for (let i = this.buffer.length + amount - 1; i >= this.buffer.length; i--) {
+            let value = this.buffer.readInt8(i);
             switch (type) {
                 case ValueType.A:
                     value -= 128;
@@ -176,18 +175,18 @@ export class Packet {
     public readString(): string {
         let builder = new StringBuilder();
         let value;
-        while (this.buffer.isReadable() && (value = this.buffer.readByte()) != 10) {
+        while (this.buffer.readUInt8() && (value = this.buffer.readInt8()) != 10) {
             builder.append(String.fromCharCode(value));
         }
         return builder.toString();
     }
 
     public readSmart(): number {
-        return this.buffer.getByte(this.buffer.readerIndex()) < 128 ? this.readByte() & 0xFF : (this.readShort() & 0xFFFF) - 32768;
+        return this.buffer.readInt8(this.buffer.readInt8()) < 128 ? this.readByte() & 0xFF : (this.readShort() & 0xFFFF) - 32768;
     }
 
     public readSignedSmart(): number {
-        return this.buffer.getByte(this.buffer.readerIndex()) < 128 ? (this.readByte() & 0xFF) - 64 : (this.readShort() & 0xFFFF) - 49152;
+        return this.buffer.readInt8(this.buffer.readInt8()) < 128 ? (this.readByte() & 0xFF) - 64 : (this.readShort() & 0xFFFF) - 49152;
     }
 
     public toString(): string {
