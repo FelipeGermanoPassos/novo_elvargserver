@@ -36,6 +36,7 @@ export class World {
     private static playerBots: Map<string, PlayerBot> = new Map<string, PlayerBot>();
     private static npcs: MobileList<NPC> = new MobileList<NPC>(5000);
     private static items: ItemOnGround[] = [];
+    private static playerArray: Player[] = []
 
     /**
      * The collection of active {@link GameObject}s..
@@ -83,6 +84,9 @@ export class World {
     public addNPCQueue = new Array<NPC>();
     public removeNPCQueue = new Array<NPC>();
 
+    public static getPlayerById(id: number): Player | undefined {
+        return this.playerArray.find(player => player.id === id);
+    }
 
     public static getPlayerByName(username: string): Player | undefined {
         return this.players.search(p => p !== null && p.getUsername() === Misc.formatText(username));
@@ -306,6 +310,7 @@ export class World {
             });
         }));
     }
+
 }
 
 class NPCSyncTask implements GameSyncTaskInterface {

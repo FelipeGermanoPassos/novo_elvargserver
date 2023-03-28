@@ -226,6 +226,8 @@ export class Player extends Mobile {
     private loyaltyTitle = "empty";
     private spawnedBarrows: boolean;
     private oldPosition: Location;
+    public id: number;
+    public name: string;
 
     /**
      * Creates this player with pre defined spawn location.

@@ -1,40 +1,53 @@
-import WebSocket from 'ws';
 import { World } from '../../game/World';
+import { NetworkConstants } from '../NetworkConstants';
+import * as io from 'socket.io';
+import { PlayerSession } from '../PlayerSession';
 
 export class ChannelEventHandler {
+    private io: io.Server;
 
-    public channelInactive(ctx: ChannelHandlerContext) {
-        let session = ctx.channel().attr(NetworkConstants.SESSION_KEY).get();
+    constructor(io: io.Server) {
+        this.io = io;
+    }
 
-        if (!session || !session.getPlayer()) {
+    public channelInactive(playerId: number) {
+
+        const player = World.getPlayerById(playerId);
+
+        if (!player || !player.isRegistered() || World.getRemovePlayerQueue().includes(player)) {
             return;
         }
 
-        let player = session.getPlayer();
+        // Close all open interfaces..
+        if (player.busy()) {
+            player.getPacketSender().sendInterfaceRemoval();
+        }
 
-        if (player.isRegistered()) {
-            if (!World.getRemovePlayerQueue().includes(player)) {
-                // Close all open interfaces..
-                if (player.busy()) {
-                    player.getPacketSender().sendInterfaceRemoval();
-                }
+        // After 60 seconds, force a logout.
+        player.getForcedLogoutTimer().start(60);
 
-                // After 60 seconds, force a logout.
-                player.getForcedLogoutTimer().start(60);
+        // Add player to logout queue.
+        World.getRemovePlayerQueue().push(player);
 
-                // Add player to logout queue.
-                World.getRemovePlayerQueue().push(player);
-            }
+        // Enviar uma mensagem para o cliente usando o socket.io
+        const client = this.io.sockets.sockets.get(player.id.toString());
+        if (client) {
+            client.emit('canalInativo', { player: player.name });
         }
     }
 
-    public exceptionCaught(ctx: ChannelHandlerContext, t: Error) {
+    public exceptionCaught(playerId: number, t: Error) {
         if (!(t instanceof Error)) {
             console.log(t);
         }
 
-        try {
-            ctx.channel().close();
-        } catch (e) { }
+        const player = World.getPlayerById(playerId);
+        if (player) {
+            // Enviar uma mensagem para o cliente usando o socket.io
+            const client = this.io.sockets.sockets.get(player.id.toString());
+            if (client) {
+                client.emit('excecaoCapturada', { message: t.message });
+            }
+        }
     }
 }
