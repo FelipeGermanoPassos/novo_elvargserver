@@ -4,6 +4,7 @@ import { ChannelEventHandler } from "./ChannelEventHandler";
 import { LoginDecoder } from "../codec/LoginDecoder";
 import { LoginEncoder } from "../codec/LoginEncoder";
 import * as websocket from "ws";
+import * as io from 'socket.io';
 import { NetworkConstants } from "../NetworkConstants";
 
 /**
@@ -22,7 +23,7 @@ export class ChannelPipelineHandler {
     The part of the pipeline that handles exceptions caught, channels being read, inactive
     channels, and channel-triggered events.
     */
-    private readonly HANDLER: ChannelEventHandler = new ChannelEventHandler(websocket);
+    private readonly HANDLER: ChannelEventHandler = new ChannelEventHandler(io);
     public async initChannel(channel: any): Promise<void> {
         const pipeline = channel.pipeline();
 
