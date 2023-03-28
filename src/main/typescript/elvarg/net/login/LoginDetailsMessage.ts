@@ -1,8 +1,6 @@
-import {IsaacRandom} from '../security/IsaacRandom';
-import { ChannelHandlerContext } from 'ws'
-
+import { IsaacRandom } from '../security/IsaacRandom';
+import { Socket } from 'socket.io';
 export class LoginDetailsMessage {
-    private readonly context: ChannelHandlerContext;
     private readonly username: string;
     private readonly password: string;
     private readonly host: string;
@@ -10,17 +8,12 @@ export class LoginDetailsMessage {
     private readonly decryptor: IsaacRandom;
     private isDiscord = false;
 
-    constructor(context: ChannelHandlerContext, username: string, password: string, host: string, encryptor: IsaacRandom, decryptor: IsaacRandom) {
-        this.context = context;
+    constructor(username: string, password: string, host: string, encryptor: IsaacRandom, decryptor: IsaacRandom) {
         this.username = username;
         this.password = password;
         this.host = host;
         this.encryptor = encryptor;
         this.decryptor = decryptor;
-    }
-
-    public getContext(): ChannelHandlerContext {
-        return this.context;
     }
 
     public getUsername(): string {
