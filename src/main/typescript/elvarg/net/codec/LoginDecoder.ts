@@ -7,7 +7,6 @@ import { LoginResponses } from '../login/LoginResponses';
 import { IsaacRandom } from '../security/IsaacRandom';
 import { Misc } from '../../util/Misc';
 import { DiscordUtil } from '../../util/DiscordUtil';
-import BigInteger from 'big-integer';
 import * as Random from 'seedrandom'
 import { Server as IoServer, Socket } from 'socket.io';
 
@@ -34,7 +33,7 @@ export class LoginDecoder {
         });
     }
 
-    decode(ctx: Socket, buffer: Buffer, out: any[]) {
+    decode(buffer: Buffer, out: any[]) {
         switch (this.state) {
             case LoginDecoderState.LOGIN_REQUEST:
                 this.decodeRequest(buffer);
